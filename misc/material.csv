@@ -1,0 +1,24 @@
+id|name|point|ability|nbr_in_deck|color|pos_image|class|play_again|interaction_state|interaction_change|js_actions
+1|Spite|3|Ruin 2 random cards from a rival's Hand|2|Red|13|Spite|false|||actionSelectRivalPlayer_CheckHand
+2|Vengeance|3|Ruin a rival's exposed Deed|2|Red|14|Vengeance|false|||actionSelectRivalExposedDeed
+3|Crisis|2|The rival of your choice ruins 1 of their Deeds|3|Red|8|Crisis|false|crisis|true|actionSelectRivalPlayer
+4|Hell's Heart|2|Ruin the top 2 cards of a rival's Future Life|3|Red|10|HellsHeart|false|||actionSelectRivalPlayer
+5|Roulette|2|Ruin up to 2 cards in your Hand. You may draw up to that many cards plus 1 from the Well|3|Red|12|Roulette|false|||actionRoulette
+6|Dwindle|1|The player of your choice ruins a card from their Hand.|3|Red|9|Dwindle|false|dwindle|true|actionSelectPlayer
+7|Panic|1|Ruin the top card of any player's Deck. You may then play another card|3|Red|11|Panic|true|||actionSelectPlayerDeck
+11|Journey|3|Draw 3 cards from the Well. You may then play another card|2|Green|16|Journey|true|||
+12|Jubilee|3|Move up to 2 cards from your hand onto your Deeds|2|Green|17|Jubilee|false|||actionJubilee
+13|Longevity|2|Deal 2 cards from the Well onto any player's Deck|3|Green|18|Longevity|false|||actionSelectPlayer
+14|Salvage|2|Take 1 of the top 3 cards from the Ruins into your Hand|3|Green|20|Salvage|false|||actionSelectTopRuinsCard
+15|Sowing|2|Draw 2 cards from the Well, then place 2 cards from your Hand on your Future Life|3|Green|21|Sowing|false|sowing|false|
+16|Another Day|1|Draw a card from the Well. You may then play another card|3|Green|15|AnotherDay|true|||
+17|Recycle|1|Move 1 of the top 3 Ruins onto your Future Life|3|Green|19|Recycle|false|||actionSelectTopRuinsCard
+21|Swindle|3|Look at 3 random cards from a rival's Hand; take 1 into your Hand|2|Blue|5|Swindle|false|swindle|false|actionSelectRivalPlayer_CheckHand
+22|Thievery|3|Take a rival's exposed Deed into your Hand|2|Blue|6|Thievery|false|||actionSelectRivalExposedDeed
+23|Denial|2|Ruin a card from your Hand. Play a copy of that card's ability|3|Blue|1|Denial|false|||actionDenial
+24|Destiny|2|Look at the top 3 cards of the Well; place up to 2 on your Future Life. Replace the rest, in any order|3|Blue|2|Destiny|false|destiny|false|
+25|Stolen Dreams|2|Move the top card of a rival's Future Life onto your Future Life|3|Blue|4|StolenDreams|false|||actionSelectRivalPlayer
+26|Peek|1|Look at a rival's Hand. You may then play another card|3|Blue|3|Peek|true|peek|false|actionSelectRivalPlayer_CheckHand
+27|Transmigrate|1|Take any card from your Future Life into your Hand|3|Blue|7|Transmigrate|false|||actionTransmigrate
+31|Embody|1|Choose 1 of your Deeds. Play a copy of that Deed's ability|5|Mosaic|22|Embody|false|||actionSelectEmbody
+32|Mimic|1|Choose any rival's exposed Deed. Play a copy of that Deed's ability|2|Mosaic|23|Mimic|false|||actionSelectMimic
