@@ -1,0 +1,36 @@
+.bga-dice_die-face {
+   background-size: 300% 200%;
+}
+
+.bga-dice_die .bga-dice_die-face[data-face='1'] {
+   background-position: 0% -92%;
+}
+.bga-dice_die .bga-dice_die-face[data-face='2'] {
+   background-position: 0% 0%;
+}
+.bga-dice_die .bga-dice_die-face[data-face='3'] {
+   background-position: -100% -100%;
+}
+.bga-dice_die .bga-dice_die-face[data-face='4'] {
+   background-position: -100% 0%;
+}
+.bga-dice_die .bga-dice_die-face[data-face='5'] {
+   background-position: -200% 0%;
+}
+.bga-dice_die .bga-dice_die-face[data-face='6'] {
+   background-position: -200% -100%;
+}
+
+@each $playerColor in $playerColorNames {
+   .colored-die[data-color='#{$playerColor}'] .bga-dice_die-face {
+      background-image: url('img/dice_#{$playerColor}.jpg');
+   }
+}
+
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face='1'] {
+   transform: rotate3d(1, 1, 1, 0deg) rotate(90deg);
+}
+
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face='1'] {
+   transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
+}

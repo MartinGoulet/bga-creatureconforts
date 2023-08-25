@@ -1,0 +1,95 @@
+// $yellow: 'dcac28';
+// $green: '13586b';
+// $gray: '7e797b';
+// $red: 'b7313e';
+// $purple: '650e41';
+
+// $playerColorNames: (
+//    $yellow: 'dcac28',
+//    $green: '13586b',
+//    $gray: '7e797b',
+//    $red: 'b7313e',
+//    $purple: '650e41',
+// );
+
+$playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
+
+@import '../node_modules/bga-zoom/bga-zoom';
+@import '../node_modules/bga-cards/bga-cards';
+@import '../node_modules/bga-dice/bga-dice';
+@import 'table-center';
+@import 'player-table';
+@import 'cards-confort';
+@import 'cards-improvement';
+@import 'cards-traveler';
+@import 'cards-valley';
+@import 'dice';
+@import 'houses';
+
+#game_play_area {
+   #bga-zoom-wrapper {
+      padding-top: 50px;
+   }
+}
+
+#table {
+   display: flex;
+   justify-content: center;
+}
+
+#bga-zoom-wrapper {
+   padding: 20px 0;
+}
+
+#tables-and-center {
+   position: relative;
+   display: flex;
+   justify-content: center;
+   align-items: stretch;
+   gap: 20px;
+   flex-direction: column;
+   margin-right: 10px;
+
+   #tables {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      flex-direction: column;
+   }
+
+   &.double-column {
+      flex-direction: row;
+      justify-content: center;
+      align-items: start;
+
+      & > div {
+         flex: 1;
+      }
+      #tables {
+         flex-direction: row;
+      }
+   }
+}
+
+.bgabutton {
+   &.bgabutton_disabled {
+      background: #e5e5ef;
+      border: 1px solid #9090af;
+      box-shadow: none;
+      color: #9090af;
+      text-shadow: none;
+   }
+}
+
+.title {
+   position: absolute;
+   margin: -36px 0 0 0;
+   border: 3px solid var(--color);
+   border-radius: 5px;
+   padding: 3px 10px;
+   font-weight: 600;
+   background-color: white;
+}

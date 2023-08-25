@@ -17,6 +17,13 @@
  *
  */
 
+use CreatureConforts\Managers\Cards;
+use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Improvements;
+use CreatureConforts\Managers\Players;
+use CreatureConforts\Managers\Travelers;
+use CreatureConforts\Managers\Valleys;
+
 $swdNamespaceAutoload = function ($class) {
     $classParts = explode('\\', $class);
     if ($classParts[0] == 'CreatureConforts') {
@@ -37,13 +44,26 @@ require_once('modules/php/constants.inc.php');
 class CreatureConforts extends Table {
     use CreatureConforts\Traits\Actions;
     use CreatureConforts\Traits\Args;
+    use CreatureConforts\Traits\Debug;
     use CreatureConforts\Traits\States;
-    
+
     /** @var Deck */
-    public $cards;
+    public $improvements;
+    /** @var Deck */
+    public $conforts;
+    /** @var Deck */
+    public $travelers;
+    /** @var Deck */
+    public $valleys;
 
     /** @var array */
     public $card_types;
+    /** @var array */
+    public $improvement_types;
+    /** @var array */
+    public $traveler_types;
+    /** @var array */
+    public $valley_types;
 
     /** @var CreatureConforts */
     public static $instance = null;
@@ -68,8 +88,17 @@ class CreatureConforts extends Table {
 
         self::$instance = $this;
 
-        $this->cards = self::getNew("module.common.deck");
-        $this->cards->init("card");
+        $this->conforts = self::getNew("module.common.deck");
+        $this->conforts->init("confort");
+
+        $this->improvements = self::getNew("module.common.deck");
+        $this->improvements->init("improvement");
+
+        $this->travelers = self::getNew("module.common.deck");
+        $this->travelers->init("traveler");
+
+        $this->valleys = self::getNew("module.common.deck");
+        $this->valleys->init("valley");
     }
 
     public static function get() {
@@ -110,6 +139,10 @@ class CreatureConforts extends Table {
 
         /************ Start the game initialization *****/
 
+        Conforts::setup();
+        Improvements::setup();
+        Travelers::setup();
+        Valleys::setup();
         // Init global values with their initial values
         //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
 
@@ -145,8 +178,16 @@ class CreatureConforts extends Table {
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
+        $result['players_order'] = array_keys(Players::getPlayersInOrder($current_player_id));
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
+        $result['card_types'] = $this->card_types;
+        $result['improvement_types'] = $this->improvement_types;
+
+        $result['conforts'] = Conforts::getBoard();
+        $result['improvements'] = Improvements::getBoard();
+        $result['travelers'] = Travelers::getBoard();
+        $result['valleys'] = Valleys::getBoard();
 
         return $result;
     }

@@ -1,0 +1,16 @@
+id|name|power|timing
+1|Canada Lynx||IMMEDIATELY
+2|Leopard Frog||IMMEDIATELY
+3|Pileated Woodpecker||ALL_MONTH_LONG
+4|Gray Wolf||IMMEDIATELY
+5|Hairy-tailed Hole||ALL_MONTH_LONG
+6|Common Raven||IMMEDIATELY
+7|Striped Skunk||ALL_MONTH_LONG
+8|American Beaver||ALL_MONTH_LONG
+9|Common Loon||IMMEDIATELY
+10|Snapping Turtle||ALL_MONTH_LONG
+11|Pine Marten||ALL_MONTH_LONG
+12|Black Bear||ALL_MONTH_LONG
+13|Moose||END_OF_MONTH
+14|Blue Jay||END_OF_MONTH
+15|Wild Turkey||AFTER_ROLLING_FAMILY_DICE

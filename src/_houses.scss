@@ -1,0 +1,32 @@
+.card.house {
+   display: inline-block;
+   position: relative;
+   width: 60px;
+   height: 60px;
+
+   .card-sides {
+      .front {
+         background-image: url('img/houses.png');
+         background-size: 600px 60px;
+
+         $positions: (
+            'yellow': -600%,
+            'green': -100%,
+            'gray': -400%,
+            'red': -700%,
+            'purple': -800%,
+         );
+
+         @each $color, $pos in $positions {
+            &[data-type='#{$color}'] {
+               background-position-x: $pos;
+            }
+         }
+
+         & > * {
+            pointer-events: none;
+            user-select: none;
+         }
+      }
+   }
+}
