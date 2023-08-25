@@ -3,7 +3,7 @@ const states = {
       // playCard: "client_playCard",
    },
    server: {
-      // playerTurn: "playerTurn",
+      startHand: 'startHand',
    },
 };
 
@@ -14,16 +14,16 @@ class StateManager {
 
    constructor(private game: CreatureConforts) {
       this.states = {
-         // [states.server.playerTurn]: new ServerPlayerTurn(game),
+         [states.server.startHand]: new StartHandState(game),
       };
    }
 
    onEnteringState(stateName: string, args: any): void {
-      debug("Entering state: " + stateName);
+      debug('Entering state: ' + stateName);
 
       if (this.states[stateName] !== undefined) {
          this.states[stateName].onEnteringState(args.args);
-         if (stateName.startsWith("client_")) {
+         if (stateName.startsWith('client_')) {
             this.client_states.push(this.states[stateName]);
          } else {
             this.client_states.splice(0);
@@ -31,14 +31,14 @@ class StateManager {
       } else {
          this.client_states.splice(0);
          if (isDebug) {
-            console.warn("State not handled", stateName);
+            console.warn('State not handled', stateName);
          }
       }
-      console.log("client states", this.client_states);
+      console.log('client states', this.client_states);
    }
 
    onLeavingState(stateName: string): void {
-      debug("Leaving state: " + stateName);
+      debug('Leaving state: ' + stateName);
 
       if (this.states[stateName] !== undefined) {
          if (this.game.isCurrentPlayerActive()) {
@@ -48,9 +48,11 @@ class StateManager {
    }
 
    onUpdateActionButtons(stateName: string, args: any): void {
-      debug("onUpdateActionButtons: " + stateName);
+      debug('onUpdateActionButtons: ' + stateName);
       if (this.states[stateName] !== undefined) {
          if (this.game.isCurrentPlayerActive()) {
+            this.states[stateName].onUpdateActionButtons(args);
+         } else if ('isMultipleActivePlayer' in this.states[stateName]) {
             this.states[stateName].onUpdateActionButtons(args);
          }
       }

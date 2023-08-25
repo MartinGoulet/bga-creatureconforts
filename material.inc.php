@@ -21,7 +21,7 @@
  */
 
 
-$this->card_types = [
+$this->confort_types = [
    // --- gen php begin ---
    1 => [
       'name' => clienttranslate("Board Game"),

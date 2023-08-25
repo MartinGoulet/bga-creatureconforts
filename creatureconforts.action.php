@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -20,29 +21,40 @@
  * this.ajaxcall( "/creatureconforts/creatureconforts/myAction.html", ...)
  *
  */
-  
-  
-  class action_creatureconforts extends APP_GameAction
-  { 
-    // Constructor: please do not modify
-   	public function __default()
-  	{
-  	    if( self::isArg( 'notifwindow') )
-  	    {
-            $this->view = "common_notifwindow";
-  	        $this->viewArgs['table'] = self::getArg( "table", AT_posint, true );
-  	    }
-  	    else
-  	    {
-            $this->view = "creatureconforts_creatureconforts";
-            self::trace( "Complete reinitialization of board game" );
+
+
+class action_creatureconforts extends APP_GameAction {
+   // Constructor: please do not modify
+   public function __default() {
+      if (self::isArg('notifwindow')) {
+         $this->view = "common_notifwindow";
+         $this->viewArgs['table'] = self::getArg("table", AT_posint, true);
+      } else {
+         $this->view = "creatureconforts_creatureconforts";
+         self::trace("Complete reinitialization of board game");
       }
-  	} 
-  	
-  	// TODO: defines your action entry points there
+   }
+
+   public function cancelStartHand() {
+      self::setAjaxMode();
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->cancelStartHand();
+      self::ajaxResponse();
+   }
+
+   public function discardStartHand() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $card_id = self::getArg("card_id", AT_posint, true);
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->discardStartHand($card_id);
+      self::ajaxResponse();
+   }
+
+   // TODO: defines your action entry points there
 
 
-    /*
+   /*
     
     Example:
   	
@@ -62,7 +74,4 @@
     }
     
     */
-
-  }
-  
-
+}

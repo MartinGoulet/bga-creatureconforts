@@ -17,7 +17,7 @@
  *
  */
 
-use CreatureConforts\Managers\Cards;
+use CreatureConforts\Core\Game;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Improvements;
 use CreatureConforts\Managers\Players;
@@ -57,7 +57,7 @@ class CreatureConforts extends Table {
     public $valleys;
 
     /** @var array */
-    public $card_types;
+    public $confort_types;
     /** @var array */
     public $improvement_types;
     /** @var array */
@@ -78,6 +78,9 @@ class CreatureConforts extends Table {
         parent::__construct();
 
         self::initGameStateLabels(array(
+            VAR_FIRST_PLAYER => 10,
+
+            OPTION_SHORT_GAME => OPTION_SHORT_GAME_ID,
             //    "my_first_global_variable" => 10,
             //    "my_second_global_variable" => 11,
             //      ...
@@ -118,46 +121,12 @@ class CreatureConforts extends Table {
         the game is ready to be played.
     */
     protected function setupNewGame($players, $options = array()) {
-        // Set the colors of the players with HTML color code
-        // The default below is red/green/blue/orange/brown
-        // The number of colors defined here must correspond to the maximum number of players allowed for the gams
-        $gameinfos = self::getGameinfos();
-        $default_colors = $gameinfos['player_colors'];
-
-        // Create players
-        // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
-        $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
-        $values = array();
-        foreach ($players as $player_id => $player) {
-            $color = array_shift($default_colors);
-            $values[] = "('" . $player_id . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "')";
-        }
-        $sql .= implode(',', $values);
-        self::DbQuery($sql);
-        self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
-        self::reloadPlayersBasicInfos();
-
-        /************ Start the game initialization *****/
-
-        Conforts::setup();
-        Improvements::setup();
-        Travelers::setup();
-        Valleys::setup();
-        // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-
-        // Init game statistics
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
-
-        // TODO: setup the initial game situation here
-
-
-        // Activate first player (which is in general a good idea :) )
+        Players::setupNewGame($players, $options);
+        Conforts::setupNewGame($players, $options);
+        Improvements::setupNewGame();
+        Travelers::setupNewGame();
+        Valleys::setupNewGame($options);
         $this->activeNextPlayer();
-
-        /************ End of the game initialization *****/
     }
 
     /*
@@ -170,24 +139,36 @@ class CreatureConforts extends Table {
         _ when a player refreshes the game page (F5)
     */
     protected function getAllDatas() {
-        $result = array();
+        $result = [];
 
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score FROM player ";
+        $sql = "SELECT player_id id, player_score score, wood, stone, fruit, mushroom, yarn, grain, lesson, story, coin FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
-        $result['players_order'] = array_keys(Players::getPlayersInOrder($current_player_id));
+        $result['first_player_id'] = intval(self::getGameStateValue(VAR_FIRST_PLAYER));
+
+        // $result['players_order'] = array_keys(Players::getPlayersInOrder($current_player_id));
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-        $result['card_types'] = $this->card_types;
+        $result['card_types'] = $this->confort_types;
         $result['improvement_types'] = $this->improvement_types;
 
         $result['conforts'] = Conforts::getBoard();
         $result['improvements'] = Improvements::getBoard();
         $result['travelers'] = Travelers::getBoard();
         $result['valleys'] = Valleys::getBoard();
+
+        $result['confortsDeck'] = Conforts::getDeck();
+        $result['confortsDiscard'] = Conforts::getDiscard();
+
+
+        $result['hands'] = [];
+        $players = self::loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $result['hands'][$player_id] = Conforts::anonymize(Conforts::getHand($player_id), $player_id != $current_player_id);
+        }
 
         return $result;
     }

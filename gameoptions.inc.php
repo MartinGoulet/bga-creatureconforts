@@ -24,35 +24,21 @@
  *
  */
 
-$game_options = array(
+ require_once("modules/php/constants.inc.php");
 
-    /*
-    
-    // note: game variant ID should start at 100 (ie: 100, 101, 102, ...). The maximum is 199.
-    100 => array(
-                'name' => totranslate('my game option'),    
-                'values' => array(
-
-                            // A simple value for this option:
-                            1 => array( 'name' => totranslate('option 1') )
-
-                            // A simple value for this option.
-                            // If this value is chosen, the value of "tmdisplay" is displayed in the game lobby
-                            2 => array( 'name' => totranslate('option 2'), 'tmdisplay' => totranslate('option 2') ),
-
-                            // Another value, with other options:
-                            //  description => this text will be displayed underneath the option when this value is selected to explain what it does
-                            //  beta=true => this option is in beta version right now (there will be a warning)
-                            //  alpha=true => this option is in alpha version right now (there will be a warning, and starting the game will be allowed only in training mode except for the developer)
-                            //  nobeginner=true  =>  this option is not recommended for beginners
-                            //  firstgameonly=true  =>  this option is recommended only for the first game (discovery option)
-                            3 => array( 'name' => totranslate('option 3'), 'description' => totranslate('this option does X'), 'beta' => true, 'nobeginner' => true )
-                        ),
-                'default' => 1
-            ),
-
-    */
-
-);
-
-
+$game_options = [
+    OPTION_SHORT_GAME_ID => [
+        'name' => totranslate('Short game'),
+        'values' => [
+            OPTION_SHORT_GAME_ENABLED => [
+                'name' => totranslate('Enabled'),
+                'tmdisplay' => totranslate('Short game'),
+                'description' => totranslate('2 cards for Spring, Summer and Fall'),
+            ],
+            OPTION_SHORT_GAME_DISABLED => [
+                'name' => totranslate('Disabled'),
+                'description' => totranslate('3 cards for Spring and Summer, 2 cards for Fall'),
+            ],
+        ],
+    ],
+];

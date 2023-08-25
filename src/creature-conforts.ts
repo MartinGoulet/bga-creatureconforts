@@ -46,6 +46,7 @@ class CreatureConforts
    public stateManager: StateManager;
 
    public tableCenter: TableCenter;
+   public playersPanels: PlayerPanel[];
    public playersTables: PlayerTable[];
    public zoomManager: ZoomManager;
 
@@ -84,6 +85,7 @@ class CreatureConforts
       });
 
       // Setting up player boards
+      this.createPlayerPanels(gamedatas);
       this.createPlayerTables(gamedatas);
 
       this.zoomManager = new ZoomManager({
@@ -161,9 +163,18 @@ class CreatureConforts
       this.addActionButton(id, label, action, null, null, 'red');
    }
 
+   private createPlayerPanels(gamedatas: CreatureConfortsGamedatas) {
+      this.playersPanels = [];
+      gamedatas.playerorder.forEach((player_id) => {
+         const player = gamedatas.players[Number(player_id)];
+         const panel = new PlayerPanel(this, player);
+         this.playersPanels.push(panel);
+      });
+   }
+
    private createPlayerTables(gamedatas: CreatureConfortsGamedatas) {
       this.playersTables = [];
-      gamedatas.players_order.forEach((player_id) => {
+      gamedatas.playerorder.forEach((player_id) => {
          const player = gamedatas.players[Number(player_id)];
          const table = new PlayerTable(this, player);
          this.playersTables.push(table);

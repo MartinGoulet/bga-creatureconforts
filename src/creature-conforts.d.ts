@@ -1,5 +1,13 @@
 interface CreatureConfortsPlayerData extends BgaPlayer {
    // Add Player data
+   coin: string;
+   fruit: string;
+   grain: string;
+   lesson: string;
+   mushroom: string;
+   stone: string;
+   wood: string;
+   yarn: string;
 }
 
 type PlayerBoardObject = { [player_id: number]: PlayerBoardInfo };
@@ -8,13 +16,18 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
    improvement_types: { [card_type: number]: ImprovementType };
    card_types: { [card_type: number]: ImprovementType };
 
+   hands: { [player_id: number]: Confort[] };
+
    conforts: Confort[];
    improvements: Improvement[];
    travelers: Traveler[];
    valleys: Valley[];
 
+   confortsDeck: Confort[];
+   confortsDiscard: Confort[];
+
    player_board: PlayerBoardObject;
-   players_order: number[];
+   // players_order: number[];
 }
 
 interface PlayerBoardInfo {}
@@ -49,7 +62,7 @@ interface StateHandler {
    onEnteringState(args: any): void;
    onLeavingState(): void;
    onUpdateActionButtons(args: any): void;
-   restoreGameState(): Promise<boolean>;
+   // restoreGameState(): Promise<boolean>;
 }
 
 /**

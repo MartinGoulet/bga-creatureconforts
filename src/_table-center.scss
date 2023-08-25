@@ -1,18 +1,13 @@
 #table-center-wrapper {
    min-width: 950px;
    display: flex;
+   flex-wrap: wrap;
    justify-content: center;
    align-items: center;
 
    &.double-column {
       flex-direction: row;
    }
-}
-
-#table-center-wrapper {
-   // display: flex;
-   // justify-content: center;
-   // padding: 0 30px;
 
    #table-improvements {
       align-self: self-start;
@@ -33,6 +28,7 @@
       width: 720px;
       height: 1036px;
       border-radius: 10px;
+      margin-bottom: 170px;
 
       #table-conforts {
          position: absolute;
@@ -64,6 +60,30 @@
          @for $pos from 0 through 5 {
             &[data-position='#{$pos + 1}'] {
                transform: rotate($pos * -60deg);
+            }
+         }
+      }
+
+      #decks {
+         display: flex;
+         top: 1046px;
+         position: absolute;
+         right: 0;
+         gap: 20px;
+
+         .deck {
+            &[data-empty='true'] {
+               border: 1px solid black;
+               border-radius: 5px;
+            }
+
+            .bga-cards_deck-counter {
+               --bga-cards-deck-counter-size: 25px;
+            }
+         }
+         #discard-conforts {
+            .card:nth-child(1) {
+               z-index: 1;
             }
          }
       }

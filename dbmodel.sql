@@ -45,6 +45,14 @@ CREATE TABLE IF NOT EXISTS `valley` (
   PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `dice` (
+  `dice_id` int(12) unsigned NOT NULL AUTO_INCREMENT,
+  `dice_value` smallint(5) unsigned NOT NULL,
+  `dice_zone` varchar(16) NULL,
+  `dice_owner_id` int(10) NULL,
+  PRIMARY KEY (`dice_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 -- CORE TABLES --
 CREATE TABLE IF NOT EXISTS `global_variables` (
   `name` varchar(255) NOT NULL,
@@ -52,3 +60,13 @@ CREATE TABLE IF NOT EXISTS `global_variables` (
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+ALTER TABLE `player` 
+  ADD `wood` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `stone` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `fruit` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `grain` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `mushroom` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `yarn` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `coin` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `lesson` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `story` smallint UNSIGNED NOT NULL DEFAULT 0;

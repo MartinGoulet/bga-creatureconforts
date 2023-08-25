@@ -58,7 +58,7 @@ $basicGameStates = [
         "description" => clienttranslate("Game setup"),
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => ["" => ST_START_TURN]
+        "transitions" => ["" => ST_START_HAND]
     ],
 
     // Final state.
@@ -74,13 +74,31 @@ $basicGameStates = [
 
 $machinestates = $basicGameStates + array(
 
-    2 => [
+    ST_START_HAND => [
+        "name" => "startHand",
+        "descriptionmyturn" => clienttranslate('${you} must discard 1 card'),
+        "description" => clienttranslate('Waiting for others to choose the card to discard'),
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        'args' => 'argStartHandDiscard',
+        "possibleactions" => ["discardStartHand", "cancelStartHand"],
+        "transitions" => ["" =>  ST_START_HAND_DISCARD],
+    ],
+
+    ST_START_HAND_DISCARD => [
+        "name" => "startHandDiscard",
+        "type" => "game",
+        "action" => "stStartHandDiscard",
+        "transitions" => ["" => ST_START_TURN]
+    ],
+
+    ST_START_TURN => [
         "name" => "playerTurn",
         "description" => clienttranslate('${actplayer} must play a card or pass'),
         "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
         "type" => "activeplayer",
         "possibleactions" => array("playCard", "pass"),
         "transitions" => array("playCard" => 2, "pass" => 2)
-    ],
+    ]
 
 );

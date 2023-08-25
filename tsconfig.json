@@ -51,14 +51,19 @@
         "src/managers/notification.ts",
         "src/managers/state.ts",
 
+        "src/states/start-hand.ts",
+
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",
         "src/cards-traveler.ts",
         "src/cards-valley.ts",
         "src/houses.ts",
         
+        "src/player-panel.ts",
         "src/player-table.ts",
         "src/table-center.ts",
+
+        "src/utils.ts",
 
         "src/define.ts"
     ]

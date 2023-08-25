@@ -78,6 +78,14 @@ class Table
     }
 
     /**
+     * Get the name by id
+     */
+    static function getPlayerNameById($player_id) 
+    {
+        return "";
+    }
+
+    /**
      * Get an associative array with generic data about players (ie: not game specific data).
      * The key of the associative array is the player id. The returned table is cached, so ok to call multiple times without performance concerns.
      * The content of each value is:

@@ -18,6 +18,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import '../node_modules/bga-cards/bga-cards';
 @import '../node_modules/bga-dice/bga-dice';
 @import 'table-center';
+@import 'player-panel';
 @import 'player-table';
 @import 'cards-confort';
 @import 'cards-improvement';
@@ -92,4 +93,43 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    padding: 3px 10px;
    font-weight: 600;
    background-color: white;
+}
+
+.bga-cards_selected-card .front {
+   animation: pulseSelectable 1s infinite alternate;
+}
+
+.bga-cards_selected-card .front {
+   animation: pulseSelectable 1s infinite alternate;
+}
+
+@keyframes pulseSelectable {
+   0% {
+      box-shadow: 0 0 5px 5px #00ffff;
+   }
+
+   to {
+      box-shadow: 0 0 5px 5px #0885c3;
+   }
+}
+
+// States
+.current_player_is_active {
+   .gamestate_startHand {
+      #btn_discard {
+         display: inline-block;
+      }
+      #btn_cancel {
+         display: none;
+      }
+   }
+}
+
+.gamestate_startHand {
+   #btn_discard {
+      display: none;
+   }
+   #btn_cancel {
+      display: inline-block;
+   }
 }

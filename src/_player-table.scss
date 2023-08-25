@@ -27,17 +27,21 @@
 
    .player-table-board {
       margin: 0 auto;
-      background-size: 600px 331px;
-      width: 600px;
-      height: 331px;
+      background-size: 400px 220px;
+      width: 400px;
+      height: 220px;
       border-radius: 10px;
       position: relative;
 
       .player-table-dice {
          position: absolute;
-         left: 450px;
-         top: 10px;
+         left: 300px;
+         top: 8px;
       }
+   }
+
+   .hand-stock {
+      padding: 40px 0 20px;
    }
 
    @each $playerColor in $playerColorNames {
@@ -46,23 +50,3 @@
       }
    }
 }
-
-// [data-color='$red'] .player-table-board {
-//    background-image: url('img/board_red.jpg');
-// }
-
-// [data-color='$green'] .player-table-board {
-//    background-image: url('img/board_green.jpg');
-// }
-
-// [data-color='$purple'] .player-table-board {
-//    background-image: url('img/board_purple.jpg');
-// }
-
-// [data-color='$yellow'] .player-table-board {
-//    background-image: url('img/board_yellow.jpg');
-// }
-
-// [data-color='$gray'] .player-table-board {
-//    background-image: url('img/board_gray.jpg');
-// }

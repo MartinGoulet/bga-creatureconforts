@@ -10,7 +10,7 @@ use CreatureConforts\Core\Game;
 
 class Travelers {
 
-    static function setup() {
+    static function setupNewGame() {
         $cards = [];
         foreach (Game::get()->traveler_types as $id => $card_type) {
             $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => 1];

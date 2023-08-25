@@ -2185,6 +2185,7 @@ var CreatureConforts = (function () {
             _this.dontPreloadImage("board_".concat(color, ".jpg"));
             _this.dontPreloadImage("dice_".concat(color, ".jpg"));
         });
+        this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         this.zoomManager = new ZoomManager({
             element: document.getElementById('table'),
@@ -2237,10 +2238,19 @@ var CreatureConforts = (function () {
     CreatureConforts.prototype.addActionButtonRed = function (id, label, action) {
         this.addActionButton(id, label, action, null, null, 'red');
     };
+    CreatureConforts.prototype.createPlayerPanels = function (gamedatas) {
+        var _this = this;
+        this.playersPanels = [];
+        gamedatas.playerorder.forEach(function (player_id) {
+            var player = gamedatas.players[Number(player_id)];
+            var panel = new PlayerPanel(_this, player);
+            _this.playersPanels.push(panel);
+        });
+    };
     CreatureConforts.prototype.createPlayerTables = function (gamedatas) {
         var _this = this;
         this.playersTables = [];
-        gamedatas.players_order.forEach(function (player_id) {
+        gamedatas.playerorder.forEach(function (player_id) {
             var player = gamedatas.players[Number(player_id)];
             var table = new PlayerTable(_this, player);
             _this.playersTables.push(table);
@@ -2429,7 +2439,7 @@ var DiscardStock = (function (_super) {
 var ColoredDie6 = (function (_super) {
     __extends(ColoredDie6, _super);
     function ColoredDie6(color, size) {
-        if (size === void 0) { size = 60; }
+        if (size === void 0) { size = 40; }
         var _this = _super.call(this, { borderRadius: 12 }) || this;
         _this.color = color;
         _this.size = size;
@@ -2464,43 +2474,67 @@ var NotificationManager = (function () {
     }
     NotificationManager.prototype.setup = function () {
         var _this = this;
-        this.game.notifqueue.setIgnoreNotificationCheck("message", function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
+        var notifs = [['onDiscardStartHand', 1000]];
+        notifs.forEach(function (_a) {
+            var eventName = _a[0], duration = _a[1];
+            dojo.subscribe(eventName, _this, function (notifDetails) {
+                debug("notif_".concat(eventName), notifDetails.args);
+                var promise = _this["notif_".concat(eventName)](notifDetails.args);
+                promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.notifqueue.onSynchronousNotificationEnd(); });
+            });
+            _this.game.notifqueue.setSynchronous(eventName, duration);
+        });
+        if (isDebug) {
+            notifs.forEach(function (notif) {
+                if (!_this["notif_".concat(notif[0])]) {
+                    console.warn("notif_".concat(notif[0], " function is not declared, but listed in setupNotifications"));
+                }
+            });
+            Object.getOwnPropertyNames(CreatureConforts.prototype)
+                .filter(function (item) { return item.startsWith('notif_'); })
+                .map(function (item) { return item.slice(6); })
+                .forEach(function (item) {
+                if (!notifs.some(function (notif) { return notif[0] == item; })) {
+                    console.warn("notif_".concat(item, " function is declared, but not listed in setupNotifications"));
+                }
+            });
+        }
+        this.game.notifqueue.setIgnoreNotificationCheck('message', function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
     };
-    NotificationManager.prototype.subscribeEvent = function (eventName, time, setIgnore) {
-        var _this = this;
-        if (setIgnore === void 0) { setIgnore = false; }
-        try {
-            dojo.subscribe(eventName, this, "notif_" + eventName);
-            if (time) {
-                this.game.notifqueue.setSynchronous(eventName, time);
-            }
-            if (setIgnore) {
-                this.game.notifqueue.setIgnoreNotificationCheck(eventName, function (notif) {
-                    return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id;
-                });
-            }
-        }
-        catch (_a) {
-            console.error("NotificationManager::subscribeEvent", eventName);
-        }
+    NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.game.tableCenter.discardConfort.addCard(args.card)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
     };
     return NotificationManager;
 }());
 var states = {
     client: {},
-    server: {},
+    server: {
+        startHand: 'startHand',
+    },
 };
 var StateManager = (function () {
     function StateManager(game) {
+        var _a;
         this.game = game;
         this.client_states = [];
-        this.states = {};
+        this.states = (_a = {},
+            _a[states.server.startHand] = new StartHandState(game),
+            _a);
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
-        debug("Entering state: " + stateName);
+        debug('Entering state: ' + stateName);
         if (this.states[stateName] !== undefined) {
             this.states[stateName].onEnteringState(args.args);
-            if (stateName.startsWith("client_")) {
+            if (stateName.startsWith('client_')) {
                 this.client_states.push(this.states[stateName]);
             }
             else {
@@ -2510,13 +2544,13 @@ var StateManager = (function () {
         else {
             this.client_states.splice(0);
             if (isDebug) {
-                console.warn("State not handled", stateName);
+                console.warn('State not handled', stateName);
             }
         }
-        console.log("client states", this.client_states);
+        console.log('client states', this.client_states);
     };
     StateManager.prototype.onLeavingState = function (stateName) {
-        debug("Leaving state: " + stateName);
+        debug('Leaving state: ' + stateName);
         if (this.states[stateName] !== undefined) {
             if (this.game.isCurrentPlayerActive()) {
                 this.states[stateName].onLeavingState();
@@ -2524,9 +2558,12 @@ var StateManager = (function () {
         }
     };
     StateManager.prototype.onUpdateActionButtons = function (stateName, args) {
-        debug("onUpdateActionButtons: " + stateName);
+        debug('onUpdateActionButtons: ' + stateName);
         if (this.states[stateName] !== undefined) {
             if (this.game.isCurrentPlayerActive()) {
+                this.states[stateName].onUpdateActionButtons(args);
+            }
+            else if ('isMultipleActivePlayer' in this.states[stateName]) {
                 this.states[stateName].onUpdateActionButtons(args);
             }
         }
@@ -2559,6 +2596,58 @@ var StateManager = (function () {
     };
     return StateManager;
 }());
+var StartHandState = (function () {
+    function StartHandState(game) {
+        this.game = game;
+        this.isMultipleActivePlayer = true;
+    }
+    StartHandState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var _a, _b;
+        var hand = this.game.getCurrentPlayerTable().hand;
+        this.game.confortManager.markAsSelected((_b = (_a = args._private) === null || _a === void 0 ? void 0 : _a.card_id) !== null && _b !== void 0 ? _b : 0);
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var handleSelection = function (selection) {
+            _this.game.toggleButtonEnable('btn_discard', selection.length == 1);
+        };
+        hand.setSelectionMode('single');
+        hand.onSelectionChange = handleSelection;
+    };
+    StartHandState.prototype.onLeavingState = function () {
+        var hand = this.game.getCurrentPlayerTable().hand;
+        hand.setSelectionMode('none');
+        hand.onSelectionChange = null;
+    };
+    StartHandState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleDiscardComplete = function () {
+            var hand = _this.game.getCurrentPlayerTable().hand;
+            var selection = hand.getSelection();
+            hand.setSelectionMode('none');
+            hand.onSelectionChange = null;
+            if (selection.length == 1) {
+                _this.game.confortManager.markAsSelected(Number(selection[0].id));
+            }
+        };
+        var handleDiscard = function () {
+            var selection = _this.game.getCurrentPlayerTable().hand.getSelection();
+            if (selection.length !== 1)
+                return;
+            _this.game.takeAction('discardStartHand', { card_id: selection[0].id }, handleDiscardComplete);
+        };
+        var handleCancel = function () {
+            _this.game.takeAction('cancelStartHand', {}, null, function () {
+                _this.game.restoreGameState();
+            });
+        };
+        if (!this.game.isSpectator) {
+            this.game.addActionButtonDisabled('btn_discard', 'Discard', handleDiscard);
+            this.game.addActionButtonGray('btn_cancel', 'Cancel', handleCancel);
+        }
+    };
+    return StartHandState;
+}());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
     function ConfortManager(game) {
@@ -2575,13 +2664,18 @@ var ConfortManager = (function (_super) {
                 if (card.type_arg) {
                 }
             },
-            isCardVisible: function () { return true; },
+            isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 110,
             cardHeight: 154,
         }) || this;
         _this.game = game;
         return _this;
     }
+    ConfortManager.prototype.markAsSelected = function (card_id) {
+        if (card_id > 0) {
+            this.getCardElement({ id: card_id.toString() }).classList.add('bga-cards_selected-card');
+        }
+    };
     return ConfortManager;
 }(CardManager));
 var ImprovementManager = (function (_super) {
@@ -2679,32 +2773,45 @@ var HouseManager = (function (_super) {
     }
     return HouseManager;
 }(CardManager));
-var diceId = 1;
-function getDiceId() {
-    return diceId++;
-}
-var PlayerTable = (function () {
-    function PlayerTable(game, player) {
+var PlayerPanel = (function () {
+    function PlayerPanel(game, player) {
         var _this = this;
         this.game = game;
+        this.counters = {};
+        var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
+        var templateIcon = "<div class=\"wrapper\">\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n         <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\">1</span>\n      </div>");
+        var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n      </div>");
+        document.getElementById("player_board_".concat(player.id)).insertAdjacentHTML('beforeend', html);
+        icons.forEach(function (icon) {
+            var counter = new ebg.counter();
+            counter.create("player-panel-".concat(player.id, "-icons-").concat(icon, "-counter"));
+            counter.setValue(Number(player[icon]));
+            _this.counters[icon] = counter;
+        });
+    }
+    return PlayerPanel;
+}());
+var PlayerTable = (function () {
+    function PlayerTable(game, player) {
+        this.game = game;
         this.player_id = Number(player.id);
-        this.current_player = this.player_id == this.game.getPlayerId();
-        var colors = {
-            dcac28: 'yellow',
-            '13586b': 'green',
-            '7e797b': 'gray',
-            b7313e: 'red',
-            '650e41': 'purple',
-        };
-        this.player_color = colors[player.color];
+        this.player_color = getColorName(player.color);
+        this.setupBoard(game, player);
+        this.setupDice(game);
+        this.setupHand(game);
+    }
+    PlayerTable.prototype.setupBoard = function (game, player) {
         var dataset = ["data-color=\"".concat(player.color, "\"")].join(' ');
-        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table whiteblock player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n               <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n            </div>\n         </div>");
+        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table whiteblock player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n               <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n            </div>\n            <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n         </div>");
         document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+    };
+    PlayerTable.prototype.setupDice = function (game) {
+        var _this = this;
         this.dice = new SlotDiceStock(game.diceManager, document.getElementById("player-table-".concat(this.player_id, "-dice")), {
             slotsIds: [1, 2],
             slotClasses: [this.player_color],
             mapDieToSlot: function (die) { return die.location_arg; },
-            gap: '16px',
+            gap: '10px',
         });
         this.dice.onDieClick = function (die) {
             var dice = _this.dice.getDice();
@@ -2714,11 +2821,16 @@ var PlayerTable = (function () {
                 duration: [500, 900],
             });
         };
-        this.dice.addDice([
-            { id: getDiceId(), type: this.player_color, face: 2, location: this.player_id, location_arg: 1 },
-            { id: getDiceId(), type: this.player_color, face: 5, location: this.player_id, location_arg: 2 },
-        ]);
-    }
+    };
+    PlayerTable.prototype.setupHand = function (game) {
+        this.hand = new HandStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-hand")), {
+            cardOverlap: '10px',
+            cardShift: '5px',
+            inclination: 6,
+            sort: sortFunction('id'),
+        });
+        this.hand.addCards(game.gamedatas.hands[this.player_id]);
+    };
     return PlayerTable;
 }());
 var TableCenter = (function () {
@@ -2728,6 +2840,8 @@ var TableCenter = (function () {
         this.setupImprovements(game);
         this.setupTravelers(game);
         this.setupValleys(game);
+        this.setupConfortsDiscard(game);
+        this.setupConfortsDeck(game);
     }
     TableCenter.prototype.setupConforts = function (game) {
         this.conforts = new SlotStock(game.confortManager, document.getElementById("table-conforts"), {
@@ -2756,11 +2870,28 @@ var TableCenter = (function () {
             mapCardToSlot: function (card) { return card.location; },
             gap: '30px',
         });
-        debugger;
         this.valley.addCards(game.gamedatas.valleys);
+    };
+    TableCenter.prototype.setupConfortsDeck = function (game) {
+        this.deckConfort = new VisibleDeck(game.confortManager, document.getElementById("deck-conforts"));
+        this.deckConfort.addCards(game.gamedatas.confortsDeck);
+    };
+    TableCenter.prototype.setupConfortsDiscard = function (game) {
+        this.discardConfort = new HiddenDeck(game.confortManager, document.getElementById("discard-conforts"));
+        this.discardConfort.addCards(game.gamedatas.confortsDiscard);
     };
     return TableCenter;
 }());
+var colors = {
+    dcac28: 'yellow',
+    '13586b': 'green',
+    '7e797b': 'gray',
+    b7313e: 'red',
+    '650e41': 'purple',
+};
+function getColorName(code) {
+    return colors[code];
+}
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
     return declare("bgagame.creatureconforts", [ebg.core.gamegui], new CreatureConforts());
 });

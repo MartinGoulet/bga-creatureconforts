@@ -1,0 +1,59 @@
+.resource-icon {
+   height: 35px;
+   background-image: url('img/icons.png');
+   background-size: auto 35px;
+
+   &[data-type='wood'] {
+      width: 25px;
+      background-position-x: -25px;
+   }
+   &[data-type='stone'] {
+      width: 31px;
+      background-position-x: -173px;
+   }
+   &[data-type='fruit'] {
+      width: 25px;
+      background-position-x: -54px;
+   }
+   &[data-type='mushroom'] {
+      width: 27px;
+      background-position-x: -82px;
+   }
+   &[data-type='yarn'] {
+      width: 28px;
+      background-position-x: -111px;
+   }
+   &[data-type='grain'] {
+      width: 23px;
+   }
+   &[data-type='lesson'] {
+      height: 29px;
+      width: 29px;
+      background-position: -207px -3px;
+      border-radius: 50%;
+   }
+   &[data-type='coin'] {
+      height: 28px;
+      width: 30px;
+      background-position-x: -141px;
+   }
+   &[data-type='story'] {
+      height: 28px;
+      width: 37px;
+      background-position-x: -400px;
+      background-position-y: -5px;
+      background-size: auto 50px;
+   }
+}
+
+.icons.counters {
+   display: flex;
+   gap: 6px;
+   flex-wrap: wrap;
+
+   .wrapper {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+   }
+}

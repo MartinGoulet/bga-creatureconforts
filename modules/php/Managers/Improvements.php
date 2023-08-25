@@ -9,7 +9,7 @@ use CreatureConforts\Core\Game;
  */
 class Improvements {
 
-    static function setup() {
+    static function setupNewGame() {
         $cards = [];
         foreach (range(1, 17) as $id) {
             $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => 1];

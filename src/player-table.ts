@@ -1,29 +1,20 @@
-let diceId = 1;
-function getDiceId() {
-   return diceId++;
-}
-
 class PlayerTable {
    public player_id: number;
    public player_color: string;
-   private current_player: boolean;
 
    public dice: SlotDiceStock;
+   public hand: HandStock<Confort>;
 
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
       this.player_id = Number(player.id);
-      this.current_player = this.player_id == this.game.getPlayerId();
+      this.player_color = getColorName(player.color);
 
-      const colors = {
-         dcac28: 'yellow',
-         '13586b': 'green',
-         '7e797b': 'gray',
-         b7313e: 'red',
-         '650e41': 'purple',
-      };
+      this.setupBoard(game, player);
+      this.setupDice(game);
+      this.setupHand(game);
+   }
 
-      this.player_color = colors[player.color];
-
+   private setupBoard(game: CreatureConforts, player: CreatureConfortsPlayerData) {
       const dataset: string = [`data-color="${player.color}"`].join(' ');
 
       const html = `
@@ -32,10 +23,13 @@ class PlayerTable {
             <div id="player-table-${this.player_id}-board" class="player-table-board">
                <div id="player-table-${this.player_id}-dice" class="player-table-dice"></div>
             </div>
+            <div id="player-table-${this.player_id}-hand"></div>
          </div>`;
 
       document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+   }
 
+   private setupDice(game: CreatureConforts) {
       this.dice = new SlotDiceStock(
          game.diceManager,
          document.getElementById(`player-table-${this.player_id}-dice`),
@@ -43,7 +37,7 @@ class PlayerTable {
             slotsIds: [1, 2],
             slotClasses: [this.player_color],
             mapDieToSlot: (die) => die.location_arg,
-            gap: '16px',
+            gap: '10px',
          },
       );
 
@@ -55,10 +49,20 @@ class PlayerTable {
             duration: [500, 900],
          });
       };
+   }
 
-      this.dice.addDice([
-         { id: getDiceId(), type: this.player_color, face: 2, location: this.player_id, location_arg: 1 },
-         { id: getDiceId(), type: this.player_color, face: 5, location: this.player_id, location_arg: 2 },
-      ]);
+   private setupHand(game: CreatureConforts) {
+      this.hand = new HandStock<Confort>(
+         game.confortManager,
+         document.getElementById(`player-table-${this.player_id}-hand`),
+         {
+            cardOverlap: '10px',
+            cardShift: '5px',
+            inclination: 6,
+            sort: sortFunction('id'),
+         },
+      );
+
+      this.hand.addCards(game.gamedatas.hands[this.player_id]);
    }
 }

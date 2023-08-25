@@ -1,5 +1,5 @@
 class ColoredDie6 extends BgaDie6 {
-   constructor(private color: string, private size: number = 60) {
+   constructor(private color: string, private size: number = 40) {
       super({ borderRadius: 12 });
    }
 

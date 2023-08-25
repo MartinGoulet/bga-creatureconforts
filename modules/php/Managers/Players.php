@@ -10,6 +10,63 @@ use CreatureConforts\Core\Game;
 
 class Players extends \APP_DbObject {
 
+    public static function setupNewGame($players, $options) {
+        $gameinfos = Game::get()->getGameinfos();
+        $default_colors = $gameinfos['player_colors'];
+
+        // Create players
+        // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
+        $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
+        $values = [];
+
+        $firstPlayer = null;
+        foreach( $players as $player_id => $player ) {
+            if ($firstPlayer === null) {
+                $firstPlayer = $player_id;
+            }
+            $color = array_shift($default_colors);
+            $values[] = "('" . $player_id . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "')";
+        }
+        $sql .= implode(',', $values);
+        self::DbQuery($sql);
+        Game::get()->reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
+        Game::get()->reloadPlayersBasicInfos();
+
+        Game::get()->setGameStateInitialValue(VAR_FIRST_PLAYER, $firstPlayer);
+
+        $isShortGame = $options[OPTION_SHORT_GAME_ID] == OPTION_SHORT_GAME_ENABLED;
+
+        $player_ids = array_keys($players);
+        switch (sizeof($player_ids)) {
+            case 3:
+                if ($isShortGame) {
+                    // Player 3 get 1 coin
+                    self::addCoin(1, $player_ids[2]);
+                }
+                break;
+            case 4:
+                if ($isShortGame == false) {
+                    // Player 3 get 1 coin
+                    self::addCoin(1, $player_ids[2]);
+                    // Player 4 get 1 coin
+                    self::addCoin(1, $player_ids[3]);
+                }
+                break;
+            case 5:
+                if ($isShortGame == false) {
+                    // Player 2 get 1 coin
+                    self::addCoin(1, $player_ids[1]);
+                    // Player 3 get 1 coin
+                    self::addCoin(1, $player_ids[2]);
+                }
+                // Player 4 get 1 coin
+                self::addCoin(1, $player_ids[3]);
+                // Player 5 get 1 coin
+                self::addCoin(1, $player_ids[4]);
+                break;
+        }
+    }
+
     static function getPlayerId() {
         return intval(Game::get()->getActivePlayerId());
     }
@@ -35,5 +92,16 @@ class Players extends \APP_DbObject {
         }
 
         return $result;
+    }
+
+    /**
+     * Ressources
+     */
+
+    static function addCoin(int $count, int $player_id = null) {
+        if ($player_id == null) {
+            $player_id = self::getPlayerId();
+        }
+        self::DbQuery("UPDATE player SET coin = coin + $count WHERE player_id = '$player_id'");
     }
 }

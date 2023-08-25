@@ -2,7 +2,34 @@
 
 namespace CreatureConforts\Core;
 
+use CreatureConforts\Managers\Conforts;
+
 class Notifications extends \APP_DbObject {
+
+    static function discardStartHand(array $cards_before) {
+        $message = clienttranslate('${player_name} discards ${card_name}');
+
+        $cards = array_values(array_map(function ($card) {
+            $newCard = Conforts::get($card['id']);
+            $newCard['player_id'] = $card['location_arg'];
+            return $newCard;
+        }, $cards_before));
+
+        usort($cards, function($a, $b) {
+            return $a['location_arg'] > $b['location_arg'];
+        });
+
+        foreach ($cards as $card) {
+            $player_id = intval($card['player_id']);
+            self::notifyAll('onDiscardStartHand', $message, [
+                'player_id' => $player_id,
+                'player_name' => self::getPlayerName($player_id),
+                'card' => $card,
+                'card_name' => Conforts::getName($card),
+                'i18n' => ['card_name'],
+            ]);
+        }
+    }
 
     /*************************
      **** GENERIC METHODS ****
@@ -25,6 +52,10 @@ class Notifications extends \APP_DbObject {
 
     protected static function messageTo($player_id, $msg, $args = []) {
         self::notify($player_id, 'message', $msg, $args);
+    }
+
+    protected static function getPlayerName(int $player_id) {
+        return Game::get()->getPlayerNameById($player_id);
     }
 
     /////////////////////////////////

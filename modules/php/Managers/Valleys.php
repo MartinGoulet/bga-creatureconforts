@@ -10,7 +10,7 @@ use CreatureConforts\Core\Game;
 
 class Valleys {
 
-    static function setup() {
+    static function setupNewGame($options = []) {
         $forest = [];
         $meadow = [];
         foreach (Game::get()->valley_types as $id => $card_type) {
@@ -24,6 +24,8 @@ class Valleys {
         self::deck()->createCards($forest, FOREST . "temp");
         self::deck()->createCards($meadow, MEADOW . "temp");
 
+        $isShortGame = ($options[OPTION_SHORT_GAME] ?? 1) == OPTION_SHORT_GAME_ENABLED;
+
         foreach ([FOREST, MEADOW] as $region) {
             foreach ([FALL, SUMMER, SPRING] as $season) {
                 $cards = self::deck()->getCardsOfTypeInLocation($season, null, $region . "temp");
@@ -31,7 +33,7 @@ class Valleys {
                     return $card['id'];
                 }, $cards);
                 shuffle($cards_id);
-                $cards_id = array_slice($cards_id, 0, 3);
+                $cards_id = array_slice($cards_id, 0, $isShortGame || $region == FALL ? 2 : 3);
                 foreach ($cards_id as $card_id) {
                     self::deck()->insertCardOnExtremePosition($card_id, $region, true);
                 }

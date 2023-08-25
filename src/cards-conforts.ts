@@ -14,9 +14,15 @@ class ConfortManager extends CardManager<Confort> {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
          },
-         isCardVisible: () => true,
+         isCardVisible: (card) => 'type' in card,
          cardWidth: 110,
          cardHeight: 154,
       });
+   }
+
+   markAsSelected(card_id: number) {
+      if (card_id > 0) {
+         this.getCardElement({ id: card_id.toString() } as Confort).classList.add('bga-cards_selected-card');
+      }
    }
 }

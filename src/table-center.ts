@@ -4,11 +4,16 @@ class TableCenter {
    public travelers: Deck<Traveler>;
    public valley: SlotStock<Improvement>;
 
+   public discardConfort: HiddenDeck<Confort>;
+   public deckConfort: VisibleDeck<Confort>;
+
    constructor(private game: CreatureConforts) {
       this.setupConforts(game);
       this.setupImprovements(game);
       this.setupTravelers(game);
       this.setupValleys(game);
+      this.setupConfortsDiscard(game);
+      this.setupConfortsDeck(game);
    }
 
    private setupConforts(game: CreatureConforts) {
@@ -50,7 +55,22 @@ class TableCenter {
          mapCardToSlot: (card) => card.location,
          gap: '30px',
       });
-      debugger;
       this.valley.addCards(game.gamedatas.valleys);
+   }
+
+   private setupConfortsDeck(game: CreatureConforts) {
+      this.deckConfort = new VisibleDeck<Confort>(
+         game.confortManager,
+         document.getElementById(`deck-conforts`),
+      );
+      this.deckConfort.addCards(game.gamedatas.confortsDeck);
+   }
+
+   private setupConfortsDiscard(game: CreatureConforts) {
+      this.discardConfort = new HiddenDeck<Confort>(
+         game.confortManager,
+         document.getElementById(`discard-conforts`),
+      );
+      this.discardConfort.addCards(game.gamedatas.confortsDiscard);
    }
 }
