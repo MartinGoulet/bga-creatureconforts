@@ -4,6 +4,8 @@ const states = {
    },
    server: {
       startHand: 'startHand',
+      newTraveler: 'newTraveler',
+      familyDice: 'familyDice',
    },
 };
 
@@ -15,6 +17,8 @@ class StateManager {
    constructor(private game: CreatureConforts) {
       this.states = {
          [states.server.startHand]: new StartHandState(game),
+         // [states.server.newTraveler]: new NewTravelerState(game),
+         // [states.server.familyDice]: new FamilyDiceState(game),
       };
    }
 

@@ -41,20 +41,26 @@ class Valleys {
         }
     }
 
-    static function getBoard() {
+    static function getUIData() {
         return [
-            self::deck()->getCardOnTop(FOREST),
-            self::deck()->getCardOnTop(MEADOW),
+            FOREST => [
+                'topCard' => self::deck()->getCardOnTop(FOREST),
+                'count' => self::deck()->countCardInLocation(FOREST),
+            ],
+            MEADOW => [
+                'topCard' => self::deck()->getCardOnTop(MEADOW),
+                'count' => self::deck()->countCardInLocation(MEADOW),
+            ],
         ];
     }
 
-    // static function getBoardForest() {
+    // static function getUIDataForest() {
     //     return [self::deck()->getCardOnTop(FOREST)];
     //     // $cards = self::deck()->getCardsInLocation(FOREST, null, 'location_arg');
     //     // return array_values($cards);
     // }
 
-    // static function getBoardMeadow() {
+    // static function getUIDataMeadow() {
     //     return [self::deck()->getCardOnTop(MEADOW)];
     //     // $cards = self::deck()->getCardsInLocation(MEADOW, null, 'location_arg');
     //     // return array_values($cards);

@@ -294,69 +294,85 @@ $this->traveler_types = [
 
 $this->valley_types = [
    // --- gen php begin valleys --- 
-   1 => [
-      'season' => SPRING,
-      'type' => FOREST,
-   ],
-   2 => [
-      'season' => SPRING,
-      'type' => FOREST,
-   ],
-   3 => [
-      'season' => SPRING,
-      'type' => FOREST,
-   ],
-   4 => [
-      'season' => SUMMER,
-      'type' => FOREST,
-   ],
-   5 => [
-      'season' => SUMMER,
-      'type' => FOREST,
-   ],
-   6 => [
-      'season' => SUMMER,
-      'type' => FOREST,
-   ],
-   7 => [
-      'season' => FALL,
-      'type' => FOREST,
-   ],
-   8 => [
-      'season' => FALL,
-      'type' => FOREST,
-   ],
-   11 => [
-      'season' => SPRING,
-      'type' => MEADOW,
-   ],
-   12 => [
-      'season' => SPRING,
-      'type' => MEADOW,
-   ],
-   13 => [
-      'season' => SPRING,
-      'type' => MEADOW,
-   ],
-   14 => [
-      'season' => SUMMER,
-      'type' => MEADOW,
-   ],
-   15 => [
-      'season' => SUMMER,
-      'type' => MEADOW,
-   ],
-   16 => [
-      'season' => SUMMER,
-      'type' => MEADOW,
-   ],
-   17 => [
-      'season' => FALL,
-      'type' => MEADOW,
-   ],
-   18 => [
-      'season' => FALL,
-      'type' => MEADOW,
-   ],
+ 1 => [ 
+  'season' => SPRING,
+  'type' => FOREST,
+  'image_pos' => 3,
+],
+ 2 => [ 
+  'season' => SPRING,
+  'type' => FOREST,
+  'image_pos' => 4,
+],
+ 3 => [ 
+  'season' => SPRING,
+  'type' => FOREST,
+  'image_pos' => 5,
+],
+ 4 => [ 
+  'season' => SUMMER,
+  'type' => FOREST,
+  'image_pos' => 6,
+],
+ 5 => [ 
+  'season' => SUMMER,
+  'type' => FOREST,
+  'image_pos' => 7,
+],
+ 6 => [ 
+  'season' => SUMMER,
+  'type' => FOREST,
+  'image_pos' => 8,
+],
+ 7 => [ 
+  'season' => FALL,
+  'type' => FOREST,
+  'image_pos' => 1,
+],
+ 8 => [ 
+  'season' => FALL,
+  'type' => FOREST,
+  'image_pos' => 2,
+],
+ 11 => [ 
+  'season' => SPRING,
+  'type' => MEADOW,
+  'image_pos' => 3,
+],
+ 12 => [ 
+  'season' => SPRING,
+  'type' => MEADOW,
+  'image_pos' => 4,
+],
+ 13 => [ 
+  'season' => SPRING,
+  'type' => MEADOW,
+  'image_pos' => 5,
+],
+ 14 => [ 
+  'season' => SUMMER,
+  'type' => MEADOW,
+  'image_pos' => 6,
+],
+ 15 => [ 
+  'season' => SUMMER,
+  'type' => MEADOW,
+  'image_pos' => 7,
+],
+ 16 => [ 
+  'season' => SUMMER,
+  'type' => MEADOW,
+  'image_pos' => 8,
+],
+ 17 => [ 
+  'season' => FALL,
+  'type' => MEADOW,
+  'image_pos' => 1,
+],
+ 18 => [ 
+  'season' => FALL,
+  'type' => MEADOW,
+  'image_pos' => 2,
+],
    // --- gen php end valleys --- 
 ];

@@ -1,4 +1,4 @@
-class TravelerManager extends CardManager<Traveler> {
+class TravelerManager extends CardManager<TravelerCard> {
    constructor(public game: CreatureConforts) {
       super(game, {
          getId: (card) => `traveler-${card.id}`,
@@ -13,7 +13,7 @@ class TravelerManager extends CardManager<Traveler> {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
          },
-         isCardVisible: () => true,
+         isCardVisible: (card) => 'type' in card,
          cardWidth: 212,
          cardHeight: 142,
       });

@@ -2,7 +2,10 @@
 
 namespace CreatureConforts\Traits;
 
+use CreatureConforts\Core\Game;
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Dice;
+use CreatureConforts\Managers\Travelers;
 
 trait Actions {
 

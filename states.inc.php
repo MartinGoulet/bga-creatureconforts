@@ -89,16 +89,40 @@ $machinestates = $basicGameStates + array(
         "name" => "startHandDiscard",
         "type" => "game",
         "action" => "stStartHandDiscard",
+        "transitions" => ["" => ST_NEW_TRAVELER]
+    ],
+
+    ST_NEW_TRAVELER => [
+        "name" => "newTraveler",
+        "type" => "game",
+        "action" => "stNewTraveler",
+        "transitions" => ["" => ST_FAMILY_DICE]
+    ],
+
+    ST_FAMILY_DICE => [
+        "name" => "familyDice",
+        "type" => "game",
+        "action" => "stFamilyDice",
+        "transitions" => ["" => ST_PLACEMENT]
+    ],
+
+    ST_PLACEMENT => [
+        "name" => "placement",
+        "descriptionmyturn" => clienttranslate('${you} must place your workers'),
+        "description" => clienttranslate('Waiting for others to place their workers'),
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        "possibleactions" => ["confirmPlacement", "cancelPlacement"],
         "transitions" => ["" => ST_START_TURN]
     ],
 
-    ST_START_TURN => [
-        "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-        "type" => "activeplayer",
-        "possibleactions" => array("playCard", "pass"),
-        "transitions" => array("playCard" => 2, "pass" => 2)
-    ]
+    // ST_START_TURN => [
+    //     "name" => "playerTurn",
+    //     "description" => clienttranslate('${actplayer} must play a card or pass'),
+    //     "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+    //     "type" => "activeplayer",
+    //     "possibleactions" => array("playCard", "pass"),
+    //     "transitions" => array("playCard" => 2, "pass" => 2)
+    // ]
 
 );

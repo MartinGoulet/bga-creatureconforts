@@ -2,7 +2,11 @@ class NotificationManager {
    constructor(private game: CreatureConforts) {}
 
    setup() {
-      const notifs: [string, number][] = [['onDiscardStartHand', 1000]];
+      const notifs: [string, number][] = [
+         ['onDiscardStartHand', 1000],
+         ['onNewTraveler', 1000],
+         ['onFamilyDice', 1000],
+      ];
 
       notifs.forEach(([eventName, duration]) => {
          dojo.subscribe(eventName, this, (notifDetails: INotification<any>) => {
@@ -11,7 +15,7 @@ class NotificationManager {
             const promise = this[`notif_${eventName}`](notifDetails.args);
 
             // tell the UI notification ends, if the function returned a promise
-            promise?.then(() => (this as any).notifqueue.onSynchronousNotificationEnd());
+            promise?.then(() => this.game.notifqueue.onSynchronousNotificationEnd());
          });
          this.game.notifqueue.setSynchronous(eventName, duration);
       });
@@ -58,11 +62,39 @@ class NotificationManager {
    // }
 
    private async notif_onDiscardStartHand(args: DiscardStartHandArgs) {
-      await this.game.tableCenter.discardConfort.addCard(args.card);
+      await this.game.tableCenter.confort_discard.addCard(args.card);
+   }
+
+   private notif_onNewTraveler(args: NewTravelerArgs) {
+      const { card, count } = args;
+      const { traveler_deck: deck, hidden_traveler } = this.game.tableCenter;
+      if (count < 15) {
+         deck.removeCard(deck.getTopCard());
+      }
+      deck.setCardNumber(count, { id: card.id } as TravelerCard);
+      setTimeout(() => {
+         deck.flipCard(card);
+      }, 500);
+   }
+
+   private notif_onFamilyDice(args: FamilyDiceArgs) {
+      this.game.gamedatas.playerorder.forEach((player_id) => {
+         const dice = args.dice.filter((die) => die.owner_id == player_id.toString());
+      });
+      this.game.getPlayerTable(Number(die.owner_id)).dice.addDice;
    }
 }
 
 interface DiscardStartHandArgs {
    player_id: number;
-   card: Confort;
+   card: ConfortCard;
+}
+
+interface NewTravelerArgs {
+   card: TravelerCard;
+   count: number;
+}
+
+interface FamilyDiceArgs {
+   dice: Dice[];
 }

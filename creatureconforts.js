@@ -2178,6 +2178,8 @@ var CreatureConforts = (function () {
         this.travelerManager = new TravelerManager(this);
         this.valleyManager = new ValleyManager(this);
         this.diceManager = new MyDiceManager(this);
+        this.cottageManager = new CottageManager(this);
+        this.workerManager = new WorkerManager(this);
         this.notifManager = new NotificationManager(this);
         this.stateManager = new StateManager(this);
         this.tableCenter = new TableCenter(this);
@@ -2463,6 +2465,11 @@ var MyDiceManager = (function (_super) {
                 purple: new ColoredDie6('purple'),
                 red: new ColoredDie6('red'),
                 yellow: new ColoredDie6('yellow'),
+                '7e797b': new ColoredDie6('gray'),
+                '13586b': new ColoredDie6('green'),
+                '650e41': new ColoredDie6('purple'),
+                b7313e: new ColoredDie6('red'),
+                dcac28: new ColoredDie6('yellow'),
             },
         }) || this;
     }
@@ -2474,13 +2481,17 @@ var NotificationManager = (function () {
     }
     NotificationManager.prototype.setup = function () {
         var _this = this;
-        var notifs = [['onDiscardStartHand', 1000]];
+        var notifs = [
+            ['onDiscardStartHand', 1000],
+            ['onNewTraveler', 1000],
+            ['onFamilyDice', 1000],
+        ];
         notifs.forEach(function (_a) {
             var eventName = _a[0], duration = _a[1];
             dojo.subscribe(eventName, _this, function (notifDetails) {
                 debug("notif_".concat(eventName), notifDetails.args);
                 var promise = _this["notif_".concat(eventName)](notifDetails.args);
-                promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.notifqueue.onSynchronousNotificationEnd(); });
+                promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.game.notifqueue.onSynchronousNotificationEnd(); });
             });
             _this.game.notifqueue.setSynchronous(eventName, duration);
         });
@@ -2505,7 +2516,7 @@ var NotificationManager = (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4, this.game.tableCenter.discardConfort.addCard(args.card)];
+                    case 0: return [4, this.game.tableCenter.confort_discard.addCard(args.card)];
                     case 1:
                         _a.sent();
                         return [2];
@@ -2513,12 +2524,31 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_onNewTraveler = function (args) {
+        var card = args.card, count = args.count;
+        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
+        if (count < 15) {
+            deck.removeCard(deck.getTopCard());
+        }
+        deck.setCardNumber(count, { id: card.id });
+        setTimeout(function () {
+            deck.flipCard(card);
+        }, 500);
+    };
+    NotificationManager.prototype.notif_onFamilyDice = function (args) {
+        this.game.gamedatas.playerorder.forEach(function (player_id) {
+            var dice = args.dice.filter(function (die) { return die.owner_id == player_id.toString(); });
+        });
+        this.game.getPlayerTable(Number(die.owner_id)).dice.addDice;
+    };
     return NotificationManager;
 }());
 var states = {
     client: {},
     server: {
         startHand: 'startHand',
+        newTraveler: 'newTraveler',
+        familyDice: 'familyDice',
     },
 };
 var StateManager = (function () {
@@ -2595,6 +2625,33 @@ var StateManager = (function () {
         });
     };
     return StateManager;
+}());
+var FamilyDiceState = (function () {
+    function FamilyDiceState(game) {
+        this.game = game;
+    }
+    FamilyDiceState.prototype.onEnteringState = function (args) {
+        var topCard = args.topCard, count = args.count;
+        var _a = this.game.tableCenter, deck = _a.traveler_deck, card = _a.hidden_traveler;
+        if (count < 15) {
+            deck.removeCard(deck.getTopCard());
+            deck.setCardNumber(count, { id: topCard.id });
+        }
+        deck.flipCard(topCard, { updateData: true, updateFront: true });
+    };
+    FamilyDiceState.prototype.onLeavingState = function () { };
+    FamilyDiceState.prototype.onUpdateActionButtons = function (args) { };
+    return FamilyDiceState;
+}());
+var NewTravelerState = (function () {
+    function NewTravelerState(game) {
+        this.game = game;
+    }
+    NewTravelerState.prototype.onEnteringState = function (args) {
+    };
+    NewTravelerState.prototype.onLeavingState = function () { };
+    NewTravelerState.prototype.onUpdateActionButtons = function (args) { };
+    return NewTravelerState;
 }());
 var StartHandState = (function () {
     function StartHandState(game) {
@@ -2717,7 +2774,7 @@ var TravelerManager = (function (_super) {
                 if (card.type_arg) {
                 }
             },
-            isCardVisible: function () { return true; },
+            isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 212,
             cardHeight: 142,
         }) || this;
@@ -2738,7 +2795,7 @@ var ValleyManager = (function (_super) {
             },
             setupFrontDiv: function (card, div) {
                 div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
+                div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
                 if (card.type_arg) {
                 }
             },
@@ -2751,18 +2808,19 @@ var ValleyManager = (function (_super) {
     }
     return ValleyManager;
 }(CardManager));
-var HouseManager = (function (_super) {
-    __extends(HouseManager, _super);
-    function HouseManager(game) {
+var CottageManager = (function (_super) {
+    __extends(CottageManager, _super);
+    function CottageManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "house-".concat(card.player_id, "-").concat(card.token_id); },
+            getId: function (card) { return "cottage-".concat(card.player_id, "-").concat(card.token_id); },
             setupDiv: function (card, div) {
-                div.classList.add('house');
+                div.classList.add('cottage');
                 div.classList.add();
                 div.dataset.cardId = '' + card.token_id;
             },
             setupFrontDiv: function (card, div) {
-                div.dataset.type = game.getPlayerTable(card.player_id).player_color;
+                var color = getColorName(game.gamedatas.players[card.player_id].color);
+                div.dataset.type = color;
             },
             isCardVisible: function () { return true; },
             cardWidth: 60,
@@ -2771,7 +2829,32 @@ var HouseManager = (function (_super) {
         _this.game = game;
         return _this;
     }
-    return HouseManager;
+    return CottageManager;
+}(CardManager));
+var WorkerManager = (function (_super) {
+    __extends(WorkerManager, _super);
+    function WorkerManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "worker-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('worker');
+                div.classList.add();
+                div.dataset.cardId = '' + card.id;
+                var color = getColorName(card.type);
+                div.dataset.type = color;
+            },
+            setupFrontDiv: function (card, div) {
+                var color = getColorName(card.type);
+                div.dataset.type = color;
+            },
+            isCardVisible: function () { return true; },
+            cardWidth: 50,
+            cardHeight: 50,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    return WorkerManager;
 }(CardManager));
 var PlayerPanel = (function () {
     function PlayerPanel(game, player) {
@@ -2799,28 +2882,33 @@ var PlayerTable = (function () {
         this.setupBoard(game, player);
         this.setupDice(game);
         this.setupHand(game);
+        this.setupCottage(game, player);
+        this.setupWorker(game, player);
     }
     PlayerTable.prototype.setupBoard = function (game, player) {
         var dataset = ["data-color=\"".concat(player.color, "\"")].join(' ');
-        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table whiteblock player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n               <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n            </div>\n            <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n         </div>");
+        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table whiteblock player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n               <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n               <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n               <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n            </div>\n            <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n         </div>");
         document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+    };
+    PlayerTable.prototype.setupCottage = function (game, player) {
+        this.cottages = new LineStock(game.cottageManager, document.getElementById("player-table-".concat(this.player_id, "-cottage")), {
+            direction: 'column',
+            gap: '2px',
+        });
+        this.cottages.addCards([
+            { token_id: 1, player_id: Number(player.id), location: 0 },
+            { token_id: 2, player_id: Number(player.id), location: 0 },
+            { token_id: 3, player_id: Number(player.id), location: 0 },
+            { token_id: 4, player_id: Number(player.id), location: 0 },
+        ]);
     };
     PlayerTable.prototype.setupDice = function (game) {
         var _this = this;
-        this.dice = new SlotDiceStock(game.diceManager, document.getElementById("player-table-".concat(this.player_id, "-dice")), {
-            slotsIds: [1, 2],
-            slotClasses: [this.player_color],
-            mapDieToSlot: function (die) { return die.location_arg; },
+        this.dice = new LineDiceStock(game.diceManager, document.getElementById("player-table-".concat(this.player_id, "-dice")), {
             gap: '10px',
         });
-        this.dice.onDieClick = function (die) {
-            var dice = _this.dice.getDice();
-            dice.forEach(function (die) { return (die.value = Math.floor(Math.random() * 6) + 1); });
-            _this.dice.rollDice(dice, {
-                effect: 'rollIn',
-                duration: [500, 900],
-            });
-        };
+        var dice = game.gamedatas.dice.filter(function (die) { return die.owner_id == _this.player_id.toString() && die.location == null; });
+        this.dice.addDice(dice);
     };
     PlayerTable.prototype.setupHand = function (game) {
         this.hand = new HandStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-hand")), {
@@ -2831,54 +2919,68 @@ var PlayerTable = (function () {
         });
         this.hand.addCards(game.gamedatas.hands[this.player_id]);
     };
+    PlayerTable.prototype.setupWorker = function (game, player) {
+        var workers = game.gamedatas.workers.player.filter(function (w) { return w.type_arg == player.id; });
+        this.workers = new LineStock(game.workerManager, document.getElementById("player-table-".concat(this.player_id, "-worker")), { gap: '0' });
+        this.workers.addCards(workers);
+    };
     return PlayerTable;
 }());
 var TableCenter = (function () {
     function TableCenter(game) {
         this.game = game;
-        this.setupConforts(game);
-        this.setupImprovements(game);
-        this.setupTravelers(game);
-        this.setupValleys(game);
-        this.setupConfortsDiscard(game);
-        this.setupConfortsDeck(game);
+        this.hidden_confort = { id: '1000' };
+        this.hidden_traveler = { id: '1001' };
+        this.setupConfortCards(game);
+        this.setupImprovementCards(game);
+        this.setupTravelerCards(game);
+        this.setupValleyCards(game);
     }
-    TableCenter.prototype.setupConforts = function (game) {
-        this.conforts = new SlotStock(game.confortManager, document.getElementById("table-conforts"), {
+    TableCenter.prototype.setupConfortCards = function (game) {
+        var _a = game.gamedatas.conforts, market = _a.market, discard = _a.discard, deckCount = _a.deckCount;
+        this.confort_market = new SlotStock(game.confortManager, document.getElementById("table-conforts"), {
             slotsIds: [1, 2, 3, 4],
             mapCardToSlot: function (card) { return Number(card.location_arg); },
             gap: '12px',
         });
-        this.conforts.addCards(game.gamedatas.conforts);
+        this.confort_deck = new Deck(game.confortManager, document.getElementById("deck-conforts"), {
+            cardNumber: deckCount,
+            topCard: this.hidden_confort,
+            counter: {},
+        });
+        this.confort_discard = new Deck(game.confortManager, document.getElementById("discard-conforts"), {
+            cardNumber: discard.count,
+            topCard: discard.topCard,
+            counter: {},
+        });
+        this.confort_market.addCards(market);
     };
-    TableCenter.prototype.setupImprovements = function (game) {
-        this.improvements = new SlotStock(game.improvementManager, document.getElementById("table-improvements"), {
+    TableCenter.prototype.setupImprovementCards = function (game) {
+        var market = game.gamedatas.improvements.market;
+        this.improvement_market = new SlotStock(game.improvementManager, document.getElementById("table-improvements"), {
             slotsIds: [6, 5, 4, 3, 2, 1],
             mapCardToSlot: function (card) { return Number(card.location_arg); },
             direction: 'column',
             gap: '7px',
         });
-        this.improvements.addCards(game.gamedatas.improvements);
+        this.improvement_market.addCards(market);
     };
-    TableCenter.prototype.setupTravelers = function (game) {
-        this.travelers = new Deck(game.travelerManager, document.getElementById("table-travelers"), {});
-        this.travelers.addCards(game.gamedatas.travelers);
+    TableCenter.prototype.setupTravelerCards = function (game) {
+        var _a = game.gamedatas.travelers, count = _a.count, topCard = _a.topCard;
+        this.traveler_deck = new Deck(game.travelerManager, document.getElementById("table-travelers"), {
+            cardNumber: count,
+            topCard: topCard !== null && topCard !== void 0 ? topCard : this.hidden_traveler,
+            counter: {},
+        });
     };
-    TableCenter.prototype.setupValleys = function (game) {
+    TableCenter.prototype.setupValleyCards = function (game) {
+        var _a = game.gamedatas.valleys, forest = _a.forest, meadow = _a.meadow;
         this.valley = new SlotStock(game.valleyManager, document.getElementById("table-valleys"), {
             slotsIds: ['forest', 'meadow'],
             mapCardToSlot: function (card) { return card.location; },
             gap: '30px',
         });
-        this.valley.addCards(game.gamedatas.valleys);
-    };
-    TableCenter.prototype.setupConfortsDeck = function (game) {
-        this.deckConfort = new VisibleDeck(game.confortManager, document.getElementById("deck-conforts"));
-        this.deckConfort.addCards(game.gamedatas.confortsDeck);
-    };
-    TableCenter.prototype.setupConfortsDiscard = function (game) {
-        this.discardConfort = new HiddenDeck(game.confortManager, document.getElementById("discard-conforts"));
-        this.discardConfort.addCards(game.gamedatas.confortsDiscard);
+        this.valley.addCards([forest.topCard, meadow.topCard]);
     };
     return TableCenter;
 }());

@@ -45,11 +45,21 @@ CREATE TABLE IF NOT EXISTS `valley` (
   PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `worker` (
+  `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `card_type` varchar(16) NOT NULL,
+  `card_type_arg` int(11) NOT NULL,
+  `card_location` varchar(16) NOT NULL,
+  `card_location_arg` int(11) NOT NULL,
+  PRIMARY KEY (`card_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 CREATE TABLE IF NOT EXISTS `dice` (
-  `dice_id` int(12) unsigned NOT NULL AUTO_INCREMENT,
-  `dice_value` smallint(5) unsigned NOT NULL,
-  `dice_zone` varchar(16) NULL,
-  `dice_owner_id` int(10) NULL,
+  `dice_id` TINYINT unsigned NOT NULL AUTO_INCREMENT,
+  `dice_owner_id` int(11) NULL,
+  `dice_color` varchar(10) NOT NULL,
+  `dice_value` TINYINT unsigned NOT NULL,
+  `dice_location` TINYINT NULL,
   PRIMARY KEY (`dice_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 

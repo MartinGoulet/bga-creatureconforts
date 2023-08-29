@@ -1,5 +1,5 @@
 class ColoredDie6 extends BgaDie6 {
-   constructor(private color: string, private size: number = 40) {
+   constructor(private color: string, public size: number = 40) {
       super({ borderRadius: 12 });
    }
 
@@ -21,6 +21,12 @@ class MyDiceManager extends DiceManager {
             purple: new ColoredDie6('purple'),
             red: new ColoredDie6('red'),
             yellow: new ColoredDie6('yellow'),
+
+            '7e797b': new ColoredDie6('gray'),
+            '13586b': new ColoredDie6('green'),
+            '650e41': new ColoredDie6('purple'),
+            b7313e: new ColoredDie6('red'),
+            dcac28: new ColoredDie6('yellow'),
          },
       });
    }

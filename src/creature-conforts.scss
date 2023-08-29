@@ -1,8 +1,8 @@
-// $yellow: 'dcac28';
-// $green: '13586b';
-// $gray: '7e797b';
-// $red: 'b7313e';
-// $purple: '650e41';
+$yellow: 'dcac28';
+$green: '13586b';
+$gray: '7e797b';
+$red: 'b7313e';
+$purple: '650e41';
 
 // $playerColorNames: (
 //    $yellow: 'dcac28',
@@ -25,7 +25,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'cards-traveler';
 @import 'cards-valley';
 @import 'dice';
-@import 'houses';
+@import 'cottages';
+@import 'workers';
 
 #game_play_area {
    #bga-zoom-wrapper {
@@ -66,9 +67,9 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       justify-content: center;
       align-items: start;
 
-      & > div {
-         flex: 1;
-      }
+      // & > div {
+      //    flex: 1;
+      // }
       #tables {
          flex-direction: row;
       }

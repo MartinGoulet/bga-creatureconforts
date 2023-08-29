@@ -1,4 +1,4 @@
-class ValleyManager extends CardManager<Valley> {
+class ValleyManager extends CardManager<ValleyCard> {
    constructor(public game: CreatureConforts) {
       super(game, {
          getId: (card) => `valley-${card.id}`,
@@ -9,7 +9,8 @@ class ValleyManager extends CardManager<Valley> {
          },
          setupFrontDiv: (card: Card, div: HTMLElement) => {
             div.dataset.type = card.type;
-            div.dataset.pos = card.type_arg;
+            // div.dataset.pos = '' + (Number(card.type_arg) % 10);
+            div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }

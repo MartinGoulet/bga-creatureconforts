@@ -23,9 +23,10 @@ class Improvements {
         }
     }
 
-    static function getBoard() {
-        $cards = self::deck()->getCardsInLocation('slot', null, 'location_arg');
-        return array_values($cards);
+    static function getUIData() {
+        return [
+            'market' => array_values(self::deck()->getCardsInLocation('slot', null, 'location_arg')),
+        ];
     }
 
     private static function deck() {

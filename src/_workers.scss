@@ -1,0 +1,49 @@
+.card.worker {
+   display: inline-block;
+   position: relative;
+   height: 50px;
+
+   &[data-type='yellow'],
+   &[data-type='green'],
+   &[data-type='red'] {
+      width: 40px;
+   }
+   &[data-type='purple'] {
+      width: 46px;
+   }
+   &[data-type='gray'] {
+      width: 50px;
+   }
+   .card-sides {
+      .front {
+         background-image: url('img/workers.png');
+         background-size: 50px 250px;
+         box-shadow: none;
+
+         &[data-type='purple'] {
+            background-position: 0 -2%;
+            background-size: 55px 275px;
+            background-repeat: no-repeat;
+         }
+         &[data-type='gray'] {
+            background-position: 0 -105%;
+         }
+         &[data-type='green'] {
+            background-position: 0 -205%;
+         }
+         &[data-type='yellow'] {
+            background-position: 0 -307%;
+            background-size: 48px 242px;
+         }
+         &[data-type='red'] {
+            background-position: 0 -409%;
+            background-size: 46px 234px;
+         }
+
+         & > * {
+            pointer-events: none;
+            user-select: none;
+         }
+      }
+   }
+}

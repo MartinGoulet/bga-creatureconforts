@@ -1,4 +1,4 @@
-class ConfortManager extends CardManager<Confort> {
+class ConfortManager extends CardManager<ConfortCard> {
    constructor(public game: CreatureConforts) {
       super(game, {
          getId: (card) => `conforts-${card.id}`,
@@ -22,7 +22,9 @@ class ConfortManager extends CardManager<Confort> {
 
    markAsSelected(card_id: number) {
       if (card_id > 0) {
-         this.getCardElement({ id: card_id.toString() } as Confort).classList.add('bga-cards_selected-card');
+         this.getCardElement({ id: card_id.toString() } as ConfortCard).classList.add(
+            'bga-cards_selected-card',
+         );
       }
    }
 }

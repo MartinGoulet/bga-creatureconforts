@@ -1,33 +1,62 @@
 class TableCenter {
-   public conforts: SlotStock<Card>;
-   public improvements: SlotStock<Improvement>;
-   public travelers: Deck<Traveler>;
-   public valley: SlotStock<Improvement>;
+   public hidden_confort: ConfortCard = { id: '1000' } as ConfortCard;
+   public hidden_traveler: TravelerCard = { id: '1001' } as TravelerCard;
 
-   public discardConfort: HiddenDeck<Confort>;
-   public deckConfort: VisibleDeck<Confort>;
+   public confort_market: SlotStock<ConfortCard>;
+   public confort_discard: Deck<ConfortCard>;
+   public confort_deck: Deck<ConfortCard>;
+
+   public improvement_market: SlotStock<ImprovementCard>;
+
+   public traveler_deck: Deck<TravelerCard>;
+   public valley: SlotStock<ImprovementCard>;
 
    constructor(private game: CreatureConforts) {
-      this.setupConforts(game);
-      this.setupImprovements(game);
-      this.setupTravelers(game);
-      this.setupValleys(game);
-      this.setupConfortsDiscard(game);
-      this.setupConfortsDeck(game);
+      this.setupConfortCards(game);
+      this.setupImprovementCards(game);
+      this.setupTravelerCards(game);
+      this.setupValleyCards(game);
    }
 
-   private setupConforts(game: CreatureConforts) {
-      this.conforts = new SlotStock<Confort>(game.confortManager, document.getElementById(`table-conforts`), {
-         slotsIds: [1, 2, 3, 4],
-         mapCardToSlot: (card) => Number(card.location_arg),
-         gap: '12px',
-      });
+   private setupConfortCards(game: CreatureConforts) {
+      const { market, discard, deckCount } = game.gamedatas.conforts;
 
-      this.conforts.addCards(game.gamedatas.conforts);
+      this.confort_market = new SlotStock<ConfortCard>(
+         game.confortManager,
+         document.getElementById(`table-conforts`),
+         {
+            slotsIds: [1, 2, 3, 4],
+            mapCardToSlot: (card) => Number(card.location_arg),
+            gap: '12px',
+         },
+      );
+
+      this.confort_deck = new Deck<ConfortCard>(
+         game.confortManager,
+         document.getElementById(`deck-conforts`),
+         {
+            cardNumber: deckCount,
+            topCard: this.hidden_confort,
+            counter: {},
+         },
+      );
+
+      this.confort_discard = new Deck<ConfortCard>(
+         game.confortManager,
+         document.getElementById(`discard-conforts`),
+         {
+            cardNumber: discard.count,
+            topCard: discard.topCard,
+            counter: {},
+         },
+      );
+
+      this.confort_market.addCards(market);
    }
 
-   private setupImprovements(game: CreatureConforts) {
-      this.improvements = new SlotStock<Improvement>(
+   private setupImprovementCards(game: CreatureConforts) {
+      const { market } = game.gamedatas.improvements;
+      this.improvement_market = new SlotStock<ImprovementCard>(
          game.improvementManager,
          document.getElementById(`table-improvements`),
          {
@@ -37,40 +66,31 @@ class TableCenter {
             gap: '7px',
          },
       );
-      this.improvements.addCards(game.gamedatas.improvements);
+      this.improvement_market.addCards(market);
    }
 
-   private setupTravelers(game: CreatureConforts) {
-      this.travelers = new Deck<Traveler>(
+   private setupTravelerCards(game: CreatureConforts) {
+      const { count, topCard } = game.gamedatas.travelers;
+      this.traveler_deck = new Deck<TravelerCard>(
          game.travelerManager,
          document.getElementById(`table-travelers`),
-         {},
+         {
+            cardNumber: count,
+            topCard: topCard ?? this.hidden_traveler,
+            counter: {},
+         },
       );
-      this.travelers.addCards(game.gamedatas.travelers);
    }
 
-   private setupValleys(game: CreatureConforts) {
-      this.valley = new SlotStock<Valley>(game.valleyManager, document.getElementById(`table-valleys`), {
+   private setupValleyCards(game: CreatureConforts) {
+      const { forest, meadow } = game.gamedatas.valleys;
+
+      this.valley = new SlotStock<ValleyCard>(game.valleyManager, document.getElementById(`table-valleys`), {
          slotsIds: ['forest', 'meadow'],
          mapCardToSlot: (card) => card.location,
          gap: '30px',
       });
-      this.valley.addCards(game.gamedatas.valleys);
-   }
 
-   private setupConfortsDeck(game: CreatureConforts) {
-      this.deckConfort = new VisibleDeck<Confort>(
-         game.confortManager,
-         document.getElementById(`deck-conforts`),
-      );
-      this.deckConfort.addCards(game.gamedatas.confortsDeck);
-   }
-
-   private setupConfortsDiscard(game: CreatureConforts) {
-      this.discardConfort = new HiddenDeck<Confort>(
-         game.confortManager,
-         document.getElementById(`discard-conforts`),
-      );
-      this.discardConfort.addCards(game.gamedatas.confortsDiscard);
+      this.valley.addCards([forest.topCard, meadow.topCard]);
    }
 }

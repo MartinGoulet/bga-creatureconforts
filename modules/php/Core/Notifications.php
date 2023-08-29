@@ -3,6 +3,7 @@
 namespace CreatureConforts\Core;
 
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
 
@@ -15,7 +16,7 @@ class Notifications extends \APP_DbObject {
             return $newCard;
         }, $cards_before));
 
-        usort($cards, function($a, $b) {
+        usort($cards, function ($a, $b) {
             return $a['location_arg'] > $b['location_arg'];
         });
 
@@ -29,6 +30,24 @@ class Notifications extends \APP_DbObject {
                 'i18n' => ['card_name'],
             ]);
         }
+    }
+
+    static function familyDice($dice) {
+        self::notifyAll('onFamilyDice', '', [
+            'dice' => $dice,
+        ]);
+    }
+
+    static function newTraveler() {
+        $message = clienttranslate('${card_name} is revealed as the new traveler');
+        $info = Travelers::getUIData();
+
+        self::notifyAll('onNewTraveler', $message, [
+            'card' => $info['topCard'],
+            'count' => $info['count'],
+            'card_name' => Travelers::getName($info['topCard']),
+            'i18n' => ['card_name'],
+        ]);
     }
 
     /*************************

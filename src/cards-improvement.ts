@@ -1,4 +1,4 @@
-class ImprovementManager extends CardManager<Improvement> {
+class ImprovementManager extends CardManager<ImprovementCard> {
    constructor(public game: CreatureConforts) {
       super(game, {
          getId: (card) => `improvement-${card.id}`,

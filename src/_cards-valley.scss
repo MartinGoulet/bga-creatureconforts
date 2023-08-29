@@ -1,43 +1,67 @@
 .card.valley {
-    display: inline-block;
-    position: relative;
-    width: 310px;
-    height: 156px;
-    border-radius: 5px;
+   display: inline-block;
+   position: relative;
+   width: 310px;
+   height: 156px;
+   border-radius: 5px;
 
-    &.forest {
-        .front {
-           background-image: url('img/forest.jpg');
-        }
-     }
-     &.meadow {
-        .front {
-           background-image: url('img/meadow.jpg');
-        }
-     }
- 
-    .card-sides {
-       .front {
-          background-size: 1240px 312px;
- 
-          outline: 1px solid #000;
-          border-radius: 5px;
-          box-shadow: 0 0 5px 6px #fff;
-          filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
- 
-          @for $row from 0 through 2 {
-             @for $col from 0 through 4 {
-                &[data-type='#{(($row * 5) + $col + 1)}'] {
-                   background-position: ($col * -100%) ($row * -100%);
-                }
-             }
-          }
- 
-          & > * {
-             pointer-events: none;
-             user-select: none;
-          }
-       }
-    }
- }
- 
+   &.forest {
+      .front {
+         background-image: url('img/forest.jpg');
+      }
+   }
+   &.meadow {
+      .front {
+         background-image: url('img/meadow.jpg');
+      }
+   }
+
+   .card-sides {
+      .front {
+         background-size: 1240px 312px;
+
+         &[data-type='fall'][data-image_pos='1'] {
+            background-position: -0% -0%;
+         }
+         &[data-type='fall'][data-image_pos='2'] {
+            background-position: -100% -0%;
+         }
+         &[data-type='spring'][data-image_pos='3'] {
+            background-position: -200% -0%;
+         }
+         &[data-type='spring'][data-image_pos='4'] {
+            background-position: -300% -0%;
+         }
+         &[data-type='spring'][data-image_pos='5'] {
+            background-position: -0% -100%;
+         }
+         &[data-type='summer'][data-image_pos='6'] {
+            background-position: -100% -100%;
+         }
+         &[data-type='summer'][data-image_pos='7'] {
+            background-position: -100% -100%;
+         }
+         &[data-type='summer'][data-image_pos='8'] {
+            background-position: -100% -100%;
+         }
+
+         outline: 1px solid #000;
+         border-radius: 5px;
+         box-shadow: 0 0 5px 6px #fff;
+         filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+
+         @for $row from 0 through 2 {
+            @for $col from 0 through 4 {
+               &[data-type='#{(($row * 5) + $col + 1)}'] {
+                  background-position: ($col * -100%) ($row * -100%);
+               }
+            }
+         }
+
+         & > * {
+            pointer-events: none;
+            user-select: none;
+         }
+      }
+   }
+}

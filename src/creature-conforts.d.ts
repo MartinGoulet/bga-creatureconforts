@@ -14,30 +14,59 @@ type PlayerBoardObject = { [player_id: number]: PlayerBoardInfo };
 
 interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerData> {
    improvement_types: { [card_type: number]: ImprovementType };
-   card_types: { [card_type: number]: ImprovementType };
+   card_types: { [card_type: number]: ConfortType };
+   valley_types: { [card_type: number]: ValleyType };
 
-   hands: { [player_id: number]: Confort[] };
+   hands: { [player_id: number]: ConfortCard[] };
 
-   conforts: Confort[];
-   improvements: Improvement[];
-   travelers: Traveler[];
-   valleys: Valley[];
-
-   confortsDeck: Confort[];
-   confortsDiscard: Confort[];
+   dice: Dice[];
+   conforts: ConfortUIData;
+   improvements: ImprovementUIData;
+   travelers: TravelerUIData;
+   valleys: ValleyUIData;
+   workers: WorkerUIData;
 
    player_board: PlayerBoardObject;
-   // players_order: number[];
+}
+
+type TopCardCount<T> = {
+   topCard: T;
+   count: number;
+};
+
+interface ConfortUIData {
+   discard: {
+      topCard?: ConfortCard;
+      count: number;
+   };
+   deckCount: number;
+   market: ConfortCard[];
+}
+interface ImprovementUIData {
+   market: ImprovementCard[];
+}
+interface TravelerUIData {
+   topCard?: TravelerCard;
+   count: number;
+}
+interface ValleyUIData {
+   forest: TopCardCount<ValleyCard>;
+   meadow: TopCardCount<ValleyCard>;
+}
+interface WorkerUIData {
+   player: Meeple[];
+   board: Meeple[];
+   improuvement: Meeple[];
 }
 
 interface PlayerBoardInfo {}
 
-interface Confort extends Card {}
-interface Improvement extends Card {}
-interface Traveler extends Card {}
-interface Valley extends Card {}
+interface ConfortCard extends Card {}
+interface ImprovementCard extends Card {}
+interface TravelerCard extends Card {}
+interface ValleyCard extends Card {}
 
-interface HouseToken {
+interface Cottage {
    player_id: number;
    token_id: number;
    location: number;
@@ -50,11 +79,25 @@ interface ImprovementType {
    power: string;
 }
 
-interface CardType {
+interface ConfortType {
    name: string;
    type?: 'outdoor' | 'food' | 'clothing' | 'lighting';
    score: number;
 }
+
+interface ValleyType {
+   id: string;
+   name: string;
+   season: string;
+   image_pos: number;
+}
+
+interface Dice extends BgaDie {
+   owner_id?: string;
+   location?: number;
+}
+
+interface Meeple extends Card {}
 
 /////////////////////////////////////////////
 // States

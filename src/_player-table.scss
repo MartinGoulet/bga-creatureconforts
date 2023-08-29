@@ -1,5 +1,5 @@
 .player-table {
-   min-width: 660px;
+   max-width: 660px;
    width: 100%;
    padding: 10px 0 30px;
    border-radius: 8px;
@@ -37,6 +37,20 @@
          position: absolute;
          left: 300px;
          top: 8px;
+      }
+
+      .player-table-cottage {
+         position: absolute;
+         left: 11px;
+         top: 13px;
+      }
+
+      .player-table-worker {
+         position: absolute;
+         top: 167px;
+         left: 6px;
+         // top: 10px;
+         // left: 56px;
       }
    }
 

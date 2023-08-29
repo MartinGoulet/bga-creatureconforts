@@ -10,7 +10,7 @@ class StartHandState implements StateHandler {
 
       if (!this.game.isCurrentPlayerActive()) return;
 
-      const handleSelection = (selection: Confort[]) => {
+      const handleSelection = (selection: ConfortCard[]) => {
          this.game.toggleButtonEnable('btn_discard', selection.length == 1);
       };
 

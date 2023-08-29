@@ -4,6 +4,8 @@ namespace CreatureConforts\Traits;
 
 use CreatureConforts\Core\Game;
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Dice;
+use CreatureConforts\Managers\Travelers;
 
 trait Args {
 
@@ -17,7 +19,7 @@ trait Args {
         game state.
     */
 
-    public function argStartHandDiscard() {
+    function argStartHandDiscard() {
         $players = Game::get()->loadPlayersBasicInfos();
         $args = ["_private" => []];
 
@@ -35,4 +37,13 @@ trait Args {
 
         return $args;
     }
+
+    // function argNewTraveler() {
+    //     return Travelers::getUIData();
+    // }
+
+    // function argFamilyDice() {
+    //     return Travelers::getUIData();
+    //     // return ["dice" => Dice::getPlayerDice()];
+    // }
 }

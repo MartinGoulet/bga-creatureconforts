@@ -19,7 +19,11 @@ const ST_END_GAME = 99;
 const ST_START_HAND = 2;
 const ST_START_HAND_DISCARD = 3;
 
-const ST_START_TURN = 10;
+const ST_NEW_TRAVELER = 10;
+const ST_FAMILY_DICE = 20;
+const ST_PLACEMENT = 30;
+
+const ST_START_TURN = 90;
 
 /**
  * Goods tokens

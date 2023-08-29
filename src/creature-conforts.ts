@@ -40,6 +40,8 @@ class CreatureConforts
    public valleyManager: ValleyManager;
 
    public diceManager: MyDiceManager;
+   public cottageManager: CottageManager;
+   public workerManager: WorkerManager;
 
    public readonly gamedatas: CreatureConfortsGamedatas;
    public notifManager: NotificationManager;
@@ -73,6 +75,8 @@ class CreatureConforts
       this.valleyManager = new ValleyManager(this);
 
       this.diceManager = new MyDiceManager(this);
+      this.cottageManager = new CottageManager(this);
+      this.workerManager = new WorkerManager(this);
 
       this.notifManager = new NotificationManager(this);
       this.stateManager = new StateManager(this);

@@ -19,10 +19,12 @@
 
 use CreatureConforts\Core\Game;
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Improvements;
 use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 use CreatureConforts\Managers\Valleys;
+use CreatureConforts\Managers\Worker;
 
 $swdNamespaceAutoload = function ($class) {
     $classParts = explode('\\', $class);
@@ -55,6 +57,8 @@ class CreatureConforts extends Table {
     public $travelers;
     /** @var Deck */
     public $valleys;
+    /** @var Worker */
+    public $workers;
 
     /** @var array */
     public $confort_types;
@@ -102,6 +106,9 @@ class CreatureConforts extends Table {
 
         $this->valleys = self::getNew("module.common.deck");
         $this->valleys->init("valley");
+
+        $this->workers = self::getNew("module.common.deck");
+        $this->workers->init("worker");
     }
 
     public static function get() {
@@ -126,6 +133,8 @@ class CreatureConforts extends Table {
         Improvements::setupNewGame();
         Travelers::setupNewGame();
         Valleys::setupNewGame($options);
+        Dice::setupNewGame($players, $options);
+        Worker::setupNewGame();
         $this->activeNextPlayer();
     }
 
@@ -149,19 +158,18 @@ class CreatureConforts extends Table {
         $result['players'] = self::getCollectionFromDb($sql);
         $result['first_player_id'] = intval(self::getGameStateValue(VAR_FIRST_PLAYER));
 
-        // $result['players_order'] = array_keys(Players::getPlayersInOrder($current_player_id));
-
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         $result['card_types'] = $this->confort_types;
         $result['improvement_types'] = $this->improvement_types;
+        $result['valley_types'] = $this->valley_types;
 
-        $result['conforts'] = Conforts::getBoard();
-        $result['improvements'] = Improvements::getBoard();
-        $result['travelers'] = Travelers::getBoard();
-        $result['valleys'] = Valleys::getBoard();
+        $result['dice'] = Dice::getUIData();
 
-        $result['confortsDeck'] = Conforts::getDeck();
-        $result['confortsDiscard'] = Conforts::getDiscard();
+        $result['conforts'] = Conforts::getUIData();
+        $result['improvements'] = Improvements::getUIData();
+        $result['travelers'] = Travelers::getUIData();
+        $result['valleys'] = Valleys::getUIData();
+        $result['workers'] = Worker::getUIData();
 
 
         $result['hands'] = [];

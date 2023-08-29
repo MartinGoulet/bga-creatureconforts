@@ -11,14 +11,19 @@
    }
 
    .card-sides {
-      .front {
-         background-image: url('img/travelers.jpg');
-         background-size: 1060px 426px;
-
+      .back, .front {
          outline: 1px solid #000;
          border-radius: 5px;
          box-shadow: 0 0 5px 6px #fff;
          filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+      }
+      .back {
+         background-image: url('img/travelers-back.jpg');
+         background-size: 212px 142px;
+      }
+      .front {
+         background-image: url('img/travelers.jpg');
+         background-size: 1060px 426px;
 
          @for $row from 0 through 2 {
             @for $col from 0 through 4 {

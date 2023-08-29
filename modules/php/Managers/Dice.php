@@ -1,0 +1,53 @@
+<?php
+
+namespace CreatureConforts\Managers;
+
+use CreatureConforts\Core\Game;
+
+/*
+ * Dice manager : allows to easily access dice
+ */
+
+class Dice extends \APP_DbObject {
+
+    static function setupNewGame($players, $options) {
+        $players = Game::get()->loadPlayersBasicInfos();
+        $sql = "INSERT INTO dice (dice_owner_id, dice_color, dice_value, dice_location) VALUES ";
+        $values = [];
+
+        // 4 starting white dice
+        for ($i = 0; $i < 4; $i++) {
+            $values[] = "(null, 'white', 1, null)";
+        }
+
+        // Each player starts with 2 dice
+        foreach ($players as $player_id => $player) {
+            $player_color = $player['player_color'];
+            $values[] = "(" . $player_id . ", '" . $player_color . "', 1, null)";
+            $values[] = "(" . $player_id . ", '" . $player_color . "', 1, null)";
+        }
+
+        $sql .= implode(',', $values);
+        self::DbQuery($sql);
+    }
+
+    static function getUIData() {
+        $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice";
+        return array_values(self::getCollectionFromDb($sql));
+    }
+
+    static function getPlayerDice() {
+        $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
+        return array_values(self::getCollectionFromDb($sql));
+    }
+
+    static function throwPlayerDice() {
+        $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
+        $dice = self::getCollectionFromDb($sql);
+
+        foreach ($dice as $die_id => $die) {
+            $value = bga_rand(1, 6);
+            self::DbQuery("UPDATE dice SET dice_value = $value WHERE dice_id = $die_id;");
+        }
+    }
+}
