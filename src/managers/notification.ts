@@ -2,12 +2,53 @@ class NotificationManager {
    constructor(private game: CreatureConforts) {}
 
    setup() {
-      const notifs: [string, number][] = [
-         ['onDiscardStartHand', 1000],
+      const notifs: [string, number?][] = [
+         ['onDiscardStartHand'],
          ['onNewTraveler', 1000],
          ['onFamilyDice', 1000],
+         ['onRevealPlacement', 1000],
+         ['onVillageDice', 1000],
       ];
 
+      this.setupNotifications(notifs);
+   }
+
+   private async notif_onDiscardStartHand(args: DiscardStartHandArgs) {
+      await this.game.tableCenter.confort_discard.addCard(args.card);
+   }
+
+   private notif_onNewTraveler(args: NewTravelerArgs) {
+      const { card, count } = args;
+      const { traveler_deck: deck, hidden_traveler } = this.game.tableCenter;
+      if (count < 15) {
+         deck.removeCard(deck.getTopCard());
+      }
+      deck.setCardNumber(count, { id: card.id } as TravelerCard);
+      setTimeout(() => deck.flipCard(card), 500);
+   }
+
+   private notif_onFamilyDice(args: FamilyDiceArgs) {
+      this.game.gamedatas.playerorder.forEach(async (player_id) => {
+         const dice = args.dice.filter((die) => die.owner_id == player_id.toString());
+         const stack = this.game.getPlayerTable(Number(player_id)).dice;
+         await stack.addDice(dice);
+         stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+      });
+   }
+
+   private notif_onRevealPlacement({ workers }: { workers: WorkerUIData }) {
+      this.game.tableCenter.worker_locations.addCards(workers.board);
+      // TODO add improvement
+   }
+
+   private async notif_onVillageDice({ dice }: { dice: Dice[] }) {
+      const white_dice = dice.filter((die) => die.type == 'white');
+      const stack = this.game.tableCenter.hill;
+      await stack.addDice(white_dice);
+      stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+   }
+
+   private setupNotifications(notifs: any) {
       notifs.forEach(([eventName, duration]) => {
          dojo.subscribe(eventName, this, (notifDetails: INotification<any>) => {
             debug(`notif_${eventName}`, notifDetails.args);
@@ -41,47 +82,6 @@ class NotificationManager {
          'message',
          (notif) => notif.args.excluded_player_id && notif.args.excluded_player_id == this.game.player_id,
       );
-   }
-
-   // private subscribeEvent(eventName: string, time?: number, setIgnore = false) {
-   //    try {
-   //       dojo.subscribe(eventName, this, 'notif_' + eventName);
-   //       if (time) {
-   //          this.game.notifqueue.setSynchronous(eventName, time);
-   //       }
-   //       if (setIgnore) {
-   //          this.game.notifqueue.setIgnoreNotificationCheck(
-   //             eventName,
-   //             (notif) =>
-   //                notif.args.excluded_player_id && notif.args.excluded_player_id == this.game.player_id,
-   //          );
-   //       }
-   //    } catch {
-   //       console.error('NotificationManager::subscribeEvent', eventName);
-   //    }
-   // }
-
-   private async notif_onDiscardStartHand(args: DiscardStartHandArgs) {
-      await this.game.tableCenter.confort_discard.addCard(args.card);
-   }
-
-   private notif_onNewTraveler(args: NewTravelerArgs) {
-      const { card, count } = args;
-      const { traveler_deck: deck, hidden_traveler } = this.game.tableCenter;
-      if (count < 15) {
-         deck.removeCard(deck.getTopCard());
-      }
-      deck.setCardNumber(count, { id: card.id } as TravelerCard);
-      setTimeout(() => {
-         deck.flipCard(card);
-      }, 500);
-   }
-
-   private notif_onFamilyDice(args: FamilyDiceArgs) {
-      this.game.gamedatas.playerorder.forEach((player_id) => {
-         const dice = args.dice.filter((die) => die.owner_id == player_id.toString());
-      });
-      this.game.getPlayerTable(Number(die.owner_id)).dice.addDice;
    }
 }
 

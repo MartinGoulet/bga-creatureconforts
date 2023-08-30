@@ -2,7 +2,9 @@
 
 namespace CreatureConforts\Traits;
 
+use BgaUserException;
 use CreatureConforts\Core\Game;
+use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Travelers;
@@ -37,5 +39,27 @@ trait Actions {
         $current_player_id = $this->getCurrentPlayerId();
         $this->gamestate->setPlayersMultiactive([$current_player_id], '');
         Conforts::cancelStartHand($current_player_id);
+    }
+
+    function confirmPlacement(array $locations) {
+        // Basic location
+        $available_locations = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+        // TODO add location from cards
+
+        foreach ($locations as $location) {
+            if (!in_array($location, $available_locations)) {
+                throw new BgaUserException(self::_("You are not allowed to go one of the location you choose (" . $location . "}"));
+            }
+        }
+
+        $current_player_id = $this->getCurrentPlayerId();
+        Globals::setWorkerPlacement($current_player_id, $locations);
+        $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
+    }
+
+    function cancelPlacement() {
+        $current_player_id = $this->getCurrentPlayerId();
+        $this->gamestate->setPlayersMultiactive([$current_player_id], '');
+        Globals::setWorkerPlacement($current_player_id, []);
     }
 }

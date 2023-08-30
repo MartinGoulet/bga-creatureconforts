@@ -50,6 +50,21 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function revealPlacement($workers) {
+        self::notifyAll('onRevealPlacement', '', [
+            'workers' => $workers,
+        ]);
+    }
+
+    static function villageDice($dice) {
+        $dice = array_filter($dice, function ($die) {
+            return $die['type'] == "white";
+        });
+        self::notifyAll('onVillageDice', '', [
+            'dice' => $dice,
+        ]);
+    }
+
     /*************************
      **** GENERIC METHODS ****
      *************************/

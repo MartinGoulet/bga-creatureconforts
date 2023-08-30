@@ -38,6 +38,7 @@ class action_creatureconforts extends APP_GameAction {
    public function cancelStartHand() {
       self::setAjaxMode();
       // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->gamestate->checkPossibleAction('cancelStartHand');
       $this->game->cancelStartHand();
       self::ajaxResponse();
    }
@@ -47,12 +48,31 @@ class action_creatureconforts extends APP_GameAction {
       // Retrieve arguments
       $card_id = self::getArg("card_id", AT_posint, true);
       // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->checkAction('discardStartHand');
       $this->game->discardStartHand($card_id);
       self::ajaxResponse();
    }
 
    // TODO: defines your action entry points there
 
+   public function confirmPlacement() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $locations = self::getArg("locations", AT_numberlist, true);
+      $locations_id = self::getArrayArgs($locations);
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->checkAction('confirmPlacement');
+      $this->game->confirmPlacement($locations_id);
+      self::ajaxResponse();
+   }
+
+   public function cancelPlacement() {
+      self::setAjaxMode();
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->gamestate->checkPossibleAction('cancelPlacement');
+      $this->game->cancelPlacement();
+      self::ajaxResponse();
+   }
 
    /*
     
@@ -74,4 +94,17 @@ class action_creatureconforts extends APP_GameAction {
     }
     
     */
+
+    private function getArrayArgs($args) {
+      // Removing last ';' if exists
+      if (substr($args, -1) == ';')
+         $args = substr($args, 0, -1);
+
+      if ($args == '')
+         $args = array();
+      else
+         $args = explode(';', $args);
+
+      return $args;
+   }
 }

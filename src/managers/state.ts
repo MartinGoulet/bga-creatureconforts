@@ -1,14 +1,3 @@
-const states = {
-   client: {
-      // playCard: "client_playCard",
-   },
-   server: {
-      startHand: 'startHand',
-      newTraveler: 'newTraveler',
-      familyDice: 'familyDice',
-   },
-};
-
 class StateManager {
    private readonly states: { [statename: string]: StateHandler };
    private readonly client_states: StateHandler[] = [];
@@ -16,9 +5,8 @@ class StateManager {
 
    constructor(private game: CreatureConforts) {
       this.states = {
-         [states.server.startHand]: new StartHandState(game),
-         // [states.server.newTraveler]: new NewTravelerState(game),
-         // [states.server.familyDice]: new FamilyDiceState(game),
+         startHand: new StartHandState(game),
+         placement: new PlacementState(game),
       };
    }
 

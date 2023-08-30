@@ -48,6 +48,97 @@
          left: 44px;
       }
 
+      #worker-locations {
+         position: relative;
+         .slot {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+
+            &.selectable {
+               animation: pulseSelectable 1s infinite alternate;
+            }
+
+            &.selected {
+               box-shadow: 0 0 5px 5px #00ffff;
+            }
+
+            .card.worker {
+               zoom: 0.75;
+               &:nth-child(3),
+               &:nth-child(4),
+               &:nth-child(5) {
+                  margin-top: -35px;
+               }
+            }
+         }
+
+         [data-slot-id='1'] {
+            top: 98px;
+            left: 85px;
+         }
+         [data-slot-id='2'] {
+            top: 98px;
+            left: 241px;
+         }
+         [data-slot-id='3'] {
+            top: 98px;
+            left: 427px;
+         }
+         [data-slot-id='4'] {
+            top: 98px;
+            left: 583px;
+         }
+
+         [data-slot-id='5'] {
+            top: 202px;
+            left: 592px;
+         }
+         [data-slot-id='6'] {
+            top: 345px;
+            left: 624px;
+         }
+         [data-slot-id='7'] {
+            top: 291px;
+            left: 438px;
+         }
+
+         [data-slot-id='8'] {
+            top: 472px;
+            left: 462px;
+         }
+         [data-slot-id='9'] {
+            top: 576px;
+            left: 279px;
+         }
+
+         [data-slot-id='10'] {
+            top: 802px;
+            left: 83px;
+         }
+         [data-slot-id='11'] {
+            top: 749px;
+            left: 295px;
+         }
+         [data-slot-id='12'] {
+            top: 749px;
+            left: 457px;
+         }
+      }
+
+      #hill-dice {
+         position: absolute;
+         top: 227px;
+         left: 228px;
+         display: flex;
+         flex-wrap: wrap;
+         width: 70px;
+      }
+
       #river-dial {
          position: absolute;
          width: 120px;
@@ -87,5 +178,9 @@
             }
          }
       }
+   }
+
+   .bga-dice_die.bga-dice_die6.colored-die {
+      zoom: 0.8;
    }
 }

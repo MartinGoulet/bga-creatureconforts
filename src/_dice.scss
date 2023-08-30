@@ -36,7 +36,7 @@
 // }
 
 .bga-dice_die-face {
-   background-size: 600% 700%;
+   background-size: 600% 800%;
    background-image: url('img/agk_spritesheet_dice1.png');
 
 }
@@ -74,4 +74,7 @@
 }
 .colored-die[data-color='purple'] .bga-dice_die-face {
    background-position-y: -600%;
+}
+.colored-die[data-color='white'] .bga-dice_die-face {
+   background-position-y: -700%;
 }

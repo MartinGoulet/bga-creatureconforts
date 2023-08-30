@@ -8,6 +8,13 @@ namespace CreatureConforts\Core;
 
 class Globals extends \APP_DbObject {
 
+    public static function getWorkerPlacement(int $player_id) {
+        return self::get("locations_" . $player_id);
+    }
+
+    public static function setWorkerPlacement(int $player_id, $locations_id) {
+        self::set("locations_" . $player_id, $locations_id);
+    }
 
     /*************************
      **** GENERIC METHODS ****
@@ -18,7 +25,7 @@ class Globals extends \APP_DbObject {
         self::DbQuery("INSERT INTO `global_variables`(`name`, `value`)  VALUES ('$name', '$jsonObj') ON DUPLICATE KEY UPDATE `value` = '$jsonObj'");
     }
 
-    private static function get(string $name, $asArray = null) {
+    public static function get(string $name, $asArray = null) {
         /** @var string */
         $json_obj = self::getUniqueValueFromDB("SELECT `value` FROM `global_variables` where `name` = '$name'");
         if ($json_obj) {

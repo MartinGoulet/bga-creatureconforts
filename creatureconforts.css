@@ -516,6 +516,86 @@ body > .bga-dice_die {
   top: 24px;
   left: 44px;
 }
+#table-center-wrapper #board #worker-locations {
+  position: relative;
+}
+#table-center-wrapper #board #worker-locations .slot {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#table-center-wrapper #board #worker-locations .slot.selectable {
+  animation: pulseSelectable 1s infinite alternate;
+}
+#table-center-wrapper #board #worker-locations .slot.selected {
+  box-shadow: 0 0 5px 5px #00ffff;
+}
+#table-center-wrapper #board #worker-locations .slot .card.worker {
+  zoom: 0.75;
+}
+#table-center-wrapper #board #worker-locations .slot .card.worker:nth-child(3), #table-center-wrapper #board #worker-locations .slot .card.worker:nth-child(4), #table-center-wrapper #board #worker-locations .slot .card.worker:nth-child(5) {
+  margin-top: -35px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="1"] {
+  top: 98px;
+  left: 85px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="2"] {
+  top: 98px;
+  left: 241px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="3"] {
+  top: 98px;
+  left: 427px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="4"] {
+  top: 98px;
+  left: 583px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="5"] {
+  top: 202px;
+  left: 592px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="6"] {
+  top: 345px;
+  left: 624px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="7"] {
+  top: 291px;
+  left: 438px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="8"] {
+  top: 472px;
+  left: 462px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="9"] {
+  top: 576px;
+  left: 279px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="10"] {
+  top: 802px;
+  left: 83px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="11"] {
+  top: 749px;
+  left: 295px;
+}
+#table-center-wrapper #board #worker-locations [data-slot-id="12"] {
+  top: 749px;
+  left: 457px;
+}
+#table-center-wrapper #board #hill-dice {
+  position: absolute;
+  top: 227px;
+  left: 228px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 70px;
+}
 #table-center-wrapper #board #river-dial {
   position: absolute;
   width: 120px;
@@ -559,6 +639,9 @@ body > .bga-dice_die {
 }
 #table-center-wrapper #board #decks #discard-conforts .card:nth-child(1) {
   z-index: 1;
+}
+#table-center-wrapper .bga-dice_die.bga-dice_die6.colored-die {
+  zoom: 0.8;
 }
 
 .resource-icon {
@@ -1187,7 +1270,7 @@ body > .bga-dice_die {
 }
 
 .bga-dice_die-face {
-  background-size: 600% 700%;
+  background-size: 600% 800%;
   background-image: url("img/agk_spritesheet_dice1.png");
 }
 
@@ -1235,6 +1318,10 @@ body > .bga-dice_die {
   background-position-y: -600%;
 }
 
+.colored-die[data-color=white] .bga-dice_die-face {
+  background-position-y: -700%;
+}
+
 .card.cottage {
   display: inline-block;
   position: relative;
@@ -1271,7 +1358,10 @@ body > .bga-dice_die {
   position: relative;
   height: 50px;
 }
-.card.worker[data-type=yellow], .card.worker[data-type=green], .card.worker[data-type=red] {
+.card.worker[data-type=yellow] {
+  width: 34px;
+}
+.card.worker[data-type=green], .card.worker[data-type=red] {
   width: 40px;
 }
 .card.worker[data-type=purple] {

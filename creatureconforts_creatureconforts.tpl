@@ -9,6 +9,8 @@
                 <div id="table-conforts" class="white-border"></div>
                 <div id="table-travelers"></div>
                 <div id="table-valleys"></div>
+                <div id="worker-locations"></div>
+                <div id="hill-dice"></div>
 
                 <div id="decks">
                     <div id="deck-conforts"></div>

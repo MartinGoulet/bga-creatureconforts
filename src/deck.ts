@@ -37,10 +37,10 @@ class Hand extends HandStock<Card> {
       super(manager, element, {
          // center: true,
          // wrap: "wrap",
-         cardOverlap: "30px",
-         cardShift: "6px",
+         cardOverlap: '30px',
+         cardShift: '6px',
          inclination: 6,
-         sort: sortFunction("type_arg"),
+         sort: sortFunction('type_arg'),
       });
    }
 
@@ -69,7 +69,7 @@ class HiddenLineStock<T> extends LineStock<T> {
       super(manager, element);
    }
    public addCard(card: T, animation?: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
-      const copy = { ...card, type: "", type_arg: "" };
+      const copy = { ...card, type: '', type_arg: '' };
       return super.addCard(copy);
    }
 }
@@ -96,5 +96,33 @@ class DiscardStock extends VisibleDeck<Card> {
       const copy = { ...card };
       super.removeCard(card, settings);
       this.onRemoveCard(copy);
+   }
+}
+
+class LocationStock extends SlotStock<Meeple> {
+   OnLocationClick: (slotId: SlotId) => void;
+
+   protected createSlot(slotId: SlotId): void {
+      super.createSlot(slotId);
+      const handleClick = (ev: MouseEvent) => {
+         if (this.OnLocationClick && (ev.target as HTMLDivElement).classList.contains('selectable')) {
+            this.OnLocationClick(slotId);
+         }
+      };
+      (this.slots[slotId] as HTMLDivElement).addEventListener('click', handleClick);
+   }
+
+   public setSelectableLocation(locations: SlotId[] = []): void {
+      this.slots.forEach((slot) => {
+         slot.classList.toggle('selectable', false);
+      });
+      locations.forEach((sel) => this.slots[sel].classList.toggle('selectable', true));
+   }
+
+   public setSelectedLocation(locations: SlotId[] = []): void {
+      this.slots.forEach((slot) => {
+         slot.classList.toggle('selected', false);
+      });
+      locations.forEach((sel) => this.slots[sel].classList.toggle('selected', true));
    }
 }

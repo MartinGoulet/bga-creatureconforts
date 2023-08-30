@@ -3,6 +3,7 @@
 namespace CreatureConforts\Traits;
 
 use CreatureConforts\Core\Game;
+use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Travelers;
@@ -38,12 +39,17 @@ trait Args {
         return $args;
     }
 
-    // function argNewTraveler() {
-    //     return Travelers::getUIData();
-    // }
+    function argPlacement() {
+        $players = Game::get()->loadPlayersBasicInfos();
+        $args = ["_private" => []];
 
-    // function argFamilyDice() {
-    //     return Travelers::getUIData();
-    //     // return ["dice" => Dice::getPlayerDice()];
-    // }
+        foreach ($players as $player_id => $player) {
+            $locations = Globals::getWorkerPlacement($player_id);
+            $args["_private"][$player_id] = [
+                "locations" => $locations,
+            ];
+        }
+
+        return $args;
+    }
 }

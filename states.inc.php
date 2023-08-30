@@ -112,17 +112,44 @@ $machinestates = $basicGameStates + array(
         "description" => clienttranslate('Waiting for others to place their workers'),
         "type" => "multipleactiveplayer",
         'action' => 'stMakeEveryoneActive',
+        'args' => 'argPlacement',
         "possibleactions" => ["confirmPlacement", "cancelPlacement"],
-        "transitions" => ["" => ST_START_TURN]
+        "transitions" => ["" => ST_PLACEMENT_END]
     ],
 
-    // ST_START_TURN => [
-    //     "name" => "playerTurn",
-    //     "description" => clienttranslate('${actplayer} must play a card or pass'),
-    //     "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
-    //     "type" => "activeplayer",
-    //     "possibleactions" => array("playCard", "pass"),
-    //     "transitions" => array("playCard" => 2, "pass" => 2)
-    // ]
+    ST_PLACEMENT_END => [
+        "name" => "placementEnd",
+        "type" => "game",
+        "action" => "stPlacementEnd",
+        "transitions" => ["" => ST_VILLAGE_DICE]
+    ],
+
+    ST_VILLAGE_DICE => [
+        "name" => "villageDice",
+        "type" => "game",
+        "action" => "stVillageDice",
+        "transitions" => ["" => ST_PLAYER_TURN]
+    ],
+
+    ST_PLAYER_TURN => [
+        "name" => "playerTurn",
+        "description" => clienttranslate('${actplayer} must resolve your workers'),
+        "descriptionmyturn" => clienttranslate('${you} must resolve their workers'),
+        "type" => "activeplayer",
+        "possibleactions" => array("resolveWorker", "confirmPlayerTurn"),
+        "transitions" => [
+            "" => ST_NEXT_PLAYER_TURN,
+        ]
+    ],
+
+    ST_NEXT_PLAYER_TURN => [
+        "name" => "nextPlayerTurn",
+        "type" => "game",
+        "action" => "stNextPlayerTurn",
+        "transitions" => [
+            "next" => ST_PLAYER_TURN,
+            "end" => ST_PLAYER_TURN
+        ]
+    ],
 
 );

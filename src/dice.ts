@@ -21,6 +21,7 @@ class MyDiceManager extends DiceManager {
             purple: new ColoredDie6('purple'),
             red: new ColoredDie6('red'),
             yellow: new ColoredDie6('yellow'),
+            white: new ColoredDie6('white'),
 
             '7e797b': new ColoredDie6('gray'),
             '13586b': new ColoredDie6('green'),

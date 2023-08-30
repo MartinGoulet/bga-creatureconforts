@@ -17,8 +17,8 @@ class Worker extends \APP_DbObject {
         // Each player starts with 2 dice
         foreach ($players as $player_id => $player) {
             $workers[] = [
-                'type' => $player['player_color'], 
-                'type_arg' => $player['player_id'], 
+                'type' => $player['player_color'],
+                'type_arg' => $player['player_id'],
                 'nbr' => 4
             ];
         }
@@ -32,6 +32,20 @@ class Worker extends \APP_DbObject {
             'board' => array_values(self::deck()->getCardsInLocation('board')),
             'improvement' => array_values(self::deck()->getCardsInLocation('improvement')),
         ];
+    }
+
+    static function getWorkersFromPlayer(int $player_id) {
+        $players = Game::get()->loadPlayersBasicInfos();
+        $player_color = $players[$player_id]['player_color'];
+        return self::deck()->getCardsOfType($player_color);
+    }
+
+    static function moveToLocation($worker_id, $location_id) {
+        if($location_id <= 12) {
+            self::deck()->moveCard($worker_id, 'board', $location_id);
+        } else {
+            self::deck()->moveCard($worker_id, 'improvement', $location_id);
+        }
     }
 
     /**

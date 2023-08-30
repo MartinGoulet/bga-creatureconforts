@@ -18,6 +18,7 @@
  */
 
 use CreatureConforts\Core\Game;
+use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Improvements;
@@ -177,6 +178,8 @@ class CreatureConforts extends Table {
         foreach ($players as $player_id => $player) {
             $result['hands'][$player_id] = Conforts::anonymize(Conforts::getHand($player_id), $player_id != $current_player_id);
         }
+
+        $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
 
         return $result;
     }

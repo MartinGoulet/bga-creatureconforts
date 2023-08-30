@@ -11,11 +11,17 @@ class TableCenter {
    public traveler_deck: Deck<TravelerCard>;
    public valley: SlotStock<ImprovementCard>;
 
+   public worker_locations: LocationStock;
+
+   public hill: LineDiceStock;
+
    constructor(private game: CreatureConforts) {
       this.setupConfortCards(game);
       this.setupImprovementCards(game);
       this.setupTravelerCards(game);
       this.setupValleyCards(game);
+      this.setupWorkerLocations(game);
+      this.setupHillDice(game);
    }
 
    private setupConfortCards(game: CreatureConforts) {
@@ -52,6 +58,16 @@ class TableCenter {
       );
 
       this.confort_market.addCards(market);
+   }
+
+   private setupHillDice(game: CreatureConforts) {
+      this.hill = new LineDiceStock(game.diceManager, document.getElementById(`hill-dice`), {
+         gap: '5px',
+         sort: sortFunction('id'),
+      });
+
+      const dice = game.gamedatas.dice.filter((die) => die.type == 'white' && die.location == null);
+      this.hill.addDice(dice);
    }
 
    private setupImprovementCards(game: CreatureConforts) {
@@ -92,5 +108,18 @@ class TableCenter {
       });
 
       this.valley.addCards([forest.topCard, meadow.topCard]);
+   }
+
+   private setupWorkerLocations(game: CreatureConforts) {
+      this.worker_locations = new LocationStock(
+         game.workerManager,
+         document.getElementById(`worker-locations`),
+         {
+            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            mapCardToSlot: (meeple) => meeple.location_arg,
+            gap: '0',
+         },
+      );
+      this.worker_locations.addCards(game.gamedatas.workers.board);
    }
 }

@@ -58,6 +58,7 @@ class PlayerTable {
          document.getElementById(`player-table-${this.player_id}-dice`),
          {
             gap: '10px',
+            sort: sortFunction('id'),
          },
       );
 

@@ -3,7 +3,9 @@
    position: relative;
    height: 50px;
 
-   &[data-type='yellow'],
+   &[data-type='yellow'] {
+      width: 34px;
+   }
    &[data-type='green'],
    &[data-type='red'] {
       width: 40px;

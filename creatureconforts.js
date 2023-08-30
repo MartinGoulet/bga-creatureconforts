@@ -2385,10 +2385,10 @@ var Hand = (function (_super) {
     __extends(Hand, _super);
     function Hand(manager, element, current_player) {
         var _this = _super.call(this, manager, element, {
-            cardOverlap: "30px",
-            cardShift: "6px",
+            cardOverlap: '30px',
+            cardShift: '6px',
             inclination: 6,
-            sort: sortFunction("type_arg"),
+            sort: sortFunction('type_arg'),
         }) || this;
         _this.current_player = current_player;
         return _this;
@@ -2416,7 +2416,7 @@ var HiddenLineStock = (function (_super) {
         return _super.call(this, manager, element) || this;
     }
     HiddenLineStock.prototype.addCard = function (card, animation, settings) {
-        var copy = __assign(__assign({}, card), { type: "", type_arg: "" });
+        var copy = __assign(__assign({}, card), { type: '', type_arg: '' });
         return _super.prototype.addCard.call(this, copy);
     };
     return HiddenLineStock;
@@ -2438,6 +2438,39 @@ var DiscardStock = (function (_super) {
     };
     return DiscardStock;
 }(VisibleDeck));
+var LocationStock = (function (_super) {
+    __extends(LocationStock, _super);
+    function LocationStock() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    LocationStock.prototype.createSlot = function (slotId) {
+        var _this = this;
+        _super.prototype.createSlot.call(this, slotId);
+        var handleClick = function (ev) {
+            if (_this.OnLocationClick && ev.target.classList.contains('selectable')) {
+                _this.OnLocationClick(slotId);
+            }
+        };
+        this.slots[slotId].addEventListener('click', handleClick);
+    };
+    LocationStock.prototype.setSelectableLocation = function (locations) {
+        var _this = this;
+        if (locations === void 0) { locations = []; }
+        this.slots.forEach(function (slot) {
+            slot.classList.toggle('selectable', false);
+        });
+        locations.forEach(function (sel) { return _this.slots[sel].classList.toggle('selectable', true); });
+    };
+    LocationStock.prototype.setSelectedLocation = function (locations) {
+        var _this = this;
+        if (locations === void 0) { locations = []; }
+        this.slots.forEach(function (slot) {
+            slot.classList.toggle('selected', false);
+        });
+        locations.forEach(function (sel) { return _this.slots[sel].classList.toggle('selected', true); });
+    };
+    return LocationStock;
+}(SlotStock));
 var ColoredDie6 = (function (_super) {
     __extends(ColoredDie6, _super);
     function ColoredDie6(color, size) {
@@ -2465,6 +2498,7 @@ var MyDiceManager = (function (_super) {
                 purple: new ColoredDie6('purple'),
                 red: new ColoredDie6('red'),
                 yellow: new ColoredDie6('yellow'),
+                white: new ColoredDie6('white'),
                 '7e797b': new ColoredDie6('gray'),
                 '13586b': new ColoredDie6('green'),
                 '650e41': new ColoredDie6('purple'),
@@ -2480,12 +2514,78 @@ var NotificationManager = (function () {
         this.game = game;
     }
     NotificationManager.prototype.setup = function () {
-        var _this = this;
         var notifs = [
-            ['onDiscardStartHand', 1000],
+            ['onDiscardStartHand'],
             ['onNewTraveler', 1000],
             ['onFamilyDice', 1000],
+            ['onRevealPlacement', 1000],
+            ['onVillageDice', 1000],
         ];
+        this.setupNotifications(notifs);
+    };
+    NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.game.tableCenter.confort_discard.addCard(args.card)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onNewTraveler = function (args) {
+        var card = args.card, count = args.count;
+        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
+        if (count < 15) {
+            deck.removeCard(deck.getTopCard());
+        }
+        deck.setCardNumber(count, { id: card.id });
+        setTimeout(function () { return deck.flipCard(card); }, 500);
+    };
+    NotificationManager.prototype.notif_onFamilyDice = function (args) {
+        var _this = this;
+        this.game.gamedatas.playerorder.forEach(function (player_id) { return __awaiter(_this, void 0, void 0, function () {
+            var dice, stack;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        dice = args.dice.filter(function (die) { return die.owner_id == player_id.toString(); });
+                        stack = this.game.getPlayerTable(Number(player_id)).dice;
+                        return [4, stack.addDice(dice)];
+                    case 1:
+                        _a.sent();
+                        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+                        return [2];
+                }
+            });
+        }); });
+    };
+    NotificationManager.prototype.notif_onRevealPlacement = function (_a) {
+        var workers = _a.workers;
+        this.game.tableCenter.worker_locations.addCards(workers.board);
+    };
+    NotificationManager.prototype.notif_onVillageDice = function (_a) {
+        var dice = _a.dice;
+        return __awaiter(this, void 0, void 0, function () {
+            var white_dice, stack;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        white_dice = dice.filter(function (die) { return die.type == 'white'; });
+                        stack = this.game.tableCenter.hill;
+                        return [4, stack.addDice(white_dice)];
+                    case 1:
+                        _b.sent();
+                        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.setupNotifications = function (notifs) {
+        var _this = this;
         notifs.forEach(function (_a) {
             var eventName = _a[0], duration = _a[1];
             dojo.subscribe(eventName, _this, function (notifDetails) {
@@ -2512,53 +2612,16 @@ var NotificationManager = (function () {
         }
         this.game.notifqueue.setIgnoreNotificationCheck('message', function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
     };
-    NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, this.game.tableCenter.confort_discard.addCard(args.card)];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onNewTraveler = function (args) {
-        var card = args.card, count = args.count;
-        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
-        if (count < 15) {
-            deck.removeCard(deck.getTopCard());
-        }
-        deck.setCardNumber(count, { id: card.id });
-        setTimeout(function () {
-            deck.flipCard(card);
-        }, 500);
-    };
-    NotificationManager.prototype.notif_onFamilyDice = function (args) {
-        this.game.gamedatas.playerorder.forEach(function (player_id) {
-            var dice = args.dice.filter(function (die) { return die.owner_id == player_id.toString(); });
-        });
-        this.game.getPlayerTable(Number(die.owner_id)).dice.addDice;
-    };
     return NotificationManager;
 }());
-var states = {
-    client: {},
-    server: {
-        startHand: 'startHand',
-        newTraveler: 'newTraveler',
-        familyDice: 'familyDice',
-    },
-};
 var StateManager = (function () {
     function StateManager(game) {
-        var _a;
         this.game = game;
         this.client_states = [];
-        this.states = (_a = {},
-            _a[states.server.startHand] = new StartHandState(game),
-            _a);
+        this.states = {
+            startHand: new StartHandState(game),
+            placement: new PlacementState(game),
+        };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
         debug('Entering state: ' + stateName);
@@ -2626,33 +2689,6 @@ var StateManager = (function () {
     };
     return StateManager;
 }());
-var FamilyDiceState = (function () {
-    function FamilyDiceState(game) {
-        this.game = game;
-    }
-    FamilyDiceState.prototype.onEnteringState = function (args) {
-        var topCard = args.topCard, count = args.count;
-        var _a = this.game.tableCenter, deck = _a.traveler_deck, card = _a.hidden_traveler;
-        if (count < 15) {
-            deck.removeCard(deck.getTopCard());
-            deck.setCardNumber(count, { id: topCard.id });
-        }
-        deck.flipCard(topCard, { updateData: true, updateFront: true });
-    };
-    FamilyDiceState.prototype.onLeavingState = function () { };
-    FamilyDiceState.prototype.onUpdateActionButtons = function (args) { };
-    return FamilyDiceState;
-}());
-var NewTravelerState = (function () {
-    function NewTravelerState(game) {
-        this.game = game;
-    }
-    NewTravelerState.prototype.onEnteringState = function (args) {
-    };
-    NewTravelerState.prototype.onLeavingState = function () { };
-    NewTravelerState.prototype.onUpdateActionButtons = function (args) { };
-    return NewTravelerState;
-}());
 var StartHandState = (function () {
     function StartHandState(game) {
         this.game = game;
@@ -2704,6 +2740,91 @@ var StartHandState = (function () {
         }
     };
     return StartHandState;
+}());
+var PlacementState = (function () {
+    function PlacementState(game) {
+        this.game = game;
+        this.isMultipleActivePlayer = true;
+        this.locations = [];
+        this.original_workers = [];
+    }
+    PlacementState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var _a, _b, _c;
+        this.original_workers = [];
+        this.locations = (_c = (_b = (_a = args._private) === null || _a === void 0 ? void 0 : _a.locations) === null || _b === void 0 ? void 0 : _b.map(function (loc) { return Number(loc); })) !== null && _c !== void 0 ? _c : [];
+        if (this.locations.length > 0) {
+            this.locations.forEach(function (slotId) { return _this.moveWorker(slotId); });
+        }
+        this.showSelection();
+        if (!this.game.isCurrentPlayerActive)
+            return;
+        this.game.tableCenter.worker_locations.OnLocationClick = function (slotId) {
+            _this.moveWorker(slotId);
+        };
+    };
+    PlacementState.prototype.onLeavingState = function () {
+        var deck = this.game.tableCenter.worker_locations;
+        deck.setSelectableLocation([]);
+        deck.setSelectedLocation([]);
+        deck.OnLocationClick = null;
+    };
+    PlacementState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleCancelLocal = function () {
+            _this.resetState();
+        };
+        var handleConfirmPlacement = function () {
+            if (_this.locations.length !== 4) {
+                _this.game.showMessage('You must place all your workers', 'error');
+                return;
+            }
+            _this.game.takeAction('confirmPlacement', { locations: _this.locations.join(';') });
+        };
+        var handleRestartPlacement = function () {
+            _this.game.takeAction('cancelPlacement', {}, null, function () {
+                _this.resetState();
+            });
+        };
+        if (!this.game.isSpectator) {
+            if (this.game.isCurrentPlayerActive()) {
+                this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirmPlacement);
+                this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancelLocal);
+            }
+            else {
+                this.game.addActionButtonGray('btn_restart', _('Cancel'), handleRestartPlacement);
+            }
+        }
+    };
+    PlacementState.prototype.moveWorker = function (slotId) {
+        var worker = this.game.getCurrentPlayerTable().workers.getCards()[0];
+        var copy = __assign(__assign({}, worker), { location: 'board', location_arg: slotId.toString() });
+        this.original_workers.push(__assign({}, worker));
+        this.game.tableCenter.worker_locations.addCard(copy);
+        this.locations.push(Number(slotId));
+        this.showSelection();
+        this.game.toggleButtonEnable('btn_confirm', this.locations.length == 4);
+    };
+    PlacementState.prototype.resetState = function () {
+        this.game.getCurrentPlayerTable().workers.addCards(this.original_workers);
+        this.locations = [];
+        this.original_workers = [];
+        this.showSelection();
+        this.game.disableButton('btn_confirm');
+    };
+    PlacementState.prototype.showSelection = function () {
+        var _this = this;
+        var locations = this.game.tableCenter.worker_locations;
+        if (this.locations.length < 4) {
+            var selectable = arrayRange(1, 12).filter(function (num) { return _this.locations.indexOf(num) < 0; });
+            locations.setSelectableLocation(selectable);
+        }
+        else {
+            locations.setSelectableLocation([]);
+        }
+        locations.setSelectedLocation(this.locations);
+    };
+    return PlacementState;
 }());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
@@ -2906,6 +3027,7 @@ var PlayerTable = (function () {
         var _this = this;
         this.dice = new LineDiceStock(game.diceManager, document.getElementById("player-table-".concat(this.player_id, "-dice")), {
             gap: '10px',
+            sort: sortFunction('id'),
         });
         var dice = game.gamedatas.dice.filter(function (die) { return die.owner_id == _this.player_id.toString() && die.location == null; });
         this.dice.addDice(dice);
@@ -2935,6 +3057,8 @@ var TableCenter = (function () {
         this.setupImprovementCards(game);
         this.setupTravelerCards(game);
         this.setupValleyCards(game);
+        this.setupWorkerLocations(game);
+        this.setupHillDice(game);
     }
     TableCenter.prototype.setupConfortCards = function (game) {
         var _a = game.gamedatas.conforts, market = _a.market, discard = _a.discard, deckCount = _a.deckCount;
@@ -2954,6 +3078,14 @@ var TableCenter = (function () {
             counter: {},
         });
         this.confort_market.addCards(market);
+    };
+    TableCenter.prototype.setupHillDice = function (game) {
+        this.hill = new LineDiceStock(game.diceManager, document.getElementById("hill-dice"), {
+            gap: '5px',
+            sort: sortFunction('id'),
+        });
+        var dice = game.gamedatas.dice.filter(function (die) { return die.type == 'white' && die.location == null; });
+        this.hill.addDice(dice);
     };
     TableCenter.prototype.setupImprovementCards = function (game) {
         var market = game.gamedatas.improvements.market;
@@ -2981,6 +3113,14 @@ var TableCenter = (function () {
             gap: '30px',
         });
         this.valley.addCards([forest.topCard, meadow.topCard]);
+    };
+    TableCenter.prototype.setupWorkerLocations = function (game) {
+        this.worker_locations = new LocationStock(game.workerManager, document.getElementById("worker-locations"), {
+            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            mapCardToSlot: function (meeple) { return meeple.location_arg; },
+            gap: '0',
+        });
+        this.worker_locations.addCards(game.gamedatas.workers.board);
     };
     return TableCenter;
 }());

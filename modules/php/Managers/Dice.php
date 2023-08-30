@@ -36,6 +36,11 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
+    // static function getDiceFromPlayer(int $player_id) {
+    //     $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_owner_id == $player_id";
+    //     return array_values(self::getCollectionFromDb($sql));
+    // }
+
     static function getPlayerDice() {
         $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
         return array_values(self::getCollectionFromDb($sql));
@@ -44,7 +49,16 @@ class Dice extends \APP_DbObject {
     static function throwPlayerDice() {
         $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
         $dice = self::getCollectionFromDb($sql);
+        self::throwDice($dice);
+    }
 
+    static function throwWhiteDice() {
+        $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color = 'white'";
+        $dice = self::getCollectionFromDb($sql);
+        self::throwDice($dice);
+    }
+
+    private static function throwDice($dice) {
         foreach ($dice as $die_id => $die) {
             $value = bga_rand(1, 6);
             self::DbQuery("UPDATE dice SET dice_value = $value WHERE dice_id = $die_id;");
