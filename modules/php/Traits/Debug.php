@@ -2,6 +2,7 @@
 
 namespace CreatureConforts\Traits;
 
+use CreatureConforts\Core\Game;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Improvements;
@@ -23,5 +24,8 @@ trait Debug {
 
     function setupDice() {
         Dice::setupNewGame([], []);
+    }
+    function setupVar() {
+        Game::get()->setGameStateInitialValue(VAR_RIVER_DIAL, 1);
     }
 }

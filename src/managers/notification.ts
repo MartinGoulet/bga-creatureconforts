@@ -7,7 +7,8 @@ class NotificationManager {
          ['onNewTraveler', 1000],
          ['onFamilyDice', 1000],
          ['onRevealPlacement', 1000],
-         ['onVillageDice', 1000],
+         ['onVillageDice', 1200],
+         ['onMoveDiceToHill', 1000],
       ];
 
       this.setupNotifications(notifs);
@@ -41,11 +42,15 @@ class NotificationManager {
       // TODO add improvement
    }
 
-   private async notif_onVillageDice({ dice }: { dice: Dice[] }) {
+   private notif_onVillageDice({ dice }: { dice: Dice[] }) {
       const white_dice = dice.filter((die) => die.type == 'white');
       const stack = this.game.tableCenter.hill;
-      await stack.addDice(white_dice);
+      stack.addDice(white_dice);
       stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+   }
+
+   private notif_onMoveDiceToHill({ dice }: { dice: Dice[] }) {
+      this.game.tableCenter.hill.addDice(dice);
    }
 
    private setupNotifications(notifs: any) {

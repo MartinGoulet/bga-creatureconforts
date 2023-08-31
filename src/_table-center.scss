@@ -130,13 +130,84 @@
          }
       }
 
+      #dice-locations {
+         position: relative;
+         .slot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            // background-color: pink;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+         }
+
+         [data-slot-id='1'] {
+            top: 54px;
+            left: 55px;
+            width: 130px;
+         }
+         [data-slot-id='2'] {
+            top: 54px;
+            left: 211px;
+            width: 130px;
+         }
+         [data-slot-id='3'] {
+            top: 54px;
+            left: 397px;
+            width: 130px;
+         }
+         [data-slot-id='4'] {
+            top: 54px;
+            left: 553px;
+            width: 130px;
+         }
+
+         [data-slot-id='5'] {
+            top: 220px;
+            left: 664px;
+         }
+         [data-slot-id='6'] {
+            top: 400px;
+            left: 590px;
+         }
+         [data-slot-id='7'] {
+            top: 306px;
+            left: 392px;
+         }
+
+         [data-slot-id='8'] {
+            top: 479px;
+            left: 416px;
+         }
+         [data-slot-id='9'] {
+            top: 590px;
+            left: 354px;
+         }
+
+         [data-slot-id='10'] {
+            top: 755px;
+            left: 97px;
+         }
+         [data-slot-id='11'] {
+            top: 702px;
+            left: 310px;
+         }
+         [data-slot-id='12'] {
+            top: 702px;
+            left: 472px;
+         }
+      }
+
       #hill-dice {
          position: absolute;
          top: 227px;
          left: 228px;
          display: flex;
          flex-wrap: wrap;
-         width: 70px;
+         width: 76px;
       }
 
       #river-dial {
@@ -150,7 +221,7 @@
 
          @for $pos from 0 through 5 {
             &[data-position='#{$pos + 1}'] {
-               transform: rotate($pos * -60deg);
+               transform: rotate(($pos + 4) * -60deg);
             }
          }
       }

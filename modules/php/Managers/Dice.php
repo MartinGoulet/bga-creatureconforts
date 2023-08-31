@@ -36,14 +36,18 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
-    // static function getDiceFromPlayer(int $player_id) {
-    //     $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_owner_id == $player_id";
-    //     return array_values(self::getCollectionFromDb($sql));
-    // }
+    static function getDiceFromPlayer(int $player_id) {
+        $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_owner_id = $player_id";
+        return array_values(self::getCollectionFromDb($sql));
+    }
 
     static function getPlayerDice() {
         $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
         return array_values(self::getCollectionFromDb($sql));
+    }
+
+    static function movePlayerDiceToHill($player_id) {
+        self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id = $player_id OR dice_owner_id is null");
     }
 
     static function throwPlayerDice() {

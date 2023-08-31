@@ -100,8 +100,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    animation: pulseSelectable 1s infinite alternate;
 }
 
-.bga-cards_selected-card .front {
-   animation: pulseSelectable 1s infinite alternate;
+.bga-dice_selected-die {
+   box-shadow: 0 0 5px 7px #00ffff;
 }
 
 @keyframes pulseSelectable {

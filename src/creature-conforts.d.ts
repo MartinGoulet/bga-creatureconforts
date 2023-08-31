@@ -14,7 +14,7 @@ type PlayerBoardObject = { [player_id: number]: PlayerBoardInfo };
 
 interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerData> {
    improvement_types: { [card_type: number]: ImprovementType };
-   card_types: { [card_type: number]: ConfortType };
+   confort_types: { [card_type: number]: ConfortType };
    valley_types: { [card_type: number]: ValleyType };
 
    hands: { [player_id: number]: ConfortCard[] };
@@ -27,6 +27,9 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
    workers: WorkerUIData;
 
    player_board: PlayerBoardObject;
+
+   first_player_id: number;
+   river_dial: number;
 }
 
 type TopCardCount<T> = {
@@ -90,6 +93,19 @@ interface ValleyType {
    name: string;
    season: string;
    image_pos: number;
+   position: {
+      1: ValleyLocationInfo;
+      2: ValleyLocationInfo;
+      3: ValleyLocationInfo;
+      4: ValleyLocationInfo;
+   };
+}
+
+interface ValleyLocationInfo {
+   count: number;
+   rule: string;
+   values: number[];
+   resources: string[];
 }
 
 interface Dice extends BgaDie {

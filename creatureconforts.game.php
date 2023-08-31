@@ -84,6 +84,7 @@ class CreatureConforts extends Table {
 
         self::initGameStateLabels(array(
             VAR_FIRST_PLAYER => 10,
+            VAR_RIVER_DIAL => 11,
 
             OPTION_SHORT_GAME => OPTION_SHORT_GAME_ID,
             //    "my_first_global_variable" => 10,
@@ -136,6 +137,7 @@ class CreatureConforts extends Table {
         Valleys::setupNewGame($options);
         Dice::setupNewGame($players, $options);
         Worker::setupNewGame();
+        self::setGameStateInitialValue(VAR_RIVER_DIAL, bga_rand(1, 6));
         $this->activeNextPlayer();
     }
 
@@ -158,9 +160,10 @@ class CreatureConforts extends Table {
         $sql = "SELECT player_id id, player_score score, wood, stone, fruit, mushroom, yarn, grain, lesson, story, coin FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
         $result['first_player_id'] = intval(self::getGameStateValue(VAR_FIRST_PLAYER));
+        $result['river_dial'] = intval(self::getGameStateValue(VAR_RIVER_DIAL));
 
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-        $result['card_types'] = $this->confort_types;
+        $result['confort_types'] = $this->confort_types;
         $result['improvement_types'] = $this->improvement_types;
         $result['valley_types'] = $this->valley_types;
 

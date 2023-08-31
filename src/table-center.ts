@@ -12,6 +12,7 @@ class TableCenter {
    public valley: SlotStock<ImprovementCard>;
 
    public worker_locations: LocationStock;
+   public dice_locations: SlotDiceStock;
 
    public hill: LineDiceStock;
 
@@ -21,7 +22,10 @@ class TableCenter {
       this.setupTravelerCards(game);
       this.setupValleyCards(game);
       this.setupWorkerLocations(game);
+      this.setupDiceLocations(game);
       this.setupHillDice(game);
+
+      document.getElementById('river-dial').dataset.position = game.gamedatas.river_dial.toString();
    }
 
    private setupConfortCards(game: CreatureConforts) {
@@ -60,13 +64,23 @@ class TableCenter {
       this.confort_market.addCards(market);
    }
 
+   private setupDiceLocations(game: CreatureConforts) {
+      this.dice_locations = new SlotDiceStock(game.diceManager, document.getElementById(`dice-locations`), {
+         slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+         mapDieToSlot: (die) => die.location,
+         gap: '0',
+      });
+      const dice = game.gamedatas.dice.filter((die) => die.location > 0);
+      this.dice_locations.addDice(dice);
+   }
+
    private setupHillDice(game: CreatureConforts) {
       this.hill = new LineDiceStock(game.diceManager, document.getElementById(`hill-dice`), {
-         gap: '5px',
+         gap: '10px',
          sort: sortFunction('id'),
       });
 
-      const dice = game.gamedatas.dice.filter((die) => die.type == 'white' && die.location == null);
+      const dice = game.gamedatas.dice.filter((die) => die.location == 0);
       this.hill.addDice(dice);
    }
 

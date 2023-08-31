@@ -6,8 +6,8 @@ class PlayerPanel {
       const icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 
       const templateIcon = `<div class="wrapper">
+      <span id="player-panel-${player.id}-icons-{icon-value}-counter" class="counter">1</span>
          <div class="resource-icon" data-type="{icon-value}"></div>
-         <span id="player-panel-${player.id}-icons-{icon-value}-counter">1</span>
       </div>`;
 
       const html = `<div id="player-panel-${player.id}-icons" class="icons counters">

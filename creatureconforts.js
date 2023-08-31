@@ -2440,8 +2440,17 @@ var DiscardStock = (function (_super) {
 }(VisibleDeck));
 var LocationStock = (function (_super) {
     __extends(LocationStock, _super);
-    function LocationStock() {
-        return _super !== null && _super.apply(this, arguments) || this;
+    function LocationStock(manager, element, settings) {
+        var _this = _super.call(this, manager, element, settings) || this;
+        _this.manager = manager;
+        _this.element = element;
+        var handleMeepleClick = function (meeple) {
+            if (_this.OnLocationClick && _this.slots[meeple.location_arg].classList.contains('selectable')) {
+                _this.OnLocationClick(meeple.location_arg);
+            }
+        };
+        _this.onCardClick = handleMeepleClick;
+        return _this;
     }
     LocationStock.prototype.createSlot = function (slotId) {
         var _this = this;
@@ -2509,6 +2518,172 @@ var MyDiceManager = (function (_super) {
     }
     return MyDiceManager;
 }(DiceManager));
+var DiceHelper = (function () {
+    function DiceHelper(game) {
+        this.game = game;
+    }
+    DiceHelper.prototype.getTotalDiceSlot = function (location_id) {
+        if (location_id > 4) {
+            return 1;
+        }
+        return this.getValleyLocationInfo(location_id).count;
+    };
+    DiceHelper.prototype.isRequirementMet = function (location_id, dice) {
+        if (dice.length == 0)
+            return true;
+        var requirement = null;
+        if (location_id >= 1 && location_id <= 4) {
+            var info = this.getValleyLocationInfo(location_id);
+            if (info.count > 0 && info.count !== dice.length)
+                return false;
+            requirement = this.getValleyRequirement(info);
+        }
+        else if (location_id >= 5 && location_id <= 7) {
+            requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
+        }
+        return requirement.isRequirementMet(dice.map(function (d) { return Number(d.face); }).sort(function (a, b) { return a - b; }));
+    };
+    DiceHelper.prototype.getValleyLocationInfo = function (location_id) {
+        var location = location_id <= 2 ? 'forest' : 'meadow';
+        var card = this.game.tableCenter.valley.getCards().filter(function (card) { return card.location == location; })[0];
+        return this.game.gamedatas.valley_types[Number(card.type_arg)].position[location_id];
+    };
+    DiceHelper.prototype.getValleyRequirement = function (_a) {
+        var count = _a.count, values = _a.values, rule = _a.rule;
+        if (values) {
+            return new ValuesRequirement(values);
+        }
+        switch (rule) {
+            case '3_OR_UNDER':
+                return new ValueTotalLowerRequirement(3);
+            case '4_OR_HIGHER':
+                return new ValueTotalHigherRequirement(4);
+            case 'TOTAL_5_OR_LOWER':
+                return new ValueTotalLowerRequirement(7);
+            case 'TOTAL_6_OR_LOWER':
+                return new ValueTotalLowerRequirement(7);
+            case 'TOTAL_7_OR_HIGHER':
+                return new ValueTotalHigherRequirement(7);
+            case 'TOTAL_10_OR_HIGHER':
+                return new ValueTotalHigherRequirement(10);
+            case 'TOTAL_11_OR_HIGHER':
+                return new ValueTotalHigherRequirement(11);
+            case 'TOTAL_7':
+                return new ValueTotalExactRequirement(7);
+            case 'TOTAL_8':
+                return new ValueTotalExactRequirement(8);
+            case 'SAME_VALUE':
+                return new SameValueRequirement();
+            case 'ALL_EVEN':
+                return new AllEvenRequirement();
+            case 'ALL_ODD':
+                return new AllOddRequirement();
+            case 'STRAIGHT':
+                return new StraightRequirement();
+            default:
+                this.game.showMessage('Rule not implemented', 'error');
+        }
+    };
+    return DiceHelper;
+}());
+var ValuesRequirement = (function () {
+    function ValuesRequirement(values) {
+        this.values = values;
+    }
+    ValuesRequirement.prototype.isRequirementMet = function (values) {
+        var _this = this;
+        return values.every(function (val, index) { return val == _this.values[index]; });
+    };
+    return ValuesRequirement;
+}());
+var ValueTotalExactRequirement = (function () {
+    function ValueTotalExactRequirement(total) {
+        this.total = total;
+    }
+    ValueTotalExactRequirement.prototype.isRequirementMet = function (values) {
+        var sum = values.reduce(function (total, value) { return (total += value); }, 0);
+        return sum == this.total;
+    };
+    return ValueTotalExactRequirement;
+}());
+var ValueTotalLowerRequirement = (function () {
+    function ValueTotalLowerRequirement(total) {
+        this.total = total;
+    }
+    ValueTotalLowerRequirement.prototype.isRequirementMet = function (values) {
+        var sum = values.reduce(function (total, value) { return (total += value); }, 0);
+        return sum <= this.total;
+    };
+    return ValueTotalLowerRequirement;
+}());
+var ValueTotalHigherRequirement = (function () {
+    function ValueTotalHigherRequirement(total) {
+        this.total = total;
+    }
+    ValueTotalHigherRequirement.prototype.isRequirementMet = function (values) {
+        var sum = values.reduce(function (total, value) { return (total += value); }, 0);
+        return sum >= this.total;
+    };
+    return ValueTotalHigherRequirement;
+}());
+var SameValueRequirement = (function () {
+    function SameValueRequirement() {
+    }
+    SameValueRequirement.prototype.isRequirementMet = function (values) {
+        var firstNumber = values[0];
+        return values.every(function (val) { return val == firstNumber; });
+    };
+    return SameValueRequirement;
+}());
+var AllEvenRequirement = (function () {
+    function AllEvenRequirement() {
+    }
+    AllEvenRequirement.prototype.isRequirementMet = function (values) {
+        return values.every(function (val) { return val % 2 == 0; });
+    };
+    return AllEvenRequirement;
+}());
+var AllOddRequirement = (function () {
+    function AllOddRequirement() {
+    }
+    AllOddRequirement.prototype.isRequirementMet = function (values) {
+        return values.every(function (val) { return val % 2 == 1; });
+    };
+    return AllOddRequirement;
+}());
+var StraightRequirement = (function () {
+    function StraightRequirement() {
+    }
+    StraightRequirement.prototype.isRequirementMet = function (values) {
+        var firstNumber = values[0];
+        return values.every(function (v, index) { return firstNumber + index == v; });
+    };
+    return StraightRequirement;
+}());
+var DialRequirement = (function () {
+    function DialRequirement(dial, location_id) {
+        this.dial = dial;
+        this.location_id = location_id;
+    }
+    DialRequirement.prototype.isRequirementMet = function (values) {
+        var dieValue = values[0];
+        switch (this.location_id) {
+            case 5:
+                return dieValue == this.dial;
+            case 6: {
+                var baseValue = (this.dial + 1) % 6;
+                return dieValue == baseValue || dieValue == baseValue + 1;
+            }
+            case 7: {
+                var baseValue = (this.dial + 3) % 6;
+                return dieValue == baseValue || dieValue == baseValue + 1 || dieValue == baseValue + 2;
+            }
+            default:
+                return false;
+        }
+    };
+    return DialRequirement;
+}());
 var NotificationManager = (function () {
     function NotificationManager(game) {
         this.game = game;
@@ -2519,7 +2694,8 @@ var NotificationManager = (function () {
             ['onNewTraveler', 1000],
             ['onFamilyDice', 1000],
             ['onRevealPlacement', 1000],
-            ['onVillageDice', 1000],
+            ['onVillageDice', 1200],
+            ['onMoveDiceToHill', 1000],
         ];
         this.setupNotifications(notifs);
     };
@@ -2568,21 +2744,14 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_onVillageDice = function (_a) {
         var dice = _a.dice;
-        return __awaiter(this, void 0, void 0, function () {
-            var white_dice, stack;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        white_dice = dice.filter(function (die) { return die.type == 'white'; });
-                        stack = this.game.tableCenter.hill;
-                        return [4, stack.addDice(white_dice)];
-                    case 1:
-                        _b.sent();
-                        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
-                        return [2];
-                }
-            });
-        });
+        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
+        var stack = this.game.tableCenter.hill;
+        stack.addDice(white_dice);
+        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+    };
+    NotificationManager.prototype.notif_onMoveDiceToHill = function (_a) {
+        var dice = _a.dice;
+        this.game.tableCenter.hill.addDice(dice);
     };
     NotificationManager.prototype.setupNotifications = function (notifs) {
         var _this = this;
@@ -2621,6 +2790,7 @@ var StateManager = (function () {
         this.states = {
             startHand: new StartHandState(game),
             placement: new PlacementState(game),
+            playerTurnDice: new PlayerTurnDiceState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -2826,6 +2996,88 @@ var PlacementState = (function () {
     };
     return PlacementState;
 }());
+var PlayerTurnDiceState = (function () {
+    function PlayerTurnDiceState(game) {
+        this.game = game;
+        this.diceHelper = new DiceHelper(game);
+    }
+    PlayerTurnDiceState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        var handleHillClick = function (selection) {
+            if (selection.length == 1) {
+                var locations = _this.getWorkerLocations().filter(function (location_id) {
+                    var count = _this.getDiceFromLocation(location_id).length;
+                    return count < _this.diceHelper.getTotalDiceSlot(location_id);
+                });
+                worker_locations.setSelectableLocation(locations);
+            }
+            else {
+                worker_locations.setSelectableLocation([]);
+            }
+        };
+        var handleWorkerLocationClick = function (slotId) {
+            var _a = hill.getSelection(), die = _a[0], others = _a.slice(1);
+            if (!die)
+                return;
+            var copy = __assign(__assign({}, die), { location: slotId });
+            dice_locations.addDie(copy);
+        };
+        var handleDiceLocationClick = function (die) {
+            hill.unselectAll();
+            hill.addDie(die);
+        };
+        hill.setSelectionMode('single');
+        hill.onSelectionChange = handleHillClick;
+        worker_locations.OnLocationClick = handleWorkerLocationClick;
+        dice_locations.onDieClick = handleDiceLocationClick;
+    };
+    PlayerTurnDiceState.prototype.onLeavingState = function () { };
+    PlayerTurnDiceState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleCancel = function () {
+            var _a = _this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
+            hill.addDice(dice_locations.getDice());
+        };
+        var handleConfirm = function () {
+            _this.validate();
+        };
+        this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+    };
+    PlayerTurnDiceState.prototype.validate = function () {
+        var locations = this.getWorkerLocations();
+        var error = [];
+        for (var _i = 0, locations_1 = locations; _i < locations_1.length; _i++) {
+            var location_id = locations_1[_i];
+            var dice = this.getDiceFromLocation(location_id);
+            if (!this.diceHelper.isRequirementMet(location_id, dice)) {
+                error.push(location_id);
+            }
+        }
+        if (error.length > 0) {
+            this.game.showMessage("Requirement not met for location ".concat(error.join(', ')), 'error');
+        }
+        else {
+            this.game.showMessage("Requirement met", 'info');
+        }
+    };
+    PlayerTurnDiceState.prototype.getWorkerLocations = function () {
+        var player_id = this.game.getPlayerId().toString();
+        return this.game.tableCenter.worker_locations
+            .getCards()
+            .filter(function (meeple) { return meeple.type_arg == player_id; })
+            .map(function (meeple) { return Number(meeple.location_arg); });
+    };
+    PlayerTurnDiceState.prototype.getDiceFromLocation = function (location_id) {
+        return this.game.tableCenter.dice_locations
+            .getDice()
+            .filter(function (die) { return die.location == location_id; });
+    };
+    return PlayerTurnDiceState;
+}());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
     function ConfortManager(game) {
@@ -2983,7 +3235,7 @@ var PlayerPanel = (function () {
         this.game = game;
         this.counters = {};
         var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
-        var templateIcon = "<div class=\"wrapper\">\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n         <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\">1</span>\n      </div>");
+        var templateIcon = "<div class=\"wrapper\">\n      <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
         var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n      </div>");
         document.getElementById("player_board_".concat(player.id)).insertAdjacentHTML('beforeend', html);
         icons.forEach(function (icon) {
@@ -3058,7 +3310,9 @@ var TableCenter = (function () {
         this.setupTravelerCards(game);
         this.setupValleyCards(game);
         this.setupWorkerLocations(game);
+        this.setupDiceLocations(game);
         this.setupHillDice(game);
+        document.getElementById('river-dial').dataset.position = game.gamedatas.river_dial.toString();
     }
     TableCenter.prototype.setupConfortCards = function (game) {
         var _a = game.gamedatas.conforts, market = _a.market, discard = _a.discard, deckCount = _a.deckCount;
@@ -3079,12 +3333,21 @@ var TableCenter = (function () {
         });
         this.confort_market.addCards(market);
     };
+    TableCenter.prototype.setupDiceLocations = function (game) {
+        this.dice_locations = new SlotDiceStock(game.diceManager, document.getElementById("dice-locations"), {
+            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            mapDieToSlot: function (die) { return die.location; },
+            gap: '0',
+        });
+        var dice = game.gamedatas.dice.filter(function (die) { return die.location > 0; });
+        this.dice_locations.addDice(dice);
+    };
     TableCenter.prototype.setupHillDice = function (game) {
         this.hill = new LineDiceStock(game.diceManager, document.getElementById("hill-dice"), {
-            gap: '5px',
+            gap: '10px',
             sort: sortFunction('id'),
         });
-        var dice = game.gamedatas.dice.filter(function (die) { return die.type == 'white' && die.location == null; });
+        var dice = game.gamedatas.dice.filter(function (die) { return die.location == 0; });
         this.hill.addDice(dice);
     };
     TableCenter.prototype.setupImprovementCards = function (game) {

@@ -128,27 +128,45 @@ $machinestates = $basicGameStates + array(
         "name" => "villageDice",
         "type" => "game",
         "action" => "stVillageDice",
-        "transitions" => ["" => ST_PLAYER_TURN]
+        "transitions" => ["" => ST_PLAYER_TURN_START]
     ],
 
-    ST_PLAYER_TURN => [
-        "name" => "playerTurn",
+    ST_PLAYER_TURN_START => [
+        "name" => "playerTurnStart",
+        "type" => "game",
+        "action" => "stPlayerTurnStart",
+        "transitions" => ["" => ST_PLAYER_TURN_DICE]
+    ],
+
+    ST_PLAYER_TURN_DICE => [
+        "name" => "playerTurnDice",
+        "description" => clienttranslate('${actplayer} must place your dices where your have workers'),
+        "descriptionmyturn" => clienttranslate('${you} must place their dices'),
+        "type" => "activeplayer",
+        "possibleactions" => array("placeDice"),
+        "transitions" => [
+            "" => ST_PLAYER_TURN_RESOLVE,
+        ]
+    ],
+
+    ST_PLAYER_TURN_RESOLVE => [
+        "name" => "playerTurnDice",
         "description" => clienttranslate('${actplayer} must resolve your workers'),
         "descriptionmyturn" => clienttranslate('${you} must resolve their workers'),
         "type" => "activeplayer",
         "possibleactions" => array("resolveWorker", "confirmPlayerTurn"),
         "transitions" => [
-            "" => ST_NEXT_PLAYER_TURN,
+            "" => ST_PLAYER_TURN_NEXT,
         ]
     ],
 
-    ST_NEXT_PLAYER_TURN => [
+    ST_PLAYER_TURN_NEXT => [
         "name" => "nextPlayerTurn",
         "type" => "game",
         "action" => "stNextPlayerTurn",
         "transitions" => [
-            "next" => ST_PLAYER_TURN,
-            "end" => ST_PLAYER_TURN
+            "next" => ST_PLAYER_TURN_START,
+            "end" => ST_PLAYER_TURN_START
         ]
     ],
 

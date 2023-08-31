@@ -56,6 +56,12 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function moveDiceToHill($dice) {
+        self::notifyAll('onMoveDiceToHill', '', [
+            'dice' => $dice,
+        ]);
+    }
+
     static function villageDice($dice) {
         $dice = array_filter($dice, function ($die) {
             return $die['type'] == "white";

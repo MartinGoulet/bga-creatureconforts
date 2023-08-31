@@ -10,6 +10,7 @@
                 <div id="table-travelers"></div>
                 <div id="table-valleys"></div>
                 <div id="worker-locations"></div>
+                <div id="dice-locations"></div>
                 <div id="hill-dice"></div>
 
                 <div id="decks">

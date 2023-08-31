@@ -48,12 +48,20 @@
 
 .icons.counters {
    display: flex;
-   gap: 6px;
+   gap: 5px;
    flex-wrap: wrap;
 
    .wrapper {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
+      background-color: rgba(235, 255, 235, 0.45);
+      padding: 0px 4px;
+      border-radius: 10px;
+
+      .counter {
+         font-size: 21px;
+         font-weight: 700;
+      }
    }
 }

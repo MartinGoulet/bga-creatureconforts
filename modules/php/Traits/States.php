@@ -2,7 +2,6 @@
 
 namespace CreatureConforts\Traits;
 
-use BgaUserException;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
@@ -25,9 +24,9 @@ trait States {
 
     function stNewTraveler() {
         $isFirstTurn = Travelers::count() == 15;
-        if(!$isFirstTurn) {
+        if (!$isFirstTurn) {
             Travelers::discardTopCard();
-        }   
+        }
         Travelers::revealTopCard();
         Notifications::newTraveler();
         Game::get()->gamestate->nextState();
@@ -58,6 +57,15 @@ trait States {
     function stVillageDice() {
         Dice::throwWhiteDice();
         Notifications::villageDice(Dice::getUIData());
+        Game::get()->gamestate->nextState();
+    }
+
+    function stPlayerTurnStart() {
+        $player_id = $this->getActivePlayerId();
+        Dice::movePlayerDiceToHill($player_id);
+
+        $dice = Dice::getDiceFromPlayer($player_id);
+        Notifications::moveDiceToHill($dice);
         Game::get()->gamestate->nextState();
     }
 }

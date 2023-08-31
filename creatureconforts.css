@@ -588,13 +588,78 @@ body > .bga-dice_die {
   top: 749px;
   left: 457px;
 }
+#table-center-wrapper #board #dice-locations {
+  position: relative;
+}
+#table-center-wrapper #board #dice-locations .slot {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="1"] {
+  top: 54px;
+  left: 55px;
+  width: 130px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="2"] {
+  top: 54px;
+  left: 211px;
+  width: 130px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="3"] {
+  top: 54px;
+  left: 397px;
+  width: 130px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="4"] {
+  top: 54px;
+  left: 553px;
+  width: 130px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="5"] {
+  top: 220px;
+  left: 664px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="6"] {
+  top: 400px;
+  left: 590px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="7"] {
+  top: 306px;
+  left: 392px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="8"] {
+  top: 479px;
+  left: 416px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="9"] {
+  top: 590px;
+  left: 354px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="10"] {
+  top: 755px;
+  left: 97px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="11"] {
+  top: 702px;
+  left: 310px;
+}
+#table-center-wrapper #board #dice-locations [data-slot-id="12"] {
+  top: 702px;
+  left: 472px;
+}
 #table-center-wrapper #board #hill-dice {
   position: absolute;
   top: 227px;
   left: 228px;
   display: flex;
   flex-wrap: wrap;
-  width: 70px;
+  width: 76px;
 }
 #table-center-wrapper #board #river-dial {
   position: absolute;
@@ -606,22 +671,22 @@ body > .bga-dice_die {
   left: 514px;
 }
 #table-center-wrapper #board #river-dial[data-position="1"] {
-  transform: rotate(0deg);
-}
-#table-center-wrapper #board #river-dial[data-position="2"] {
-  transform: rotate(-60deg);
-}
-#table-center-wrapper #board #river-dial[data-position="3"] {
-  transform: rotate(-120deg);
-}
-#table-center-wrapper #board #river-dial[data-position="4"] {
-  transform: rotate(-180deg);
-}
-#table-center-wrapper #board #river-dial[data-position="5"] {
   transform: rotate(-240deg);
 }
-#table-center-wrapper #board #river-dial[data-position="6"] {
+#table-center-wrapper #board #river-dial[data-position="2"] {
   transform: rotate(-300deg);
+}
+#table-center-wrapper #board #river-dial[data-position="3"] {
+  transform: rotate(-360deg);
+}
+#table-center-wrapper #board #river-dial[data-position="4"] {
+  transform: rotate(-420deg);
+}
+#table-center-wrapper #board #river-dial[data-position="5"] {
+  transform: rotate(-480deg);
+}
+#table-center-wrapper #board #river-dial[data-position="6"] {
+  transform: rotate(-540deg);
 }
 #table-center-wrapper #board #decks {
   display: flex;
@@ -693,13 +758,20 @@ body > .bga-dice_die {
 
 .icons.counters {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   flex-wrap: wrap;
 }
 .icons.counters .wrapper {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
+  background-color: rgba(235, 255, 235, 0.45);
+  padding: 0px 4px;
+  border-radius: 10px;
+}
+.icons.counters .wrapper .counter {
+  font-size: 21px;
+  font-weight: 700;
 }
 
 .player-table {
@@ -1461,8 +1533,8 @@ body > .bga-dice_die {
   animation: pulseSelectable 1s infinite alternate;
 }
 
-.bga-cards_selected-card .front {
-  animation: pulseSelectable 1s infinite alternate;
+.bga-dice_selected-die {
+  box-shadow: 0 0 5px 7px #00ffff;
 }
 
 @keyframes pulseSelectable {

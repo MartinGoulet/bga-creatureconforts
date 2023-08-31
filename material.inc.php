@@ -293,86 +293,276 @@ $this->traveler_types = [
 ];
 
 $this->valley_types = [
-   // --- gen php begin valleys --- 
- 1 => [ 
-  'season' => SPRING,
-  'type' => FOREST,
-  'image_pos' => 3,
-],
- 2 => [ 
-  'season' => SPRING,
-  'type' => FOREST,
-  'image_pos' => 4,
-],
- 3 => [ 
-  'season' => SPRING,
-  'type' => FOREST,
-  'image_pos' => 5,
-],
- 4 => [ 
-  'season' => SUMMER,
-  'type' => FOREST,
-  'image_pos' => 6,
-],
- 5 => [ 
-  'season' => SUMMER,
-  'type' => FOREST,
-  'image_pos' => 7,
-],
- 6 => [ 
-  'season' => SUMMER,
-  'type' => FOREST,
-  'image_pos' => 8,
-],
- 7 => [ 
-  'season' => FALL,
-  'type' => FOREST,
-  'image_pos' => 1,
-],
- 8 => [ 
-  'season' => FALL,
-  'type' => FOREST,
-  'image_pos' => 2,
-],
- 11 => [ 
-  'season' => SPRING,
-  'type' => MEADOW,
-  'image_pos' => 3,
-],
- 12 => [ 
-  'season' => SPRING,
-  'type' => MEADOW,
-  'image_pos' => 4,
-],
- 13 => [ 
-  'season' => SPRING,
-  'type' => MEADOW,
-  'image_pos' => 5,
-],
- 14 => [ 
-  'season' => SUMMER,
-  'type' => MEADOW,
-  'image_pos' => 6,
-],
- 15 => [ 
-  'season' => SUMMER,
-  'type' => MEADOW,
-  'image_pos' => 7,
-],
- 16 => [ 
-  'season' => SUMMER,
-  'type' => MEADOW,
-  'image_pos' => 8,
-],
- 17 => [ 
-  'season' => FALL,
-  'type' => MEADOW,
-  'image_pos' => 1,
-],
- 18 => [ 
-  'season' => FALL,
-  'type' => MEADOW,
-  'image_pos' => 2,
-],
-   // --- gen php end valleys --- 
+   1 => [
+      'season' => SPRING,
+      'type' => FOREST,
+      'image_pos' => 3,
+      'position' => [
+         1 => [
+            "count" => 1,
+            "rule" => RULE_3_OR_UNDER,
+            "resources" => [WOOD => 1]
+         ],
+         2 => [
+            "count" => 2,
+            "rule" => RULE_TOTAL_5_OR_LOWER,
+            "resources" => [WOOD => 2, MUSHROOM => 2]
+         ],
+      ],
+   ],
+   2 => [
+      'season' => SPRING,
+      'type' => FOREST,
+      'image_pos' => 4,
+      'position' => [
+         1 => [
+            "count" => 1,
+            "values" => [4],
+            "resources" => [MUSHROOM => 2],
+         ],
+         2 => [
+            "count" => 2,
+            "values" => [5, 6],
+            "resources" => [WOOD => 2, FRUIT => 1],
+         ],
+      ],
+   ],
+   3 => [
+      'season' => SPRING,
+      'type' => FOREST,
+      'image_pos' => 5,
+      'position' => [
+         1 => [
+            "count" => -1,
+            "rule" => RULE_TOTAL_11_OR_HIGHER,
+            "resources" => [WOOD => 2, MUSHROOM => 1],
+         ],
+         2 => [
+            "count" => 2,
+            "values" => [3, 4],
+            "resources" => [MUSHROOM => 2, FRUIT => 1],
+         ],
+      ]
+   ],
+   4 => [
+      'season' => SUMMER,
+      'type' => FOREST,
+      'image_pos' => 6,
+      'position' => [
+         1 => [
+            "count" => 1,
+            "values" => [3],
+            "resources" => [WOOD => 2],
+         ],
+         2 => [
+            "count" => 2,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [WOOD => 1, COIN => 1],
+         ],
+      ],
+   ],
+   5 => [
+      'season' => SUMMER,
+      'type' => FOREST,
+      'image_pos' => 7,
+      'position' => [
+         1 => [
+            "count" => 3,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [COIN => 3],
+         ],
+         2 => [
+            "count" => 3,
+            "rule" => RULE_TOTAL_11_OR_HIGHER,
+            "resources" => [WOOD => 3, FRUIT => 1],
+         ],
+      ],
+   ],
+   6 => [
+      'season' => SUMMER,
+      'type' => FOREST,
+      'image_pos' => 8,
+      'position' => [
+         1 => [
+            "count" => 1,
+            "rule" => RULE_4_OR_HIGHER,
+            "resources" => [WOOD => 1],
+         ],
+         2 => [
+            "count" => 3,
+            "rule" => RULE_ALL_EVEN,
+            "resources" => [WOOD => 1, FRUIT => 2, COIN => 1],
+         ],
+      ],
+   ],
+   7 => [
+      'season' => FALL,
+      'type' => FOREST,
+      'image_pos' => 1,
+      'position' => [
+         1 => [
+            "count" => 2,
+            "rule" => RULE_TOTAL_5_OR_LOWER,
+            "resources" => [WOOD => 1, MUSHROOM => 1],
+         ],
+         2 => [
+            "count" => 2,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [WOOD => 1, FRUIT => 2],
+         ],
+      ],
+   ],
+   8 => [
+      'season' => FALL,
+      'type' => FOREST,
+      'image_pos' => 2,
+      'position' => [
+         1 => [
+            "count" => 1,
+            "values" => [6],
+            "resources" => [WOOD => 1, FRUIT => 1],
+         ],
+         2 => [
+            "count" => 2,
+            "rule" => RULE_ALL_EVEN,
+            "resources" => [WOOD => 1, MUSHROOM => 2],
+         ],
+      ],
+   ],
+   11 => [
+      'season' => SPRING,
+      'type' => MEADOW,
+      'image_pos' => 3,
+      'position' => [
+         3 => [
+            "count" => 2,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [FRUIT => 2],
+         ],
+         4 => [
+            "count" => 2,
+            "rule" => RULE_TOTAL_7_OR_HIGHER,
+            "resources" => [YARN => 1, COIN => 1],
+         ],
+      ],
+   ],
+   12 => [
+      'season' => SPRING,
+      'type' => MEADOW,
+      'image_pos' => 4,
+      'position' => [
+         3 => [
+            "count" => 3,
+            "rule" => RULE_STRAIGHT,
+            "resources" => [STORY => 2, COIN => 1],
+         ],
+         4 => [
+            "count" => 2,
+            "values" => [1, 2],
+            "resources" => [FRUIT => 1, YARN => 1],
+         ],
+      ],
+   ],
+   13 => [
+      'season' => SPRING,
+      'type' => MEADOW,
+      'image_pos' => 5,
+      'position' => [
+         3 => [
+            "count" => 2,
+            "rule" => RULE_TOTAL_8,
+            "resources" => [YARN => 2],
+         ],
+         4 => [
+            "count" => 1,
+            "values" => [2],
+            "resources" => [STORY => 1],
+         ],
+      ],
+   ],
+   14 => [
+      'season' => SUMMER,
+      'type' => MEADOW,
+      'image_pos' => 6,
+      'position' => [
+         3 => [
+            "count" => 2,
+            "rule" => RULE_TOTAL_10_OR_HIGHER,
+            "resources" => [GRAIN => 1, FRUIT => 1, YARN => 1],
+         ],
+         4 => [
+            "count" => 3,
+            "rule" => RULE_ALL_EVEN,
+            "resources" => [GRAIN => 4],
+         ],
+      ],
+   ],
+   15 => [
+      'season' => SUMMER,
+      'type' => MEADOW,
+      'image_pos' => 7,
+      'position' => [
+         3 => [
+            "count" => 3,
+            "rule" => RULE_STRAIGHT,
+            "resources" => [YARN => 2, STORY => 1],
+         ],
+         4 => [
+            "count" => 2,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [GRAIN => 1, FRUIT => 1],
+         ],
+      ],
+   ],
+   16 => [
+      'season' => SUMMER,
+      'type' => MEADOW,
+      'image_pos' => 8,
+      'position' => [
+         3 => [
+            "count" => 2,
+            "rule" => RULE_SAME_VALUE,
+            "resources" => [YARN => 1, GRAIN => 1],
+         ],
+         4 => [
+            "count" => 2,
+            "rule" => RULE_STRAIGHT,
+            "resources" => [GRAIN => 2],
+         ],
+      ],
+   ],
+   17 => [
+      'season' => FALL,
+      'type' => MEADOW,
+      'image_pos' => 1,
+      'position' => [
+         3 => [
+            "count" => 3,
+            "rule" => RULE_TOTAL_6_OR_LOWER,
+            "resources" => [STORY => 2]
+         ],
+         4 => [
+            "count" => 3,
+            "rule" => RULE_TOTAL_7,
+            "resources" => [GRAIN => 2, FRUIT => 2],
+         ],
+      ],
+   ],
+   18 => [
+      'season' => FALL,
+      'type' => MEADOW,
+      'image_pos' => 2,
+      'position' => [
+         3 => [
+            "count" => 1,
+            "values" => [5],
+            "resources" => [STORY => 1],
+         ],
+         4 => [
+            "count" => 2,
+            "rule" => RULE_ALL_ODD,
+            "resources" => [GRAIN => 2],
+         ],
+      ],
+   ],
 ];

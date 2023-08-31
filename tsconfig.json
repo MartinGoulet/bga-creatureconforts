@@ -54,6 +54,7 @@
 
         "src/states/start-hand.ts",
         "src/states/placement.ts",
+        "src/states/player-turn-dice.ts",
 
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",
