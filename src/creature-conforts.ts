@@ -1,7 +1,7 @@
 const isDebug =
    window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 const debug = isDebug ? console.log.bind(window.console) : function () {};
-const LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
+// const LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 
 interface CreatureConforts
@@ -50,7 +50,7 @@ class CreatureConforts
    public tableCenter: TableCenter;
    public playersPanels: PlayerPanel[];
    public playersTables: PlayerTable[];
-   public zoomManager: ZoomManager;
+   // public zoomManager: ZoomManager;
 
    constructor() {}
 
@@ -92,21 +92,21 @@ class CreatureConforts
       this.createPlayerPanels(gamedatas);
       this.createPlayerTables(gamedatas);
 
-      this.zoomManager = new ZoomManager({
-         element: document.getElementById('table'),
-         smooth: false,
-         zoomControls: {
-            color: 'white',
-         },
-         localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
-         onDimensionsChange: () => {
-            const tablesAndCenter = document.getElementById('tables-and-center');
-            const clientWidth = document.getElementById('table').clientWidth;
-            const tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
-            tablesAndCenter.classList.toggle('double-column', clientWidth > 971 + tablesWidth); // 950 + 21 + tablesWidth
-         },
-         // zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1],
-      });
+      // this.zoomManager = new ZoomManager({
+      //    element: document.getElementById('table'),
+      //    smooth: false,
+      //    zoomControls: {
+      //       color: 'white',
+      //    },
+      //    localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
+      //    onDimensionsChange: () => {
+      //       const tablesAndCenter = document.getElementById('tables-and-center');
+      //       const clientWidth = document.getElementById('table').clientWidth;
+      //       const tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
+      //       tablesAndCenter.classList.toggle('double-column', clientWidth > 971 + tablesWidth); // 950 + 21 + tablesWidth
+      //    },
+      //    // zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1],
+      // });
 
       this.setupNotifications();
    }

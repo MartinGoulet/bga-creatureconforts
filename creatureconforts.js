@@ -1,172 +1,3 @@
-var DEFAULT_ZOOM_LEVELS = [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
-var ZoomManager = (function () {
-    function ZoomManager(settings) {
-        var _this = this;
-        var _a, _b, _c, _d, _e;
-        this.settings = settings;
-        if (!settings.element) {
-            throw new DOMException('You need to set the element to wrap in the zoom element');
-        }
-        this._zoomLevels = (_a = settings.zoomLevels) !== null && _a !== void 0 ? _a : DEFAULT_ZOOM_LEVELS;
-        this._zoom = this.settings.defaultZoom || 1;
-        if (this.settings.localStorageZoomKey) {
-            var zoomStr = localStorage.getItem(this.settings.localStorageZoomKey);
-            if (zoomStr) {
-                this._zoom = Number(zoomStr);
-            }
-        }
-        this.wrapper = document.createElement('div');
-        this.wrapper.id = 'bga-zoom-wrapper';
-        this.wrapElement(this.wrapper, settings.element);
-        this.wrapper.appendChild(settings.element);
-        settings.element.classList.add('bga-zoom-inner');
-        if ((_b = settings.smooth) !== null && _b !== void 0 ? _b : true) {
-            settings.element.dataset.smooth = 'true';
-            settings.element.addEventListener('transitionend', function () { return _this.zoomOrDimensionChanged(); });
-        }
-        if ((_d = (_c = settings.zoomControls) === null || _c === void 0 ? void 0 : _c.visible) !== null && _d !== void 0 ? _d : true) {
-            this.initZoomControls(settings);
-        }
-        if (this._zoom !== 1) {
-            this.setZoom(this._zoom);
-        }
-        window.addEventListener('resize', function () {
-            var _a;
-            _this.zoomOrDimensionChanged();
-            if ((_a = _this.settings.autoZoom) === null || _a === void 0 ? void 0 : _a.expectedWidth) {
-                _this.setAutoZoom();
-            }
-        });
-        if (window.ResizeObserver) {
-            new ResizeObserver(function () { return _this.zoomOrDimensionChanged(); }).observe(settings.element);
-        }
-        if ((_e = this.settings.autoZoom) === null || _e === void 0 ? void 0 : _e.expectedWidth) {
-            this.setAutoZoom();
-        }
-    }
-    Object.defineProperty(ZoomManager.prototype, "zoom", {
-        get: function () {
-            return this._zoom;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Object.defineProperty(ZoomManager.prototype, "zoomLevels", {
-        get: function () {
-            return this._zoomLevels;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    ZoomManager.prototype.setAutoZoom = function () {
-        var _this = this;
-        var _a, _b, _c;
-        var zoomWrapperWidth = document.getElementById('bga-zoom-wrapper').clientWidth;
-        if (!zoomWrapperWidth) {
-            setTimeout(function () { return _this.setAutoZoom(); }, 200);
-            return;
-        }
-        var expectedWidth = (_a = this.settings.autoZoom) === null || _a === void 0 ? void 0 : _a.expectedWidth;
-        var newZoom = this.zoom;
-        while (newZoom > this._zoomLevels[0] && newZoom > ((_c = (_b = this.settings.autoZoom) === null || _b === void 0 ? void 0 : _b.minZoomLevel) !== null && _c !== void 0 ? _c : 0) && zoomWrapperWidth / newZoom < expectedWidth) {
-            newZoom = this._zoomLevels[this._zoomLevels.indexOf(newZoom) - 1];
-        }
-        if (this._zoom == newZoom) {
-            if (this.settings.localStorageZoomKey) {
-                localStorage.setItem(this.settings.localStorageZoomKey, '' + this._zoom);
-            }
-        }
-        else {
-            this.setZoom(newZoom);
-        }
-    };
-    ZoomManager.prototype.setZoomLevels = function (zoomLevels, newZoom) {
-        if (!zoomLevels || zoomLevels.length <= 0) {
-            return;
-        }
-        this._zoomLevels = zoomLevels;
-        var zoomIndex = newZoom && zoomLevels.includes(newZoom) ? this._zoomLevels.indexOf(newZoom) : this._zoomLevels.length - 1;
-        this.setZoom(this._zoomLevels[zoomIndex]);
-    };
-    ZoomManager.prototype.setZoom = function (zoom) {
-        var _a, _b, _c, _d;
-        if (zoom === void 0) { zoom = 1; }
-        this._zoom = zoom;
-        if (this.settings.localStorageZoomKey) {
-            localStorage.setItem(this.settings.localStorageZoomKey, '' + this._zoom);
-        }
-        var newIndex = this._zoomLevels.indexOf(this._zoom);
-        (_a = this.zoomInButton) === null || _a === void 0 ? void 0 : _a.classList.toggle('disabled', newIndex === this._zoomLevels.length - 1);
-        (_b = this.zoomOutButton) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', newIndex === 0);
-        this.settings.element.style.transform = zoom === 1 ? '' : "scale(".concat(zoom, ")");
-        (_d = (_c = this.settings).onZoomChange) === null || _d === void 0 ? void 0 : _d.call(_c, this._zoom);
-        this.zoomOrDimensionChanged();
-    };
-    ZoomManager.prototype.manualHeightUpdate = function () {
-        if (!window.ResizeObserver) {
-            this.zoomOrDimensionChanged();
-        }
-    };
-    ZoomManager.prototype.zoomOrDimensionChanged = function () {
-        var _a, _b;
-        this.settings.element.style.width = "".concat(this.wrapper.getBoundingClientRect().width / this._zoom, "px");
-        this.wrapper.style.height = "".concat(this.settings.element.getBoundingClientRect().height, "px");
-        (_b = (_a = this.settings).onDimensionsChange) === null || _b === void 0 ? void 0 : _b.call(_a, this._zoom);
-    };
-    ZoomManager.prototype.zoomIn = function () {
-        if (this._zoom === this._zoomLevels[this._zoomLevels.length - 1]) {
-            return;
-        }
-        var newIndex = this._zoomLevels.indexOf(this._zoom) + 1;
-        this.setZoom(newIndex === -1 ? 1 : this._zoomLevels[newIndex]);
-    };
-    ZoomManager.prototype.zoomOut = function () {
-        if (this._zoom === this._zoomLevels[0]) {
-            return;
-        }
-        var newIndex = this._zoomLevels.indexOf(this._zoom) - 1;
-        this.setZoom(newIndex === -1 ? 1 : this._zoomLevels[newIndex]);
-    };
-    ZoomManager.prototype.setZoomControlsColor = function (color) {
-        if (this.zoomControls) {
-            this.zoomControls.dataset.color = color;
-        }
-    };
-    ZoomManager.prototype.initZoomControls = function (settings) {
-        var _this = this;
-        var _a, _b, _c, _d, _e, _f;
-        this.zoomControls = document.createElement('div');
-        this.zoomControls.id = 'bga-zoom-controls';
-        this.zoomControls.dataset.position = (_b = (_a = settings.zoomControls) === null || _a === void 0 ? void 0 : _a.position) !== null && _b !== void 0 ? _b : 'top-right';
-        this.zoomOutButton = document.createElement('button');
-        this.zoomOutButton.type = 'button';
-        this.zoomOutButton.addEventListener('click', function () { return _this.zoomOut(); });
-        if ((_c = settings.zoomControls) === null || _c === void 0 ? void 0 : _c.customZoomOutElement) {
-            settings.zoomControls.customZoomOutElement(this.zoomOutButton);
-        }
-        else {
-            this.zoomOutButton.classList.add("bga-zoom-out-icon");
-        }
-        this.zoomInButton = document.createElement('button');
-        this.zoomInButton.type = 'button';
-        this.zoomInButton.addEventListener('click', function () { return _this.zoomIn(); });
-        if ((_d = settings.zoomControls) === null || _d === void 0 ? void 0 : _d.customZoomInElement) {
-            settings.zoomControls.customZoomInElement(this.zoomInButton);
-        }
-        else {
-            this.zoomInButton.classList.add("bga-zoom-in-icon");
-        }
-        this.zoomControls.appendChild(this.zoomOutButton);
-        this.zoomControls.appendChild(this.zoomInButton);
-        this.wrapper.appendChild(this.zoomControls);
-        this.setZoomControlsColor((_f = (_e = settings.zoomControls) === null || _e === void 0 ? void 0 : _e.color) !== null && _f !== void 0 ? _f : 'black');
-    };
-    ZoomManager.prototype.wrapElement = function (wrapper, element) {
-        element.parentNode.insertBefore(wrapper, element);
-        wrapper.appendChild(element);
-    };
-    return ZoomManager;
-}());
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -2164,7 +1995,6 @@ function sortFunction() {
 }
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.log.bind(window.console) : function () { };
-var LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
 var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
 var CreatureConforts = (function () {
     function CreatureConforts() {
@@ -2189,20 +2019,6 @@ var CreatureConforts = (function () {
         });
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
-        this.zoomManager = new ZoomManager({
-            element: document.getElementById('table'),
-            smooth: false,
-            zoomControls: {
-                color: 'white',
-            },
-            localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
-            onDimensionsChange: function () {
-                var tablesAndCenter = document.getElementById('tables-and-center');
-                var clientWidth = document.getElementById('table').clientWidth;
-                var tablesWidth = Math.max(640);
-                tablesAndCenter.classList.toggle('double-column', clientWidth > 971 + tablesWidth);
-            },
-        });
         this.setupNotifications();
     };
     CreatureConforts.prototype.onEnteringState = function (stateName, args) {
@@ -3456,7 +3272,6 @@ var TableCenter = (function () {
         this.traveler_deck = new Deck(game.travelerManager, document.getElementById("table-travelers"), {
             cardNumber: count,
             topCard: topCard !== null && topCard !== void 0 ? topCard : this.hidden_traveler,
-            counter: {},
         });
     };
     TableCenter.prototype.setupValleyCards = function (game) {

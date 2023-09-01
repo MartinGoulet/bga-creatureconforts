@@ -115,7 +115,6 @@ class TableCenter {
          {
             cardNumber: count,
             topCard: topCard ?? this.hidden_traveler,
-            counter: {},
          },
       );
    }

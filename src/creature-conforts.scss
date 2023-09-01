@@ -14,7 +14,7 @@ $purple: '650e41';
 
 $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 
-@import '../node_modules/bga-zoom/bga-zoom';
+// @import '../node_modules/bga-zoom/bga-zoom';
 @import '../node_modules/bga-cards/bga-cards';
 @import '../node_modules/bga-dice/bga-dice';
 @import 'table-center';
@@ -37,20 +37,22 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 #table {
    display: flex;
    justify-content: center;
+   padding-top: 40px;
 }
 
-#bga-zoom-wrapper {
-   padding: 20px 0;
-}
+// #bga-zoom-wrapper {
+//    padding: 20px 0;
+// }
 
 #tables-and-center {
    position: relative;
    display: flex;
    justify-content: center;
-   align-items: stretch;
+   align-items: flex-start;
    gap: 20px;
-   flex-direction: column;
+   flex-wrap: wrap;
    margin-right: 10px;
+   width: 100%;
 
    #tables {
       position: relative;
@@ -58,21 +60,26 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      gap: 20px;
+      flex-grow: 1;
       flex-direction: column;
+      gap: 20px;
    }
 
-   &.double-column {
-      flex-direction: row;
-      justify-content: center;
-      align-items: start;
+   // &.double-column {
+   //    flex-direction: row;
+   //    justify-content: center;
+   //    align-items: start;
 
-      // & > div {
-      //    flex: 1;
-      // }
-      #tables {
-         flex-direction: row;
-      }
+   //    // & > div {
+   //    //    flex: 1;
+   //    // }
+   //    #tables {
+   //       flex-direction: row;
+   //    }
+   // }
+
+   .whiteblock {
+      margin: 0;
    }
 }
 
