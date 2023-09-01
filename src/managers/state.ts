@@ -8,6 +8,7 @@ class StateManager {
          startHand: new StartHandState(game),
          placement: new PlacementState(game),
          playerTurnDice: new PlayerTurnDiceState(game),
+         playerTurnResolve: new PlayerTurnResolveState(game),
       };
    }
 

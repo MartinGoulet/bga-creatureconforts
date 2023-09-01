@@ -519,6 +519,9 @@ body > .bga-dice_die {
 #table-center-wrapper #board #worker-locations {
   position: relative;
 }
+#table-center-wrapper #board #worker-locations.has-selected-location .slot.selectable {
+  animation: none !important;
+}
 #table-center-wrapper #board #worker-locations .slot {
   position: absolute;
   width: 70px;
@@ -775,12 +778,11 @@ body > .bga-dice_die {
 }
 
 .player-table {
-  max-width: 660px;
   width: 100%;
   padding: 10px 0 30px;
   border-radius: 8px;
   position: relative;
-  border: 2px solid var(--player-color);
+  border: 4px solid var(--player-color);
 }
 .player-table .name-wrapper {
   color: var(--player-color);

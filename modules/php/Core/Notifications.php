@@ -38,6 +38,14 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function getResourcesFromLocation(int $player_id, int $location_id, array $resources) {
+        self::notifyAll('onGetResourcesFromLocation', '', [
+            'player_id' => $player_id,
+            'location_id' => $location_id,
+            'resources' => $resources,
+        ]);
+    }
+
     static function newTraveler() {
         $message = clienttranslate('${card_name} is revealed as the new traveler');
         $info = Travelers::getUIData();
@@ -59,6 +67,19 @@ class Notifications extends \APP_DbObject {
     static function moveDiceToHill($dice) {
         self::notifyAll('onMoveDiceToHill', '', [
             'dice' => $dice,
+        ]);
+    }
+
+    static function moveDiceToLocation($dice) {
+        self::notifyAll('onMoveDiceToLocation', '', [
+            'dice' => $dice,
+        ]);
+    }
+
+    static function returnToPlayerBoard($worker) {
+        self::notifyAll('onReturnWorkerToPlayerBoard', '', [
+            'player_id' => intval($worker['type_arg']),
+            'worker' => $worker,
         ]);
     }
 

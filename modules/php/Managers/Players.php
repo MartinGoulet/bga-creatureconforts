@@ -20,7 +20,7 @@ class Players extends \APP_DbObject {
         $values = [];
 
         $firstPlayer = null;
-        foreach( $players as $player_id => $player ) {
+        foreach ($players as $player_id => $player) {
             if ($firstPlayer === null) {
                 $firstPlayer = $player_id;
             }
@@ -97,11 +97,13 @@ class Players extends \APP_DbObject {
     /**
      * Ressources
      */
-
-    static function addCoin(int $count, int $player_id = null) {
-        if ($player_id == null) {
-            $player_id = self::getPlayerId();
-        }
+    static function addCoin(int $count, int $player_id) {
         self::DbQuery("UPDATE player SET coin = coin + $count WHERE player_id = '$player_id'");
+    }
+
+    static function addResources($player_id, array $resources) {
+        foreach ($resources as $resource_type => $count) {
+            self::DbQuery("UPDATE player SET $resource_type = $resource_type + $count WHERE player_id = '$player_id'");
+        }
     }
 }

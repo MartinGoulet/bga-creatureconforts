@@ -28,6 +28,14 @@ class TableCenter {
       document.getElementById('river-dial').dataset.position = game.gamedatas.river_dial.toString();
    }
 
+   public getWorkerLocations(): number[] {
+      const player_id = this.game.getPlayerId().toString();
+      return this.game.tableCenter.worker_locations
+         .getCards()
+         .filter((meeple) => meeple.type_arg == player_id)
+         .map((meeple) => Number(meeple.location_arg));
+   }
+
    private setupConfortCards(game: CreatureConforts) {
       const { market, discard, deckCount } = game.gamedatas.conforts;
 

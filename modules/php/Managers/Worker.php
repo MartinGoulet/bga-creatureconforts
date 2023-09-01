@@ -2,6 +2,7 @@
 
 namespace CreatureConforts\Managers;
 
+use BgaUserException;
 use CreatureConforts\Core\Game;
 
 /*
@@ -41,11 +42,21 @@ class Worker extends \APP_DbObject {
     }
 
     static function moveToLocation($worker_id, $location_id) {
-        if($location_id <= 12) {
+        if ($location_id <= 12) {
             self::deck()->moveCard($worker_id, 'board', $location_id);
         } else {
             self::deck()->moveCard($worker_id, 'improvement', $location_id);
         }
+    }
+
+    static function returnToPlayerBoard(int $player_id, int $location_id) {
+        $workers = self::getWorkersFromPlayer($player_id);
+        $worker = array_values(array_filter($workers, function ($worker) use ($location_id) {
+            return intval($worker['location_arg']) == $location_id;
+        }));
+        if(sizeof($worker) == 0) return null;
+        self::deck()->moveCard($worker[0]['id'], 'player');
+        return self::deck()->getCard($worker[0]['id']);
     }
 
     /**

@@ -12,7 +12,7 @@ class PlayerTurnDiceState implements StateHandler {
 
       const handleHillClick = (selection: Dice[]) => {
          if (selection.length == 1) {
-            const locations = this.getWorkerLocations().filter((location_id) => {
+            const locations = this.game.tableCenter.getWorkerLocations().filter((location_id) => {
                const count = this.getDiceFromLocation(location_id).length;
                return count < this.diceHelper.getTotalDiceSlot(location_id);
             });
@@ -50,7 +50,14 @@ class PlayerTurnDiceState implements StateHandler {
       };
 
       const handleConfirm = () => {
-         this.validate();
+         // this.validate();
+         const dice: Dice[] = this.game.tableCenter.dice_locations.getDice();
+         const args = {
+            dice_ids: dice.map((die) => die.id).join(';'),
+            location_ids: dice.map((die) => Number(die.location)).join(';'),
+         };
+         console.log(args);
+         this.game.takeAction('confirmPlayerDice', args);
       };
 
       this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
@@ -58,7 +65,7 @@ class PlayerTurnDiceState implements StateHandler {
    }
 
    private validate() {
-      const locations = this.getWorkerLocations();
+      const locations = this.game.tableCenter.getWorkerLocations();
       const error: number[] = [];
 
       for (const location_id of locations) {
@@ -75,13 +82,6 @@ class PlayerTurnDiceState implements StateHandler {
       }
    }
 
-   private getWorkerLocations(): number[] {
-      const player_id = this.game.getPlayerId().toString();
-      return this.game.tableCenter.worker_locations
-         .getCards()
-         .filter((meeple) => meeple.type_arg == player_id)
-         .map((meeple) => Number(meeple.location_arg));
-   }
    private getDiceFromLocation(location_id: number): Dice[] {
       return this.game.tableCenter.dice_locations
          .getDice()

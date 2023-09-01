@@ -214,6 +214,10 @@ class CreatureConforts
       return Number(this.player_id);
    }
 
+   public getPlayerPanel(playerId: number): PlayerPanel {
+      return this.playersPanels.find((playerPanel) => playerPanel.player_id === playerId);
+   }
+
    public getPlayerTable(playerId: number): PlayerTable {
       return this.playersTables.find((playerTable) => playerTable.player_id === playerId);
    }

@@ -2286,6 +2286,9 @@ var CreatureConforts = (function () {
     CreatureConforts.prototype.getPlayerId = function () {
         return Number(this.player_id);
     };
+    CreatureConforts.prototype.getPlayerPanel = function (playerId) {
+        return this.playersPanels.find(function (playerPanel) { return playerPanel.player_id === playerId; });
+    };
     CreatureConforts.prototype.getPlayerTable = function (playerId) {
         return this.playersTables.find(function (playerTable) { return playerTable.player_id === playerId; });
     };
@@ -2444,6 +2447,7 @@ var LocationStock = (function (_super) {
         var _this = _super.call(this, manager, element, settings) || this;
         _this.manager = manager;
         _this.element = element;
+        _this.selectedLocations = [];
         var handleMeepleClick = function (meeple) {
             if (_this.OnLocationClick && _this.slots[meeple.location_arg].classList.contains('selectable')) {
                 _this.OnLocationClick(meeple.location_arg);
@@ -2462,6 +2466,12 @@ var LocationStock = (function (_super) {
         };
         this.slots[slotId].addEventListener('click', handleClick);
     };
+    LocationStock.prototype.getSelectedLocation = function () {
+        return this.selectedLocations;
+    };
+    LocationStock.prototype.isSelectedLocation = function (slotId) {
+        return this.slots[Number(slotId)].classList.contains('selected');
+    };
     LocationStock.prototype.setSelectableLocation = function (locations) {
         var _this = this;
         if (locations === void 0) { locations = []; }
@@ -2473,10 +2483,12 @@ var LocationStock = (function (_super) {
     LocationStock.prototype.setSelectedLocation = function (locations) {
         var _this = this;
         if (locations === void 0) { locations = []; }
+        this.selectedLocations = locations;
         this.slots.forEach(function (slot) {
             slot.classList.toggle('selected', false);
         });
         locations.forEach(function (sel) { return _this.slots[sel].classList.toggle('selected', true); });
+        this.element.classList.toggle('has-selected-location', locations.length > 0);
     };
     return LocationStock;
 }(SlotStock));
@@ -2696,6 +2708,9 @@ var NotificationManager = (function () {
             ['onRevealPlacement', 1000],
             ['onVillageDice', 1200],
             ['onMoveDiceToHill', 1000],
+            ['onMoveDiceToLocation', 1000],
+            ['onReturnWorkerToPlayerBoard'],
+            ['onGetResourcesFromLocation', 1200],
         ];
         this.setupNotifications(notifs);
     };
@@ -2753,6 +2768,35 @@ var NotificationManager = (function () {
         var dice = _a.dice;
         this.game.tableCenter.hill.addDice(dice);
     };
+    NotificationManager.prototype.notif_onMoveDiceToLocation = function (_a) {
+        var dice = _a.dice;
+        this.game.tableCenter.dice_locations.addDice(dice);
+    };
+    NotificationManager.prototype.notif_onReturnWorkerToPlayerBoard = function (_a) {
+        var player_id = _a.player_id, worker = _a.worker;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4, this.game.getPlayerTable(player_id).workers.addCard(worker)];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onGetResourcesFromLocation = function (_a) {
+        var _this = this;
+        var location_id = _a.location_id, resources = _a.resources, player_id = _a.player_id;
+        var index = 0;
+        Object.keys(resources).forEach(function (type) {
+            var count = resources[type];
+            for (var i = 0; i < count; i++) {
+                _this.game.slideTemporaryObject("<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"), 'overall-content', document.querySelectorAll("#worker-locations *[data-slot-id=\"".concat(location_id, "\""))[0], "player-panel-".concat(player_id, "-icons-").concat(type, "-counter"), 1000, 250 * index++);
+            }
+            _this.game.getPlayerPanel(player_id).counters[type].incValue(count);
+        });
+    };
     NotificationManager.prototype.setupNotifications = function (notifs) {
         var _this = this;
         notifs.forEach(function (_a) {
@@ -2791,6 +2835,7 @@ var StateManager = (function () {
             startHand: new StartHandState(game),
             placement: new PlacementState(game),
             playerTurnDice: new PlayerTurnDiceState(game),
+            playerTurnResolve: new PlayerTurnResolveState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -3008,7 +3053,7 @@ var PlayerTurnDiceState = (function () {
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         var handleHillClick = function (selection) {
             if (selection.length == 1) {
-                var locations = _this.getWorkerLocations().filter(function (location_id) {
+                var locations = _this.game.tableCenter.getWorkerLocations().filter(function (location_id) {
                     var count = _this.getDiceFromLocation(location_id).length;
                     return count < _this.diceHelper.getTotalDiceSlot(location_id);
                 });
@@ -3042,13 +3087,19 @@ var PlayerTurnDiceState = (function () {
             hill.addDice(dice_locations.getDice());
         };
         var handleConfirm = function () {
-            _this.validate();
+            var dice = _this.game.tableCenter.dice_locations.getDice();
+            var args = {
+                dice_ids: dice.map(function (die) { return die.id; }).join(';'),
+                location_ids: dice.map(function (die) { return Number(die.location); }).join(';'),
+            };
+            console.log(args);
+            _this.game.takeAction('confirmPlayerDice', args);
         };
         this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
         this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
     };
     PlayerTurnDiceState.prototype.validate = function () {
-        var locations = this.getWorkerLocations();
+        var locations = this.game.tableCenter.getWorkerLocations();
         var error = [];
         for (var _i = 0, locations_1 = locations; _i < locations_1.length; _i++) {
             var location_id = locations_1[_i];
@@ -3064,19 +3115,51 @@ var PlayerTurnDiceState = (function () {
             this.game.showMessage("Requirement met", 'info');
         }
     };
-    PlayerTurnDiceState.prototype.getWorkerLocations = function () {
-        var player_id = this.game.getPlayerId().toString();
-        return this.game.tableCenter.worker_locations
-            .getCards()
-            .filter(function (meeple) { return meeple.type_arg == player_id; })
-            .map(function (meeple) { return Number(meeple.location_arg); });
-    };
     PlayerTurnDiceState.prototype.getDiceFromLocation = function (location_id) {
         return this.game.tableCenter.dice_locations
             .getDice()
             .filter(function (die) { return die.location == location_id; });
     };
     return PlayerTurnDiceState;
+}());
+var PlayerTurnResolveState = (function () {
+    function PlayerTurnResolveState(game) {
+        this.game = game;
+    }
+    PlayerTurnResolveState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var worker_locations = this.game.tableCenter.worker_locations;
+        var locations = this.game.tableCenter.getWorkerLocations();
+        var handleWorkerLocationClick = function (slotId) {
+            if (worker_locations.isSelectedLocation(slotId)) {
+                worker_locations.setSelectedLocation([]);
+                _this.game.disableButton('btn_resolve');
+            }
+            else {
+                worker_locations.setSelectedLocation([slotId]);
+                _this.game.enableButton('btn_resolve');
+            }
+        };
+        worker_locations.setSelectableLocation(locations);
+        worker_locations.OnLocationClick = handleWorkerLocationClick;
+    };
+    PlayerTurnResolveState.prototype.onLeavingState = function () {
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectableLocation([]);
+        worker_locations.setSelectedLocation([]);
+        worker_locations.OnLocationClick = null;
+    };
+    PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleResolve = function () {
+            var location_id = _this.game.tableCenter.worker_locations.getSelectedLocation()[0];
+            _this.game.takeAction('resolveWorker', { location_id: location_id });
+        };
+        this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+    };
+    return PlayerTurnResolveState;
 }());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
@@ -3234,6 +3317,7 @@ var PlayerPanel = (function () {
         var _this = this;
         this.game = game;
         this.counters = {};
+        this.player_id = Number(player.id);
         var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
         var templateIcon = "<div class=\"wrapper\">\n      <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
         var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n      </div>");
@@ -3314,6 +3398,13 @@ var TableCenter = (function () {
         this.setupHillDice(game);
         document.getElementById('river-dial').dataset.position = game.gamedatas.river_dial.toString();
     }
+    TableCenter.prototype.getWorkerLocations = function () {
+        var player_id = this.game.getPlayerId().toString();
+        return this.game.tableCenter.worker_locations
+            .getCards()
+            .filter(function (meeple) { return meeple.type_arg == player_id; })
+            .map(function (meeple) { return Number(meeple.location_arg); });
+    };
     TableCenter.prototype.setupConfortCards = function (game) {
         var _a = game.gamedatas.conforts, market = _a.market, discard = _a.discard, deckCount = _a.deckCount;
         this.confort_market = new SlotStock(game.confortManager, document.getElementById("table-conforts"), {

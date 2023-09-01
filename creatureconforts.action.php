@@ -74,6 +74,29 @@ class action_creatureconforts extends APP_GameAction {
       self::ajaxResponse();
    }
 
+   public function confirmPlayerDice() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $dice_ids = self::getArg("dice_ids", AT_numberlist, true);
+      $location_ids = self::getArg("location_ids", AT_numberlist, true);
+      $dice_ids = self::getArrayArgs($dice_ids);
+      $location_ids = self::getArrayArgs($location_ids);
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->checkAction('confirmPlayerDice');
+      $this->game->confirmPlayerDice($dice_ids, $location_ids);
+      self::ajaxResponse();
+   }
+
+   public function resolveWorker() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $location_id = self::getArg("location_id", AT_posint, true);
+      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      $this->game->checkAction('resolveWorker');
+      $this->game->resolveWorker($location_id);
+      self::ajaxResponse();
+   }
+
    /*
     
     Example:
@@ -95,7 +118,7 @@ class action_creatureconforts extends APP_GameAction {
     
     */
 
-    private function getArrayArgs($args) {
+   private function getArrayArgs($args) {
       // Removing last ';' if exists
       if (substr($args, -1) == ';')
          $args = substr($args, 0, -1);

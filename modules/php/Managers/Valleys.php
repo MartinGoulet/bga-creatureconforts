@@ -54,6 +54,17 @@ class Valleys {
         ];
     }
 
+    static function getCardType($card) {
+        return Game::get()->valley_types[$card['type_arg']];
+    }
+
+    static function getValleyLocationInfo($location_id): array {
+        $location = $location_id <= 2 ? FOREST : MEADOW;
+        $card = Valleys::getUIData()[$location]['topCard'];
+        $card_type = Valleys::getCardType($card);
+        return $card_type['position'][$location_id];
+    }
+
     // static function getUIDataForest() {
     //     return [self::deck()->getCardOnTop(FOREST)];
     //     // $cards = self::deck()->getCardsInLocation(FOREST, null, 'location_arg');

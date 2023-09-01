@@ -50,6 +50,11 @@
 
       #worker-locations {
          position: relative;
+         &.has-selected-location {
+            .slot.selectable {
+               animation:  none !important;
+            }
+         }
          .slot {
             position: absolute;
             width: 70px;

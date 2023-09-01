@@ -47,6 +47,7 @@
         "src/creature-conforts.ts",
         "src/deck.ts",
         "src/dice.ts",
+        "src/dice-helper.ts",
         
         "src/managers/action.ts",
         "src/managers/notification.ts",
@@ -55,6 +56,7 @@
         "src/states/start-hand.ts",
         "src/states/placement.ts",
         "src/states/player-turn-dice.ts",
+        "src/states/player-turn-resolve.ts",
 
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",

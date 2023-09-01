@@ -143,20 +143,21 @@ $machinestates = $basicGameStates + array(
         "description" => clienttranslate('${actplayer} must place your dices where your have workers'),
         "descriptionmyturn" => clienttranslate('${you} must place their dices'),
         "type" => "activeplayer",
-        "possibleactions" => array("placeDice"),
+        "possibleactions" => array("confirmPlayerDice"),
         "transitions" => [
             "" => ST_PLAYER_TURN_RESOLVE,
         ]
     ],
 
     ST_PLAYER_TURN_RESOLVE => [
-        "name" => "playerTurnDice",
+        "name" => "playerTurnResolve",
         "description" => clienttranslate('${actplayer} must resolve your workers'),
         "descriptionmyturn" => clienttranslate('${you} must resolve their workers'),
         "type" => "activeplayer",
         "possibleactions" => array("resolveWorker", "confirmPlayerTurn"),
         "transitions" => [
-            "" => ST_PLAYER_TURN_NEXT,
+            "next" => ST_PLAYER_TURN_RESOLVE,
+            "end" => ST_PLAYER_TURN_NEXT,
         ]
     ],
 

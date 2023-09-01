@@ -3,6 +3,8 @@ class PlayerPanel {
    public counters: { [icon: string]: ebg.counter } = {};
 
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
+      this.player_id = Number(player.id);
+
       const icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 
       const templateIcon = `<div class="wrapper">

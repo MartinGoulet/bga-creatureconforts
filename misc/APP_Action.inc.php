@@ -14,6 +14,7 @@ define('AT_localurl', 10);  //  a local TEL mainsite url (that can go safely aft
 define('AT_password', 11);  //  anything (no filter)
 define('AT_channel', 12);   //  anything (no filter)
 define('AT_numberlist', 13);   //  exemple: 1,4;2,3;-1,2
+define('AT_Base64', 14);   //  exemple: 1,4;2,3;-1,2
 
 abstract class APP_Action extends APP_DbObject
 {

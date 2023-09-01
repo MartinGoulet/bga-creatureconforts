@@ -36,6 +36,16 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
+    static function countDiceInLocation(int $location_id) {
+        return intval(self::getUniqueValueFromDB("SELECT count(1) FROM dice WHERE dice_location = $location_id"));
+    }
+
+    static function getDice(array $dice_ids) {
+        $dice_ids = implode(',', $dice_ids);
+        $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_id in ($dice_ids)";
+        return array_values(self::getCollectionFromDb($sql));
+    }
+
     static function getDiceFromPlayer(int $player_id) {
         $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_owner_id = $player_id";
         return array_values(self::getCollectionFromDb($sql));
@@ -44,6 +54,11 @@ class Dice extends \APP_DbObject {
     static function getPlayerDice() {
         $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
         return array_values(self::getCollectionFromDb($sql));
+    }
+
+    static function moveDiceToLocation(array $dice_ids, int $location_id) {
+        $ids = implode(',', $dice_ids);
+        self::DbQuery("UPDATE dice SET dice_location = $location_id WHERE dice_id in ($ids)");
     }
 
     static function movePlayerDiceToHill($player_id) {

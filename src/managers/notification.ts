@@ -9,6 +9,9 @@ class NotificationManager {
          ['onRevealPlacement', 1000],
          ['onVillageDice', 1200],
          ['onMoveDiceToHill', 1000],
+         ['onMoveDiceToLocation', 1000],
+         ['onReturnWorkerToPlayerBoard'],
+         ['onGetResourcesFromLocation', 1200],
       ];
 
       this.setupNotifications(notifs);
@@ -51,6 +54,42 @@ class NotificationManager {
 
    private notif_onMoveDiceToHill({ dice }: { dice: Dice[] }) {
       this.game.tableCenter.hill.addDice(dice);
+   }
+
+   private notif_onMoveDiceToLocation({ dice }: { dice: Dice[] }) {
+      this.game.tableCenter.dice_locations.addDice(dice);
+   }
+
+   private async notif_onReturnWorkerToPlayerBoard({
+      player_id,
+      worker,
+   }: {
+      player_id: number;
+      worker: Meeple;
+   }) {
+      await this.game.getPlayerTable(player_id).workers.addCard(worker);
+   }
+
+   private notif_onGetResourcesFromLocation({
+      location_id,
+      resources,
+      player_id,
+   }: GetResourcesFromLocationArgs) {
+      let index = 0;
+      Object.keys(resources).forEach((type) => {
+         const count = resources[type];
+         for (let i = 0; i < count; i++) {
+            this.game.slideTemporaryObject(
+               `<div class="resource-icon" data-type="${type}"></div>`,
+               'overall-content', //'left-side-wrapper',
+               document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"`)[0],
+               `player-panel-${player_id}-icons-${type}-counter`,
+               1000,
+               250 * index++,
+            );
+         }
+         this.game.getPlayerPanel(player_id).counters[type].incValue(count);
+      });
    }
 
    private setupNotifications(notifs: any) {
@@ -102,4 +141,10 @@ interface NewTravelerArgs {
 
 interface FamilyDiceArgs {
    dice: Dice[];
+}
+
+interface GetResourcesFromLocationArgs {
+   player_id: number;
+   location_id: number;
+   resources: { [type: string]: number }[];
 }
