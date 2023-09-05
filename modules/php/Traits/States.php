@@ -7,6 +7,7 @@ use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
+use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 use CreatureConforts\Managers\Worker;
 
@@ -67,5 +68,30 @@ trait States {
         $dice = Dice::getDiceFromPlayer($player_id);
         Notifications::moveDiceToHill($dice);
         Game::get()->gamestate->nextState();
+    }
+
+    function stPlayerTurnEnd() {
+        $player_id = $this->getActivePlayerId();
+        // Return dices
+        Dice::moveWhiteDiceToHill();
+        Dice::movePlayerDiceToBoard($player_id);
+
+        Notifications::returnDice($player_id, Dice::getUIData());
+
+        $next_state = sizeof(Conforts::getHand($player_id)) > 3 ? 'discard' : 'next';
+        Game::get()->gamestate->nextState($next_state);
+    }
+
+    function stPlayerTurnNext() {
+        $current_player_id = $this->getActivePlayerId();
+        $next_player_id = intval(Game::get()->getNextPlayerTable()[$current_player_id]);
+        if($next_player_id == Globals::getFirstPlayerId()) {
+            // All player has played their turn
+            Game::get()->gamestate->nextState('end');
+        } else {
+            Game::get()->giveExtraTime($current_player_id);
+            Game::get()->activeNextPlayer();
+            Game::get()->gamestate->nextState('next');
+        }
     }
 }

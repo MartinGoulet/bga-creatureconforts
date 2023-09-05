@@ -7,6 +7,19 @@ use CreatureConforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
 
+    static function craftConfort(int $player_id, array $card, array $cost) {
+        $message = clienttranslate('${player_name} crafts ${card_name}');
+
+        self::notifyAll('onCraftConfort', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'card' => $card,
+            'cost' => $cost,
+            'card_name' => Conforts::getName($card),
+            'i18n' => ['card_name'],
+        ]);
+    }
+
     static function discardStartHand(array $cards_before) {
         $message = clienttranslate('${player_name} discards ${card_name}');
 
@@ -55,6 +68,13 @@ class Notifications extends \APP_DbObject {
             'count' => $info['count'],
             'card_name' => Travelers::getName($info['topCard']),
             'i18n' => ['card_name'],
+        ]);
+    }
+
+    static function returnDice(int $player_id, array $dice) {
+        self::notifyAll('onReturnDice', '', [
+            'player_id' => $player_id,
+            'dice' => $dice,
         ]);
     }
 

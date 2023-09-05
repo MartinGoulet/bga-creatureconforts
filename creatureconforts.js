@@ -2512,6 +2512,94 @@ var DialRequirement = (function () {
     };
     return DialRequirement;
 }());
+var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+var ChooseResource = (function () {
+    function ChooseResource(game, player_id) {
+        var _this = this;
+        this.game = game;
+        this.player_id = player_id;
+        this.counters = {};
+        this.placeholder = [];
+        var root = document.getElementById('choose-resource');
+        if (root)
+            root.remove();
+        var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+        var templateIcon = "<div class=\"wrapper\">\n         <span id=\"icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>";
+        var html = "<div id=\"choose-resource\">\n         <div id=\"choose-resource-player\">\n            ".concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n         </div>\n         <div id=\"choose-resource-placeholder\"></div>\n         <div id=\"choose-resource-buttons\"></div>\n      </div>");
+        document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
+        for (var _i = 0, icons_1 = icons; _i < icons_1.length; _i++) {
+            var icon = icons_1[_i];
+            this.counters[icon] = new ebg.counter();
+            this.counters[icon].create("icons-".concat(icon, "-counter"));
+            this.counters[icon].setValue(0);
+        }
+        var handleReset = function () {
+            _this.placeholder = [];
+            _this.displayPlaceholder();
+            _this.displayResource();
+        };
+        this.game.addActionButton('choose-resource-button-reset', _('Reset'), handleReset, 'choose-resource-buttons', false, 'gray');
+    }
+    ChooseResource.prototype.display = function (cost) {
+        var _this = this;
+        var handleResourceClick = function (type, counter, wrapper) {
+            if (counter.getValue() <= 0)
+                return;
+            if (_this.placeholder.length >= cost['*'])
+                return;
+            counter.incValue(-1);
+            wrapper.classList.toggle('disabled', counter.getValue() == 0);
+            _this.placeholder.push(type);
+            _this.displayPlaceholder();
+        };
+        this.placeholder = [];
+        var player_resource = this.game.getPlayerPanel(this.player_id).counters;
+        var _loop_4 = function (type) {
+            var counter = player_resource[type];
+            this_1.counters[type].setValue(counter.getValue());
+            var wrapper = document.getElementById("icons-".concat(type, "-counter")).parentElement;
+            wrapper.classList.toggle('disabled', this_1.counters[type].getValue() == 0);
+            wrapper.addEventListener('click', function () { return handleResourceClick(type, _this.counters[type], wrapper); });
+        };
+        var this_1 = this;
+        for (var _i = 0, icons_2 = icons; _i < icons_2.length; _i++) {
+            var type = icons_2[_i];
+            _loop_4(type);
+        }
+        var html = [];
+        for (var index = 0; index < cost['*']; index++) {
+            html.push("<div id=\"placeholder-".concat(index, "\" class=\"placeholder\"></div>"));
+        }
+        var placeholder = document.getElementById('choose-resource-placeholder');
+        placeholder.innerHTML = '';
+        placeholder.insertAdjacentHTML('beforeend', html.join(''));
+        document.getElementById('choose-resource').classList.toggle('show', true);
+    };
+    ChooseResource.prototype.hide = function () {
+        document.getElementById('choose-resource').classList.toggle('show', false);
+    };
+    ChooseResource.prototype.displayResource = function () {
+        var player_resource = this.game.getPlayerPanel(this.player_id).counters;
+        for (var _i = 0, icons_3 = icons; _i < icons_3.length; _i++) {
+            var type = icons_3[_i];
+            var counter = player_resource[type];
+            this.counters[type].setValue(counter.getValue());
+            var wrapper = document.getElementById("icons-".concat(type, "-counter")).parentElement;
+            wrapper.classList.toggle('disabled', this.counters[type].getValue() == 0);
+        }
+    };
+    ChooseResource.prototype.displayPlaceholder = function () {
+        document.querySelectorAll("#choose-resource-placeholder .placeholder").forEach(function (placeholder) {
+            placeholder.innerHTML = "";
+        });
+        for (var index = 0; index < this.placeholder.length; index++) {
+            var type = this.placeholder[index];
+            var placeholder = document.getElementById("placeholder-".concat(index));
+            placeholder.insertAdjacentHTML("beforeend", "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"));
+        }
+    };
+    return ChooseResource;
+}());
 var NotificationManager = (function () {
     function NotificationManager(game) {
         this.game = game;
@@ -2527,6 +2615,8 @@ var NotificationManager = (function () {
             ['onMoveDiceToLocation', 1000],
             ['onReturnWorkerToPlayerBoard'],
             ['onGetResourcesFromLocation', 1200],
+            ['onCraftConfort', 1000],
+            ['onReturnDice', 1200],
         ];
         this.setupNotifications(notifs);
     };
@@ -2613,6 +2703,23 @@ var NotificationManager = (function () {
             _this.game.getPlayerPanel(player_id).counters[type].incValue(count);
         });
     };
+    NotificationManager.prototype.notif_onCraftConfort = function (_a) {
+        var player_id = _a.player_id, card = _a.card, cost = _a.cost;
+        var counters = this.game.getPlayerPanel(player_id).counters;
+        var conforts = this.game.getPlayerTable(player_id).conforts;
+        conforts.addCard(card);
+        Object.keys(cost).forEach(function (type) {
+            var value = -cost[type];
+            counters[type].incValue(value);
+        });
+    };
+    NotificationManager.prototype.notif_onReturnDice = function (_a) {
+        var player_id = _a.player_id, dice = _a.dice;
+        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
+        var player_dice = dice.filter(function (die) { return Number(die.owner_id) == player_id; });
+        this.game.tableCenter.hill.addDice(white_dice);
+        this.game.getPlayerTable(player_id).dice.addDice(player_dice);
+    };
     NotificationManager.prototype.setupNotifications = function (notifs) {
         var _this = this;
         notifs.forEach(function (_a) {
@@ -2652,6 +2759,7 @@ var StateManager = (function () {
             placement: new PlacementState(game),
             playerTurnDice: new PlayerTurnDiceState(game),
             playerTurnResolve: new PlayerTurnResolveState(game),
+            playerTurnCraftConfort: new PlayerTurnCraftState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -2977,6 +3085,88 @@ var PlayerTurnResolveState = (function () {
     };
     return PlayerTurnResolveState;
 }());
+var PlayerTurnCraftState = (function () {
+    function PlayerTurnCraftState(game) {
+        this.game = game;
+    }
+    PlayerTurnCraftState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        this.resourceManager = new ChooseResource(this.game, this.game.getPlayerId());
+        var hand = this.game.getCurrentPlayerTable().hand;
+        var handleSelectionChange = function (selection) {
+            _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
+            if (selection.length == 0)
+                return;
+            var card_type = _this.game.confortManager.getCardType(selection[0]);
+            if ('*' in card_type.cost) {
+                _this.resourceManager.display(card_type.cost);
+                _this.game.toggleButtonEnable('btn_craft', false);
+            }
+            else {
+                _this.resourceManager.hide();
+            }
+        };
+        var selection = hand.getCards().filter(function (card) {
+            var card_type = _this.game.confortManager.getCardType(card);
+            if (!card_type.cost) {
+                console.warn('No cost for', card_type);
+                return false;
+            }
+            if ('*' in card_type.cost) {
+                return true;
+            }
+            else {
+                var res = _this.isRequirementMet(card_type.cost);
+                return res;
+            }
+        });
+        this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
+        hand.setSelectionMode('single');
+        hand.setSelectableCards(selection);
+        hand.onSelectionChange = handleSelectionChange;
+    };
+    PlayerTurnCraftState.prototype.onLeavingState = function () { };
+    PlayerTurnCraftState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var hand = this.game.getCurrentPlayerTable().hand;
+        var handleCraft = function () {
+            var card = hand.getSelection()[0];
+            if (!card)
+                return;
+            var card_type = _this.game.confortManager.getCardType(card);
+            var resources = [0, 0, 0, 0, 0, 0];
+            _this.game.takeAction('craftConfort', { card_id: card.id, resources: resources });
+        };
+        var handlePass = function () {
+            _this.game.takeAction('passCraftConfort');
+        };
+        this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
+        this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
+    };
+    PlayerTurnCraftState.prototype.isRequirementMet = function (cost) {
+        var counters = this.game.getPlayerPanel(this.game.getPlayerId()).counters;
+        for (var _i = 0, _a = Object.keys(cost); _i < _a.length; _i++) {
+            var type = _a[_i];
+            if (type !== '*' && counters[type].getValue() < cost[type]) {
+                return false;
+            }
+        }
+        if ('*' in cost) {
+            var goods = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+            var total_goods = goods
+                .map(function (type) { return counters[type].getValue(); })
+                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            var total_cost = Object.keys(cost)
+                .map(function (type) { return cost[type]; })
+                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            return total_goods >= total_cost;
+        }
+        return true;
+    };
+    return PlayerTurnCraftState;
+}());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
     function ConfortManager(game) {
@@ -2985,11 +3175,12 @@ var ConfortManager = (function (_super) {
             setupDiv: function (card, div) {
                 div.classList.add('confort');
                 div.dataset.cardId = '' + card.id;
-                div.classList.add(Number(card.type) <= 12 ? 'background_1' : 'background_2');
             },
             setupFrontDiv: function (card, div) {
                 div.dataset.type = card.type;
                 div.dataset.pos = card.type_arg;
+                div.classList.toggle('background_1', Number(card.type) <= 12);
+                div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
                 if (card.type_arg) {
                 }
             },
@@ -3004,6 +3195,9 @@ var ConfortManager = (function (_super) {
         if (card_id > 0) {
             this.getCardElement({ id: card_id.toString() }).classList.add('bga-cards_selected-card');
         }
+    };
+    ConfortManager.prototype.getCardType = function (card) {
+        return this.game.gamedatas.confort_types[card.type];
     };
     return ConfortManager;
 }(CardManager));
@@ -3136,7 +3330,7 @@ var PlayerPanel = (function () {
         this.player_id = Number(player.id);
         var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
         var templateIcon = "<div class=\"wrapper\">\n      <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
-        var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n      </div>");
+        var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n        <div class=\"row\"></div>\n      </div>");
         document.getElementById("player_board_".concat(player.id)).insertAdjacentHTML('beforeend', html);
         icons.forEach(function (icon) {
             var counter = new ebg.counter();
@@ -3144,7 +3338,15 @@ var PlayerPanel = (function () {
             counter.setValue(Number(player[icon]));
             _this.counters[icon] = counter;
         });
+        if (this.player_id == game.gamedatas.first_player_id) {
+            this.addFirstTokenPlayer();
+        }
     }
+    PlayerPanel.prototype.addFirstTokenPlayer = function () {
+        document.querySelectorAll(".first-player-marker").forEach(function (div) { return div.remove(); });
+        var container = document.querySelectorAll("#player-panel-".concat(this.player_id, "-icons .row"))[0];
+        container.insertAdjacentHTML('afterbegin', '<div class="first-player-marker"></div>');
+    };
     return PlayerPanel;
 }());
 var PlayerTable = (function () {
@@ -3157,11 +3359,22 @@ var PlayerTable = (function () {
         this.setupHand(game);
         this.setupCottage(game, player);
         this.setupWorker(game, player);
+        this.setupConfort(game, player);
     }
     PlayerTable.prototype.setupBoard = function (game, player) {
         var dataset = ["data-color=\"".concat(player.color, "\"")].join(' ');
-        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table whiteblock player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n               <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n               <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n               <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n            </div>\n            <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n         </div>");
+        var resourceManager = this.game.getPlayerId() === Number(player.id)
+            ? "<div id=\"player-table-".concat(this.player_id, "-resources\" class=\"icons counters\"></div>")
+            : '';
+        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n                     <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n                  </div>\n                  ").concat(resourceManager, "\n                  <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n               </div>\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-improvement\" class=\"player-table-improvement\"></div>\n                  <div id=\"player-table-").concat(this.player_id, "-confort\" class=\"player-table-confort\"></div>\n               </div>\n            </div>\n         </div>");
         document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+    };
+    PlayerTable.prototype.setupConfort = function (game, player) {
+        this.conforts = new LineStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-confort")), {
+            direction: 'column',
+            gap: '2px',
+        });
+        this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
     };
     PlayerTable.prototype.setupCottage = function (game, player) {
         this.cottages = new LineStock(game.cottageManager, document.getElementById("player-table-".concat(this.player_id, "-cottage")), {
@@ -3191,7 +3404,7 @@ var PlayerTable = (function () {
             inclination: 6,
             sort: sortFunction('id'),
         });
-        this.hand.addCards(game.gamedatas.hands[this.player_id]);
+        this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
     };
     PlayerTable.prototype.setupWorker = function (game, player) {
         var workers = game.gamedatas.workers.player.filter(function (w) { return w.type_arg == player.id; });

@@ -26,112 +26,136 @@ $this->confort_types = [
    1 => [
       'name' => clienttranslate("Board Game"),
       'score' => 7,
+      'cost' => [ANY_RESOURCE => 2, COIN => 1, STORY => 1],
    ],
    2 => [
       'name' => clienttranslate("Snowshoes"),
       'type' => OUTDOOR,
       'score' => 6,
+      'cost' => [WOOD => 1, YARN => 2],
    ],
    3 => [
       'name' => clienttranslate("Preserves"),
       'type' => FOOD,
       'score' => 4,
+      'cost' => [FRUIT => 4],
    ],
    4 => [
       'name' => clienttranslate("Ice Skates"),
       'type' => OUTDOOR,
       'score' => 6,
+      'cost' => [COIN => 2, YARN => 1],
    ],
    5 => [
       'name' => clienttranslate("Muffler"),
       'type' => CLOTHING,
       'score' => 5,
+      'cost' => [WOOD => 1, YARN => 1, FRUIT => 1],
    ],
    6 => [
       'name' => clienttranslate("Rocking Chair"),
       'score' => 5,
+      'cost' => [WOOD => 3, YARN => 1],
    ],
    7 => [
       'name' => clienttranslate("Piggy Bank"),
       'score' => 3,
+      'cost' => [STONE => 1, COIN => 2],
    ],
    8 => [
       'name' => clienttranslate("Bookshelf"),
       'score' => 6,
+      'cost' => [WOOD => 2, STORY => 2],
    ],
    9 => [
       'name' => clienttranslate("Pot of Tea"),
       'score' => 4,
+      'cost' => [FRUIT => 2, COIN => 1],
    ],
    10 => [
       'name' => clienttranslate("Candles"),
       'type' => LIGHTING,
       'score' => 5,
+      'cost' => [STONE => 1, YARN => 1, COIN => 1],
    ],
    11 => [
       'name' => clienttranslate("Socks"),
       'type' => CLOTHING,
       'score' => 4,
+      'cost' => [YARN => 2, FRUIT => 1],
    ],
    12 => [
       'name' => clienttranslate("Pantry"),
       'score' => 5,
+      'cost' => [WOOD => 1, GRAIN => 1, MUSHROOM => 1, FRUIT => 1],
    ],
    13 => [
       'name' => clienttranslate("Pie"),
       'type' => FOOD,
       'score' => 4,
+      'cost' => [GRAIN => 2, FRUIT => 2],
    ],
    14 => [
       'name' => clienttranslate("Stew"),
       'type' => FOOD,
       'score' => 5,
+      'cost' => [MUSHROOM => 4],
    ],
    15 => [
       'name' => clienttranslate("Flute"),
       'score' => 4,
+      'cost' => [WOOD => 1, COIN => 1],
    ],
    16 => [
       'name' => clienttranslate("Soup"),
       'type' => FOOD,
       'score' => 5,
+      'cost' => [GRAIN => 2, MUSHROOM => 2],
    ],
    17 => [
       'name' => clienttranslate("Fairy Garden"),
       'score' => 4,
+      'cost' => [MUSHROOM => 2, COIN => 2],
    ],
    18 => [
       'name' => clienttranslate("Toys"),
       'score' => 6,
+      'cost' => [WOOD => 1, STONE => 1, STORY => 1],
    ],
    19 => [
       'name' => clienttranslate("Toboggan"),
       'type' => OUTDOOR,
       'score' => 5,
+      'cost' => [WOOD => 2, STONE => 3],
    ],
    20 => [
       'name' => clienttranslate("Mandolin"),
       'score' => 6,
+      'cost' => [WOOD => 2, COIN => 2],
    ],
    21 => [
       'name' => clienttranslate("Quilt"),
       'type' => CLOTHING,
       'score' => 7,
+      'cost' => [YARN => 1, COIN => 1, STORY => 1],
    ],
    22 => [
       'name' => clienttranslate("Bread"),
       'type' => FOOD,
       'score' => 4,
+      'cost' => [GRAIN => 5],
    ],
    23 => [
       'name' => clienttranslate("Hearth"),
       'type' => LIGHTING,
       'score' => 6,
+      'cost' => [WOOD => 2, STONE => 3],
    ],
    24 => [
       'name' => clienttranslate("Lamp"),
       'type' => LIGHTING,
       'score' => 4,
+      'cost' => [STONE => 1, YARN => 1, COIN => 1],
    ],
    // --- gen php end --- 
 ];

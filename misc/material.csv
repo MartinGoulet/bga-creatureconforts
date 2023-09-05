@@ -1,25 +1,25 @@
-id|name|type|score
-1|Board Game||7
-2|Snowshoes|OUTDOOR|6
-3|Preserves|FOOD|4
-4|Ice Skates|OUTDOOR|6
-5|Muffler|CLOTHING|5
-6|Rocking Chair||5
-7|Piggy Bank||3
-8|Bookshelf||6
-9|Pot of Tea||4
-10|Candles|LIGHTING|5
-11|Socks|CLOTHING|4
-12|Pantry||5
-13|Pie|FOOD|4
-14|Stew|FOOD|5
-15|Flute||4
-16|Soup|FOOD|5
-17|Fairy Garden||4
-18|Toys||6
-19|Toboggan|OUTDOOR|5
-20|Mandolin||6
-21|Quilt|CLOTHING|7
-22|Bread|FOOD|4
-23|Hearth|LIGHTING|6
-24|Lamp|LIGHTING|4
+id|name|type|score|cost
+1|Board Game||7|[ANY_RESOURCE => 2, COIN => 1, STORY => 1]
+2|Snowshoes|OUTDOOR|6|[WOOD => 1, YARN => 2]
+3|Preserves|FOOD|4|[FRUIT => 4]
+4|Ice Skates|OUTDOOR|6|[COIN => 2, YARN => 1]
+5|Muffler|CLOTHING|5|[WOOD => 1, YARN => 1, FRUIT => 1]
+6|Rocking Chair||5|[WOOD => 3, YARN => 1]
+7|Piggy Bank||3|[STONE => 1, COIN => 2]
+8|Bookshelf||6|[WOOD => 2, STORY => 2]
+9|Pot of Tea||4|[FRUIT => 2, COIN => 1]
+10|Candles|LIGHTING|5|[STONE => 1, YARN => 1, COIN => 1]
+11|Socks|CLOTHING|4|[YARN => 2, FRUIT => 1]
+12|Pantry||5|[WOOD => 1, GRAIN => 1, MUSHROOM => 1, FRUIT => 1]
+13|Pie|FOOD|4|[GRAIN => 2, FRUIT => 2]
+14|Stew|FOOD|5|[MUSHROOM => 4]
+15|Flute||4|[WOOD => 1, COIN => 1]
+16|Soup|FOOD|5|[GRAIN => 2, MUSHROOM => 2]
+17|Fairy Garden||4|[MUSHROOM => 2, COIN => 2]
+18|Toys||6|[WOOD => 1, STONE => 1, STORY => 1]
+19|Toboggan|OUTDOOR|5|[WOOD => 2, STONE => 3]
+20|Mandolin||6|[WOOD => 2, COIN => 2]
+21|Quilt|CLOTHING|7|[YARN => 1, COIN => 1, STORY => 1]
+22|Bread|FOOD|4|[GRAIN => 5]
+23|Hearth|LIGHTING|6|[WOOD => 2, STONE => 3]
+24|Lamp|LIGHTING|4|[STONE => 1, YARN => 1, COIN => 1]

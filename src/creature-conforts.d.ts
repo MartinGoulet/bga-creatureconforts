@@ -17,8 +17,6 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
    confort_types: { [card_type: number]: ConfortType };
    valley_types: { [card_type: number]: ValleyType };
 
-   hands: { [player_id: number]: ConfortCard[] };
-
    dice: Dice[];
    conforts: ConfortUIData;
    improvements: ImprovementUIData;
@@ -44,6 +42,12 @@ interface ConfortUIData {
    };
    deckCount: number;
    market: ConfortCard[];
+   players: { [player_id: number]: ConfortUIDataPlayer };
+}
+
+interface ConfortUIDataPlayer {
+   hand: ConfortCard[];
+   board: ConfortCard[];
 }
 interface ImprovementUIData {
    market: ImprovementCard[];
@@ -86,6 +90,7 @@ interface ConfortType {
    name: string;
    type?: 'outdoor' | 'food' | 'clothing' | 'lighting';
    score: number;
+   cost: { [type: string]: number };
 }
 
 interface ValleyType {

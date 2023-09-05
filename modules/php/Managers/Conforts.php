@@ -35,15 +35,27 @@ class Conforts {
         return self::deck()->getCard($card_id);
     }
 
-    static function getUIData() {
-        return [
+    static function getUIData(int $current_player_id) {
+
+        $result = [
             'discard' => [
                 'topCard' => self::deck()->getCardOnTop('discard'),
                 'count' => self::deck()->countCardInLocation('discard'),
             ],
             'deckCount' => self::deck()->countCardInLocation('deck'),
             'market' => array_values(self::deck()->getCardsInLocation('slot', null, 'location_arg')),
+            'players' => [],
         ];
+
+        $players = Game::get()->loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $result['players'][$player_id] = [
+                'board' => self::getPlayerBoard($player_id),
+                'hand' => self::anonymize(self::getHand($player_id), $player_id != $current_player_id),
+            ];
+        }
+
+        return $result;
     }
 
     static function getDeck() {
@@ -64,6 +76,20 @@ class Conforts {
     static function getName($card) {
         $card_type = Game::get()->confort_types[$card['type']];
         return $card_type['name'];
+    }
+
+    static function getCost($card) {
+        $card_type = Game::get()->confort_types[$card['type']];
+        return $card_type['cost'];
+    }
+
+    static function getPlayerBoard($player_id) {
+        $cards = self::deck()->getCardsInLocation('board', $player_id);
+        return array_values($cards);
+    }
+
+    static function moveCardToPlayerBoard($player_id, $card_id) {
+        self::deck()->movecard($card_id, 'board', $player_id);
     }
 
     static function remainderStartHand(int $card_id, int $player_id) {

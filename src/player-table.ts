@@ -7,6 +7,8 @@ class PlayerTable {
    public cottages: LineStock<Cottage>;
    public workers: LineStock<Meeple>;
 
+   public conforts: LineStock<ConfortCard>;
+
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
       this.player_id = Number(player.id);
       this.player_color = getColorName(player.color);
@@ -16,23 +18,59 @@ class PlayerTable {
       this.setupHand(game);
       this.setupCottage(game, player);
       this.setupWorker(game, player);
+      this.setupConfort(game, player);
+      // if (this.player_id == this.game.getPlayerId()) this.setupResources();
    }
+
+   // public displayResource(resources: { [type: string]: number }[]) {
+   //    document.getElementById(`player-table-${this.player_id}-resources`).classList.add('show');
+   // }
+
+   // public hideResource() {
+   //    document.getElementById(`player-table-${this.player_id}-resources`).classList.remove('show');
+   // }
 
    private setupBoard(game: CreatureConforts, player: CreatureConfortsPlayerData) {
       const dataset: string = [`data-color="${player.color}"`].join(' ');
 
+      const resourceManager =
+         this.game.getPlayerId() === Number(player.id)
+            ? `<div id="player-table-${this.player_id}-resources" class="icons counters"></div>`
+            : '';
+
       const html = `
-         <div id="player-table-${this.player_id}" class="player-table whiteblock player-color-${this.player_color}" style="--player-color: #${player.color}" ${dataset}>
+         <div id="player-table-${this.player_id}" class="player-table player-color-${this.player_color}" style="--player-color: #${player.color}" ${dataset}>
             <div id="player-table-${this.player_id}-name" class="name-wrapper">${player.name}</div>
-            <div id="player-table-${this.player_id}-board" class="player-table-board">
-               <div id="player-table-${this.player_id}-dice" class="player-table-dice"></div>
-               <div id="player-table-${this.player_id}-cottage" class="player-table-cottage"></div>
-               <div id="player-table-${this.player_id}-worker" class="player-table-worker"></div>
+            <div class="cols">
+               <div class="col">
+                  <div id="player-table-${this.player_id}-board" class="player-table-board">
+                     <div id="player-table-${this.player_id}-dice" class="player-table-dice"></div>
+                     <div id="player-table-${this.player_id}-cottage" class="player-table-cottage"></div>
+                     <div id="player-table-${this.player_id}-worker" class="player-table-worker"></div>
+                  </div>
+                  ${resourceManager}
+                  <div id="player-table-${this.player_id}-hand"></div>
+               </div>
+               <div class="col">
+                  <div id="player-table-${this.player_id}-improvement" class="player-table-improvement"></div>
+                  <div id="player-table-${this.player_id}-confort" class="player-table-confort"></div>
+               </div>
             </div>
-            <div id="player-table-${this.player_id}-hand"></div>
          </div>`;
 
       document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+   }
+
+   private setupConfort(game: CreatureConforts, player: CreatureConfortsPlayerData) {
+      this.conforts = new LineStock<ConfortCard>(
+         game.confortManager,
+         document.getElementById(`player-table-${this.player_id}-confort`),
+         {
+            direction: 'column',
+            gap: '2px',
+         },
+      );
+      this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
    }
 
    private setupCottage(game: CreatureConforts, player: CreatureConfortsPlayerData) {
@@ -44,6 +82,7 @@ class PlayerTable {
             gap: '2px',
          },
       );
+      // TODO remove
       this.cottages.addCards([
          { token_id: 1, player_id: Number(player.id), location: 0 } as Cottage,
          { token_id: 2, player_id: Number(player.id), location: 0 } as Cottage,
@@ -80,8 +119,24 @@ class PlayerTable {
          },
       );
 
-      this.hand.addCards(game.gamedatas.hands[this.player_id]);
+      this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
    }
+
+   // private setupResources() {
+   //    const icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+
+   //    const templateIcon = `<div class="wrapper">
+   //       <span id="player-resource-${this.player_id}-icons-{icon-value}-counter" class="counter">1</span>
+   //       <div class="resource-icon" data-type="{icon-value}"></div>
+   //    </div>`;
+
+   //    document
+   //       .getElementById(`player-table-${this.player_id}-resources`)
+   //       .insertAdjacentHTML(
+   //          'afterbegin',
+   //          icons.map((icon) => templateIcon.replaceAll('{icon-value}', icon)).join(' '),
+   //       );
+   // }
 
    private setupWorker(game: CreatureConforts, player: CreatureConfortsPlayerData) {
       const workers = game.gamedatas.workers.player.filter((w) => w.type_arg == player.id);

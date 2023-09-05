@@ -32,6 +32,11 @@ const ST_PLAYER_TURN_START = 49;
 const ST_PLAYER_TURN_DICE = 50;
 const ST_PLAYER_TURN_RESOLVE = 51;
 const ST_PLAYER_TURN_NEXT = 52;
+const ST_PLAYER_TURN_CRAFT_CONFORT = 53;
+const ST_PLAYER_TURN_END = 54;
+const ST_PLAYER_TURN_DISCARD = 55;
+
+const ST_UNKEEP = 60;
 
 const ST_START_TURN = 90;
 
@@ -45,6 +50,8 @@ const FRUIT = "fruit";
 const MUSHROOM = "mushroom";
 const YARN = "yarn";
 const GRAIN = "grain";
+
+const ANY_RESOURCE = "*";
 
 /**
  * Tokens

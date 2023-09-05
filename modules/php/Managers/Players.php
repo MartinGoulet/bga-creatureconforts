@@ -101,9 +101,29 @@ class Players extends \APP_DbObject {
         self::DbQuery("UPDATE player SET coin = coin + $count WHERE player_id = '$player_id'");
     }
 
-    static function addResources($player_id, array $resources) {
+    static function addResources(int $player_id, array $resources) {
         foreach ($resources as $resource_type => $count) {
             self::DbQuery("UPDATE player SET $resource_type = $resource_type + $count WHERE player_id = '$player_id'");
         }
+    }
+
+    static function hasEnoughResource(int $player_id, array $cost) {
+        $values = ["player_id = $player_id"];
+        foreach ($cost as $type => $count) {
+            $values[] = "$type >= $count";
+        }
+        $criteria = implode(' AND ', $values);
+        $sql = "SELECT Count(1) FROM player WHERE $criteria";
+        return intval(self::getUniqueValueFromDB($sql)) == 1;
+    }
+
+    static function removeResource(int $player_id, array $cost) {
+        $values = [];
+        foreach ($cost as $type => $count) {
+            $values[] = "$type = $type - $count";
+        }
+        $update = implode(', ', $values);
+        $sql = "UPDATE player SET $update WHERE player_id = $player_id";
+        self::DbQuery($sql);
     }
 }

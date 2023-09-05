@@ -99,12 +99,12 @@ trait Actions {
         $player_id = $this->getActivePlayerId();
 
         $worker = Worker::returnToPlayerBoard($player_id, $location_id);
-        if($worker == null) {
+        if ($worker == null) {
             throw new BgaUserException("No worker in this location, please refresh your page");
         }
 
         Notifications::returnToPlayerBoard($worker);
-        
+
         if (Dice::countDiceInLocation($location_id) == 0) {
             Players::addResources($player_id, [LESSON_LEARNED => 1]);
             Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
@@ -120,17 +120,55 @@ trait Actions {
             return;
         }
 
+        if ($location_id >= 5 && $location_id <= 7) {
+            $resources = [
+                5 => [COIN => 1, STONE => 1],
+                6 => [STONE => 2],
+                7 => [STONE => 1],
+            ];
+            Players::addResources($player_id, $resources[$location_id]);
+            Notifications::getResourcesFromLocation($player_id, $location_id, $resources[$location_id]);
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
         throw new BgaUserException("Not implemented yet");
     }
 
     private function resolveWorkerNextStep() {
         $player_id = $this->getActivePlayerId();
 
-        $workers_not_home = array_filter(Worker::getWorkersFromPlayer($player_id), function($worker) {
+        $workers_not_home = array_filter(Worker::getWorkersFromPlayer($player_id), function ($worker) {
             return $worker['location'] !== 'player';
         });
 
         $next_step = count($workers_not_home) > 0 ? "next" : "end";
         Game::get()->gamestate->nextState($next_step);
+    }
+
+    function craftConfort(int $card_id, array $resources) {
+
+        $player_id = intval($this->getActivePlayerId());
+        $card = Conforts::get($card_id);
+        if ($card['location'] != 'hand' || $card['location_arg'] != $player_id) {
+            throw new BgaUserException("The card is not in your hand");
+        }
+
+        $cost = Conforts::getCost($card);
+        if(!Players::hasEnoughResource($player_id, $cost)) {
+            throw new BgaUserException("Not enough resource");
+        }
+
+        Players::removeResource($player_id, $cost);
+        Conforts::moveCardToPlayerBoard($player_id, $card_id);
+
+        $card = Conforts::get($card_id);
+        Notifications::craftConfort($player_id, $card, $cost);
+
+        Game::get()->gamestate->nextState('craft');
+    }
+
+    function passCraftConfort() {
+        Game::get()->gamestate->nextState('end');
     }
 }

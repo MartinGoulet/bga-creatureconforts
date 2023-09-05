@@ -64,4 +64,16 @@
          font-weight: 700;
       }
    }
+
+   .row {
+      flex-basis: 100%;
+      padding-top: 10px;
+   }
+
+   .first-player-marker {
+      background-image: url('img/the_worm.png');
+      background-size: cover;
+      height: 50px;
+      width: 47px;
+   }
 }

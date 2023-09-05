@@ -27,6 +27,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'dice';
 @import 'cottages';
 @import 'workers';
+@import 'choose-resource';
 
 #game_play_area {
    #bga-zoom-wrapper {
@@ -61,7 +62,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       align-items: center;
       flex-wrap: wrap;
       flex-grow: 1;
-      flex-direction: column;
+      // flex-direction: column;
       gap: 20px;
    }
 
@@ -77,10 +78,6 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    //       flex-direction: row;
    //    }
    // }
-
-   .whiteblock {
-      margin: 0;
-   }
 }
 
 .bgabutton {

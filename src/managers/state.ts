@@ -9,6 +9,7 @@ class StateManager {
          placement: new PlacementState(game),
          playerTurnDice: new PlayerTurnDiceState(game),
          playerTurnResolve: new PlayerTurnResolveState(game),
+         playerTurnCraftConfort: new PlayerTurnCraftState(game),
       };
    }
 

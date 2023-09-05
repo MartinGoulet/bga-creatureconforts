@@ -65,6 +65,14 @@ class Dice extends \APP_DbObject {
         self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id = $player_id OR dice_owner_id is null");
     }
 
+    static function moveWhiteDiceToHill() {
+        self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id is null");
+    }
+
+    static function movePlayerDiceToBoard($player_id) {
+        self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id");
+    }
+
     static function throwPlayerDice() {
         $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color != 'white'";
         $dice = self::getCollectionFromDb($sql);

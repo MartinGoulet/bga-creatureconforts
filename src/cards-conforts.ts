@@ -5,11 +5,12 @@ class ConfortManager extends CardManager<ConfortCard> {
          setupDiv: (card: Card, div: HTMLElement) => {
             div.classList.add('confort');
             div.dataset.cardId = '' + card.id;
-            div.classList.add(Number(card.type) <= 12 ? 'background_1' : 'background_2');
          },
          setupFrontDiv: (card: Card, div: HTMLElement) => {
             div.dataset.type = card.type;
             div.dataset.pos = card.type_arg;
+            div.classList.toggle('background_1', Number(card.type) <= 12);
+            div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
@@ -26,5 +27,9 @@ class ConfortManager extends CardManager<ConfortCard> {
             'bga-cards_selected-card',
          );
       }
+   }
+
+   getCardType(card: ConfortCard): ConfortType {
+      return this.game.gamedatas.confort_types[card.type];
    }
 }

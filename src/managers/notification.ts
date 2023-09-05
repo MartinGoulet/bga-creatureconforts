@@ -12,6 +12,8 @@ class NotificationManager {
          ['onMoveDiceToLocation', 1000],
          ['onReturnWorkerToPlayerBoard'],
          ['onGetResourcesFromLocation', 1200],
+         ['onCraftConfort', 1000],
+         ['onReturnDice', 1200],
       ];
 
       this.setupNotifications(notifs);
@@ -92,6 +94,24 @@ class NotificationManager {
       });
    }
 
+   private notif_onCraftConfort({ player_id, card, cost }: CraftConfortArgs) {
+      const counters = this.game.getPlayerPanel(player_id).counters;
+      const conforts = this.game.getPlayerTable(player_id).conforts;
+
+      conforts.addCard(card);
+      Object.keys(cost).forEach((type) => {
+         const value = -cost[type];
+         counters[type].incValue(value);
+      });
+   }
+
+   private notif_onReturnDice({ player_id, dice }: { player_id: number; dice: Dice[] }) {
+      const white_dice = dice.filter((die) => die.type == 'white');
+      const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
+      this.game.tableCenter.hill.addDice(white_dice);
+      this.game.getPlayerTable(player_id).dice.addDice(player_dice);
+   }
+
    private setupNotifications(notifs: any) {
       notifs.forEach(([eventName, duration]) => {
          dojo.subscribe(eventName, this, (notifDetails: INotification<any>) => {
@@ -147,4 +167,10 @@ interface GetResourcesFromLocationArgs {
    player_id: number;
    location_id: number;
    resources: { [type: string]: number }[];
+}
+
+interface CraftConfortArgs {
+   player_id: number;
+   card: ConfortCard;
+   cost: { [type: string]: number }[];
 }

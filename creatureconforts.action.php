@@ -37,7 +37,7 @@ class action_creatureconforts extends APP_GameAction {
 
    public function cancelStartHand() {
       self::setAjaxMode();
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->gamestate->checkPossibleAction('cancelStartHand');
       $this->game->cancelStartHand();
       self::ajaxResponse();
@@ -47,7 +47,7 @@ class action_creatureconforts extends APP_GameAction {
       self::setAjaxMode();
       // Retrieve arguments
       $card_id = self::getArg("card_id", AT_posint, true);
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->checkAction('discardStartHand');
       $this->game->discardStartHand($card_id);
       self::ajaxResponse();
@@ -60,7 +60,7 @@ class action_creatureconforts extends APP_GameAction {
       // Retrieve arguments
       $locations = self::getArg("locations", AT_numberlist, true);
       $locations_id = self::getArrayArgs($locations);
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmPlacement');
       $this->game->confirmPlacement($locations_id);
       self::ajaxResponse();
@@ -68,7 +68,7 @@ class action_creatureconforts extends APP_GameAction {
 
    public function cancelPlacement() {
       self::setAjaxMode();
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->gamestate->checkPossibleAction('cancelPlacement');
       $this->game->cancelPlacement();
       self::ajaxResponse();
@@ -81,7 +81,7 @@ class action_creatureconforts extends APP_GameAction {
       $location_ids = self::getArg("location_ids", AT_numberlist, true);
       $dice_ids = self::getArrayArgs($dice_ids);
       $location_ids = self::getArrayArgs($location_ids);
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmPlayerDice');
       $this->game->confirmPlayerDice($dice_ids, $location_ids);
       self::ajaxResponse();
@@ -91,9 +91,30 @@ class action_creatureconforts extends APP_GameAction {
       self::setAjaxMode();
       // Retrieve arguments
       $location_id = self::getArg("location_id", AT_posint, true);
-      // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+      // Then, call the appropriate method in your game logic
       $this->game->checkAction('resolveWorker');
       $this->game->resolveWorker($location_id);
+      self::ajaxResponse();
+   }
+
+   public function craftConfort() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $card_id = self::getArg("card_id", AT_posint, true);
+      $resources = self::getArg("resources", AT_numberlist, true);
+      $resources = self::getArrayArgs($resources);
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('craftConfort');
+      $this->game->craftConfort($card_id, $resources);
+      self::ajaxResponse();
+   }
+
+   public function passCraftConfort() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('passCraftConfort');
+      $this->game->passCraftConfort();
       self::ajaxResponse();
    }
 
@@ -110,7 +131,7 @@ class action_creatureconforts extends APP_GameAction {
         $arg1 = self::getArg( "myArgument1", AT_posint, true );
         $arg2 = self::getArg( "myArgument2", AT_posint, true );
 
-        // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
+        // Then, call the appropriate method in your game logic
         $this->game->myAction( $arg1, $arg2 );
 
         self::ajaxResponse( );

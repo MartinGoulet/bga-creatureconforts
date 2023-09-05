@@ -8,6 +8,10 @@ namespace CreatureConforts\Core;
 
 class Globals extends \APP_DbObject {
 
+    public static function getFirstPlayerId() {
+        return intval(Game::get()->getGameStateValue(VAR_FIRST_PLAYER));
+    }
+
     public static function getRiverDialValue() {
         return intval(Game::get()->getGameStateValue(VAR_RIVER_DIAL));
     }

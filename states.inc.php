@@ -157,18 +157,47 @@ $machinestates = $basicGameStates + array(
         "possibleactions" => array("resolveWorker", "confirmPlayerTurn"),
         "transitions" => [
             "next" => ST_PLAYER_TURN_RESOLVE,
-            "end" => ST_PLAYER_TURN_NEXT,
+            "end" => ST_PLAYER_TURN_CRAFT_CONFORT,
+        ]
+    ],
+
+    ST_PLAYER_TURN_CRAFT_CONFORT => [
+        "name" => "playerTurnCraftConfort",
+        "description" => clienttranslate('${actplayer} may craft any number of Conforts'),
+        "descriptionmyturn" => clienttranslate('${you} may craft any number of Conforts from your hand'),
+        "type" => "activeplayer",
+        "possibleactions" => array("craftConfort", "passCraftConfort"),
+        "transitions" => [
+            "craft" => ST_PLAYER_TURN_CRAFT_CONFORT,
+            "end" => ST_PLAYER_TURN_END,
+        ]
+    ],
+
+    ST_PLAYER_TURN_END => [
+        "name" => "playerTurnEnd",
+        "type" => "game",
+        "action" => "stPlayerTurnEnd",
+        "transitions" => [
+            "discard" => ST_PLAYER_TURN_DISCARD,
+            "next" => ST_PLAYER_TURN_NEXT
         ]
     ],
 
     ST_PLAYER_TURN_NEXT => [
-        "name" => "nextPlayerTurn",
+        "name" => "playerTurnNext",
         "type" => "game",
-        "action" => "stNextPlayerTurn",
+        "action" => "stPlayerTurnNext",
         "transitions" => [
             "next" => ST_PLAYER_TURN_START,
-            "end" => ST_PLAYER_TURN_START
+            "end" => ST_UNKEEP
         ]
+    ],
+
+    ST_UNKEEP => [
+        "name" => "unkeep",
+        "type" => "game",
+        "action" => "stUnkeep",
+        "transitions" => ["" => ST_PLAYER_TURN_NEXT]
     ],
 
 );

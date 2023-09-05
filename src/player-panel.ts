@@ -14,6 +14,7 @@ class PlayerPanel {
 
       const html = `<div id="player-panel-${player.id}-icons" class="icons counters">
         ${icons.map((icon) => templateIcon.replaceAll('{icon-value}', icon)).join(' ')}
+        <div class="row"></div>
       </div>`;
 
       document.getElementById(`player_board_${player.id}`).insertAdjacentHTML('beforeend', html);
@@ -24,5 +25,18 @@ class PlayerPanel {
          counter.setValue(Number(player[icon]));
          this.counters[icon] = counter;
       });
+
+      if (this.player_id == game.gamedatas.first_player_id) {
+         this.addFirstTokenPlayer();
+      }
+   }
+
+   addFirstTokenPlayer() {
+      // Remove first token player
+      document.querySelectorAll(`.first-player-marker`).forEach((div) => div.remove());
+
+      // Add first token player
+      const container = document.querySelectorAll(`#player-panel-${this.player_id}-icons .row`)[0];
+      container.insertAdjacentHTML('afterbegin', '<div class="first-player-marker"></div>');
    }
 }

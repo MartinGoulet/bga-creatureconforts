@@ -5,17 +5,6 @@
    height: 154px;
    border-radius: 5px;
 
-   &.background_1 {
-      .front {
-         background-image: url('img/confort_front_1.jpg');
-      }
-   }
-   &.background_2 {
-      .front {
-         background-image: url('img/confort_front_1.jpg');
-      }
-   }
-
    .card-sides {
       .back {
          background-image: url('img/confort_back.jpg');
@@ -26,9 +15,32 @@
          border-radius: 5px;
          background-size: 660px 924px;
 
+         &.background_1 {
+            background-image: url('img/confort_front_1.jpg');
+         }
+         &.background_2 {
+            background-image: url('img/confort_front_2.jpg');
+         }
+
          @for $row from 0 through 5 {
-            @for $col from 0 through 2 {
-               &[data-type='#{(($row * 3) + $col + 1)}'] {
+            @for $col from 0 through 1 {
+               &[data-type='#{(($row * 2) + $col + 1)}'] {
+                  &[data-pos='1'] {
+                     background-position: (($col * 3) * -100%) ($row * -100%);
+                  }
+                  &[data-pos='2'] {
+                     background-position: ((($col * 3) + 1) * -100%) ($row * -100%);
+                  }
+                  &[data-pos='3'] {
+                     background-position: ((($col * 3) + 2) * -100%) ($row * -100%);
+                  }
+               }
+            }
+         }
+
+         @for $row from 0 through 5 {
+            @for $col from 0 through 1 {
+               &[data-type='#{(($row * 2) + $col + 1 + 12)}'] {
                   &[data-pos='1'] {
                      background-position: (($col * 3) * -100%) ($row * -100%);
                   }

@@ -169,20 +169,13 @@ class CreatureConforts extends Table {
 
         $result['dice'] = Dice::getUIData();
 
-        $result['conforts'] = Conforts::getUIData();
+        $result['conforts'] = Conforts::getUIData($current_player_id);
         $result['improvements'] = Improvements::getUIData();
         $result['travelers'] = Travelers::getUIData();
         $result['valleys'] = Valleys::getUIData();
         $result['workers'] = Worker::getUIData();
 
-
-        $result['hands'] = [];
-        $players = self::loadPlayersBasicInfos();
-        foreach ($players as $player_id => $player) {
-            $result['hands'][$player_id] = Conforts::anonymize(Conforts::getHand($player_id), $player_id != $current_player_id);
-        }
-
-        $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
+        // $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
 
         return $result;
     }
