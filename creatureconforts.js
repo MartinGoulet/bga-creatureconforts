@@ -1996,6 +1996,7 @@ function sortFunction() {
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.log.bind(window.console) : function () { };
 var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
+var GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
 var CreatureConforts = (function () {
     function CreatureConforts() {
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
@@ -2512,37 +2513,43 @@ var DialRequirement = (function () {
     };
     return DialRequirement;
 }());
-var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-var ChooseResource = (function () {
-    function ChooseResource(game, player_id) {
+var SelectResources = (function () {
+    function SelectResources(game, player_id) {
         var _this = this;
         this.game = game;
         this.player_id = player_id;
         this.counters = {};
         this.placeholder = [];
-        var root = document.getElementById('choose-resource');
+        this.isHandleSet = false;
+        var root = document.getElementById('select-resources');
         if (root)
             root.remove();
-        var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
         var templateIcon = "<div class=\"wrapper\">\n         <span id=\"icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>";
-        var html = "<div id=\"choose-resource\">\n         <div id=\"choose-resource-player\">\n            ".concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n         </div>\n         <div id=\"choose-resource-placeholder\"></div>\n         <div id=\"choose-resource-buttons\"></div>\n      </div>");
+        var html = "<div id=\"select-resources\">\n         <div id=\"select-resources-player\">\n            ".concat(GOODS.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n         </div>\n         <div id=\"select-resources-placeholder\"></div>\n         <div id=\"select-resources-buttons\"></div>\n      </div>");
         document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
-        for (var _i = 0, icons_1 = icons; _i < icons_1.length; _i++) {
-            var icon = icons_1[_i];
+        for (var _i = 0, GOODS_1 = GOODS; _i < GOODS_1.length; _i++) {
+            var icon = GOODS_1[_i];
             this.counters[icon] = new ebg.counter();
             this.counters[icon].create("icons-".concat(icon, "-counter"));
             this.counters[icon].setValue(0);
         }
         var handleReset = function () {
+            var _a;
             _this.placeholder = [];
             _this.displayPlaceholder();
             _this.displayResource();
+            (_a = _this.OnResourceChanged) === null || _a === void 0 ? void 0 : _a.call(_this, _this.placeholder);
         };
-        this.game.addActionButton('choose-resource-button-reset', _('Reset'), handleReset, 'choose-resource-buttons', false, 'gray');
+        this.game.addActionButton('select-resources-button-reset', _('Reset'), handleReset, 'select-resources-buttons', false, 'gray');
     }
-    ChooseResource.prototype.display = function (cost) {
+    SelectResources.prototype.getResources = function () {
+        return this.placeholder.map(function (type) { return GOODS.indexOf(type) + 1; });
+    };
+    SelectResources.prototype.display = function (cost) {
         var _this = this;
+        this.cost = cost;
         var handleResourceClick = function (type, counter, wrapper) {
+            var _a;
             if (counter.getValue() <= 0)
                 return;
             if (_this.placeholder.length >= cost['*'])
@@ -2551,45 +2558,59 @@ var ChooseResource = (function () {
             wrapper.classList.toggle('disabled', counter.getValue() == 0);
             _this.placeholder.push(type);
             _this.displayPlaceholder();
+            (_a = _this.OnResourceChanged) === null || _a === void 0 ? void 0 : _a.call(_this, _this.placeholder.slice());
         };
         this.placeholder = [];
         var player_resource = this.game.getPlayerPanel(this.player_id).counters;
         var _loop_4 = function (type) {
             var counter = player_resource[type];
-            this_1.counters[type].setValue(counter.getValue());
+            if (type in cost) {
+                this_1.counters[type].setValue(counter.getValue() - cost[type]);
+            }
+            else {
+                this_1.counters[type].setValue(counter.getValue());
+            }
             var wrapper = document.getElementById("icons-".concat(type, "-counter")).parentElement;
             wrapper.classList.toggle('disabled', this_1.counters[type].getValue() == 0);
-            wrapper.addEventListener('click', function () { return handleResourceClick(type, _this.counters[type], wrapper); });
+            if (!this_1.isHandleSet) {
+                wrapper.addEventListener('click', function () { return handleResourceClick(type, _this.counters[type], wrapper); });
+            }
         };
         var this_1 = this;
-        for (var _i = 0, icons_2 = icons; _i < icons_2.length; _i++) {
-            var type = icons_2[_i];
+        for (var _i = 0, GOODS_2 = GOODS; _i < GOODS_2.length; _i++) {
+            var type = GOODS_2[_i];
             _loop_4(type);
         }
+        this.isHandleSet = true;
         var html = [];
         for (var index = 0; index < cost['*']; index++) {
             html.push("<div id=\"placeholder-".concat(index, "\" class=\"placeholder\"></div>"));
         }
-        var placeholder = document.getElementById('choose-resource-placeholder');
+        var placeholder = document.getElementById('select-resources-placeholder');
         placeholder.innerHTML = '';
         placeholder.insertAdjacentHTML('beforeend', html.join(''));
-        document.getElementById('choose-resource').classList.toggle('show', true);
+        document.getElementById('select-resources').classList.toggle('show', true);
     };
-    ChooseResource.prototype.hide = function () {
-        document.getElementById('choose-resource').classList.toggle('show', false);
+    SelectResources.prototype.hide = function () {
+        document.getElementById('select-resources').classList.toggle('show', false);
     };
-    ChooseResource.prototype.displayResource = function () {
+    SelectResources.prototype.displayResource = function () {
         var player_resource = this.game.getPlayerPanel(this.player_id).counters;
-        for (var _i = 0, icons_3 = icons; _i < icons_3.length; _i++) {
-            var type = icons_3[_i];
+        for (var _i = 0, GOODS_3 = GOODS; _i < GOODS_3.length; _i++) {
+            var type = GOODS_3[_i];
             var counter = player_resource[type];
-            this.counters[type].setValue(counter.getValue());
+            if (type in this.cost) {
+                this.counters[type].setValue(counter.getValue() - this.cost[type]);
+            }
+            else {
+                this.counters[type].setValue(counter.getValue());
+            }
             var wrapper = document.getElementById("icons-".concat(type, "-counter")).parentElement;
             wrapper.classList.toggle('disabled', this.counters[type].getValue() == 0);
         }
     };
-    ChooseResource.prototype.displayPlaceholder = function () {
-        document.querySelectorAll("#choose-resource-placeholder .placeholder").forEach(function (placeholder) {
+    SelectResources.prototype.displayPlaceholder = function () {
+        document.querySelectorAll("#select-resources-placeholder .placeholder").forEach(function (placeholder) {
             placeholder.innerHTML = "";
         });
         for (var index = 0; index < this.placeholder.length; index++) {
@@ -2598,7 +2619,7 @@ var ChooseResource = (function () {
             placeholder.insertAdjacentHTML("beforeend", "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"));
         }
     };
-    return ChooseResource;
+    return SelectResources;
 }());
 var NotificationManager = (function () {
     function NotificationManager(game) {
@@ -3093,19 +3114,31 @@ var PlayerTurnCraftState = (function () {
         var _this = this;
         if (!this.game.isCurrentPlayerActive())
             return;
-        this.resourceManager = new ChooseResource(this.game, this.game.getPlayerId());
+        var resourceManager = new SelectResources(this.game, this.game.getPlayerId());
+        this.resourceManager = resourceManager;
         var hand = this.game.getCurrentPlayerTable().hand;
+        var handleResourceChanged = function (resources) {
+            var card = hand.getSelection()[0];
+            if (!card || resources.length == 0) {
+                _this.game.disableButton('btn_craft');
+                return;
+            }
+            var card_type = _this.game.confortManager.getCardType(card);
+            if ('*' in card_type.cost) {
+                _this.game.toggleButtonEnable('btn_craft', card_type.cost['*'] == resources.length);
+            }
+        };
         var handleSelectionChange = function (selection) {
             _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
             if (selection.length == 0)
                 return;
             var card_type = _this.game.confortManager.getCardType(selection[0]);
             if ('*' in card_type.cost) {
-                _this.resourceManager.display(card_type.cost);
+                resourceManager.display(card_type.cost);
                 _this.game.toggleButtonEnable('btn_craft', false);
             }
             else {
-                _this.resourceManager.hide();
+                resourceManager.hide();
             }
         };
         var selection = hand.getCards().filter(function (card) {
@@ -3114,18 +3147,13 @@ var PlayerTurnCraftState = (function () {
                 console.warn('No cost for', card_type);
                 return false;
             }
-            if ('*' in card_type.cost) {
-                return true;
-            }
-            else {
-                var res = _this.isRequirementMet(card_type.cost);
-                return res;
-            }
+            return _this.isRequirementMet(card_type.cost);
         });
         this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
         hand.setSelectionMode('single');
         hand.setSelectableCards(selection);
         hand.onSelectionChange = handleSelectionChange;
+        resourceManager.OnResourceChanged = handleResourceChanged;
     };
     PlayerTurnCraftState.prototype.onLeavingState = function () { };
     PlayerTurnCraftState.prototype.onUpdateActionButtons = function (args) {
@@ -3136,8 +3164,14 @@ var PlayerTurnCraftState = (function () {
             if (!card)
                 return;
             var card_type = _this.game.confortManager.getCardType(card);
-            var resources = [0, 0, 0, 0, 0, 0];
-            _this.game.takeAction('craftConfort', { card_id: card.id, resources: resources });
+            if (!_this.isRequirementMet(card_type.cost)) {
+                _this.game.showMessage('Requirement not met', 'error');
+            }
+            var resources = [];
+            if ('*' in card_type.cost) {
+                resources = _this.resourceManager.getResources();
+            }
+            _this.game.takeAction('craftConfort', { card_id: card.id, resources: resources.join(';') });
         };
         var handlePass = function () {
             _this.game.takeAction('passCraftConfort');
@@ -3154,11 +3188,9 @@ var PlayerTurnCraftState = (function () {
             }
         }
         if ('*' in cost) {
-            var goods = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-            var total_goods = goods
-                .map(function (type) { return counters[type].getValue(); })
-                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
             var total_cost = Object.keys(cost)
+                .filter(function (type) { return GOODS.indexOf(type) >= 0; })
                 .map(function (type) { return cost[type]; })
                 .reduce(function (prev, curr) { return prev + curr; }, 0);
             return total_goods >= total_cost;
@@ -3328,7 +3360,7 @@ var PlayerPanel = (function () {
         this.game = game;
         this.counters = {};
         this.player_id = Number(player.id);
-        var icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
+        var icons = __spreadArray(__spreadArray([], GOODS, true), ['lesson', 'story', 'coin'], false);
         var templateIcon = "<div class=\"wrapper\">\n      <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
         var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n        <div class=\"row\"></div>\n      </div>");
         document.getElementById("player_board_".concat(player.id)).insertAdjacentHTML('beforeend', html);

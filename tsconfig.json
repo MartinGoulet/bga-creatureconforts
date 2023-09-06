@@ -48,7 +48,7 @@
         "src/deck.ts",
         "src/dice.ts",
         "src/dice-helper.ts",
-        "src/choose-resource.ts",
+        "src/select-resources.ts",
         
         "src/managers/action.ts",
         "src/managers/notification.ts",

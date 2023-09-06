@@ -590,3 +590,12 @@ $this->valley_types = [
       ],
    ],
 ];
+
+$this->good_types = [
+   1 => WOOD,
+   2 => STONE,
+   3 => FRUIT,
+   4 => MUSHROOM, 
+   5 => YARN,
+   6 => GRAIN,
+];

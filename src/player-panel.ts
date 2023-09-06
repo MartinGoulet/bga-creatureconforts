@@ -5,7 +5,7 @@ class PlayerPanel {
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
       this.player_id = Number(player.id);
 
-      const icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
+      const icons = [...GOODS, 'lesson', 'story', 'coin'];
 
       const templateIcon = `<div class="wrapper">
       <span id="player-panel-${player.id}-icons-{icon-value}-counter" class="counter">1</span>

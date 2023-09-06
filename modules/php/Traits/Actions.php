@@ -155,7 +155,24 @@ trait Actions {
         }
 
         $cost = Conforts::getCost($card);
-        if(!Players::hasEnoughResource($player_id, $cost)) {
+
+        if (array_key_exists(ANY_RESOURCE, $cost)) {
+            if (sizeof($resources) !== $cost[ANY_RESOURCE]) {
+                throw new BgaUserException("Not the right amount of resources");
+            }
+
+            unset($cost[ANY_RESOURCE]);
+            foreach ($resources as $idResource) {
+                $code = $this->good_types[$idResource];
+                if(array_key_exists($code, $cost)) {
+                    $cost[$code] += 1;
+                } else {
+                    $cost[$code] = 1;
+                }
+            }
+        }
+
+        if (!Players::hasEnoughResource($player_id, $cost)) {
             throw new BgaUserException("Not enough resource");
         }
 

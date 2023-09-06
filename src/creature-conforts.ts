@@ -4,6 +4,8 @@ const debug = isDebug ? console.log.bind(window.console) : function () {};
 // const LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 
+const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+
 interface CreatureConforts
    extends ebg.core.gamegui,
       BgaGame<CreatureConfortsPlayerData, CreatureConfortsGamedatas> {
