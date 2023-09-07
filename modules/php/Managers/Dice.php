@@ -36,8 +36,18 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
+    static function getWhiteDice() {
+        $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_color = 'white'";
+        return array_values(self::getCollectionFromDb($sql));
+    }
+
     static function countDiceInLocation(int $location_id) {
         return intval(self::getUniqueValueFromDB("SELECT count(1) FROM dice WHERE dice_location = $location_id"));
+    }
+
+    static function getDiceInLocation(int $location_id) {
+        $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_location = $location_id";
+        return array_values(self::getCollectionFromDb($sql));
     }
 
     static function getDice(array $dice_ids) {

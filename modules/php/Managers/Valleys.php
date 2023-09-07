@@ -65,6 +65,16 @@ class Valleys {
         return $card_type['position'][$location_id];
     }
 
+    static function nextSeason() {
+        $deck = self::deck();
+
+        $topForest = $deck->getCardOnTop(FOREST);
+        $deck->playCard($topForest['id']);
+
+        $topMeadow = $deck->getCardOnTop(MEADOW);
+        $deck->playCard($topMeadow['id']);
+    }
+
     // static function getUIDataForest() {
     //     return [self::deck()->getCardOnTop(FOREST)];
     //     // $cards = self::deck()->getCardsInLocation(FOREST, null, 'location_arg');

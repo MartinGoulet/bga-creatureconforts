@@ -27,8 +27,14 @@ class PlayerTurnResolveState implements StateHandler {
    }
    onUpdateActionButtons(args: any): void {
       const handleResolve = () => {
-         const location_id = this.game.tableCenter.worker_locations.getSelectedLocation()[0];
-         this.game.takeAction('resolveWorker', { location_id });
+         const location_id: number = Number(this.game.tableCenter.worker_locations.getSelectedLocation()[0]);
+         if (location_id == 9) {
+            this.game.setClientState('resolveTraveler', {
+               descriptionmyturn: _('You must resolve the effect of the traveler'),
+            });
+         } else {
+            this.game.takeAction('resolveWorker', { location_id });
+         }
       };
       this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
    }

@@ -2,7 +2,7 @@ class PlayerTable {
    public player_id: number;
    public player_color: string;
 
-   public dice: LineDiceStock;
+   public dice: PlayerDiceStock;
    public hand: HandStock<ConfortCard>;
    public cottages: LineStock<Cottage>;
    public workers: LineStock<Meeple>;
@@ -92,13 +92,9 @@ class PlayerTable {
    }
 
    private setupDice(game: CreatureConforts) {
-      this.dice = new LineDiceStock(
+      this.dice = new PlayerDiceStock(
          game.diceManager,
          document.getElementById(`player-table-${this.player_id}-dice`),
-         {
-            gap: '10px',
-            sort: sortFunction('id'),
-         },
       );
 
       const dice = game.gamedatas.dice.filter(

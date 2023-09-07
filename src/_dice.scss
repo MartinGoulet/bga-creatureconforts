@@ -38,7 +38,6 @@
 .bga-dice_die-face {
    background-size: 600% 800%;
    background-image: url('img/agk_spritesheet_dice1.png');
-
 }
 
 .bga-dice_die .bga-dice_die-face[data-face='1'] {
@@ -77,4 +76,54 @@
 }
 .colored-die[data-color='white'] .bga-dice_die-face {
    background-position-y: -700%;
+}
+
+.dice-icon-log {
+   width: 25px;
+   height: 25px;
+   display: inline-block;
+   margin: 0 5px;
+   vertical-align: middle;
+   
+   > span {
+      display: none;
+   }
+
+   &.colored-die[data-color='yellow'] {
+      background-position-y: -300%;
+   }
+   &.colored-die[data-color='green'] {
+      background-position-y: -500%;
+   }
+   &.colored-die[data-color='gray'] {
+      background-position-y: -0%;
+   }
+   &.colored-die[data-color='red'] {
+      background-position-y: -100%;
+   }
+   &.colored-die[data-color='purple'] {
+      background-position-y: -600%;
+   }
+   &.colored-die[data-color='white'] {
+      background-position-y: -700%;
+   }
+
+   &.bga-dice_die-face[data-face='1'] {
+      background-position-x: -0%;
+   }
+   &.bga-dice_die-face[data-face='2'] {
+      background-position-x: -100%;
+   }
+   &.bga-dice_die-face[data-face='3'] {
+      background-position-x: -200%;
+   }
+   &.bga-dice_die-face[data-face='4'] {
+      background-position-x: -300%;
+   }
+   &.bga-dice_die-face[data-face='5'] {
+      background-position-x: -400%;
+   }
+   &.bga-dice_die-face[data-face='6'] {
+      background-position-x: -500%;
+   }
 }

@@ -50,12 +50,30 @@ interface ConfortUIDataPlayer {
    board: ConfortCard[];
 }
 interface ImprovementUIData {
+   discard: {
+      topCard?: ConfortCard;
+      count: number;
+   };
+   deckCount: number;
    market: ImprovementCard[];
 }
 interface TravelerUIData {
    topCard?: TravelerCard;
    count: number;
+   types: { [type: number]: TravelerType };
 }
+
+interface TravelerType {
+   name: string;
+   timing: string;
+   reward: TravelerReward[];
+}
+interface TravelerReward {
+   from?: string[];
+   to: string[];
+   times: number;
+}
+
 interface ValleyUIData {
    forest: TopCardCount<ValleyCard>;
    meadow: TopCardCount<ValleyCard>;

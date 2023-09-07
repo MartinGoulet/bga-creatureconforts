@@ -11,6 +11,11 @@
    }
 
    .card-sides {
+      .back {
+         background-image: url('img/improvement_back.jpg');
+         background-size: 125px 125px;
+         border-radius: 5px;
+      }
       .front {
          background-image: url('img/improvements.jpg');
          background-size: 750px 750px;

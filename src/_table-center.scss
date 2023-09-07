@@ -1,5 +1,5 @@
 #table-center-wrapper {
-   min-width: 950px;
+   min-width: 900px;
    display: flex;
    flex-wrap: wrap;
    justify-content: center;
@@ -50,9 +50,10 @@
 
       #worker-locations {
          position: relative;
+         // Placement should be activated
          &.has-selected-location {
-            .slot.selectable {
-               animation:  none !important;
+            .slot.selectable.selected {
+               animation: none !important;
             }
          }
          .slot {
@@ -85,53 +86,65 @@
          [data-slot-id='1'] {
             top: 98px;
             left: 85px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='2'] {
             top: 98px;
             left: 241px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='3'] {
             top: 98px;
             left: 427px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='4'] {
             top: 98px;
             left: 583px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
 
          [data-slot-id='5'] {
             top: 202px;
             left: 592px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%)
          }
          [data-slot-id='6'] {
             top: 345px;
             left: 624px;
+            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%)
          }
          [data-slot-id='7'] {
             top: 291px;
             left: 438px;
+            clip-path: polygon(-10% -10%, 80% -10%, 80% 100%, -10% 150%);
          }
 
          [data-slot-id='8'] {
             top: 472px;
             left: 462px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
          [data-slot-id='9'] {
             top: 576px;
             left: 279px;
+            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -60% 80%);
          }
 
          [data-slot-id='10'] {
             top: 802px;
             left: 83px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
          [data-slot-id='11'] {
             top: 749px;
             left: 295px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
          [data-slot-id='12'] {
             top: 749px;
             left: 457px;
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
       }
 
@@ -233,10 +246,17 @@
 
       #decks {
          display: flex;
+         justify-content: space-between;
          top: 1046px;
          position: absolute;
          right: 0;
          gap: 20px;
+         width: 720px;
+
+         > div {
+            display: flex;
+            gap: 20px;
+         }
 
          .deck {
             &[data-empty='true'] {
@@ -258,5 +278,12 @@
 
    .bga-dice_die.bga-dice_die6.colored-die {
       zoom: 0.8;
+   }
+}
+
+.gamestate_placement {
+   .slot.selected {
+      animation: none !important;
+      box-shadow: 0 0 5px 5px orange !important;
    }
 }

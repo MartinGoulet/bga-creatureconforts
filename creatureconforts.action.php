@@ -91,9 +91,11 @@ class action_creatureconforts extends APP_GameAction {
       self::setAjaxMode();
       // Retrieve arguments
       $location_id = self::getArg("location_id", AT_posint, true);
+      $resources = self::getArg("resources", AT_numberlist, false);
+      $resources = $resources != null ? self::getArrayArgs($resources) : [];
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('resolveWorker');
-      $this->game->resolveWorker($location_id);
+      $this->game->resolveWorker($location_id, $resources);
       self::ajaxResponse();
    }
 

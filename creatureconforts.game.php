@@ -70,6 +70,9 @@ class CreatureConforts extends Table {
     /** @var array */
     public $valley_types;
 
+    /** @var array */
+    public $resource_types;
+
     /** @var CreatureConforts */
     public static $instance = null;
 
@@ -175,7 +178,7 @@ class CreatureConforts extends Table {
         $result['valleys'] = Valleys::getUIData();
         $result['workers'] = Worker::getUIData();
 
-        // $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
+        $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
 
         return $result;
     }

@@ -3,6 +3,7 @@
 namespace CreatureConforts\Core;
 
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
@@ -45,17 +46,28 @@ class Notifications extends \APP_DbObject {
         }
     }
 
-    static function familyDice($dice) {
-        self::notifyAll('onFamilyDice', '', [
+    static function discardTraveler() {
+        self::notifyAll('onDiscardTraveler', '', []);
+    }
+
+    static function familyDice(int $player_id, array $dice) {
+        $message = clienttranslate('${player_name} rolls dice ${rolledDice}');
+        self::notifyAll('onFamilyDice', $message, [
+            'player_id' => $player_id, 
+            'player_name' => self::getPlayerName($player_id),
             'dice' => $dice,
+            'rolledDice' => implode(',', array_column($dice, 'face')),
         ]);
     }
 
     static function getResourcesFromLocation(int $player_id, int $location_id, array $resources) {
-        self::notifyAll('onGetResourcesFromLocation', '', [
-            'player_id' => $player_id,
+        $message = clienttranslate('${player_name} get ${resources_to} from a location');
+        self::notifyAll('onGetResourcesFromLocation', $message, [
+            'player_id' => Players::getPlayerId(),
+            'player_name' => self::getPlayerName(Players::getPlayerId()),
             'location_id' => $location_id,
             'resources' => $resources,
+            'resources_to' => $resources,
         ]);
     }
 
@@ -96,6 +108,34 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function newFirstPlayer(int $player_id) {
+        $message = clienttranslate('${player_name} get the worm and is now the new first player for the turn');
+        self::notifyAll('onNewFirstPlayer', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+        ]);
+    }
+
+    static function newSeason($info) {
+        self::notifyAll('onNewSeason', '', [
+            'info' => $info,
+        ]);
+    }
+
+    static function refillLadder(array $ladder, array $discard = null) {
+        self::notifyAll('onRefillLadder', '', [
+            'ladder' => $ladder,
+            'discard' => $discard,
+        ]);
+    }
+
+    static function refillOwlNest(array $owl_nest, array $discard = null) {
+        self::notifyAll('onRefillOwlNest', '', [
+            'owl_nest' => $owl_nest,
+            'discard' => $discard,
+        ]);
+    }
+
     static function returnToPlayerBoard($worker) {
         self::notifyAll('onReturnWorkerToPlayerBoard', '', [
             'player_id' => intval($worker['type_arg']),
@@ -103,12 +143,32 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function riverDialRotate($newValue) {
+        self::notifyAll('onRiverDialRotate', '', [
+            'value' => $newValue,
+        ]);
+    }
+
+    static function travelerExchangeResources($resources_from, $resources_to) {
+        $message = clienttranslate('${player_name} use the traveler to exchange ${resources_from} for ${resources_to}');
+        self::notifyAll('onTravelerExchangeResources', $message, [
+            'player_id' => Players::getPlayerId(),
+            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'resources_from' => $resources_from,
+            'resources_to' => $resources_to,
+            'from' => $resources_from,
+            'to' => $resources_to,
+        ]);
+    }
+
     static function villageDice($dice) {
-        $dice = array_filter($dice, function ($die) {
-            return $die['type'] == "white";
-        });
-        self::notifyAll('onVillageDice', '', [
+        $message = clienttranslate('${player_name} rolls dice ${rolledDice}');
+        $player_id = Globals::getFirstPlayerId();
+        self::notifyAll('onVillageDice', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
             'dice' => $dice,
+            'rolledDice' => implode(',', array_column($dice, 'face')),
         ]);
     }
 

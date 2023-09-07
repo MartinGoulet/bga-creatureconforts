@@ -197,7 +197,7 @@ $machinestates = $basicGameStates + array(
         "name" => "unkeep",
         "type" => "game",
         "action" => "stUnkeep",
-        "transitions" => ["" => ST_PLAYER_TURN_NEXT]
+        "transitions" => ["" => ST_NEW_TRAVELER]
     ],
 
 );

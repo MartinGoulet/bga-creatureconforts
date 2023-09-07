@@ -10,6 +10,7 @@ class StateManager {
          playerTurnDice: new PlayerTurnDiceState(game),
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
+         resolveTraveler: new ResolveTravelerState(game),
       };
    }
 

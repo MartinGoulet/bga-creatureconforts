@@ -32,3 +32,20 @@ class MyDiceManager extends DiceManager {
       });
    }
 }
+
+class PlayerDiceStock extends LineDiceStock {
+   constructor(protected manager: DiceManager, protected element: HTMLElement) {
+      super(manager, element, {
+         gap: '10px',
+         sort: sortFunction('id'),
+      });
+   }
+
+   public rollDie(die: BgaDie, settings?: RollDieSettings): void {
+      super.rollDie(die, settings);
+
+      const div = this.getDieElement(die);
+      const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
+      faces.dataset.visibleFace = `${die.face}`;
+   }
+}

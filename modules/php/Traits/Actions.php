@@ -7,6 +7,8 @@ use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
 use CreatureConforts\Helpers\DiceHelper;
+use CreatureConforts\Helpers\ResourcesHelper;
+use CreatureConforts\Helpers\TravelerHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Players;
@@ -95,7 +97,7 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
-    function resolveWorker($location_id) {
+    function resolveWorker(int $location_id, array $resources) {
         $player_id = $this->getActivePlayerId();
 
         $worker = Worker::returnToPlayerBoard($player_id, $location_id);
@@ -105,7 +107,9 @@ trait Actions {
 
         Notifications::returnToPlayerBoard($worker);
 
-        if (Dice::countDiceInLocation($location_id) == 0) {
+        $dice = Dice::getDiceInLocation($location_id);
+
+        if (sizeof($dice) == 0) {
             Players::addResources($player_id, [LESSON_LEARNED => 1]);
             Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
             $this->resolveWorkerNextStep();
@@ -128,6 +132,14 @@ trait Actions {
             ];
             Players::addResources($player_id, $resources[$location_id]);
             Notifications::getResourcesFromLocation($player_id, $location_id, $resources[$location_id]);
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
+        if ($location_id == 9) {
+            $die = array_shift($dice);
+            $converted_resources = ResourcesHelper::convertNumberToResource($resources);
+            TravelerHelper::resolve($die, $converted_resources);
             $this->resolveWorkerNextStep();
             return;
         }
@@ -164,7 +176,7 @@ trait Actions {
             unset($cost[ANY_RESOURCE]);
             foreach ($resources as $idResource) {
                 $code = $this->good_types[$idResource];
-                if(array_key_exists($code, $cost)) {
+                if (array_key_exists($code, $cost)) {
                     $cost[$code] += 1;
                 } else {
                     $cost[$code] = 1;

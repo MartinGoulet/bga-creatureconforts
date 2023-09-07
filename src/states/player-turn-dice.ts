@@ -41,7 +41,13 @@ class PlayerTurnDiceState implements StateHandler {
       dice_locations.onDieClick = handleDiceLocationClick;
    }
 
-   onLeavingState(): void {}
+   onLeavingState(): void {
+      const { hill, worker_locations, dice_locations } = this.game.tableCenter;
+      hill.setSelectionMode('none');
+      hill.onSelectionChange = null;
+      worker_locations.OnLocationClick = null;
+      dice_locations.onDieClick = null;
+   }
 
    onUpdateActionButtons(args: any): void {
       const handleCancel = () => {

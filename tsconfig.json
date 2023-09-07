@@ -49,16 +49,17 @@
         "src/dice.ts",
         "src/dice-helper.ts",
         "src/select-resources.ts",
+        "src/traveler-convert.ts",
         
-        "src/managers/action.ts",
-        "src/managers/notification.ts",
-        "src/managers/state.ts",
+        "src/notification.ts",
+        "src/states/state.ts",
 
         "src/states/start-hand.ts",
         "src/states/placement.ts",
         "src/states/player-turn-dice.ts",
         "src/states/player-turn-resolve.ts",
         "src/states/player-turn-craft.ts",
+        "src/states/resolve-traveler.ts",
 
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",

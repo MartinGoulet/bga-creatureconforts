@@ -28,6 +28,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'cottages';
 @import 'workers';
 @import 'select-resources';
+@import 'traveler-convert';
+@import 'log';
 
 #game_play_area {
    #bga-zoom-wrapper {

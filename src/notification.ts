@@ -14,6 +14,12 @@ class NotificationManager {
          ['onGetResourcesFromLocation', 1200],
          ['onCraftConfort', 1000],
          ['onReturnDice', 1200],
+         ['onNewSeason', 1000],
+         ['onRiverDialRotate', 500],
+         ['onRefillOwlNest'],
+         ['onDiscardTraveler', 100],
+         ['onNewFirstPlayer', 100],
+         ['onTravelerExchangeResources', 100],
       ];
 
       this.setupNotifications(notifs);
@@ -37,8 +43,9 @@ class NotificationManager {
       this.game.gamedatas.playerorder.forEach(async (player_id) => {
          const dice = args.dice.filter((die) => die.owner_id == player_id.toString());
          const stack = this.game.getPlayerTable(Number(player_id)).dice;
+         stack.removeAll();
          await stack.addDice(dice);
-         stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+         stack.rollDice(dice, { duration: [500, 900], effect: 'rollIn' });
       });
    }
 
@@ -62,14 +69,8 @@ class NotificationManager {
       this.game.tableCenter.dice_locations.addDice(dice);
    }
 
-   private async notif_onReturnWorkerToPlayerBoard({
-      player_id,
-      worker,
-   }: {
-      player_id: number;
-      worker: Meeple;
-   }) {
-      await this.game.getPlayerTable(player_id).workers.addCard(worker);
+   private async notif_onReturnWorkerToPlayerBoard(args: { player_id: number; worker: Meeple }) {
+      await this.game.getPlayerTable(args.player_id).workers.addCard(args.worker);
    }
 
    private notif_onGetResourcesFromLocation({
@@ -77,21 +78,26 @@ class NotificationManager {
       resources,
       player_id,
    }: GetResourcesFromLocationArgs) {
-      let index = 0;
-      Object.keys(resources).forEach((type) => {
-         const count = resources[type];
-         for (let i = 0; i < count; i++) {
-            this.game.slideTemporaryObject(
-               `<div class="resource-icon" data-type="${type}"></div>`,
-               'overall-content', //'left-side-wrapper',
-               document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"`)[0],
-               `player-panel-${player_id}-icons-${type}-counter`,
-               1000,
-               250 * index++,
-            );
-         }
-         this.game.getPlayerPanel(player_id).counters[type].incValue(count);
-      });
+      // let index = 0;
+      // Object.keys(resources).forEach((type) => {
+      //    const count = resources[type];
+      //    for (let i = 0; i < count; i++) {
+      //       this.game.slideTemporaryObject(
+      //          `<div class="resource-icon" data-type="${type}"></div>`,
+      //          'overall-content', //'left-side-wrapper',
+      //          document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"`)[0],
+      //          `player-panel-${player_id}-icons-${type}-counter`,
+      //          1000,
+      //          250 * index++,
+      //       );
+      //    }
+      //    this.game.getPlayerPanel(player_id).counters[type].incValue(count);
+      // });
+      this.animationMoveResource(
+         player_id,
+         resources,
+         document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"]`)[0],
+      );
    }
 
    private notif_onCraftConfort({ player_id, card, cost }: CraftConfortArgs) {
@@ -110,6 +116,80 @@ class NotificationManager {
       const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
       this.game.tableCenter.hill.addDice(white_dice);
       this.game.getPlayerTable(player_id).dice.addDice(player_dice);
+   }
+
+   private notif_onNewSeason(args: { info: ValleyUIData }) {
+      const { forest, meadow } = args.info;
+      this.game.tableCenter.valley.removeAll();
+      this.game.tableCenter.valley.addCards([forest.topCard, meadow.topCard]);
+   }
+
+   private notif_onRiverDialRotate({ value }: { value: number }) {
+      this.game.tableCenter.setRiverDial(value);
+   }
+
+   private async notif_onRefillOwlNest(args: { owl_nest: ConfortCard[]; discard?: ConfortCard }) {
+      const { owl_nest, discard } = args;
+      if (discard) {
+         await this.game.tableCenter.confort_discard.addCard(discard);
+      }
+      const { confort_deck: deck, confort_market: market, hidden_confort } = this.game.tableCenter;
+
+      await market.swapCards(owl_nest.slice(0, 3));
+      await market.addCard(owl_nest[3], { fromStock: deck });
+      // deck.setCardNumber(deck.getCardNumber(), { ...hidden_confort });
+   }
+
+   private notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
+      const { ladder, discard } = args;
+      if (discard) {
+         this.game.tableCenter.confort_discard.addCard(discard);
+      }
+      const { improvement_deck: deck, confort_market: market, hidden_improvement } = this.game.tableCenter;
+      deck.setCardNumber(deck.getCardNumber(), { id: ladder[5].id } as ImprovementCard);
+      market.addCards(ladder);
+      deck.setCardNumber(deck.getCardNumber(), { ...hidden_improvement });
+   }
+
+   private notif_onDiscardTraveler(args: any) {
+      const { traveler_deck: deck, hidden_traveler } = this.game.tableCenter;
+      deck.setCardNumber(deck.getCardNumber() - 1, { ...hidden_traveler });
+   }
+
+   private notif_onNewFirstPlayer({ player_id }: { player_id: number }) {
+      this.game.getPlayerPanel(player_id).addFirstTokenPlayer();
+   }
+
+   private notif_onTravelerExchangeResources({ from, to, player_id }: TravelerExchangeResourcesArgs) {
+      const { counters } = this.game.getPlayerPanel(player_id);
+      Object.keys(from).forEach((type) => counters[type].incValue(-from[type]));
+      this.animationMoveResource(
+         player_id,
+         to,
+         document.querySelectorAll(`#worker-locations *[data-slot-id="9"]`)[0],
+      );
+   }
+
+   private animationMoveResource(
+      player_id: number,
+      resources: { [type: string]: number }[],
+      fromElement: Element,
+   ) {
+      let index = 0;
+      Object.keys(resources).forEach((type) => {
+         const count = resources[type];
+         for (let i = 0; i < count; i++) {
+            this.game.slideTemporaryObject(
+               `<div class="resource-icon" data-type="${type}"></div>`,
+               'overall-content', //'left-side-wrapper',
+               fromElement,
+               `player-panel-${player_id}-icons-${type}-counter`,
+               1000,
+               250 * index++,
+            );
+         }
+         this.game.getPlayerPanel(player_id).counters[type].incValue(count);
+      });
    }
 
    private setupNotifications(notifs: any) {
@@ -160,6 +240,8 @@ interface NewTravelerArgs {
 }
 
 interface FamilyDiceArgs {
+   player_id: number;
+   rolledDice: number[];
    dice: Dice[];
 }
 
@@ -173,4 +255,10 @@ interface CraftConfortArgs {
    player_id: number;
    card: ConfortCard;
    cost: { [type: string]: number }[];
+}
+
+interface TravelerExchangeResourcesArgs {
+   player_id: number;
+   from: { [type: string]: number }[];
+   to: { [type: string]: number }[];
 }

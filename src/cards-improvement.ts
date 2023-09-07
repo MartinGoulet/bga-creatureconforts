@@ -13,7 +13,7 @@ class ImprovementManager extends CardManager<ImprovementCard> {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
          },
-         isCardVisible: () => true,
+         isCardVisible: (card) => 'type' in card,
          cardWidth: 125,
          cardHeight: 125,
       });

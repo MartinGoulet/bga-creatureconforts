@@ -252,7 +252,6 @@ $this->improvement_types = [
 ];
 
 $this->traveler_types = [
-   // --- gen php begin travelers --- 
    1 => [
       'name' => clienttranslate("Canada Lynx"),
       'timing' => "IMMEDIATELY",
@@ -296,6 +295,14 @@ $this->traveler_types = [
    11 => [
       'name' => clienttranslate("Pine Marten"),
       'timing' => "ALL_MONTH_LONG",
+      'reward' => [
+         1 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
+         2 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
+         3 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
+         4 => ["from" => [LESSON_LEARNED], 'to' => [COIN], 'times' => 3],
+         5 => ["from" => [LESSON_LEARNED], 'to' => [COIN], 'times' => 3],
+         6 => ["from" => [FRUIT, MUSHROOM], 'to' => [STORY], 'times' => 5],
+      ],
    ],
    12 => [
       'name' => clienttranslate("Black Bear"),
@@ -313,7 +320,6 @@ $this->traveler_types = [
       'name' => clienttranslate("Wild Turkey"),
       'timing' => "AFTER_ROLLING_FAMILY_DICE",
    ],
-   // --- gen php end travelers --- 
 ];
 
 $this->valley_types = [
@@ -595,7 +601,19 @@ $this->good_types = [
    1 => WOOD,
    2 => STONE,
    3 => FRUIT,
-   4 => MUSHROOM, 
+   4 => MUSHROOM,
    5 => YARN,
    6 => GRAIN,
+];
+
+$this->resource_types = [
+   1 => WOOD,
+   2 => STONE,
+   3 => FRUIT,
+   4 => MUSHROOM,
+   5 => YARN,
+   6 => GRAIN,
+   7 => LESSON_LEARNED,
+   8 => STORY,
+   9 => COIN,
 ];

@@ -5,6 +5,7 @@ const debug = isDebug ? console.log.bind(window.console) : function () {};
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 
 const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+const ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 
 interface CreatureConforts
    extends ebg.core.gamegui,
@@ -105,7 +106,7 @@ class CreatureConforts
       //       const tablesAndCenter = document.getElementById('tables-and-center');
       //       const clientWidth = document.getElementById('table').clientWidth;
       //       const tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
-      //       tablesAndCenter.classList.toggle('double-column', clientWidth > 971 + tablesWidth); // 950 + 21 + tablesWidth
+      //       tablesAndCenter.classList.toggle('double-column', clientWidth > 921 + tablesWidth); // 900 + 21 + tablesWidth
       //    },
       //    // zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1],
       // });
@@ -288,6 +289,18 @@ class CreatureConforts
             if (args.card_name !== undefined) {
                args.card_name = '<b>' + _(args.card_name) + '</b>';
             }
+
+            if (args.rolledDice !== undefined) {
+               args.rolledDice = this.formatTextDice(args.player_id, args.rolledDice);
+            }
+
+            if (args.resources_from !== undefined) {
+               args.resources_from = this.formatResourceIcons(args.resources_from);
+            }
+
+            if (args.resources_to !== undefined) {
+               args.resources_to = this.formatResourceIcons(args.resources_to);
+            }
          }
       } catch (e) {
          console.error(log, args, 'Exception thrown', e.stack);
@@ -297,5 +310,34 @@ class CreatureConforts
       } catch {
          debugger;
       }
+   }
+
+   formatTextDice(player_id: number, rawText: string) {
+      if (!rawText) return '';
+
+      const dice = rawText.split(',');
+      let values = [];
+
+      const color = dice.length == 2 ? this.getPlayerTable(player_id).player_color : 'white';
+
+      dice.forEach((value: string) => {
+         values.push(
+            `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`,
+         );
+      });
+
+      return values.join('');
+   }
+
+   formatResourceIcons(group: { [type: string]: number }[]) {
+      let values = [];
+
+      Object.keys(group).forEach((icon: string) => {
+         for (let index = 0; index < group[icon]; index++) {
+            values.push(`<div class="resource-icon" data-type="${icon}"></div>`);
+         }
+      });
+
+      return values.join('');
    }
 }

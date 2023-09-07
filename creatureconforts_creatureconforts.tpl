@@ -14,8 +14,14 @@
                 <div id="hill-dice"></div>
 
                 <div id="decks">
-                    <div id="deck-conforts"></div>
-                    <div id="discard-conforts"></div>
+                    <div>
+                        <div id="deck-improvements"></div>
+                        <div id="discard-improvements"></div>
+                    </div>
+                    <div>
+                        <div id="deck-conforts"></div>
+                        <div id="discard-conforts"></div>
+                    </div>
                 </div>
             </div>
             

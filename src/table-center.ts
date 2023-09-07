@@ -1,12 +1,15 @@
 class TableCenter {
    public hidden_confort: ConfortCard = { id: '1000' } as ConfortCard;
    public hidden_traveler: TravelerCard = { id: '1001' } as TravelerCard;
+   public hidden_improvement: ImprovementCard = { id: '1002' } as ImprovementCard;
 
    public confort_market: SlotStock<ConfortCard>;
    public confort_discard: Deck<ConfortCard>;
    public confort_deck: Deck<ConfortCard>;
 
    public improvement_market: SlotStock<ImprovementCard>;
+   public improvement_deck: Deck<ImprovementCard>;
+   public improvement_discard: Deck<ImprovementCard>;
 
    public traveler_deck: Deck<TravelerCard>;
    public valley: SlotStock<ImprovementCard>;
@@ -24,8 +27,7 @@ class TableCenter {
       this.setupWorkerLocations(game);
       this.setupDiceLocations(game);
       this.setupHillDice(game);
-
-      document.getElementById('river-dial').dataset.position = game.gamedatas.river_dial.toString();
+      this.setRiverDial(game.gamedatas.river_dial);
    }
 
    public getWorkerLocations(): number[] {
@@ -34,6 +36,10 @@ class TableCenter {
          .getCards()
          .filter((meeple) => meeple.type_arg == player_id)
          .map((meeple) => Number(meeple.location_arg));
+   }
+
+   public setRiverDial(value: number) {
+      document.getElementById('river-dial').dataset.position = value.toString();
    }
 
    private setupConfortCards(game: CreatureConforts) {
@@ -84,7 +90,7 @@ class TableCenter {
 
    private setupHillDice(game: CreatureConforts) {
       this.hill = new LineDiceStock(game.diceManager, document.getElementById(`hill-dice`), {
-         gap: '10px',
+         gap: '5px',
          sort: sortFunction('id'),
       });
 
@@ -93,7 +99,7 @@ class TableCenter {
    }
 
    private setupImprovementCards(game: CreatureConforts) {
-      const { market } = game.gamedatas.improvements;
+      const { market, discard, deckCount } = game.gamedatas.improvements;
       this.improvement_market = new SlotStock<ImprovementCard>(
          game.improvementManager,
          document.getElementById(`table-improvements`),
@@ -104,6 +110,27 @@ class TableCenter {
             gap: '7px',
          },
       );
+
+      this.improvement_deck = new Deck<ImprovementCard>(
+         game.improvementManager,
+         document.getElementById(`deck-improvements`),
+         {
+            cardNumber: deckCount,
+            topCard: this.hidden_confort,
+            counter: {},
+         },
+      );
+
+      this.improvement_discard = new Deck<ImprovementCard>(
+         game.improvementManager,
+         document.getElementById(`discard-improvements`),
+         {
+            cardNumber: discard.count,
+            topCard: discard.topCard,
+            counter: {},
+         },
+      );
+
       this.improvement_market.addCards(market);
    }
 

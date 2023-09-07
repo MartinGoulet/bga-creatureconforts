@@ -45,11 +45,12 @@ class Travelers {
         return [
             'topCard' => array_shift($cards),
             'count' => self::deck()->countCardInLocation('deck') + self::deck()->countCardInLocation('revealed'),
+            'types' => Game::get()->traveler_types,
         ];
     }
 
     static function getTopCard() {
-        return self::getUIData();
+        return self::getUIData()['topCard'];
     }
 
     static function revealTopCard() {

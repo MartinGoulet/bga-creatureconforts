@@ -12,15 +12,23 @@ class Globals extends \APP_DbObject {
         return intval(Game::get()->getGameStateValue(VAR_FIRST_PLAYER));
     }
 
+    public static function setFirstPlayerId(int $player_id) {
+        Game::get()->setGameStateValue(VAR_FIRST_PLAYER, $player_id);
+    }
+
     public static function getRiverDialValue() {
         return intval(Game::get()->getGameStateValue(VAR_RIVER_DIAL));
+    }
+
+    public static function setRiverDialValue(int $value) {
+        Game::get()->setGameStateValue(VAR_RIVER_DIAL, $value);
     }
 
     public static function getWorkerPlacement(int $player_id) {
         return self::get("locations_" . $player_id);
     }
 
-    public static function setWorkerPlacement(int $player_id, $locations_id) {
+    public static function setWorkerPlacement(int $player_id, array $locations_id) {
         self::set("locations_" . $player_id, $locations_id);
     }
 

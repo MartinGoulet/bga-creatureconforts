@@ -58,6 +58,16 @@ class Conforts {
         return $result;
     }
 
+    static function discardLeftMostOwlNest() {
+        $deck = self::deck();
+
+        $cards = $deck->getCardsInLocation('slot', 1);
+        $leftMostCard = array_shift($cards);
+        $deck->playCard($leftMostCard['id']);
+
+        return $deck->getCard($leftMostCard['id']);
+    }
+
     static function getDeck() {
         $cards = self::deck()->getCardsInLocation('deck', null, 'location_arg');
         return self::anonymize($cards);
@@ -83,6 +93,10 @@ class Conforts {
         return $card_type['cost'];
     }
 
+    static function getOwlNest() {
+        return array_values(self::deck()->getCardsInLocation('slot', null, 'location_arg'));
+    }
+
     static function getPlayerBoard($player_id) {
         $cards = self::deck()->getCardsInLocation('board', $player_id);
         return array_values($cards);
@@ -90,6 +104,25 @@ class Conforts {
 
     static function moveCardToPlayerBoard($player_id, $card_id) {
         self::deck()->movecard($card_id, 'board', $player_id);
+    }
+
+    static function refillOwlNest() {
+        $deck = self::deck();
+        for ($i = 1; $i < 4; $i++) {
+            $cards = $deck->getCardsInLocation('slot', $i);
+            if (sizeof($cards) == 0) {
+                for ($j = $i + 1; $j < 4; $j++) {
+                    $slot = $deck->getCardsInLocation('slot', $j);
+                    $next_card = array_shift($slot);
+                    $deck->moveCard($next_card['id'], 'slot', $j - 1);
+                }
+            }
+        }
+
+        $slot = $deck->getCardsInLocation('slot', 4);
+        $next_card = array_shift($slot);
+        $deck->moveCard($next_card['id'], 'slot', 3);
+        $deck->pickCardForLocation('deck', 'slot', 4);
     }
 
     static function remainderStartHand(int $card_id, int $player_id) {
