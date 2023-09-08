@@ -78,26 +78,8 @@ class NotificationManager {
       resources,
       player_id,
    }: GetResourcesFromLocationArgs) {
-      // let index = 0;
-      // Object.keys(resources).forEach((type) => {
-      //    const count = resources[type];
-      //    for (let i = 0; i < count; i++) {
-      //       this.game.slideTemporaryObject(
-      //          `<div class="resource-icon" data-type="${type}"></div>`,
-      //          'overall-content', //'left-side-wrapper',
-      //          document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"`)[0],
-      //          `player-panel-${player_id}-icons-${type}-counter`,
-      //          1000,
-      //          250 * index++,
-      //       );
-      //    }
-      //    this.game.getPlayerPanel(player_id).counters[type].incValue(count);
-      // });
-      this.animationMoveResource(
-         player_id,
-         resources,
-         document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"]`)[0],
-      );
+      const fromElement = document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"]`)[0];
+      this.animationMoveResource(player_id, resources, fromElement);
    }
 
    private notif_onCraftConfort({ player_id, card, cost }: CraftConfortArgs) {
@@ -137,7 +119,6 @@ class NotificationManager {
 
       await market.swapCards(owl_nest.slice(0, 3));
       await market.addCard(owl_nest[3], { fromStock: deck });
-      // deck.setCardNumber(deck.getCardNumber(), { ...hidden_confort });
    }
 
    private notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
@@ -163,11 +144,9 @@ class NotificationManager {
    private notif_onTravelerExchangeResources({ from, to, player_id }: TravelerExchangeResourcesArgs) {
       const { counters } = this.game.getPlayerPanel(player_id);
       Object.keys(from).forEach((type) => counters[type].incValue(-from[type]));
-      this.animationMoveResource(
-         player_id,
-         to,
-         document.querySelectorAll(`#worker-locations *[data-slot-id="9"]`)[0],
-      );
+
+      const fromElement = document.querySelectorAll(`#worker-locations *[data-slot-id="9"]`)[0];
+      this.animationMoveResource(player_id, to, fromElement);
    }
 
    private animationMoveResource(

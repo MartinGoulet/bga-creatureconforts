@@ -27,8 +27,17 @@ class PlayerTurnResolveState implements StateHandler {
    }
    onUpdateActionButtons(args: any): void {
       const handleResolve = () => {
+         if (this.game.tableCenter.worker_locations.getSelectedLocation().length == 0) {
+            this.game.showMessage(_('You must select a location with one of your worker'), 'error');
+            return;
+         }
+
          const location_id: number = Number(this.game.tableCenter.worker_locations.getSelectedLocation()[0]);
-         if (location_id == 9) {
+         if (location_id == 8) {
+            this.game.setClientState('resolveMarket', {
+               descriptionmyturn: _('You must resolve the effect of the market'),
+            });
+         } else if (location_id == 9) {
             this.game.setClientState('resolveTraveler', {
                descriptionmyturn: _('You must resolve the effect of the traveler'),
             });

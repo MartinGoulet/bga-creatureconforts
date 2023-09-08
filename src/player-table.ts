@@ -118,22 +118,6 @@ class PlayerTable {
       this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
    }
 
-   // private setupResources() {
-   //    const icons = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-
-   //    const templateIcon = `<div class="wrapper">
-   //       <span id="player-resource-${this.player_id}-icons-{icon-value}-counter" class="counter">1</span>
-   //       <div class="resource-icon" data-type="{icon-value}"></div>
-   //    </div>`;
-
-   //    document
-   //       .getElementById(`player-table-${this.player_id}-resources`)
-   //       .insertAdjacentHTML(
-   //          'afterbegin',
-   //          icons.map((icon) => templateIcon.replaceAll('{icon-value}', icon)).join(' '),
-   //       );
-   // }
-
    private setupWorker(game: CreatureConforts, player: CreatureConfortsPlayerData) {
       const workers = game.gamedatas.workers.player.filter((w) => w.type_arg == player.id);
       this.workers = new LineStock<Meeple>(

@@ -8,7 +8,7 @@ class PlayerPanel {
       const icons = [...GOODS, 'lesson', 'story', 'coin'];
 
       const templateIcon = `<div class="wrapper">
-      <span id="player-panel-${player.id}-icons-{icon-value}-counter" class="counter">1</span>
+         <span id="player-panel-${player.id}-icons-{icon-value}-counter" class="counter">1</span>
          <div class="resource-icon" data-type="{icon-value}"></div>
       </div>`;
 

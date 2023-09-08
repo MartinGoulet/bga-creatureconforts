@@ -2058,6 +2058,9 @@ var CreatureConforts = (function () {
     CreatureConforts.prototype.addActionButtonRed = function (id, label, action) {
         this.addActionButton(id, label, action, null, null, 'red');
     };
+    CreatureConforts.prototype.addActionButtonReset = function (parent, handle) {
+        this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
+    };
     CreatureConforts.prototype.createPlayerPanels = function (gamedatas) {
         var _this = this;
         this.playersPanels = [];
@@ -2192,6 +2195,185 @@ var CreatureConforts = (function () {
         return values.join('');
     };
     return CreatureConforts;
+}());
+var ResourceCounter = (function () {
+    function ResourceCounter(id, parent, icon, settings) {
+        var _this = this;
+        this.id = id;
+        this.icon = icon;
+        this.settings = settings;
+        var initialValue = settings.initialValue, disabled = settings.disabled;
+        var html = "<div id=\"".concat(id, "-").concat(icon, "\" class=\"wrapper\" data-type=\"").concat(icon, "\">\n         <span id=\"").concat(id, "-").concat(icon, "-counter\" class=\"counter\">-</span>\n         <div class=\"resource-icon\" data-type=\"").concat(icon, "\"></div>\n      </div>");
+        parent.insertAdjacentHTML('beforeend', html);
+        this.counter = new ebg.counter();
+        this.counter.create("".concat(id, "-").concat(icon, "-counter"));
+        this.counter.setValue(initialValue !== null && initialValue !== void 0 ? initialValue : 0);
+        document.getElementById("".concat(id, "-").concat(icon)).addEventListener('click', function () {
+            if (_this.onClick &&
+                _this.counter.getValue() > 0 &&
+                !document.getElementById("".concat(_this.id, "-").concat(_this.icon)).classList.contains('disabled')) {
+                _this.onClick();
+                _this.counter.incValue(-1);
+            }
+        });
+        if (disabled)
+            this.disabled(true);
+    }
+    ResourceCounter.prototype.disabled = function (value) {
+        document.getElementById("".concat(this.id, "-").concat(this.icon)).classList.toggle('disabled', value == true);
+    };
+    ResourceCounter.prototype.getValue = function () {
+        return this.counter.getValue();
+    };
+    ResourceCounter.prototype.incValue = function (value) {
+        this.counter.incValue(value);
+        if (this.counter.getValue() == 0)
+            this.disabled(true);
+    };
+    ResourceCounter.prototype.setValue = function (value) {
+        this.counter.setValue(value);
+        if (this.counter.getValue() == 0)
+            this.disabled(true);
+    };
+    ResourceCounter.prototype.reset = function () {
+        var _a = this.settings, initialValue = _a.initialValue, enabled = _a.disabled;
+        this.counter.setValue(initialValue !== null && initialValue !== void 0 ? initialValue : 0);
+        this.disabled(enabled);
+    };
+    return ResourceCounter;
+}());
+var PlayerResourceCounter = (function () {
+    function PlayerResourceCounter(game, element, id, settings) {
+        var _this = this;
+        if (settings === void 0) { settings = {}; }
+        var _a, _b;
+        this.counters = {};
+        var player_id = (_a = settings.player_id) !== null && _a !== void 0 ? _a : game.getPlayerId();
+        var player_counters = game.getPlayerPanel(player_id).counters;
+        var handleResourceClick = function (type, counter) {
+            if (_this.onResourceClick)
+                _this.onResourceClick(type);
+        };
+        var icons = (_b = settings.icons) !== null && _b !== void 0 ? _b : ICONS;
+        icons.forEach(function (icon) {
+            var _a;
+            var value = (_a = settings.initialValue) !== null && _a !== void 0 ? _a : player_counters[icon].getValue();
+            _this.counters[icon] = new ResourceCounter(id, element, icon, {
+                initialValue: value,
+                disabled: value == 0 || icons.indexOf(icon) < 0,
+            });
+            _this.counters[icon].onClick = function () { return handleResourceClick(icon, _this.counters[icon]); };
+        });
+    }
+    PlayerResourceCounter.prototype.reset = function () {
+        var _this = this;
+        Object.keys(this.counters).forEach(function (type) {
+            _this.counters[type].reset();
+        });
+    };
+    PlayerResourceCounter.prototype.disabled = function () {
+        var _this = this;
+        Object.keys(this.counters).forEach(function (type) {
+            _this.counters[type].disabled(true);
+        });
+    };
+    return PlayerResourceCounter;
+}());
+var ResourceLineStock = (function () {
+    function ResourceLineStock(element, settings) {
+        if (settings === void 0) { settings = {}; }
+        this.element = element;
+        this.settings = settings;
+        this.resources = [];
+    }
+    ResourceLineStock.prototype.add = function (resource) {
+        this.resources.push(resource);
+        this.element.insertAdjacentHTML('beforeend', ResourceHelper.getElement(resource));
+    };
+    ResourceLineStock.prototype.getResources = function () {
+        return __spreadArray([], this.resources, true);
+    };
+    ResourceLineStock.prototype.isFull = function () {
+        return false;
+    };
+    ResourceLineStock.prototype.reset = function () {
+        this.resources = [];
+        while (this.element.children.length > 0) {
+            this.element.removeChild(this.element.childNodes[0]);
+        }
+    };
+    return ResourceLineStock;
+}());
+var ResourcePlaceholder = (function () {
+    function ResourcePlaceholder(parent) {
+        this.resource = null;
+        this.element = document.createElement('div');
+        this.element.classList.add('placeholder');
+        parent.insertAdjacentElement('beforeend', this.element);
+    }
+    ResourcePlaceholder.prototype.getResource = function () {
+        return this.resource;
+    };
+    ResourcePlaceholder.prototype.reset = function () {
+        this.resource = null;
+        while (this.element.children.length > 0) {
+            this.element.removeChild(this.element.childNodes[0]);
+        }
+    };
+    ResourcePlaceholder.prototype.add = function (type) {
+        this.resource = type;
+        this.element.insertAdjacentHTML('beforeend', ResourceHelper.getElement(type));
+    };
+    return ResourcePlaceholder;
+}());
+var ResourcePlaceholderLineStock = (function () {
+    function ResourcePlaceholderLineStock(element, count, settings) {
+        var _a;
+        this.element = element;
+        this.count = count;
+        this.placeholders = [];
+        var restriction = (_a = settings === null || settings === void 0 ? void 0 : settings.restriction) !== null && _a !== void 0 ? _a : 'none';
+        for (var index = 0; index < count; index++) {
+            this.placeholders.push(new ResourcePlaceholder(element));
+            if (restriction == 'same') {
+                element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
+            }
+            else if (restriction == 'different') {
+                element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
+            }
+        }
+    }
+    ResourcePlaceholderLineStock.prototype.add = function (resource) {
+        var count = this.getResources().length;
+        this.placeholders[count].add(resource);
+    };
+    ResourcePlaceholderLineStock.prototype.isFull = function () {
+        return this.placeholders.every(function (p) { return p.getResource() != null; });
+    };
+    ResourcePlaceholderLineStock.prototype.getResources = function () {
+        return this.placeholders.map(function (p) { return p.getResource(); }).filter(function (r) { return r !== null; });
+    };
+    ResourcePlaceholderLineStock.prototype.reset = function () {
+        this.placeholders.forEach(function (p) { return p.reset(); });
+    };
+    return ResourcePlaceholderLineStock;
+}());
+var ResourceHelper = (function () {
+    function ResourceHelper() {
+    }
+    ResourceHelper.getElement = function (type) {
+        return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>");
+    };
+    ResourceHelper.getIconSame = function () {
+        return '<div class="resource-icon same"></div>';
+    };
+    ResourceHelper.getIconDifferent = function () {
+        return '<div class="resource-icon different"></div>';
+    };
+    ResourceHelper.convertToInt = function (icons) {
+        return icons.map(function (type) { return ICONS.indexOf(type) + 1; });
+    };
+    return ResourceHelper;
 }());
 var HiddenDeck = (function (_super) {
     __extends(HiddenDeck, _super);
@@ -2670,124 +2852,141 @@ var SelectResources = (function () {
     };
     return SelectResources;
 }());
-var TravelerConvert = (function () {
-    function TravelerConvert(game) {
+var ResourceConverter = (function () {
+    function ResourceConverter(game, from, to, times, settings) {
         this.game = game;
-        this.counters = {};
-        this.resources = [];
+        this.from = from;
+        this.to = to;
+        this.times = times;
+        this.settings = settings;
     }
-    TravelerConvert.prototype.show = function (reward, player_id) {
-        this.reward = reward;
-        this.player_id = player_id;
-        this.resources = [];
+    ResourceConverter.prototype.show = function () {
         this.removeControl();
-        this.addControl(reward, player_id);
+        var count_any_ressource_to = this.to.filter(function (r) { return r == '*'; }).length;
+        this.addBanner(count_any_ressource_to);
+        this.addControlResourcesPlayer();
+        this.addControlResourceGive();
+        this.addControlResourceBoard(count_any_ressource_to);
+        this.addControlResourceGet(count_any_ressource_to);
         this.addResetButton();
     };
-    TravelerConvert.prototype.hide = function () {
+    ResourceConverter.prototype.hide = function () {
         this.removeControl();
     };
-    TravelerConvert.prototype.addControl = function (reward, player_id) {
-        var _this = this;
-        var handleResourceClick = function (type, counter) {
-            if (counter.getValue() <= 0)
-                return;
-            if (_this.resources.length >= _this.reward.times)
-                return;
-            counter.incValue(-1);
-            _this.resources.push(type);
-            if (reward.from.length == 1) {
-                _this.counters['reward'].incValue(1);
-            }
-            else {
-                var values_1 = [];
-                _this.reward.from.forEach(function (icon) {
-                    values_1.push(_this.resources.filter(function (type) { return type == icon; }).length);
-                });
-                _this.counters['reward'].setValue(Math.min.apply(null, values_1));
-            }
-            _this.setActiveResource();
-            _this.displayResources();
-        };
-        var templateIcon = "<div class=\"wrapper\">\n          <span id=\"tc-icons-{icon}-counter\" class=\"counter\">1</span>\n          <div class=\"resource-icon\" data-type=\"{icon}\"></div>\n       </div>";
-        var html_to = reward.to.map(function (icon) { return "<div class=\"resource-icon\" data-type=\"".concat(icon, "\"></div>"); });
-        var html = "<div id=\"traveler-convert\">\n         <div id=\"traveler-convert-player\">\n             ".concat(ICONS.map(function (icon) { return templateIcon.replaceAll('{icon}', icon); }).join(' '), "\n          </div>\n         <div class=\"wrapper no-border from\"></div>\n         <div class=\"wrapper no-border\">=> (max x").concat(reward.times, ")</div>\n         <div class=\"wrapper no-border to\">\n            <span id=\"tc-icons-reward-counter\" class=\"counter\">1</span>\n            ").concat(html_to, "\n         </div>\n         <div id=\"traveler-convert-buttons\"></div>\n      </div>");
-        document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
-        this.createCounter('reward', 'tc-icons-reward-counter', 0);
-        var player_resource = this.game.getPlayerPanel(player_id).counters;
-        var _loop_5 = function (icon) {
-            this_2.createCounter(icon, "tc-icons-".concat(icon, "-counter"), player_resource[icon].getValue());
-            if (this_2.counters[icon].getValue() > 0) {
-                var wrapper = document.getElementById("tc-icons-".concat(icon, "-counter"))
-                    .parentElement;
-                wrapper.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleResourceClick(icon, _this.counters[icon]);
-                });
-            }
-        };
-        var this_2 = this;
-        for (var _i = 0, ICONS_1 = ICONS; _i < ICONS_1.length; _i++) {
-            var icon = ICONS_1[_i];
-            _loop_5(icon);
-        }
-        this.setActiveResource();
+    ResourceConverter.prototype.getResourcesGive = function () {
+        return this.resources_give.getResources();
     };
-    TravelerConvert.prototype.addResetButton = function () {
+    ResourceConverter.prototype.getResourcesGet = function () {
+        return this.resource_get.getResources();
+    };
+    ResourceConverter.prototype.addBanner = function (count_any_ressource_to) {
+        var arrow = count_any_ressource_to > 0
+            ? "<div class=\"wrapper no-border arrow\">\n                  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               </div>"
+            : '';
+        var html = "<div id=\"resource-converter\">\n         <div class=\"line\">\n            <div id=\"resource-converter-player\"></div>\n            ".concat(arrow, "\n            <div id=\"resource-converter-board-resources\"></div>\n         </div>\n         <div class=\"line\">\n            <div id=\"resource-converter-placeholder-from\"></div>\n            <div class=\"wrapper no-border from\"></div>\n            <div class=\"wrapper no-border arrow\">\n               <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               ").concat(this.times > 1 ? "x".concat(this.times) : '', "\n            </div>\n            <div class=\"wrapper no-border to\">\n               <span id=\"tc-icons-reward-counter\" class=\"counter\">1</span>\n               ").concat(this.to.map(function (icon) { return ResourceHelper.getElement(icon); }), "\n            </div>\n            <div id=\"resource-converter-placeholder\"></div>\n            <div id=\"resource-converter-buttons\"></div>\n         </div>\n      </div>");
+        document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
+    };
+    ResourceConverter.prototype.addControlResourcesPlayer = function () {
+        var _this = this;
+        var handleResourceClick = function (type) {
+            var _a, _b, _c, _d;
+            _this.resources_give.add(type);
+            if (_this.counter_reward) {
+                if (_this.from.length == 1) {
+                    _this.counter_reward.incValue(1);
+                }
+                else if (_this.from.length > 1 && _this.from.every(function (icon) { return icon == '*'; })) {
+                    _this.counter_reward.setValue(Math.floor(_this.resources_give.getResources().length / _this.from.length));
+                }
+                else {
+                    var values_1 = [];
+                    _this.from.forEach(function (icon) {
+                        values_1.push(_this.resources_give.getResources().filter(function (type) { return type == icon; }).length);
+                    });
+                    _this.counter_reward.setValue(Math.min.apply(null, values_1));
+                }
+            }
+            if (((_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.getValue()) >= _this.times || _this.resources_give.isFull()) {
+                _this.resources_player.disabled();
+            }
+            if ((_d = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.from) === null || _c === void 0 ? void 0 : _c.max) !== null && _d !== void 0 ? _d : 0 == _this.resources_give.getResources().length) {
+                _this.resources_player.disabled();
+            }
+        };
+        var element = document.getElementById('resource-converter-player');
+        this.resources_player = new PlayerResourceCounter(this.game, element, 'player-counter', {
+            icons: this.getAllowedResources(),
+        });
+        this.resources_player.onResourceClick = function (type) { return handleResourceClick(type); };
+    };
+    ResourceConverter.prototype.addControlResourceGive = function () {
+        var _a, _b, _c, _d;
+        if ((this.from && this.from.every(function (r) { return r == '*'; }) && this.times == 1) || ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.max)) {
+            var element = document.getElementById('resource-converter-placeholder-from');
+            this.resources_give = new ResourcePlaceholderLineStock(element, this.from.length, {
+                restriction: (_d = (_c = this.settings) === null || _c === void 0 ? void 0 : _c.from) === null || _d === void 0 ? void 0 : _d.restriction,
+            });
+        }
+        else {
+            this.resources_give = new ResourceLineStock(document.querySelector('#resource-converter .from'));
+        }
+    };
+    ResourceConverter.prototype.addControlResourceBoard = function (count_any_ressource_to) {
+        var _this = this;
+        if (count_any_ressource_to == 0) {
+            document.getElementById('resource-converter-placeholder').remove();
+        }
+        else {
+            var element = document.getElementById('resource-converter-board-resources');
+            this.resources_board = new PlayerResourceCounter(this.game, element, 'board-resources', {
+                icons: GOODS,
+                initialValue: 20,
+            });
+            this.resources_board.onResourceClick = function (type) { return _this.handleBoardResourceClick(type); };
+            document.querySelector('#resource-converter .wrapper.to').remove();
+        }
+    };
+    ResourceConverter.prototype.addControlResourceGet = function (count_any_ressource_to) {
+        if (document.getElementById('tc-icons-reward-counter')) {
+            this.counter_reward = createCounter('tc-icons-reward-counter');
+        }
+        var element = document.getElementById('resource-converter-placeholder');
+        this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to);
+    };
+    ResourceConverter.prototype.addResetButton = function () {
         var _this = this;
         var handleReset = function () {
-            _this.resources = [];
-            _this.counters['reward'].setValue(0);
-            _this.resetResourcesValues();
-            _this.setActiveResource();
-            _this.displayResources();
+            var _a, _b;
+            _this.resources_give.reset();
+            (_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.setValue(0);
+            _this.resources_player.reset();
+            _this.resource_get.reset();
+            (_b = _this.resources_board) === null || _b === void 0 ? void 0 : _b.reset();
         };
-        this.game.addActionButton('btn_reset', _('Reset'), handleReset, 'traveler-convert-buttons', false, 'gray');
+        this.game.addActionButtonReset('resource-converter-buttons', handleReset);
     };
-    TravelerConvert.prototype.createCounter = function (name, element, value) {
-        this.counters[name] = new ebg.counter();
-        this.counters[name].create(element);
-        this.counters[name].setValue(value);
+    ResourceConverter.prototype.getAllowedResources = function () {
+        var _a, _b, _c;
+        if ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.allowed_resources) {
+            return this.settings.from.allowed_resources;
+        }
+        else {
+            return this.from.indexOf('*') >= 0 ? GOODS : (_c = this.from) !== null && _c !== void 0 ? _c : ICONS;
+        }
     };
-    TravelerConvert.prototype.displayResources = function () {
-        var container = document.querySelectorAll('#traveler-convert .from')[0];
-        var resources = this.resources.map(function (icon) { return "<div class=\"resource-icon\" data-type=\"".concat(icon, "\"></div>"); });
-        container.innerHTML = '';
-        container.insertAdjacentHTML('beforeend', resources.join(''));
+    ResourceConverter.prototype.handleBoardResourceClick = function (type) {
+        this.resource_get.add(type);
+        if (this.resource_get.isFull()) {
+            this.resources_board.disabled();
+        }
     };
-    TravelerConvert.prototype.getResources = function () {
-        return this.resources.map(function (type) { return ICONS.indexOf(type) + 1; });
-    };
-    TravelerConvert.prototype.removeControl = function () {
-        var root = document.getElementById('traveler-convert');
+    ResourceConverter.prototype.removeControl = function () {
+        var root = document.getElementById('resource-converter');
         if (root)
             root.remove();
-        this.counters = {};
+        this.resources_player = null;
     };
-    TravelerConvert.prototype.resetResourcesValues = function () {
-        var player_resource = this.game.getPlayerPanel(this.player_id).counters;
-        for (var _i = 0, ICONS_2 = ICONS; _i < ICONS_2.length; _i++) {
-            var icon = ICONS_2[_i];
-            this.counters[icon].setValue(player_resource[icon].getValue());
-        }
-    };
-    TravelerConvert.prototype.setActiveResource = function () {
-        for (var _i = 0, ICONS_3 = ICONS; _i < ICONS_3.length; _i++) {
-            var icon = ICONS_3[_i];
-            var wrapper = document.getElementById("tc-icons-".concat(icon, "-counter")).parentElement;
-            if (this.counters[icon].getValue() == 0 || this.resources.length == this.reward.times) {
-                wrapper.classList.toggle('disabled', true);
-            }
-            else if (this.reward.from.indexOf('*') >= 0) {
-                wrapper.classList.toggle('disabled', GOODS.indexOf(icon) < 0);
-            }
-            else {
-                wrapper.classList.toggle('disabled', this.reward.from.indexOf(icon) < 0);
-            }
-        }
-    };
-    return TravelerConvert;
+    return ResourceConverter;
 }());
 var NotificationManager = (function () {
     function NotificationManager(game) {
@@ -2888,7 +3087,8 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_onGetResourcesFromLocation = function (_a) {
         var location_id = _a.location_id, resources = _a.resources, player_id = _a.player_id;
-        this.animationMoveResource(player_id, resources, document.querySelectorAll("#worker-locations *[data-slot-id=\"".concat(location_id, "\"]"))[0]);
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"".concat(location_id, "\"]"))[0];
+        this.animationMoveResource(player_id, resources, fromElement);
     };
     NotificationManager.prototype.notif_onCraftConfort = function (_a) {
         var player_id = _a.player_id, card = _a.card, cost = _a.cost;
@@ -2963,7 +3163,8 @@ var NotificationManager = (function () {
         var from = _a.from, to = _a.to, player_id = _a.player_id;
         var counters = this.game.getPlayerPanel(player_id).counters;
         Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
-        this.animationMoveResource(player_id, to, document.querySelectorAll("#worker-locations *[data-slot-id=\"9\"]")[0]);
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"9\"]")[0];
+        this.animationMoveResource(player_id, to, fromElement);
     };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
         var _this = this;
@@ -3017,6 +3218,7 @@ var StateManager = (function () {
             playerTurnResolve: new PlayerTurnResolveState(game),
             playerTurnCraftConfort: new PlayerTurnCraftState(game),
             resolveTraveler: new ResolveTravelerState(game),
+            resolveMarket: new ResolveMarketState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -3341,8 +3543,17 @@ var PlayerTurnResolveState = (function () {
     PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleResolve = function () {
+            if (_this.game.tableCenter.worker_locations.getSelectedLocation().length == 0) {
+                _this.game.showMessage(_('You must select a location with one of your worker'), 'error');
+                return;
+            }
             var location_id = Number(_this.game.tableCenter.worker_locations.getSelectedLocation()[0]);
-            if (location_id == 9) {
+            if (location_id == 8) {
+                _this.game.setClientState('resolveMarket', {
+                    descriptionmyturn: _('You must resolve the effect of the market'),
+                });
+            }
+            else if (location_id == 9) {
                 _this.game.setClientState('resolveTraveler', {
                     descriptionmyturn: _('You must resolve the effect of the traveler'),
                 });
@@ -3448,19 +3659,78 @@ var PlayerTurnCraftState = (function () {
     };
     return PlayerTurnCraftState;
 }());
+var ResolveMarketState = (function () {
+    function ResolveMarketState(game) {
+        this.game = game;
+        this.isModeResource = false;
+    }
+    ResolveMarketState.prototype.onEnteringState = function (args) {
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectableLocation([8]);
+        worker_locations.setSelectedLocation([8]);
+    };
+    ResolveMarketState.prototype.onLeavingState = function () {
+        this.convert.hide();
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectedLocation([]);
+        this.isModeResource = false;
+    };
+    ResolveMarketState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var resources = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
+            _this.game.takeAction('resolveWorker', { location_id: 8, resources: resources });
+        };
+        var handleChoice1 = function () {
+            _this.convert = new ResourceConverter(_this.game, ['coin'], ['*'], 1, {
+                from: { allowed_resources: ['coin'], max: 1 },
+            });
+            handleChoice();
+        };
+        var handleChoice2 = function () {
+            _this.convert = new ResourceConverter(_this.game, ['*', '*'], ['*'], 1, {
+                from: { restriction: 'same', allowed_resources: GOODS },
+            });
+            handleChoice();
+        };
+        var handleChoice3 = function () {
+            _this.convert = new ResourceConverter(_this.game, ['*', '*', '*'], ['coin'], 1, {
+                from: { allowed_resources: GOODS },
+            });
+            handleChoice();
+        };
+        var handleChoice = function () {
+            _this.convert.show();
+            _this.isModeResource = true;
+            _this.game.updatePageTitle();
+        };
+        if (this.isModeResource) {
+            this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+            this.game.addActionButtonClientCancel();
+        }
+        else {
+            this.game.addActionButton('btn_confirm1', _('Convert Coin to any good'), handleChoice1);
+            this.game.addActionButton('btn_confirm2', _('Convert 2 identical goods to any good'), handleChoice2);
+            this.game.addActionButton('btn_confirm3', _('Convert 3 goods to a Coin'), handleChoice3);
+            this.game.addActionButtonClientCancel();
+        }
+    };
+    return ResolveMarketState;
+}());
 var ResolveTravelerState = (function () {
     function ResolveTravelerState(game) {
         this.game = game;
     }
     ResolveTravelerState.prototype.onEnteringState = function (args) {
-        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        var _a;
+        var _b = this.game.tableCenter, worker_locations = _b.worker_locations, dice_locations = _b.dice_locations;
         worker_locations.setSelectableLocation([9]);
         worker_locations.setSelectedLocation([9]);
         var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
-        this.convert = new TravelerConvert(this.game);
         var traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
         var reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
-        this.convert.show(reward, this.game.getPlayerId());
+        this.convert = new ResourceConverter(this.game, (_a = reward.from) !== null && _a !== void 0 ? _a : GOODS, reward.to, reward.times);
+        this.convert.show();
     };
     ResolveTravelerState.prototype.onLeavingState = function () {
         this.convert.hide();
@@ -3470,8 +3740,8 @@ var ResolveTravelerState = (function () {
     ResolveTravelerState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
-            var resources = _this.convert.getResources().join(';');
-            _this.game.takeAction('resolveWorker', { location_id: 9, resources: resources });
+            var resources_give = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
+            _this.game.takeAction('resolveWorker', { location_id: 9, resources: resources_give });
         };
         this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
         this.game.addActionButtonClientCancel();
@@ -3640,7 +3910,7 @@ var PlayerPanel = (function () {
         this.counters = {};
         this.player_id = Number(player.id);
         var icons = __spreadArray(__spreadArray([], GOODS, true), ['lesson', 'story', 'coin'], false);
-        var templateIcon = "<div class=\"wrapper\">\n      <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
+        var templateIcon = "<div class=\"wrapper\">\n         <span id=\"player-panel-".concat(player.id, "-icons-{icon-value}-counter\" class=\"counter\">1</span>\n         <div class=\"resource-icon\" data-type=\"{icon-value}\"></div>\n      </div>");
         var html = "<div id=\"player-panel-".concat(player.id, "-icons\" class=\"icons counters\">\n        ").concat(icons.map(function (icon) { return templateIcon.replaceAll('{icon-value}', icon); }).join(' '), "\n        <div class=\"row\"></div>\n      </div>");
         document.getElementById("player_board_".concat(player.id)).insertAdjacentHTML('beforeend', html);
         icons.forEach(function (icon) {
@@ -3837,6 +4107,13 @@ var colors = {
 };
 function getColorName(code) {
     return colors[code];
+}
+function createCounter(id, value) {
+    if (value === void 0) { value = 0; }
+    var counter = new ebg.counter();
+    counter.create(id);
+    counter.setValue(value);
+    return counter;
 }
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
     return declare("bgagame.creatureconforts", [ebg.core.gamegui], new CreatureConforts());

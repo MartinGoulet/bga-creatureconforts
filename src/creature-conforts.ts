@@ -170,6 +170,10 @@ class CreatureConforts
       this.addActionButton(id, label, action, null, null, 'red');
    }
 
+   public addActionButtonReset(parent: string, handle: () => void) {
+      this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
+   }
+
    private createPlayerPanels(gamedatas: CreatureConfortsGamedatas) {
       this.playersPanels = [];
       gamedatas.playerorder.forEach((player_id) => {
