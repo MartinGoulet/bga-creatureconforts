@@ -18,6 +18,15 @@ class Conforts {
         }, $cards);
     }
 
+    static function addCardToDiscard(int $card_id) {
+        self::deck()->playCard($card_id);
+    }
+
+    static function addToHand(array $card, int $player_id) {
+        self::deck()->moveCard($card['id'], 'hand', $player_id);
+        return self::deck()->getCard($card['id']);
+    }
+
     static function cancelStartHand($player_id) {
         self::deck()->moveAllCardsInLocation('selection', 'hand', $player_id, $player_id);
     }
@@ -31,8 +40,26 @@ class Conforts {
         return $cards;
     }
 
+    static function draw($player_id, $count = 1) {
+        // Each player starts with 3 cards in hand
+        if($count == 1) {
+            return self::deck()->pickCard('deck', $player_id);
+        } else {
+            return self::deck()->pickCards($count, 'deck', $player_id);
+        }
+    }
+
     static function get($card_id) {
         return self::deck()->getCard($card_id);
+    }
+
+    static function getCards(array $card_ids) {
+        return self::deck()->getCards($card_ids);
+    }
+
+    static function getFromMarket($slot_id) {
+        $cards = self::deck()->getCardsInLocation('slot', $slot_id);
+        return array_shift($cards);
     }
 
     static function getUIData(int $current_player_id) {

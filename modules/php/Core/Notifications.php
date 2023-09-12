@@ -2,11 +2,18 @@
 
 namespace CreatureConforts\Core;
 
+use BgaSystemException;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
+
+    static function addConfortToHand(int $player_id, array $card) {
+        $message = clienttranslate('${player_name} get ${card_name} from the Owl\'s nest');
+        $card_args = self::getConfortCardArgs($card, $player_id);
+        self::notifyAll('onAddConfortToHand', $message, $card_args);
+    }
 
     static function craftConfort(int $player_id, array $card, array $cost) {
         $message = clienttranslate('${player_name} crafts ${card_name}');
@@ -19,6 +26,10 @@ class Notifications extends \APP_DbObject {
             'card_name' => Conforts::getName($card),
             'i18n' => ['card_name'],
         ]);
+    }
+
+    static function discardConfort(array $cards_before) {
+        self::discardStartHand($cards_before);
     }
 
     static function discardStartHand(array $cards_before) {
@@ -50,10 +61,29 @@ class Notifications extends \APP_DbObject {
         self::notifyAll('onDiscardTraveler', '', []);
     }
 
+    static function drawConfort(int $player_id, array $cards) {
+        $args = [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'nbr_cards' => count($cards)
+        ];
+        $message = clienttranslate('${player_name} draws ${nbr_cards}');
+        self::notifyAll('message', $message, $args, $player_id);
+
+        $message = clienttranslate('${player_name} draws ${card_name}');
+        foreach ($cards as $card_id => $card) {
+            $card_args = self::getConfortCardArgs($card, $player_id);
+            self::notify($player_id, 'onDrawConfort', $message, $card_args);
+
+            $card_args = self::getConfortCardOtherArgs($card, $player_id);
+            self::notifyAll('onDrawConfort', '', $card_args, $player_id);
+        }
+    }
+
     static function familyDice(int $player_id, array $dice) {
         $message = clienttranslate('${player_name} rolls dice ${rolledDice}');
         self::notifyAll('onFamilyDice', $message, [
-            'player_id' => $player_id, 
+            'player_id' => $player_id,
             'player_name' => self::getPlayerName($player_id),
             'dice' => $dice,
             'rolledDice' => implode(',', array_column($dice, 'face')),
@@ -149,6 +179,18 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function marketExchangeResources($resources_from, $resources_to) {
+        $message = clienttranslate('${player_name} use the market to exchange ${resources_from} for ${resources_to}');
+        self::notifyAll('onMarketExchangeResources', $message, [
+            'player_id' => Players::getPlayerId(),
+            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'resources_from' => $resources_from,
+            'resources_to' => $resources_to,
+            'from' => $resources_from,
+            'to' => $resources_to,
+        ]);
+    }
+
     static function travelerExchangeResources($resources_from, $resources_to) {
         $message = clienttranslate('${player_name} use the traveler to exchange ${resources_from} for ${resources_to}');
         self::notifyAll('onTravelerExchangeResources', $message, [
@@ -157,6 +199,17 @@ class Notifications extends \APP_DbObject {
             'resources_from' => $resources_from,
             'resources_to' => $resources_to,
             'from' => $resources_from,
+            'to' => $resources_to,
+        ]);
+    }
+
+    static function travelerReceivedResources($resources_to) {
+        $message = clienttranslate('${player_name} receives ${resources_to} from the traveler');
+        self::notifyAll('onTravelerExchangeResources', $message, [
+            'player_id' => Players::getPlayerId(),
+            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'resources_to' => $resources_to,
+            'from' => [],
             'to' => $resources_to,
         ]);
     }
@@ -201,5 +254,24 @@ class Notifications extends \APP_DbObject {
 
     /////////////////////////////////
     /////// Private Methods
+    private static function getConfortCardArgs($card, $player_id) {
+        if (!array_key_exists('type_arg', $card)) {
+            throw new BgaSystemException("Invalid card");
+        }
 
+        return [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'card_name' => Conforts::getName($card),
+            'card' => $card,
+            "i18n" => ["card_name"],
+        ];
+    }
+    private static function getConfortCardOtherArgs($card, $player_id) {
+        return [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'card' => ['id' => $card['id']],
+        ];
+    }
 }

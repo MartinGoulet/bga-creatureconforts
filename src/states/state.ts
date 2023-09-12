@@ -12,6 +12,9 @@ class StateManager {
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
          resolveTraveler: new ResolveTravelerState(game),
          resolveMarket: new ResolveMarketState(game),
+         resolveOwnNest: new ResolveOwlNestState(game),
+         resolveWorkshop: new ResolveWorkshopState(game),
+         playerTurnDiscard: new PlayerTurnDiscardState(game),
       };
    }
 
@@ -20,7 +23,7 @@ class StateManager {
 
       if (this.states[stateName] !== undefined) {
          this.states[stateName].onEnteringState(args.args);
-         if (stateName.startsWith('client_')) {
+         if (stateName.startsWith('resolve')) {
             this.client_states.push(this.states[stateName]);
          } else {
             this.client_states.splice(0);

@@ -60,8 +60,11 @@
         "src/states/player-turn-dice.ts",
         "src/states/player-turn-resolve.ts",
         "src/states/player-turn-craft.ts",
+        "src/states/player-turn-discard.ts",
         "src/states/resolve-market.ts",
         "src/states/resolve-traveler.ts",
+        "src/states/resolve-owl-nest.ts",
+        "src/states/resolve-workshop.ts",
 
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",

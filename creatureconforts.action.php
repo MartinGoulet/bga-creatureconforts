@@ -91,11 +91,31 @@ class action_creatureconforts extends APP_GameAction {
       self::setAjaxMode();
       // Retrieve arguments
       $location_id = self::getArg("location_id", AT_posint, true);
-      $resources = self::getArg("resources", AT_numberlist, false);
-      $resources = $resources != null ? self::getArrayArgs($resources) : [];
+      $resources = self::getArg("resources", AT_numberlist, false, '');
+      $resources2 = self::getArg("resources2", AT_numberlist, false, '');
+      $resources = self::getArrayArgs($resources);
+      $resources2 = self::getArrayArgs($resources2);
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('resolveWorker');
-      $this->game->resolveWorker($location_id, $resources);
+      $this->game->resolveWorker($location_id, $resources, $resources2);
+      self::ajaxResponse();
+   }
+
+   public function confirmResolveWorker() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmResolveWorker');
+      $this->game->confirmResolveWorker();
+      self::ajaxResponse();
+   }
+
+   public function undo() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('undo');
+      $this->game->undo();
       self::ajaxResponse();
    }
 
@@ -117,6 +137,17 @@ class action_creatureconforts extends APP_GameAction {
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('passCraftConfort');
       $this->game->passCraftConfort();
+      self::ajaxResponse();
+   }
+
+   public function discardConfort() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $card_ids = self::getArg("card_ids", AT_numberlist, true);
+      $card_ids = self::getArrayArgs($card_ids);
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('discardConfort');
+      $this->game->discardConfort($card_ids);
       self::ajaxResponse();
    }
 

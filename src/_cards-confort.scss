@@ -76,4 +76,13 @@
          }
       }
    }
+   .bga-cards_selectable-card:not(.bga-cards_selected-card) {
+      .card-sides {
+         .front {
+            outline: 1px solid #000;
+            box-shadow: 0 0 5px 6px orange;
+            filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+         }
+      }
+   }
 }

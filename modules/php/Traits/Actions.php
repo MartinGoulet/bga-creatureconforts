@@ -7,6 +7,7 @@ use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
 use CreatureConforts\Helpers\DiceHelper;
+use CreatureConforts\Helpers\MarketHelper;
 use CreatureConforts\Helpers\ResourcesHelper;
 use CreatureConforts\Helpers\TravelerHelper;
 use CreatureConforts\Managers\Conforts;
@@ -97,7 +98,7 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
-    function resolveWorker(int $location_id, array $resources) {
+    function resolveWorker(int $location_id, array $resources, array $resources2) {
         $player_id = $this->getActivePlayerId();
 
         $worker = Worker::returnToPlayerBoard($player_id, $location_id);
@@ -136,10 +137,44 @@ trait Actions {
             return;
         }
 
+        if ($location_id == 8) {
+            $converted_resources = ResourcesHelper::convertNumberToResource($resources);
+            $converted_resources2 = ResourcesHelper::convertNumberToResource($resources2);
+            MarketHelper::resolve($converted_resources, $converted_resources2);
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
         if ($location_id == 9) {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             TravelerHelper::resolve($die, $converted_resources);
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
+        if ($location_id == 11) {
+            $slot_id = intval(array_shift($resources));
+            if($slot_id < 1 || $slot_id > 4) {
+                throw new BgaUserException("Slot id must be between 1 and 4");
+            }
+            $card = Conforts::addToHand(Conforts::getFromMarket($slot_id), $player_id);
+            Notifications::addConfortToHand(Players::getPlayerId(), $card);
+            Conforts::refillOwlNest();
+            Notifications::refillOwlNest(Conforts::getOwlNest());
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
+        if ($location_id == 12) {
+            $die = array_shift($dice);
+            if(intval($die['face']) <= 2) {
+                $cards = Conforts::draw(Players::getPlayerId(), 2);
+                Notifications::drawConfort(Players::getPlayerId(), $cards);
+            } else {
+                $card = Conforts::draw(Players::getPlayerId());
+                Notifications::drawConfort(Players::getPlayerId(), [$card]);
+            }
             $this->resolveWorkerNextStep();
             return;
         }
@@ -156,6 +191,10 @@ trait Actions {
 
         $next_step = count($workers_not_home) > 0 ? "next" : "end";
         Game::get()->gamestate->nextState($next_step);
+    }
+
+    function confirmResolveWorker() {
+        Game::get()->gamestate->nextState('end');
     }
 
     function craftConfort(int $card_id, array $resources) {
@@ -199,5 +238,23 @@ trait Actions {
 
     function passCraftConfort() {
         Game::get()->gamestate->nextState('end');
+    }
+
+    function discardConfort(array $card_ids) {
+        $player_id = Players::getPlayerId();
+        $cards = Conforts::getCards($card_ids);
+        foreach ($cards as $card_id => $card) {
+            if($card['location'] !== 'hand' || intval($card['location_arg']) !== $player_id) {
+                var_dump($card);
+                throw new BgaUserException("The card is not in your hand");
+            }
+            Conforts::addCardToDiscard($card_id);
+        }
+        Notifications::discardConfort($cards);
+        Game::get()->gamestate->nextState();
+    }
+
+    function undo() {
+        Game::undoRestorePoint();
     }
 }

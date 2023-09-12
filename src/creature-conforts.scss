@@ -140,3 +140,28 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       display: inline-block;
    }
 }
+
+#logs {
+
+   .cc-icon {
+      display: inline-block;
+      background-size: 24px 24px;
+      height: 24px;
+      width: 24px;
+      line-height: 24px;
+      vertical-align: middle;
+   }
+
+   .i-cards {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 360 500'%3E%3Cpath fill='darkred' d='M304.5,51.5A60.1,60.1,0,0,0,245,0H61.3A60.2,60.2,0,0,0,1.1,60.1V388.7a60.2,60.2,0,0,0,54.4,59.8A60.1,60.1,0,0,0,115,500H298.7a60.2,60.2,0,0,0,60.2-60.1V111.3A60.2,60.2,0,0,0,304.5,51.5Z'%3E%3C/path%3E%3Cpath fill='white' d='M326.6,111.3V439.9a28,28,0,0,1-27.9,27.9H115a27.9,27.9,0,0,1-26.4-19H245a60.1,60.1,0,0,0,60.1-60.1V84.2A28,28,0,0,1,326.6,111.3ZM245,32.2H61.3A28,28,0,0,0,33.4,60.1V388.7a27.9,27.9,0,0,0,27.9,27.8H245a27.9,27.9,0,0,0,27.9-27.8V60.1A28,28,0,0,0,245,32.2Z'%3E%3C/path%3E%3C/svg%3E");
+      color: black;
+
+      span {
+         display: block;
+         width: 90%;
+         font-size: 15px;
+         font-weight: 400;
+         text-align: center;
+      }
+   }
+}

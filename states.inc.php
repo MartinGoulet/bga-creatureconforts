@@ -140,8 +140,8 @@ $machinestates = $basicGameStates + array(
 
     ST_PLAYER_TURN_DICE => [
         "name" => "playerTurnDice",
-        "description" => clienttranslate('${actplayer} must place your dices where your have workers'),
-        "descriptionmyturn" => clienttranslate('${you} must place their dices'),
+        "descriptionmyturn" => clienttranslate('${you} must place your dices where your have workers'),
+        "description" => clienttranslate('${actplayer} must place their dices'),
         "type" => "activeplayer",
         "possibleactions" => array("confirmPlayerDice"),
         "transitions" => [
@@ -151,11 +151,12 @@ $machinestates = $basicGameStates + array(
 
     ST_PLAYER_TURN_RESOLVE => [
         "name" => "playerTurnResolve",
-        "description" => clienttranslate('${actplayer} must resolve your workers'),
-        "descriptionmyturn" => clienttranslate('${you} must resolve their workers'),
+        "descriptionmyturn" => clienttranslate('${you} must resolve your workers'),
+        "description" => clienttranslate('${actplayer} must resolve their workers'),
         "type" => "activeplayer",
-        "possibleactions" => array("resolveWorker", "confirmPlayerTurn"),
-        "transitions" => [
+        "possibleactions" => array("resolveWorker", "confirmResolveWorker", "undo"),
+        "transitions" => [  
+            "undo" => ST_PLAYER_TURN_DICE,
             "next" => ST_PLAYER_TURN_RESOLVE,
             "end" => ST_PLAYER_TURN_CRAFT_CONFORT,
         ]
@@ -163,11 +164,12 @@ $machinestates = $basicGameStates + array(
 
     ST_PLAYER_TURN_CRAFT_CONFORT => [
         "name" => "playerTurnCraftConfort",
-        "description" => clienttranslate('${actplayer} may craft any number of Conforts'),
         "descriptionmyturn" => clienttranslate('${you} may craft any number of Conforts from your hand'),
+        "description" => clienttranslate('${actplayer} may craft any number of Conforts'),
         "type" => "activeplayer",
-        "possibleactions" => array("craftConfort", "passCraftConfort"),
+        "possibleactions" => array("craftConfort", "passCraftConfort", "undo"),
         "transitions" => [
+            "undo" => ST_PLAYER_TURN_DICE,
             "craft" => ST_PLAYER_TURN_CRAFT_CONFORT,
             "end" => ST_PLAYER_TURN_END,
         ]
@@ -180,6 +182,18 @@ $machinestates = $basicGameStates + array(
         "transitions" => [
             "discard" => ST_PLAYER_TURN_DISCARD,
             "next" => ST_PLAYER_TURN_NEXT
+        ]
+    ],
+
+    ST_PLAYER_TURN_DISCARD => [
+        "name" => "playerTurnDiscard",
+        "descriptionmyturn" => clienttranslate('${you} must discard card until you have 3 Confort cards in your hand'),
+        "description" => clienttranslate('${actplayer} must discard Confort cards'),
+        "args" => "argPlayerTurnDiscard",
+        "type" => "activeplayer",
+        "possibleactions" => array("discardConfort"),
+        "transitions" => [
+            "" => ST_PLAYER_TURN_NEXT,
         ]
     ],
 

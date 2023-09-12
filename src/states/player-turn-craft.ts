@@ -41,7 +41,7 @@ class PlayerTurnCraftState implements StateHandler {
             console.warn('No cost for', card_type);
             return false;
          }
-         return this.isRequirementMet(card_type.cost);
+         return ResourceHelper.isRequirementMet(this.game, card_type.cost);
       });
 
       this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
@@ -59,7 +59,7 @@ class PlayerTurnCraftState implements StateHandler {
          if (!card) return;
          const card_type = this.game.confortManager.getCardType(card);
 
-         if (!this.isRequirementMet(card_type.cost)) {
+         if (!ResourceHelper.isRequirementMet(this.game, card_type.cost)) {
             this.game.showMessage('Requirement not met', 'error');
          }
 
@@ -77,31 +77,6 @@ class PlayerTurnCraftState implements StateHandler {
 
       this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
       this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
-   }
-
-   isRequirementMet(cost: { [type: string]: number }): boolean {
-      const { counters } = this.game.getPlayerPanel(this.game.getPlayerId());
-
-      for (const type of Object.keys(cost)) {
-         if (type !== '*' && counters[type].getValue() < cost[type]) {
-            return false;
-         }
-      }
-
-      if ('*' in cost) {
-         const total_goods = GOODS.map((type) => counters[type].getValue()).reduce(
-            (prev, curr) => prev + curr,
-            0,
-         );
-
-         const total_cost = Object.keys(cost)
-            .filter((type) => GOODS.indexOf(type) >= 0)
-            .map((type) => cost[type])
-            .reduce((prev, curr) => prev + curr, 0);
-
-         return total_goods >= total_cost;
-      }
-
-      return true;
+      this.game.addActionButtonUndo();
    }
 }

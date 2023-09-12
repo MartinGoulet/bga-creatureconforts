@@ -267,6 +267,14 @@ $this->traveler_types = [
    4 => [
       'name' => clienttranslate("Gray Wolf"),
       'timing' => "IMMEDIATELY",
+      'reward' => [
+         1 => ["from" => [COIN], 'to' => [LESSON_LEARNED, LESSON_LEARNED], 'times' => 1],
+         2 => ["from" => [COIN], 'to' => [LESSON_LEARNED, LESSON_LEARNED], 'times' => 1],
+         3 => ["from" => [], 'to' => [COIN], 'times' => 1],
+         4 => ["from" => [], 'to' => [COIN], 'times' => 1],
+         5 => ["from" => [], 'to' => [COIN], 'times' => 1],
+         6 => ["from" => [LESSON_LEARNED], 'to' => [STORY], 'times' => 2],
+      ],
    ],
    5 => [
       'name' => clienttranslate("Hairy-tailed Hole"),
@@ -319,6 +327,14 @@ $this->traveler_types = [
    15 => [
       'name' => clienttranslate("Wild Turkey"),
       'timing' => "AFTER_ROLLING_FAMILY_DICE",
+      'reward' => [
+         1 => ["from" => [], 'to' => ['draw', STORY], 'times' => 1],
+         2 => ["from" => [], 'to' => [MUSHROOM, GRAIN, FRUIT], 'times' => 1],
+         3 => ["from" => [], 'to' => [MUSHROOM, GRAIN, FRUIT], 'times' => 1],
+         4 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 4],
+         5 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 5],
+         6 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 6],
+      ],
    ],
 ];
 
@@ -616,4 +632,5 @@ $this->resource_types = [
    7 => LESSON_LEARNED,
    8 => STORY,
    9 => COIN,
+   50 => CARD,
 ];

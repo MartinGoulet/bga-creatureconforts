@@ -47,8 +47,8 @@ class StartHandState implements StateHandler {
       };
 
       if (!this.game.isSpectator) {
-         this.game.addActionButtonDisabled('btn_discard', 'Discard', handleDiscard);
-         this.game.addActionButtonGray('btn_cancel', 'Cancel', handleCancel);
+         this.game.addActionButtonDisabled('btn_discard', _('Discard'), handleDiscard);
+         this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
       }
    }
 }

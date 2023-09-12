@@ -25,6 +25,8 @@ class ResourceConverter {
    private resources_give?: IResourceLineStock;
    // Bottom right
    private counter_reward: ebg.counter;
+   private resource_reward: string;
+
    private resource_get: ResourcePlaceholderLineStock;
 
    public OnResourceChanged?: (resources: string[]) => void;
@@ -64,7 +66,13 @@ class ResourceConverter {
    }
 
    getResourcesGet(): string[] {
-      return this.resource_get.getResources();
+      if (this.counter_reward && this.counter_reward.getValue() > 0) {
+         return arrayRange(1, this.counter_reward.getValue())
+            .map(() => this.to)
+            .flat();
+      } else {
+         return this.resource_get.getResources();
+      }
    }
 
    private addBanner(count_any_ressource_to: number) {
@@ -104,6 +112,7 @@ class ResourceConverter {
       const handleResourceClick = (type: string) => {
          this.resources_give.add(type);
 
+         debugger;
          if (this.counter_reward) {
             if (this.from.length == 1) {
                this.counter_reward.incValue(1);
@@ -118,6 +127,14 @@ class ResourceConverter {
                   values.push(this.resources_give.getResources().filter((type) => type == icon).length);
                });
                this.counter_reward.setValue(Math.min.apply(null, values));
+            }
+         } else {
+            if (
+               this.resource_get.isExpandable() &&
+               this.resource_get.countPlaceholder() < this.resources_give.getResources().length
+            ) {
+               this.resource_get.addPlaceholder();
+               this.resources_board.reset();
             }
          }
 
@@ -167,7 +184,11 @@ class ResourceConverter {
          this.counter_reward = createCounter('tc-icons-reward-counter');
       }
       const element = document.getElementById('resource-converter-placeholder');
-      this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to);
+      const expandable = this.to[0] == '*' && this.to.length == 1 && this.times > 1;
+      debugger;
+      this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to, {
+         expandable,
+      });
    }
 
    private addResetButton() {

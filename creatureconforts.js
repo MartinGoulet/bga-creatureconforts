@@ -2052,6 +2052,13 @@ var CreatureConforts = (function () {
         };
         this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
     };
+    CreatureConforts.prototype.addActionButtonUndo = function () {
+        var _this = this;
+        var handleUndo = function () {
+            _this.takeAction('undo');
+        };
+        this.addActionButtonGray('btn_undo', _('Undo'), handleUndo);
+    };
     CreatureConforts.prototype.addActionButtonGray = function (id, label, action) {
         this.addActionButton(id, label, action, null, null, 'gray');
     };
@@ -2162,6 +2169,9 @@ var CreatureConforts = (function () {
                 if (args.resources_to !== undefined) {
                     args.resources_to = this.formatResourceIcons(args.resources_to);
                 }
+                if (args.nbr_cards !== undefined) {
+                    args.nbr_cards = "<div class=\"cc-icon i-cards\"><span>".concat(args.nbr_cards, "</span></div>");
+                }
             }
         }
         catch (e) {
@@ -2214,6 +2224,9 @@ var ResourceCounter = (function () {
                 !document.getElementById("".concat(_this.id, "-").concat(_this.icon)).classList.contains('disabled')) {
                 _this.onClick();
                 _this.counter.incValue(-1);
+                if (_this.counter.getValue() == 0) {
+                    _this.disabled(true);
+                }
             }
         });
         if (disabled)
@@ -2314,6 +2327,9 @@ var ResourcePlaceholder = (function () {
     ResourcePlaceholder.prototype.getResource = function () {
         return this.resource;
     };
+    ResourcePlaceholder.prototype.destroy = function () {
+        this.element.remove();
+    };
     ResourcePlaceholder.prototype.reset = function () {
         this.resource = null;
         while (this.element.children.length > 0) {
@@ -2328,21 +2344,36 @@ var ResourcePlaceholder = (function () {
 }());
 var ResourcePlaceholderLineStock = (function () {
     function ResourcePlaceholderLineStock(element, count, settings) {
-        var _a;
+        var _a, _b;
         this.element = element;
         this.count = count;
+        this.settings = settings;
         this.placeholders = [];
         var restriction = (_a = settings === null || settings === void 0 ? void 0 : settings.restriction) !== null && _a !== void 0 ? _a : 'none';
-        for (var index = 0; index < count; index++) {
-            this.placeholders.push(new ResourcePlaceholder(element));
-            if (restriction == 'same') {
-                element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
-            }
-            else if (restriction == 'different') {
-                element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
+        if ((_b = settings.expandable) !== null && _b !== void 0 ? _b : false) {
+        }
+        else {
+            for (var index = 0; index < count; index++) {
+                this.placeholders.push(new ResourcePlaceholder(element));
+                if (restriction == 'same') {
+                    element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
+                }
+                else if (restriction == 'different') {
+                    element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
+                }
             }
         }
     }
+    ResourcePlaceholderLineStock.prototype.addPlaceholder = function () {
+        this.placeholders.push(new ResourcePlaceholder(this.element));
+    };
+    ResourcePlaceholderLineStock.prototype.countPlaceholder = function () {
+        return this.placeholders.length;
+    };
+    ResourcePlaceholderLineStock.prototype.isExpandable = function () {
+        var _a, _b;
+        return (_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.expandable) !== null && _b !== void 0 ? _b : false;
+    };
     ResourcePlaceholderLineStock.prototype.add = function (resource) {
         var count = this.getResources().length;
         this.placeholders[count].add(resource);
@@ -2354,7 +2385,14 @@ var ResourcePlaceholderLineStock = (function () {
         return this.placeholders.map(function (p) { return p.getResource(); }).filter(function (r) { return r !== null; });
     };
     ResourcePlaceholderLineStock.prototype.reset = function () {
-        this.placeholders.forEach(function (p) { return p.reset(); });
+        var _a, _b;
+        if ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.expandable) !== null && _b !== void 0 ? _b : false) {
+            this.placeholders.forEach(function (p) { return p.destroy(); });
+            this.placeholders = [];
+        }
+        else {
+            this.placeholders.forEach(function (p) { return p.reset(); });
+        }
     };
     return ResourcePlaceholderLineStock;
 }());
@@ -2372,6 +2410,24 @@ var ResourceHelper = (function () {
     };
     ResourceHelper.convertToInt = function (icons) {
         return icons.map(function (type) { return ICONS.indexOf(type) + 1; });
+    };
+    ResourceHelper.isRequirementMet = function (game, cost) {
+        var counters = game.getPlayerPanel(game.getPlayerId()).counters;
+        for (var _i = 0, _a = Object.keys(cost); _i < _a.length; _i++) {
+            var type = _a[_i];
+            if (type !== '*' && counters[type].getValue() < cost[type]) {
+                return false;
+            }
+        }
+        if ('*' in cost) {
+            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
+            var total_cost = Object.keys(cost)
+                .filter(function (type) { return GOODS.indexOf(type) >= 0; })
+                .map(function (type) { return cost[type]; })
+                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            return total_goods >= total_cost;
+        }
+        return true;
     };
     return ResourceHelper;
 }());
@@ -2577,6 +2633,25 @@ var PlayerDiceStock = (function (_super) {
         faces.dataset.visibleFace = "".concat(die.face);
     };
     return PlayerDiceStock;
+}(LineDiceStock));
+var VillageDiceStock = (function (_super) {
+    __extends(VillageDiceStock, _super);
+    function VillageDiceStock(manager, element) {
+        var _this = _super.call(this, manager, element, {
+            gap: '5px',
+            sort: sortFunction('id'),
+        }) || this;
+        _this.manager = manager;
+        _this.element = element;
+        return _this;
+    }
+    VillageDiceStock.prototype.rollDie = function (die, settings) {
+        _super.prototype.rollDie.call(this, die, settings);
+        var div = this.getDieElement(die);
+        var faces = div.querySelector('.bga-dice_die-faces');
+        faces.dataset.visibleFace = "".concat(die.face);
+    };
+    return VillageDiceStock;
 }(LineDiceStock));
 var DiceHelper = (function () {
     function DiceHelper(game) {
@@ -2877,7 +2952,15 @@ var ResourceConverter = (function () {
         return this.resources_give.getResources();
     };
     ResourceConverter.prototype.getResourcesGet = function () {
-        return this.resource_get.getResources();
+        var _this = this;
+        if (this.counter_reward && this.counter_reward.getValue() > 0) {
+            return arrayRange(1, this.counter_reward.getValue())
+                .map(function () { return _this.to; })
+                .flat();
+        }
+        else {
+            return this.resource_get.getResources();
+        }
     };
     ResourceConverter.prototype.addBanner = function (count_any_ressource_to) {
         var arrow = count_any_ressource_to > 0
@@ -2891,6 +2974,7 @@ var ResourceConverter = (function () {
         var handleResourceClick = function (type) {
             var _a, _b, _c, _d;
             _this.resources_give.add(type);
+            debugger;
             if (_this.counter_reward) {
                 if (_this.from.length == 1) {
                     _this.counter_reward.incValue(1);
@@ -2904,6 +2988,13 @@ var ResourceConverter = (function () {
                         values_1.push(_this.resources_give.getResources().filter(function (type) { return type == icon; }).length);
                     });
                     _this.counter_reward.setValue(Math.min.apply(null, values_1));
+                }
+            }
+            else {
+                if (_this.resource_get.isExpandable() &&
+                    _this.resource_get.countPlaceholder() < _this.resources_give.getResources().length) {
+                    _this.resource_get.addPlaceholder();
+                    _this.resources_board.reset();
                 }
             }
             if (((_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.getValue()) >= _this.times || _this.resources_give.isFull()) {
@@ -2951,7 +3042,11 @@ var ResourceConverter = (function () {
             this.counter_reward = createCounter('tc-icons-reward-counter');
         }
         var element = document.getElementById('resource-converter-placeholder');
-        this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to);
+        var expandable = this.to[0] == '*' && this.to.length == 1 && this.times > 1;
+        debugger;
+        this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to, {
+            expandable: expandable,
+        });
     };
     ResourceConverter.prototype.addResetButton = function () {
         var _this = this;
@@ -2993,10 +3088,11 @@ var NotificationManager = (function () {
         this.game = game;
     }
     NotificationManager.prototype.setup = function () {
+        var _this = this;
         var notifs = [
             ['onDiscardStartHand'],
             ['onNewTraveler', 1000],
-            ['onFamilyDice', 1000],
+            ['onFamilyDice', undefined],
             ['onRevealPlacement', 1000],
             ['onVillageDice', 1200],
             ['onMoveDiceToHill', 1000],
@@ -3007,12 +3103,18 @@ var NotificationManager = (function () {
             ['onReturnDice', 1200],
             ['onNewSeason', 1000],
             ['onRiverDialRotate', 500],
-            ['onRefillOwlNest'],
+            ['onRefillOwlNest', undefined],
             ['onDiscardTraveler', 100],
             ['onNewFirstPlayer', 100],
             ['onTravelerExchangeResources', 100],
+            ['onMarketExchangeResources', 100],
+            ['onDrawConfort', undefined],
+            ['onAddConfortToHand', undefined],
         ];
         this.setupNotifications(notifs);
+        ['message', 'onDrawConfort'].forEach(function (eventName) {
+            _this.game.notifqueue.setIgnoreNotificationCheck(eventName, function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
+        });
     };
     NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
         return __awaiter(this, void 0, void 0, function () {
@@ -3036,23 +3138,24 @@ var NotificationManager = (function () {
         setTimeout(function () { return deck.flipCard(card); }, 500);
     };
     NotificationManager.prototype.notif_onFamilyDice = function (args) {
-        var _this = this;
-        this.game.gamedatas.playerorder.forEach(function (player_id) { return __awaiter(_this, void 0, void 0, function () {
-            var dice, stack;
+        return __awaiter(this, void 0, void 0, function () {
+            var stack;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        dice = args.dice.filter(function (die) { return die.owner_id == player_id.toString(); });
-                        stack = this.game.getPlayerTable(Number(player_id)).dice;
+                        stack = this.game.getPlayerTable(Number(args.player_id)).dice;
                         stack.removeAll();
-                        return [4, stack.addDice(dice)];
+                        return [4, stack.addDice(args.dice)];
                     case 1:
                         _a.sent();
-                        stack.rollDice(dice, { duration: [500, 900], effect: 'rollIn' });
+                        stack.rollDice(args.dice, { duration: [500, 900], effect: 'rollIn' });
+                        return [4, new Promise(function (resolve) { return setTimeout(function () { return resolve(true); }, 1000); })];
+                    case 2:
+                        _a.sent();
                         return [2];
                 }
             });
-        }); });
+        });
     };
     NotificationManager.prototype.notif_onRevealPlacement = function (_a) {
         var workers = _a.workers;
@@ -3118,24 +3221,33 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_onRefillOwlNest = function (args) {
         return __awaiter(this, void 0, void 0, function () {
-            var owl_nest, discard, _a, deck, market, hidden_confort;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var owl_nest, discard, _a, deck, market, _i, _b, card;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         owl_nest = args.owl_nest, discard = args.discard;
                         if (!discard) return [3, 2];
                         return [4, this.game.tableCenter.confort_discard.addCard(discard)];
                     case 1:
-                        _b.sent();
-                        _b.label = 2;
+                        _c.sent();
+                        _c.label = 2;
                     case 2:
-                        _a = this.game.tableCenter, deck = _a.confort_deck, market = _a.confort_market, hidden_confort = _a.hidden_confort;
-                        return [4, market.swapCards(owl_nest.slice(0, 3))];
+                        _a = this.game.tableCenter, deck = _a.confort_deck, market = _a.confort_market;
+                        _i = 0, _b = owl_nest.slice(0, 3);
+                        _c.label = 3;
                     case 3:
-                        _b.sent();
-                        return [4, market.addCard(owl_nest[3], { fromStock: deck })];
+                        if (!(_i < _b.length)) return [3, 6];
+                        card = _b[_i];
+                        return [4, market.swapCards([__assign({}, card)])];
                     case 4:
-                        _b.sent();
+                        _c.sent();
+                        _c.label = 5;
+                    case 5:
+                        _i++;
+                        return [3, 3];
+                    case 6: return [4, market.addCard(owl_nest[3], { fromStock: deck })];
+                    case 7:
+                        _c.sent();
                         return [2];
                 }
             });
@@ -3165,6 +3277,48 @@ var NotificationManager = (function () {
         Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
         var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"9\"]")[0];
         this.animationMoveResource(player_id, to, fromElement);
+    };
+    NotificationManager.prototype.notif_onMarketExchangeResources = function (_a) {
+        var from = _a.from, to = _a.to, player_id = _a.player_id;
+        var counters = this.game.getPlayerPanel(player_id).counters;
+        Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"8\"]")[0];
+        this.animationMoveResource(player_id, to, fromElement);
+    };
+    NotificationManager.prototype.notif_onDrawConfort = function (_a) {
+        var player_id = _a.player_id, card = _a.card;
+        return __awaiter(this, void 0, void 0, function () {
+            var _b, deck, hidden_confort;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _b = this.game.tableCenter, deck = _b.confort_deck, hidden_confort = _b.hidden_confort;
+                        deck.setCardNumber(deck.getCardNumber(), __assign({}, card));
+                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
+                    case 1:
+                        _c.sent();
+                        deck.setCardNumber(deck.getCardNumber(), __assign({}, hidden_confort));
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onAddConfortToHand = function (_a) {
+        var player_id = _a.player_id, card = _a.card;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (player_id !== this.game.getPlayerId()) {
+                            card = { id: card.id };
+                        }
+                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
     };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
         var _this = this;
@@ -3203,7 +3357,6 @@ var NotificationManager = (function () {
                 }
             });
         }
-        this.game.notifqueue.setIgnoreNotificationCheck('message', function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
     };
     return NotificationManager;
 }());
@@ -3219,13 +3372,16 @@ var StateManager = (function () {
             playerTurnCraftConfort: new PlayerTurnCraftState(game),
             resolveTraveler: new ResolveTravelerState(game),
             resolveMarket: new ResolveMarketState(game),
+            resolveOwnNest: new ResolveOwlNestState(game),
+            resolveWorkshop: new ResolveWorkshopState(game),
+            playerTurnDiscard: new PlayerTurnDiscardState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
         debug('Entering state: ' + stateName);
         if (this.states[stateName] !== undefined) {
             this.states[stateName].onEnteringState(args.args);
-            if (stateName.startsWith('client_')) {
+            if (stateName.startsWith('resolve')) {
                 this.client_states.push(this.states[stateName]);
             }
             else {
@@ -3333,8 +3489,8 @@ var StartHandState = (function () {
             });
         };
         if (!this.game.isSpectator) {
-            this.game.addActionButtonDisabled('btn_discard', 'Discard', handleDiscard);
-            this.game.addActionButtonGray('btn_cancel', 'Cancel', handleCancel);
+            this.game.addActionButtonDisabled('btn_discard', _('Discard'), handleDiscard);
+            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
         }
     };
     return StartHandState;
@@ -3558,11 +3714,30 @@ var PlayerTurnResolveState = (function () {
                     descriptionmyturn: _('You must resolve the effect of the traveler'),
                 });
             }
+            else if (location_id == 10) {
+                _this.game.setClientState('resolveWorkshop', {
+                    descriptionmyturn: _("You must select one card in the Workshop"),
+                });
+            }
+            else if (location_id == 11) {
+                _this.game.setClientState('resolveOwnNest', {
+                    descriptionmyturn: _("You must select one card in the Owl's Nest"),
+                });
+            }
             else {
                 _this.game.takeAction('resolveWorker', { location_id: location_id });
             }
         };
-        this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+        var handleEnd = function () {
+            _this.game.takeAction('confirmResolveWorker');
+        };
+        if (this.game.tableCenter.getWorkerLocations().length > 0) {
+            this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+        }
+        else {
+            this.game.addActionButton('btn_end', _('End'), handleEnd);
+        }
+        this.game.addActionButtonUndo();
     };
     return PlayerTurnResolveState;
 }());
@@ -3607,7 +3782,7 @@ var PlayerTurnCraftState = (function () {
                 console.warn('No cost for', card_type);
                 return false;
             }
-            return _this.isRequirementMet(card_type.cost);
+            return ResourceHelper.isRequirementMet(_this.game, card_type.cost);
         });
         this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
         hand.setSelectionMode('single');
@@ -3624,7 +3799,7 @@ var PlayerTurnCraftState = (function () {
             if (!card)
                 return;
             var card_type = _this.game.confortManager.getCardType(card);
-            if (!_this.isRequirementMet(card_type.cost)) {
+            if (!ResourceHelper.isRequirementMet(_this.game, card_type.cost)) {
                 _this.game.showMessage('Requirement not met', 'error');
             }
             var resources = [];
@@ -3638,26 +3813,49 @@ var PlayerTurnCraftState = (function () {
         };
         this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
         this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
-    };
-    PlayerTurnCraftState.prototype.isRequirementMet = function (cost) {
-        var counters = this.game.getPlayerPanel(this.game.getPlayerId()).counters;
-        for (var _i = 0, _a = Object.keys(cost); _i < _a.length; _i++) {
-            var type = _a[_i];
-            if (type !== '*' && counters[type].getValue() < cost[type]) {
-                return false;
-            }
-        }
-        if ('*' in cost) {
-            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
-            var total_cost = Object.keys(cost)
-                .filter(function (type) { return GOODS.indexOf(type) >= 0; })
-                .map(function (type) { return cost[type]; })
-                .reduce(function (prev, curr) { return prev + curr; }, 0);
-            return total_goods >= total_cost;
-        }
-        return true;
+        this.game.addActionButtonUndo();
     };
     return PlayerTurnCraftState;
+}());
+var PlayerTurnDiscardState = (function () {
+    function PlayerTurnDiscardState(game) {
+        this.game = game;
+    }
+    PlayerTurnDiscardState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        this.cards = [];
+        var hand = this.game.getCurrentPlayerTable().hand;
+        var handleSelection = function (selection, lastChanged) {
+            _this.game.toggleButtonEnable('btn_discard', selection.length == args.nbr);
+            if (selection.length > args.nbr) {
+                hand.unselectCard(lastChanged);
+            }
+        };
+        hand.setSelectionMode('multiple');
+        hand.onSelectionChange = handleSelection;
+    };
+    PlayerTurnDiscardState.prototype.onLeavingState = function () {
+        var hand = this.game.getCurrentPlayerTable().hand;
+        hand.setSelectionMode('none');
+        hand.onSelectionChange = null;
+    };
+    PlayerTurnDiscardState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleDiscard = function () {
+            var hand = _this.game.getCurrentPlayerTable().hand;
+            if (hand.getSelection().length !== args.nbr)
+                return;
+            var card_ids = hand
+                .getSelection()
+                .map(function (card) { return card.id; })
+                .join(';');
+            _this.game.takeAction('discardConfort', { card_ids: card_ids });
+        };
+        this.game.addActionButtonDisabled('btn_discard', _('Discard'), handleDiscard);
+    };
+    return PlayerTurnDiscardState;
 }());
 var ResolveMarketState = (function () {
     function ResolveMarketState(game) {
@@ -3679,7 +3877,10 @@ var ResolveMarketState = (function () {
         var _this = this;
         var handleConfirm = function () {
             var resources = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
-            _this.game.takeAction('resolveWorker', { location_id: 8, resources: resources });
+            var resources2 = ResourceHelper.convertToInt(_this.convert.getResourcesGet()).join(';');
+            _this.game.takeAction('resolveWorker', { location_id: 8, resources: resources, resources2: resources2 }, function () {
+                _this.game.restoreGameState();
+            });
         };
         var handleChoice1 = function () {
             _this.convert = new ResourceConverter(_this.game, ['coin'], ['*'], 1, {
@@ -3722,6 +3923,7 @@ var ResolveTravelerState = (function () {
         this.game = game;
     }
     ResolveTravelerState.prototype.onEnteringState = function (args) {
+        var _this = this;
         var _a;
         var _b = this.game.tableCenter, worker_locations = _b.worker_locations, dice_locations = _b.dice_locations;
         worker_locations.setSelectableLocation([9]);
@@ -3729,11 +3931,20 @@ var ResolveTravelerState = (function () {
         var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
         var traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
         var reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
-        this.convert = new ResourceConverter(this.game, (_a = reward.from) !== null && _a !== void 0 ? _a : GOODS, reward.to, reward.times);
-        this.convert.show();
+        if (reward.from == null || reward.from.length == 0) {
+            this.convert = undefined;
+            this.game.takeAction('resolveWorker', { location_id: 9, resources: [], resource2: [] }, null, function () {
+                _this.game.restoreGameState();
+            });
+        }
+        else {
+            this.convert = new ResourceConverter(this.game, (_a = reward.from) !== null && _a !== void 0 ? _a : GOODS, reward.to, reward.times);
+            this.convert.show();
+        }
     };
     ResolveTravelerState.prototype.onLeavingState = function () {
-        this.convert.hide();
+        var _a;
+        (_a = this.convert) === null || _a === void 0 ? void 0 : _a.hide();
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectedLocation([]);
     };
@@ -3747,6 +3958,84 @@ var ResolveTravelerState = (function () {
         this.game.addActionButtonClientCancel();
     };
     return ResolveTravelerState;
+}());
+var ResolveOwlNestState = (function () {
+    function ResolveOwlNestState(game) {
+        this.game = game;
+    }
+    ResolveOwlNestState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, market = _a.confort_market;
+        worker_locations.setSelectableLocation([11]);
+        worker_locations.setSelectedLocation([11]);
+        market.setSelectionMode('single');
+        market.setSelectableCards(market.getCards());
+        market.onSelectionChange = function (selection) {
+            _this.game.toggleButtonEnable('btn_confirm', selection.length == 1);
+        };
+    };
+    ResolveOwlNestState.prototype.onLeavingState = function () {
+        var market = this.game.tableCenter.confort_market;
+        market.setSelectionMode('none');
+        market.onSelectionChange = null;
+    };
+    ResolveOwlNestState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var market = _this.game.tableCenter.confort_market;
+            if (market.getSelection().length == 0)
+                return;
+            _this.game.takeAction('resolveWorker', {
+                location_id: 11,
+                resources: market.getSelection()[0].location_arg,
+            });
+        };
+        this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonClientCancel();
+    };
+    return ResolveOwlNestState;
+}());
+var ResolveWorkshopState = (function () {
+    function ResolveWorkshopState(game) {
+        this.game = game;
+    }
+    ResolveWorkshopState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations, market = _a.improvement_market;
+        worker_locations.setSelectableLocation([10]);
+        worker_locations.setSelectedLocation([10]);
+        var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
+        market.setSelectionMode('single');
+        market.setSelectableCards(market.getCards().filter(function (card) {
+            if (Number(card.location_arg) > die.face)
+                return false;
+            var type = _this.game.improvementManager.getCardType(card);
+            return ResourceHelper.isRequirementMet(_this.game, type.cost);
+        }));
+        market.onSelectionChange = function (selection) {
+            _this.game.toggleButtonEnable('btn_confirm', selection.length == 1);
+        };
+    };
+    ResolveWorkshopState.prototype.onLeavingState = function () {
+        var market = this.game.tableCenter.improvement_market;
+        market.setSelectionMode('none');
+        market.onSelectionChange = null;
+    };
+    ResolveWorkshopState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var market = _this.game.tableCenter.improvement_market;
+            if (market.getSelection().length == 0)
+                return;
+            _this.game.takeAction('resolveWorker', {
+                location_id: 10,
+                resources: market.getSelection()[0].location_arg,
+            });
+        };
+        this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonClientCancel();
+    };
+    return ResolveWorkshopState;
 }());
 var ConfortManager = (function (_super) {
     __extends(ConfortManager, _super);
@@ -3804,6 +4093,9 @@ var ImprovementManager = (function (_super) {
         _this.game = game;
         return _this;
     }
+    ImprovementManager.prototype.getCardType = function (card) {
+        return this.game.gamedatas.improvement_types[card.type];
+    };
     return ImprovementManager;
 }(CardManager));
 var TravelerManager = (function (_super) {
@@ -4024,12 +4316,12 @@ var TableCenter = (function () {
             gap: '12px',
         });
         this.confort_deck = new Deck(game.confortManager, document.getElementById("deck-conforts"), {
-            cardNumber: deckCount,
+            cardNumber: Number(deckCount),
             topCard: this.hidden_confort,
             counter: {},
         });
         this.confort_discard = new Deck(game.confortManager, document.getElementById("discard-conforts"), {
-            cardNumber: discard.count,
+            cardNumber: Number(discard.count),
             topCard: discard.topCard,
             counter: {},
         });
@@ -4045,10 +4337,7 @@ var TableCenter = (function () {
         this.dice_locations.addDice(dice);
     };
     TableCenter.prototype.setupHillDice = function (game) {
-        this.hill = new LineDiceStock(game.diceManager, document.getElementById("hill-dice"), {
-            gap: '5px',
-            sort: sortFunction('id'),
-        });
+        this.hill = new VillageDiceStock(game.diceManager, document.getElementById("hill-dice"));
         var dice = game.gamedatas.dice.filter(function (die) { return die.location == 0; });
         this.hill.addDice(dice);
     };

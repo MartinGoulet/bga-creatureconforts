@@ -17,7 +17,7 @@ class TableCenter {
    public worker_locations: LocationStock;
    public dice_locations: SlotDiceStock;
 
-   public hill: LineDiceStock;
+   public hill: VillageDiceStock;
 
    constructor(private game: CreatureConforts) {
       this.setupConfortCards(game);
@@ -59,7 +59,7 @@ class TableCenter {
          game.confortManager,
          document.getElementById(`deck-conforts`),
          {
-            cardNumber: deckCount,
+            cardNumber: Number(deckCount),
             topCard: this.hidden_confort,
             counter: {},
          },
@@ -69,7 +69,7 @@ class TableCenter {
          game.confortManager,
          document.getElementById(`discard-conforts`),
          {
-            cardNumber: discard.count,
+            cardNumber: Number(discard.count),
             topCard: discard.topCard,
             counter: {},
          },
@@ -89,10 +89,7 @@ class TableCenter {
    }
 
    private setupHillDice(game: CreatureConforts) {
-      this.hill = new LineDiceStock(game.diceManager, document.getElementById(`hill-dice`), {
-         gap: '5px',
-         sort: sortFunction('id'),
-      });
+      this.hill = new VillageDiceStock(game.diceManager, document.getElementById(`hill-dice`));
 
       const dice = game.gamedatas.dice.filter((die) => die.location == 0);
       this.hill.addDice(dice);

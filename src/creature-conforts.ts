@@ -162,6 +162,13 @@ class CreatureConforts
       this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
    }
 
+   public addActionButtonUndo() {
+      const handleUndo = () => {
+         this.takeAction('undo');
+      };
+      this.addActionButtonGray('btn_undo', _('Undo'), handleUndo);
+   }
+
    public addActionButtonGray(id: string, label: string, action: (evt: any) => void) {
       this.addActionButton(id, label, action, null, null, 'gray');
    }
@@ -304,6 +311,10 @@ class CreatureConforts
 
             if (args.resources_to !== undefined) {
                args.resources_to = this.formatResourceIcons(args.resources_to);
+            }
+
+            if (args.nbr_cards !== undefined) {
+               args.nbr_cards = `<div class="cc-icon i-cards"><span>${args.nbr_cards}</span></div>`;
             }
          }
       } catch (e) {

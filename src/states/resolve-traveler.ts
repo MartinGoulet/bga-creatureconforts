@@ -1,5 +1,5 @@
 class ResolveTravelerState implements StateHandler {
-   private convert: ResourceConverter;
+   private convert?: ResourceConverter;
 
    constructor(private game: CreatureConforts) {}
 
@@ -12,16 +12,21 @@ class ResolveTravelerState implements StateHandler {
 
       const traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
       const reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
-      // const reward = this.game.gamedatas.travelers.types[traveler_type].reward[5];
-      // this.game.getPlayerPanel(this.game.getPlayerId()).counters['fruit'].setValue(2);
-      // const reward = this.game.gamedatas.travelers.types[traveler_type].reward[6];
 
-      this.convert = new ResourceConverter(this.game, reward.from ?? GOODS, reward.to, reward.times);
-      this.convert.show();
+      if (reward.from == null || reward.from.length == 0) {
+         this.convert = undefined;
+         // Resolve automatically
+         this.game.takeAction('resolveWorker', { location_id: 9, resources: [], resource2: [] }, null, () => {
+            this.game.restoreGameState();
+         });
+      } else {
+         this.convert = new ResourceConverter(this.game, reward.from ?? GOODS, reward.to, reward.times);
+         this.convert.show();
+      }
    }
 
    onLeavingState(): void {
-      this.convert.hide();
+      this.convert?.hide();
       const { worker_locations } = this.game.tableCenter;
       worker_locations.setSelectedLocation([]);
    }

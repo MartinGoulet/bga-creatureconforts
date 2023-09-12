@@ -88,6 +88,7 @@ class CreatureConforts extends Table {
         self::initGameStateLabels(array(
             VAR_FIRST_PLAYER => 10,
             VAR_RIVER_DIAL => 11,
+            VAR_SAVEPOINT_TRANSITION => 12,
 
             OPTION_SHORT_GAME => OPTION_SHORT_GAME_ID,
             //    "my_first_global_variable" => 10,

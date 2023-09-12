@@ -21,7 +21,10 @@ class ResolveMarketState implements StateHandler {
    onUpdateActionButtons(args: any): void {
       const handleConfirm = () => {
          const resources = ResourceHelper.convertToInt(this.convert.getResourcesGive()).join(';');
-         this.game.takeAction('resolveWorker', { location_id: 8, resources });
+         const resources2 = ResourceHelper.convertToInt(this.convert.getResourcesGet()).join(';');
+         this.game.takeAction('resolveWorker', { location_id: 8, resources, resources2 }, () => {
+            this.game.restoreGameState();
+         });
       };
       const handleChoice1 = () => {
          this.convert = new ResourceConverter(this.game, ['coin'], ['*'], 1, {

@@ -81,6 +81,7 @@ trait States {
 
         $dice = Dice::getDiceFromPlayer($player_id);
         Notifications::moveDiceToHill($dice);
+        Game::get()->undoSavepoint();
         Game::get()->gamestate->nextState();
     }
 

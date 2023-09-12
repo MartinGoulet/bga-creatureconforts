@@ -5,7 +5,7 @@ class NotificationManager {
       const notifs: [string, number?][] = [
          ['onDiscardStartHand'],
          ['onNewTraveler', 1000],
-         ['onFamilyDice', 1000],
+         ['onFamilyDice', undefined],
          ['onRevealPlacement', 1000],
          ['onVillageDice', 1200],
          ['onMoveDiceToHill', 1000],
@@ -16,13 +16,23 @@ class NotificationManager {
          ['onReturnDice', 1200],
          ['onNewSeason', 1000],
          ['onRiverDialRotate', 500],
-         ['onRefillOwlNest'],
+         ['onRefillOwlNest', undefined],
          ['onDiscardTraveler', 100],
          ['onNewFirstPlayer', 100],
          ['onTravelerExchangeResources', 100],
+         ['onMarketExchangeResources', 100],
+         ['onDrawConfort', undefined],
+         ['onAddConfortToHand', undefined],
       ];
 
       this.setupNotifications(notifs);
+
+      ['message', 'onDrawConfort'].forEach((eventName) => {
+         this.game.notifqueue.setIgnoreNotificationCheck(
+            eventName,
+            (notif) => notif.args.excluded_player_id && notif.args.excluded_player_id == this.game.player_id,
+         );
+      });
    }
 
    private async notif_onDiscardStartHand(args: DiscardStartHandArgs) {
@@ -39,14 +49,12 @@ class NotificationManager {
       setTimeout(() => deck.flipCard(card), 500);
    }
 
-   private notif_onFamilyDice(args: FamilyDiceArgs) {
-      this.game.gamedatas.playerorder.forEach(async (player_id) => {
-         const dice = args.dice.filter((die) => die.owner_id == player_id.toString());
-         const stack = this.game.getPlayerTable(Number(player_id)).dice;
-         stack.removeAll();
-         await stack.addDice(dice);
-         stack.rollDice(dice, { duration: [500, 900], effect: 'rollIn' });
-      });
+   private async notif_onFamilyDice(args: FamilyDiceArgs) {
+      const stack = this.game.getPlayerTable(Number(args.player_id)).dice;
+      stack.removeAll();
+      await stack.addDice(args.dice);
+      stack.rollDice(args.dice, { duration: [500, 900], effect: 'rollIn' });
+      await new Promise((resolve) => setTimeout(() => resolve(true), 1000));
    }
 
    private notif_onRevealPlacement({ workers }: { workers: WorkerUIData }) {
@@ -115,9 +123,11 @@ class NotificationManager {
       if (discard) {
          await this.game.tableCenter.confort_discard.addCard(discard);
       }
-      const { confort_deck: deck, confort_market: market, hidden_confort } = this.game.tableCenter;
+      const { confort_deck: deck, confort_market: market } = this.game.tableCenter;
 
-      await market.swapCards(owl_nest.slice(0, 3));
+      for (const card of owl_nest.slice(0, 3)) {
+         await market.swapCards([{ ...card }]);
+      }
       await market.addCard(owl_nest[3], { fromStock: deck });
    }
 
@@ -147,6 +157,28 @@ class NotificationManager {
 
       const fromElement = document.querySelectorAll(`#worker-locations *[data-slot-id="9"]`)[0];
       this.animationMoveResource(player_id, to, fromElement);
+   }
+
+   private notif_onMarketExchangeResources({ from, to, player_id }: MarketExchangeResourcesArgs) {
+      const { counters } = this.game.getPlayerPanel(player_id);
+      Object.keys(from).forEach((type) => counters[type].incValue(-from[type]));
+
+      const fromElement = document.querySelectorAll(`#worker-locations *[data-slot-id="8"]`)[0];
+      this.animationMoveResource(player_id, to, fromElement);
+   }
+
+   private async notif_onDrawConfort({ player_id, card }: { player_id: number; card: ConfortCard }) {
+      const { confort_deck: deck, hidden_confort } = this.game.tableCenter;
+      deck.setCardNumber(deck.getCardNumber(), { ...card });
+      await this.game.getPlayerTable(player_id).hand.addCard(card);
+      deck.setCardNumber(deck.getCardNumber(), { ...hidden_confort });
+   }
+
+   private async notif_onAddConfortToHand({ player_id, card }: { player_id: number; card: ConfortCard }) {
+      if (player_id !== this.game.getPlayerId()) {
+         card = { id: card.id } as ConfortCard;
+      }
+      await this.game.getPlayerTable(player_id).hand.addCard(card);
    }
 
    private animationMoveResource(
@@ -200,11 +232,6 @@ class NotificationManager {
                }
             });
       }
-
-      this.game.notifqueue.setIgnoreNotificationCheck(
-         'message',
-         (notif) => notif.args.excluded_player_id && notif.args.excluded_player_id == this.game.player_id,
-      );
    }
 }
 
@@ -237,6 +264,12 @@ interface CraftConfortArgs {
 }
 
 interface TravelerExchangeResourcesArgs {
+   player_id: number;
+   from: { [type: string]: number }[];
+   to: { [type: string]: number }[];
+}
+
+interface MarketExchangeResourcesArgs {
    player_id: number;
    from: { [type: string]: number }[];
    to: { [type: string]: number }[];

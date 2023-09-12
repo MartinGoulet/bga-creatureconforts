@@ -6,8 +6,21 @@ namespace CreatureConforts\Core;
 /*
  * Game: a wrapper over table object to allow more generic modules
  */
+
 class Game extends \APP_DbObject {
     public static function get() {
         return \CreatureConforts::get();
+    }
+
+    public static function undoSavepoint() {
+        self::get()->undoSavepoint();
+        $stateNum = intval(Game::get()->gamestate->state()['id']);
+        self::get()->setGameStateValue(VAR_SAVEPOINT_TRANSITION, $stateNum);
+    }
+
+    public static function undoRestorePoint() {
+        self::get()->undoRestorePoint();
+        $stateNum = intval(self::get()->getGameStateValue(VAR_SAVEPOINT_TRANSITION));
+        self::get()->gamestate->jumpToState($stateNum);
     }
 }

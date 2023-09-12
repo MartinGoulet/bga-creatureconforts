@@ -18,4 +18,8 @@ class ImprovementManager extends CardManager<ImprovementCard> {
          cardHeight: 125,
       });
    }
+
+   getCardType(card: ImprovementCard): ImprovementType {
+      return this.game.gamedatas.improvement_types[card.type];
+   }
 }

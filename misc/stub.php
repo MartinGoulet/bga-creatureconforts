@@ -343,6 +343,18 @@ class Table {
      */
     static function checkAction($actionName, $bThrowException = true) {
     }
+
+    //////////////////////////////////////////////////////////////////////////////
+    //////////// Undo moves
+    ////////////
+
+    function undoSavepoint() 
+    {
+    }
+
+    function undoRestorePoint()
+    {
+    }
 }
 
 class Gamestate {
@@ -373,6 +385,12 @@ class Gamestate {
      * see Your game state machine: states.inc.php for more information about states
      */
     function nextState($transition = null) {
+    }
+
+    /**
+     * Change current state to a new state. Important: the $stateNum parameter is the key of the state
+     */
+    function jumpToState(int $stateNum) {
     }
 
     /**

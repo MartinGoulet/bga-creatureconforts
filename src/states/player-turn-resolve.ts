@@ -41,10 +41,29 @@ class PlayerTurnResolveState implements StateHandler {
             this.game.setClientState('resolveTraveler', {
                descriptionmyturn: _('You must resolve the effect of the traveler'),
             });
+         } else if (location_id == 10) {
+            this.game.setClientState('resolveWorkshop', {
+               descriptionmyturn: _(`You must select one card in the Workshop`),
+            });
+         } else if (location_id == 11) {
+            this.game.setClientState('resolveOwnNest', {
+               descriptionmyturn: _(`You must select one card in the Owl's Nest`),
+            });
          } else {
             this.game.takeAction('resolveWorker', { location_id });
          }
       };
-      this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+
+      const handleEnd = () => {
+         this.game.takeAction('confirmResolveWorker');
+      };
+
+      if (this.game.tableCenter.getWorkerLocations().length > 0) {
+         this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+      } else {
+         this.game.addActionButton('btn_end', _('End'), handleEnd);
+      }
+
+      this.game.addActionButtonUndo();
    }
 }

@@ -49,3 +49,20 @@ class PlayerDiceStock extends LineDiceStock {
       faces.dataset.visibleFace = `${die.face}`;
    }
 }
+
+class VillageDiceStock extends LineDiceStock {
+   constructor(protected manager: DiceManager, protected element: HTMLElement) {
+      super(manager, element, {
+         gap: '5px',
+         sort: sortFunction('id'),
+      });
+   }
+
+   public rollDie(die: BgaDie, settings?: RollDieSettings): void {
+      super.rollDie(die, settings);
+
+      const div = this.getDieElement(die);
+      const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
+      faces.dataset.visibleFace = `${die.face}`;
+   }
+}

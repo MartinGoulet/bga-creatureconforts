@@ -34,6 +34,10 @@
          position: absolute;
          top: 850px;
          left: 234px;
+
+         .slot {
+            min-width: 110px;
+         }
       }
 
       #table-travelers {
@@ -107,12 +111,12 @@
          [data-slot-id='5'] {
             top: 202px;
             left: 592px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%)
+            clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%);
          }
          [data-slot-id='6'] {
             top: 345px;
             left: 624px;
-            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%)
+            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%);
          }
          [data-slot-id='7'] {
             top: 291px;

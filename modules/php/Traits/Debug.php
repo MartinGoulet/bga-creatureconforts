@@ -33,4 +33,9 @@ trait Debug {
         $player_id = intval(Game::get()->getCurrentPlayerId());
         Players::addResources($player_id, [STORY => 1]);
     }
+
+    function debugSavepoint() {
+        Game::get()->setGameStateInitialValue(VAR_SAVEPOINT_TRANSITION, 0);
+        Game::get()->undoSavepoint();
+    }
 }

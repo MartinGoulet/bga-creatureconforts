@@ -26,7 +26,11 @@ class DiceHelper {
             if ($info['count'] > 0 && $info['count'] !== sizeof($dice_ids)) return false;
             // Get requirement
             $requirement = self::getValleyRequirement($info);
-            return $requirement->isRequirementMet(self::getDiceValue($dice_ids));
+            $result = $requirement->isRequirementMet(self::getDiceValue($dice_ids));
+            if(!$result) {
+                var_dump($result['values']);
+                var_dump(self::getDiceValue($dice_ids));
+            }
         } else if ($location_id >= 5 && $location_id <= 7) {
             $requirement = new DialRequirement(Globals::getRiverDialValue(), $location_id);
             return $requirement->isRequirementMet(self::getDiceValue($dice_ids));

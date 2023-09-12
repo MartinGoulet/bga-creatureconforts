@@ -6,7 +6,9 @@ use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
+use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
+use PSpell\Config;
 
 trait Args {
 
@@ -51,5 +53,11 @@ trait Args {
         }
 
         return $args;
+    }
+
+    function argPlayerTurnDiscard() {
+        return [
+            'nbr' => sizeof(Conforts::getHand(Players::getPlayerId())) - 3,
+        ];
     }
 }

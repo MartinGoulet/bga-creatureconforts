@@ -25,6 +25,8 @@
          box-shadow: 0 0 5px 6px #fff;
          filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 
+         
+
          @for $row from 0 through 5 {
             @for $col from 0 through 2 {
                &[data-type='#{(($row * 3) + $col + 1)}'] {
@@ -41,6 +43,16 @@
          & > * {
             pointer-events: none;
             user-select: none;
+         }
+      }
+   }
+
+   &.bga-cards_selectable-card:not(.bga-cards_selected-card) {
+      .card-sides {
+         .front {
+            outline: 1px solid #000;
+            box-shadow: 0 0 5px 6px orange;
+            filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
          }
       }
    }

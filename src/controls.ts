@@ -35,6 +35,9 @@ class ResourceCounter {
          ) {
             this.onClick();
             this.counter.incValue(-1);
+            if (this.counter.getValue() == 0) {
+               this.disabled(true);
+            }
          }
       });
 
@@ -165,6 +168,10 @@ class ResourcePlaceholder {
       return this.resource;
    }
 
+   destroy(): void {
+      this.element.remove();
+   }
+
    reset(): void {
       this.resource = null;
       while (this.element.children.length > 0) {
@@ -183,6 +190,11 @@ interface ResourcePlaceholderLineStockSettings {
     * Restriction. Default: none
     */
    restriction?: 'none' | 'same' | 'different';
+
+   /**
+    * Is expandable, until count is reach. Default false
+    */
+   expandable?: boolean;
 }
 
 class ResourcePlaceholderLineStock implements IResourceLineStock {
@@ -191,17 +203,33 @@ class ResourcePlaceholderLineStock implements IResourceLineStock {
    constructor(
       private element: HTMLElement,
       private count: number,
-      settings?: ResourcePlaceholderLineStockSettings,
+      private settings?: ResourcePlaceholderLineStockSettings,
    ) {
       const restriction = settings?.restriction ?? 'none';
-      for (let index = 0; index < count; index++) {
-         this.placeholders.push(new ResourcePlaceholder(element));
-         if (restriction == 'same') {
-            element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
-         } else if (restriction == 'different') {
-            element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
+      if (settings.expandable ?? false) {
+         // Do nothing
+      } else {
+         for (let index = 0; index < count; index++) {
+            this.placeholders.push(new ResourcePlaceholder(element));
+            if (restriction == 'same') {
+               element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
+            } else if (restriction == 'different') {
+               element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
+            }
          }
       }
+   }
+
+   addPlaceholder() {
+      this.placeholders.push(new ResourcePlaceholder(this.element));
+   }
+
+   countPlaceholder(): number {
+      return this.placeholders.length;
+   }
+
+   isExpandable(): boolean {
+      return this.settings?.expandable ?? false;
    }
 
    add(resource: string) {
@@ -218,7 +246,12 @@ class ResourcePlaceholderLineStock implements IResourceLineStock {
    }
 
    reset() {
-      this.placeholders.forEach((p) => p.reset());
+      if (this.settings?.expandable ?? false) {
+         this.placeholders.forEach((p) => p.destroy());
+         this.placeholders = [];
+      } else {
+         this.placeholders.forEach((p) => p.reset());
+      }
    }
 }
 
@@ -241,5 +274,31 @@ class ResourceHelper {
    }
    static convertToInt(icons: string[]): number[] {
       return icons.map((type) => ICONS.indexOf(type) + 1);
+   }
+
+   static isRequirementMet(game: CreatureConforts, cost: { [type: string]: number }): boolean {
+      const { counters } = game.getPlayerPanel(game.getPlayerId());
+
+      for (const type of Object.keys(cost)) {
+         if (type !== '*' && counters[type].getValue() < cost[type]) {
+            return false;
+         }
+      }
+
+      if ('*' in cost) {
+         const total_goods = GOODS.map((type) => counters[type].getValue()).reduce(
+            (prev, curr) => prev + curr,
+            0,
+         );
+
+         const total_cost = Object.keys(cost)
+            .filter((type) => GOODS.indexOf(type) >= 0)
+            .map((type) => cost[type])
+            .reduce((prev, curr) => prev + curr, 0);
+
+         return total_goods >= total_cost;
+      }
+
+      return true;
    }
 }

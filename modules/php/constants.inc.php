@@ -60,6 +60,8 @@ const COIN = "coin";
 const STORY = "story";
 const LESSON_LEARNED = "lesson";
 
+const CARD = 'card';
+
 /**
  * Confort type
  */
@@ -99,3 +101,4 @@ const RULE_STRAIGHT = "STRAIGHT";
  */
 const VAR_FIRST_PLAYER = 'first_player';
 const VAR_RIVER_DIAL = 'river_dial';
+const VAR_SAVEPOINT_TRANSITION = 'savepoint_transition';
