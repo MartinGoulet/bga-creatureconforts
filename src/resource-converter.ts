@@ -112,7 +112,6 @@ class ResourceConverter {
       const handleResourceClick = (type: string) => {
          this.resources_give.add(type);
 
-         debugger;
          if (this.counter_reward) {
             if (this.from.length == 1) {
                this.counter_reward.incValue(1);
@@ -185,7 +184,6 @@ class ResourceConverter {
       }
       const element = document.getElementById('resource-converter-placeholder');
       const expandable = this.to[0] == '*' && this.to.length == 1 && this.times > 1;
-      debugger;
       this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to, {
          expandable,
       });

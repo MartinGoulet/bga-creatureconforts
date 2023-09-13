@@ -12,6 +12,10 @@ class TravelerManager extends CardManager<TravelerCard> {
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
+
+            this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+               this.game.modal.displayTraveler(card),
+            );
          },
          isCardVisible: (card) => 'type' in card,
          cardWidth: 212,

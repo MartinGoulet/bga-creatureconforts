@@ -30,6 +30,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'select-resources';
 @import 'resource-converter';
 @import 'log';
+@import 'modal';
 
 #game_play_area {
    #bga-zoom-wrapper {
@@ -142,7 +143,6 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 }
 
 #logs {
-
    .cc-icon {
       display: inline-block;
       background-size: 24px 24px;
@@ -164,4 +164,15 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
          text-align: center;
       }
    }
+}
+
+.help-marker {
+   position: absolute;
+   right: 0;
+   top: 0;
+   padding: 2px;
+   cursor: zoom-in !important;
+   pointer-events: initial !important;
+   user-select: initial !important;
+   font-size: 20px;
 }

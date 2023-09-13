@@ -14,6 +14,10 @@ class ConfortManager extends CardManager<ConfortCard> {
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
+
+            this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+               this.game.modal.displayConfort(card),
+            );
          },
          isCardVisible: (card) => 'type' in card,
          cardWidth: 110,

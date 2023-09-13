@@ -49,6 +49,7 @@
         "src/deck.ts",
         "src/dice.ts",
         "src/dice-helper.ts",
+        "src/modal.ts",
         "src/select-resources.ts",
         "src/resource-converter.ts",
         

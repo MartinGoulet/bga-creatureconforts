@@ -2015,10 +2015,12 @@ var CreatureConforts = (function () {
         this.notifManager = new NotificationManager(this);
         this.stateManager = new StateManager(this);
         this.tableCenter = new TableCenter(this);
+        this.modal = new Modal(this);
         ['red', 'yellow', 'green', 'gray', 'purple'].forEach(function (color) {
             _this.dontPreloadImage("board_".concat(color, ".jpg"));
             _this.dontPreloadImage("dice_".concat(color, ".jpg"));
         });
+        this.dontPreloadImage('improvements.jpg');
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         this.setupNotifications();
@@ -2067,6 +2069,16 @@ var CreatureConforts = (function () {
     };
     CreatureConforts.prototype.addActionButtonReset = function (parent, handle) {
         this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
+    };
+    CreatureConforts.prototype.addModalToCard = function (div, helpMarkerId, callback) {
+        if (!document.getElementById(helpMarkerId)) {
+            div.insertAdjacentHTML('afterbegin', "<div id=\"".concat(helpMarkerId, "\" class=\"help-marker\">\n                     <i class=\"fa fa-search\" style=\"color: white\"></i>\n                  </div>"));
+            document.getElementById(helpMarkerId).addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                callback();
+            });
+        }
     };
     CreatureConforts.prototype.createPlayerPanels = function (gamedatas) {
         var _this = this;
@@ -2819,6 +2831,78 @@ var DialRequirement = (function () {
     };
     return DialRequirement;
 }());
+var Modal = (function () {
+    function Modal(game) {
+        var _this = this;
+        this.game = game;
+        var display = document.getElementById('modal-display');
+        if (display) {
+            display.parentElement.removeChild(display);
+        }
+        var html = "<div id=\"modal-display\">\n         <div id=\"modal-display-card\"></div>\n        </div>";
+        var elBody = document.getElementById('ebd-body');
+        elBody.insertAdjacentHTML('beforeend', html);
+        var handleKeyboard = function (ev) {
+            if (elBody.classList.contains('modal_open')) {
+                if (ev.key == 'Escape') {
+                    _this.close();
+                }
+            }
+        };
+        document.getElementById('modal-display').addEventListener('click', function () { return _this.close(); });
+        elBody.addEventListener('keydown', handleKeyboard);
+    }
+    Modal.prototype.displayImprovement = function (card) {
+        var front = this.addDivCard('improvement');
+        front.dataset.type = card.type;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayTraveler = function (card) {
+        var front = this.addDivCard('traveler');
+        front.dataset.type = card.type;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayValley = function (card) {
+        var front = this.addDivCard('valley');
+        front.parentElement.parentElement.classList.add(card.location);
+        front.dataset.type = card.type;
+        front.dataset.image_pos = '' + this.game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayConfort = function (card) {
+        var front = this.addDivCard('confort');
+        front.dataset.type = card.type;
+        front.dataset.pos = card.type_arg;
+        front.classList.toggle('background_1', Number(card.type) <= 12);
+        front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
+        this.adjustPosition();
+    };
+    Modal.prototype.addDivCard = function (type) {
+        var _a;
+        var html = "<div id=\"modal-card\" class=\"card ".concat(type, "\">\n         <div class=\"card-sides\">\n            <div id=\"modal-card-front\" class=\"card-side front\"></div>\n         </div>\n      </div>");
+        (_a = document.getElementById('modal-card')) === null || _a === void 0 ? void 0 : _a.remove();
+        document.getElementById('modal-display-card').insertAdjacentHTML('beforeend', html);
+        return document.getElementById('modal-card-front');
+    };
+    Modal.prototype.adjustPosition = function () {
+        var scrollY = window.scrollY;
+        var body = document.getElementById('ebd-body');
+        body.classList.toggle('modal_open', true);
+        body.style.top = "-".concat(scrollY, "px");
+        var display = document.getElementById('modal-display');
+        display.style.top = "".concat(scrollY, "px");
+    };
+    Modal.prototype.close = function () {
+        var body = document.getElementById('ebd-body');
+        body.classList.toggle('modal_open', false);
+        body.style.top = "";
+        var display = document.getElementById('modal-display');
+        var scrollY = Number(display.style.top.replace('px', ''));
+        display.style.top = "".concat(scrollY, "px");
+        window.scroll(0, scrollY);
+    };
+    return Modal;
+}());
 var SelectResources = (function () {
     function SelectResources(game, player_id) {
         var _this = this;
@@ -2974,7 +3058,6 @@ var ResourceConverter = (function () {
         var handleResourceClick = function (type) {
             var _a, _b, _c, _d;
             _this.resources_give.add(type);
-            debugger;
             if (_this.counter_reward) {
                 if (_this.from.length == 1) {
                     _this.counter_reward.incValue(1);
@@ -3043,7 +3126,6 @@ var ResourceConverter = (function () {
         }
         var element = document.getElementById('resource-converter-placeholder');
         var expandable = this.to[0] == '*' && this.to.length == 1 && this.times > 1;
-        debugger;
         this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to, {
             expandable: expandable,
         });
@@ -4053,6 +4135,9 @@ var ConfortManager = (function (_super) {
                 div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
                 if (card.type_arg) {
                 }
+                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                    return _this.game.modal.displayConfort(card);
+                });
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 110,
@@ -4085,6 +4170,9 @@ var ImprovementManager = (function (_super) {
                 div.dataset.pos = card.type_arg;
                 if (card.type_arg) {
                 }
+                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                    return _this.game.modal.displayImprovement(card);
+                });
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 125,
@@ -4112,6 +4200,9 @@ var TravelerManager = (function (_super) {
                 div.dataset.pos = card.type_arg;
                 if (card.type_arg) {
                 }
+                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                    return _this.game.modal.displayTraveler(card);
+                });
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 212,
@@ -4137,6 +4228,9 @@ var ValleyManager = (function (_super) {
                 div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
                 if (card.type_arg) {
                 }
+                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                    return _this.game.modal.displayValley(card);
+                });
             },
             isCardVisible: function () { return true; },
             cardWidth: 250,

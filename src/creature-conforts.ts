@@ -55,6 +55,8 @@ class CreatureConforts
    public playersTables: PlayerTable[];
    // public zoomManager: ZoomManager;
 
+   public modal: Modal;
+
    constructor() {}
 
    /*
@@ -85,11 +87,14 @@ class CreatureConforts
       this.stateManager = new StateManager(this);
 
       this.tableCenter = new TableCenter(this);
+      this.modal = new Modal(this);
 
       ['red', 'yellow', 'green', 'gray', 'purple'].forEach((color) => {
          this.dontPreloadImage(`board_${color}.jpg`);
          this.dontPreloadImage(`dice_${color}.jpg`);
       });
+
+      this.dontPreloadImage('improvements.jpg');
 
       // Setting up player boards
       this.createPlayerPanels(gamedatas);
@@ -179,6 +184,23 @@ class CreatureConforts
 
    public addActionButtonReset(parent: string, handle: () => void) {
       this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
+   }
+
+   public addModalToCard(div: HTMLElement, helpMarkerId: string, callback: () => void) {
+      if (!document.getElementById(helpMarkerId)) {
+         div.insertAdjacentHTML(
+            'afterbegin',
+            `<div id="${helpMarkerId}" class="help-marker">
+                     <i class="fa fa-search" style="color: white"></i>
+                  </div>`,
+         );
+
+         document.getElementById(helpMarkerId).addEventListener('click', (evt) => {
+            evt.stopPropagation();
+            evt.preventDefault();
+            callback();
+         });
+      }
    }
 
    private createPlayerPanels(gamedatas: CreatureConfortsGamedatas) {

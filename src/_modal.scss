@@ -1,0 +1,113 @@
+.modal_open {
+   height: 100vh;
+   width: 100vw;
+   overflow-y: hidden;
+   position: fixed;
+
+   #modal-display {
+      display: flex;
+   }
+}
+
+#modal-display {
+   display: none;
+   flex-direction: column;
+   position: absolute;
+   left: 0;
+   top: 0;
+   right: 0;
+   height: 100vh;
+   background-color: rgba(0, 0, 0, 0.867);
+   z-index: 10000;
+   justify-content: center;
+   align-items: center;
+   --width: 300px;
+   --height: 420px;
+
+   #modal-display-close {
+      color: white;
+      font-size: 32px;
+      margin-left: 320px;
+      z-index: 100;
+      margin-top: -450px;
+      position: absolute;
+   }
+
+}
+
+.desktop_version.modal_open {
+   #modal-display-card {
+      .card.improvement {
+         width: 500px;
+         height: 500px;
+
+         .front {
+            background-size: 1500px 3000px;
+         }
+      }
+
+      .card.traveler {
+         width: 750px;
+         height: 500px;
+
+         .front {
+            background-size: 3750px 1500px;
+         }
+      }
+
+      .card.valley {
+         width: 750px;
+         height: 378px;
+
+         .front {
+            background-size: 3000px 756px;
+         }
+      }
+
+      .card.confort {
+         width: 375px;
+         height: 500px;
+
+         .front {
+            background-size: 2250px 3000px;
+            outline: 1px solid #000;
+            box-shadow: 0 0 5px 6px #fff;
+            filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+         }
+      }
+   }
+}
+
+.mobile_version.modal_open {
+   #modal-display-card {
+      .card.improvement {
+         width: 250px;
+         height: 250px;
+
+         .front {
+            background-size: 750px 1500px;
+         }
+      }
+
+      .card.traveler {
+         width: 300px;
+         height: 200px;
+
+         .front {
+            background-size: 1500px 600px;
+         }
+      }
+
+      .card.confort {
+         width: 250px;
+         height: 350px;
+
+         .front {
+            background-size: 1500px 2100px;
+            outline: 1px solid #000;
+            box-shadow: 0 0 5px 6px #fff;
+            filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+         }
+      }
+   }
+}

@@ -14,6 +14,10 @@ class ValleyManager extends CardManager<ValleyCard> {
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
+
+            this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+               this.game.modal.displayValley(card),
+            );
          },
          isCardVisible: () => true,
          cardWidth: 250,

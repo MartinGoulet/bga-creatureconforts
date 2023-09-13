@@ -12,6 +12,10 @@ class ImprovementManager extends CardManager<ImprovementCard> {
             if (card.type_arg) {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
+
+            this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+               this.game.modal.displayImprovement(card),
+            );
          },
          isCardVisible: (card) => 'type' in card,
          cardWidth: 125,
