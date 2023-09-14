@@ -15,9 +15,11 @@ class ImprovementManager extends CardManager<ImprovementCard> {
                //    game.setTooltip(div.id, this.getTooltip(card));
             }
 
-            this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
-               this.game.modal.displayImprovement(card),
-            );
+            if ('type' in card) {
+               this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+                  this.game.modal.displayImprovement(card),
+               );
+            }
 
             if (!document.getElementById(`${this.getId(card)}-slot-cottage`)) {
                div.insertAdjacentHTML(

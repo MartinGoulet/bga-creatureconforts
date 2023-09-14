@@ -186,7 +186,7 @@ class NotificationManager {
       await this.game.getPlayerTable(player_id).hand.addCard(card);
    }
 
-   private async notif_onBuildImprovement({ player_id, card, cottage }: BuildImprovementArgs) {
+   private async notif_onBuildImprovement({ player_id, card, cost, cottage }: BuildImprovementArgs) {
       if (card.location == 'board') {
          await this.game.getPlayerTable(player_id).improvements.addCard(card);
       } else {
@@ -194,6 +194,13 @@ class NotificationManager {
       }
 
       await this.game.improvementManager.addCottage(card, cottage);
+
+      const counters = this.game.getPlayerPanel(player_id).counters;
+
+      Object.keys(cost).forEach((type) => {
+         const value = -cost[type];
+         counters[type].incValue(value);
+      });
    }
 
    private animationMoveResource(
@@ -294,4 +301,5 @@ interface BuildImprovementArgs {
    player_id: number;
    card: ImprovementCard;
    cottage: CottageCard;
+   cost: { [type: string]: number }[];
 }

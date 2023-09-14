@@ -3430,8 +3430,9 @@ var NotificationManager = (function () {
         });
     };
     NotificationManager.prototype.notif_onBuildImprovement = function (_a) {
-        var player_id = _a.player_id, card = _a.card, cottage = _a.cottage;
+        var player_id = _a.player_id, card = _a.card, cost = _a.cost, cottage = _a.cottage;
         return __awaiter(this, void 0, void 0, function () {
+            var counters;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -3447,6 +3448,11 @@ var NotificationManager = (function () {
                     case 4: return [4, this.game.improvementManager.addCottage(card, cottage)];
                     case 5:
                         _b.sent();
+                        counters = this.game.getPlayerPanel(player_id).counters;
+                        Object.keys(cost).forEach(function (type) {
+                            var value = -cost[type];
+                            counters[type].incValue(value);
+                        });
                         return [2];
                 }
             });
@@ -4140,7 +4146,7 @@ var ResolveWorkshopState = (function () {
         var _a = this.game.tableCenter, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations, market = _a.improvement_market;
         worker_locations.setSelectableLocation([10]);
         worker_locations.setSelectedLocation([10]);
-        var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
+        var die = dice_locations.getDice().find(function (die) { return die.location == 10; });
         market.setSelectionMode('single');
         market.setSelectableCards(market.getCards().filter(function (card) {
             if (Number(card.location_arg) > die.face)
@@ -4190,9 +4196,11 @@ var ConfortManager = (function (_super) {
                 div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
                 if (card.type_arg) {
                 }
-                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                    return _this.game.modal.displayConfort(card);
-                });
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayConfort(card);
+                    });
+                }
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 110,
@@ -4225,9 +4233,11 @@ var ImprovementManager = (function (_super) {
                 div.dataset.pos = card.type_arg;
                 if (card.type_arg) {
                 }
-                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                    return _this.game.modal.displayImprovement(card);
-                });
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayImprovement(card);
+                    });
+                }
                 if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage"))) {
                     div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
                     _this.cottages[card.id] = new LineStock(_this.game.cottageManager, document.getElementById("".concat(_this.getId(card), "-slot-cottage")));
@@ -4267,9 +4277,11 @@ var TravelerManager = (function (_super) {
                 div.dataset.pos = card.type_arg;
                 if (card.type_arg) {
                 }
-                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                    return _this.game.modal.displayTraveler(card);
-                });
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayTraveler(card);
+                    });
+                }
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 212,
@@ -4295,9 +4307,11 @@ var ValleyManager = (function (_super) {
                 div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
                 if (card.type_arg) {
                 }
-                _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                    return _this.game.modal.displayValley(card);
-                });
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayValley(card);
+                    });
+                }
             },
             isCardVisible: function () { return true; },
             cardWidth: 250,

@@ -65,7 +65,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       align-items: center;
       flex-wrap: wrap;
       flex-grow: 1;
-      // flex-direction: column;
+      flex-direction: column;
       gap: 20px;
    }
 

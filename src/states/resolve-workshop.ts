@@ -6,7 +6,7 @@ class ResolveWorkshopState implements StateHandler {
       worker_locations.setSelectableLocation([10]);
       worker_locations.setSelectedLocation([10]);
 
-      const die = dice_locations.getDice().find((die: Dice) => die.location == 9);
+      const die = dice_locations.getDice().find((die: Dice) => die.location == 10);
 
       market.setSelectionMode('single');
       market.setSelectableCards(

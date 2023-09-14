@@ -490,62 +490,50 @@ body > .bga-dice_die {
 #table-center-wrapper #board #worker-locations [data-slot-id="1"] {
   top: 98px;
   left: 85px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="2"] {
   top: 98px;
   left: 241px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="3"] {
   top: 98px;
   left: 427px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="4"] {
   top: 98px;
   left: 583px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="5"] {
   top: 202px;
   left: 592px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="6"] {
   top: 345px;
   left: 624px;
-  clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="7"] {
   top: 291px;
   left: 438px;
-  clip-path: polygon(-10% -10%, 80% -10%, 80% 100%, -10% 150%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="8"] {
   top: 472px;
   left: 462px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="9"] {
   top: 576px;
   left: 279px;
-  clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -60% 80%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="10"] {
   top: 802px;
   left: 83px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="11"] {
   top: 749px;
   left: 295px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
 }
 #table-center-wrapper #board #worker-locations [data-slot-id="12"] {
   top: 749px;
   left: 457px;
-  clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
 }
 #table-center-wrapper #board #dice-locations {
   position: relative;
@@ -628,6 +616,8 @@ body > .bga-dice_die {
   background-size: cover;
   top: 265px;
   left: 514px;
+  box-shadow: 0 0 5px 4px #fff;
+  border-radius: 50%;
 }
 #table-center-wrapper #board #river-dial[data-position="1"] {
   transform: rotate(-240deg);
@@ -674,9 +664,18 @@ body > .bga-dice_die {
   zoom: 0.8;
 }
 
+.gamestate_placement .slot.selectable {
+  animation: none !important;
+}
+.gamestate_placement .slot.selectable:hover {
+  animation: pulseSelectable 1s infinite alternate !important;
+}
 .gamestate_placement .slot.selected {
   animation: none !important;
   box-shadow: 0 0 5px 5px orange !important;
+}
+.gamestate_placement #worker-locations .slot .card.worker {
+  zoom: unset !important;
 }
 
 .resource-icon {
@@ -758,13 +757,11 @@ body > .bga-dice_die {
   width: 100%;
   padding: 10px 0 30px;
   border-radius: 8px;
-  position: relative;
   border: 4px solid var(--player-color);
   background-color: hsla(0, 0%, 100%, 0.4);
 }
 .player-table .name-wrapper {
   color: var(--player-color);
-  position: relative;
   display: flex;
   padding: 5px 5px 20px;
   justify-content: center;
@@ -781,6 +778,7 @@ body > .bga-dice_die {
 .player-table .cols .col {
   display: flex;
   flex-direction: column;
+  row-gap: 20px;
 }
 .player-table .title {
   color: var(--color);
@@ -813,8 +811,8 @@ body > .bga-dice_die {
   top: 167px;
   left: 6px;
 }
-.player-table .hand-stock {
-  padding: 20px 0;
+.player-table .player-table-improvement, .player-table .player-table-confort {
+  max-width: 515px;
 }
 .player-table .icons.counters .wrapper {
   zoom: 1.5;
@@ -1076,6 +1074,9 @@ body > .bga-dice_die {
 .card.confort .card-sides .front > * {
   pointer-events: none;
   user-select: none;
+}
+.card.confort .help-marker {
+  top: 17px;
 }
 
 .white-border .card.confort .card-sides .front {
@@ -1458,12 +1459,29 @@ body > .bga-dice_die {
   margin: 0 5px;
   vertical-align: middle;
   border-radius: 5px;
+  border: 1px solid black;
 }
 .dice-icon-log > span {
   display: none;
 }
-.dice-icon-log.colored-die[data-color=white] {
-  border: 1px solid black;
+.dice-icon-log[data-face="1"] {
+  background-position: 0% -100%;
+  transform: rotate(90deg);
+}
+.dice-icon-log[data-face="2"] {
+  background-position: 0% 0%;
+}
+.dice-icon-log[data-face="3"] {
+  background-position: -100% -100%;
+}
+.dice-icon-log[data-face="4"] {
+  background-position: -100% 0%;
+}
+.dice-icon-log[data-face="5"] {
+  background-position: -200% 0%;
+}
+.dice-icon-log[data-face="6"] {
+  background-position: -200% -100%;
 }
 
 .card.worker {
@@ -1802,6 +1820,7 @@ body > .bga-dice_die {
   align-items: center;
   flex-wrap: wrap;
   flex-grow: 1;
+  flex-direction: column;
   gap: 20px;
 }
 

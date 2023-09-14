@@ -35,6 +35,7 @@ class Cottages {
     }
 
     static function setupNewGame($players, $options) {
+        $players = Game::get()->loadPlayersBasicInfos();
         foreach ($players as $player_id => $player) {
             self::deck()->createCards([
                 ['type' => $player['player_color'], 'type_arg' => $player_id, 'nbr' => 4]

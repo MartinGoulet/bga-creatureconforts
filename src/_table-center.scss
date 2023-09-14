@@ -97,65 +97,66 @@
          [data-slot-id='1'] {
             top: 98px;
             left: 85px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='2'] {
             top: 98px;
             left: 241px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='3'] {
             top: 98px;
             left: 427px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
          [data-slot-id='4'] {
             top: 98px;
             left: 583px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
 
          [data-slot-id='5'] {
             top: 202px;
             left: 592px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%);
          }
          [data-slot-id='6'] {
             top: 345px;
             left: 624px;
-            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%);
+            // clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%);
          }
          [data-slot-id='7'] {
             top: 291px;
             left: 438px;
-            clip-path: polygon(-10% -10%, 80% -10%, 80% 100%, -10% 150%);
+            // clip-path: polygon(-10% -10%, 80% -10%, 80% 100%, -10% 150%);
          }
 
          [data-slot-id='8'] {
             top: 472px;
             left: 462px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
+
          [data-slot-id='9'] {
             top: 576px;
             left: 279px;
-            clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -60% 80%);
+            // clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -60% 80%);
          }
 
          [data-slot-id='10'] {
             top: 802px;
             left: 83px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
          [data-slot-id='11'] {
             top: 749px;
             left: 295px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
          [data-slot-id='12'] {
             top: 749px;
             left: 457px;
-            clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
+            // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
       }
 
@@ -247,6 +248,8 @@
          background-size: cover;
          top: 265px;
          left: 514px;
+         box-shadow: 0 0 5px 4px #fff;
+         border-radius: 50%;
 
          @for $pos from 0 through 5 {
             &[data-position='#{$pos + 1}'] {
@@ -293,8 +296,23 @@
 }
 
 .gamestate_placement {
+   .slot.selectable {
+      animation: none !important;
+      &:hover {
+         animation: pulseSelectable 1s infinite alternate !important;
+         // box-shadow: 0 0 5px 5px orange !important;
+      }
+   }
    .slot.selected {
       animation: none !important;
       box-shadow: 0 0 5px 5px orange !important;
+   }
+
+   #worker-locations {
+      .slot {
+         .card.worker {
+            zoom: unset !important;
+         }
+      }
    }
 }

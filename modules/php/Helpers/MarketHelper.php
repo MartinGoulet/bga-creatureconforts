@@ -15,6 +15,7 @@ class MarketHelper {
         $group2 = ResourcesHelper::groupByType($resources2);
 
         if (!Players::hasEnoughResource($player_id, $group)) {
+            var_dump($group);
             throw new BgaUserException("You dont have those resources");
         }
 

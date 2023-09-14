@@ -27,17 +27,17 @@ class DiceHelper {
             // Get requirement
             $requirement = self::getValleyRequirement($info);
             $result = $requirement->isRequirementMet(self::getDiceValue($dice_ids));
-            if(!$result) {
-                var_dump($result['values']);
-                var_dump(self::getDiceValue($dice_ids));
-            }
+            // if(!$result) {
+            //     var_dump($result['values']);
+            //     var_dump(self::getDiceValue($dice_ids));
+            // }
+            return $result;
         } else if ($location_id >= 5 && $location_id <= 7) {
             $requirement = new DialRequirement(Globals::getRiverDialValue(), $location_id);
             return $requirement->isRequirementMet(self::getDiceValue($dice_ids));
         }
 
         return true;
-
     }
 
     private static function getDiceValue($dice_ids) {
@@ -152,7 +152,9 @@ class AllOddRequirement implements DiceRequirement {
 class StraightRequirement implements DiceRequirement {
     function isRequirementMet(array $values): bool {
         for ($i = 1; $i < count($values); $i++) {
-            if ($values[$i] !== $values[$i - 1] + 1) return false;
+            if (intval($values[$i]) !== intval($values[$i - 1]) + 1) {
+                return false;
+            }
         }
         return true;
     }
@@ -172,18 +174,21 @@ class DialRequirement implements DiceRequirement {
     function isRequirementMet(array $values): bool {
         $dieValue = intval($values[0]);
 
+        $next_value = [
+            1 => 2, 2 => 3, 3 => 4, 4 => 5, 5 => 6, 6 => 1, 
+            7 => 2, 8 => 3, 9 => 4, 10 => 5, 11 => 6, 12 => 1
+        ];
+
         switch ($this->location_id) {
             case 5:
                 return $dieValue == $this->dial;
             case 6:
-                $baseValue = ($this->dial + 1) % 6;
-                return $dieValue == $baseValue
-                    || $dieValue == $baseValue + 1;
+                return $dieValue == $next_value[$this->dial]
+                    || $dieValue == $next_value[$this->dial + 1];
             case 7:
-                $baseValue = ($this->dial + 3) % 6;
-                return $dieValue == $baseValue
-                    || $dieValue == $baseValue + 1
-                    || $dieValue == $baseValue + 2;
+                return $dieValue == $next_value[$this->dial + 2]
+                    || $dieValue == $next_value[$this->dial + 3]
+                    || $dieValue == $next_value[$this->dial + 4];
             default:
                 return false;
         }
