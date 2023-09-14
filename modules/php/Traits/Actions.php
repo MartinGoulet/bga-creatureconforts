@@ -10,6 +10,7 @@ use CreatureConforts\Helpers\DiceHelper;
 use CreatureConforts\Helpers\MarketHelper;
 use CreatureConforts\Helpers\ResourcesHelper;
 use CreatureConforts\Helpers\TravelerHelper;
+use CreatureConforts\Helpers\WorkshopHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Players;
@@ -149,6 +150,14 @@ trait Actions {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             TravelerHelper::resolve($die, $converted_resources);
+            $this->resolveWorkerNextStep();
+            return;
+        }
+
+        if ($location_id == 10) {
+            $die = array_shift($dice);
+            $converted_resources = ResourcesHelper::convertNumberToResource($resources);
+            WorkshopHelper::resolve(intval($die['face']),intval(array_shift($resources)));
             $this->resolveWorkerNextStep();
             return;
         }

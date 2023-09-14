@@ -32,6 +32,25 @@
             pointer-events: none;
             user-select: none;
          }
+
+         .slot-cottage {
+            position: absolute;
+            top: 36px;
+            right: 5px;
+            width: 27px;
+            height: 27px;
+
+            &:not(:empty) {
+               outline: 1px solid #000;
+               background: #ffffff66;
+            }
+            
+            .front {
+               border-radius: 0;
+               box-shadow: none;
+               filter: none;
+            }
+         }
       }
    }
 

@@ -5,11 +5,13 @@ namespace CreatureConforts\Managers;
 use CreatureConforts\Core\Game;
 
 const LADDER = 'slot';
+const GLADE = 'glade';
+
 
 /*
  * Cards manager : allows to easily access card
  */
-class Improvements {
+class Improvements extends \APP_DbObject {
 
     static function setupNewGame() {
         $cards = [];
@@ -26,14 +28,34 @@ class Improvements {
     }
 
     static function getUIData() {
-        return [
+        $result = [
             'discard' => [
                 'topCard' => self::deck()->getCardOnTop('discard'),
                 'count' => self::deck()->countCardInLocation('discard'),
             ],
             'deckCount' => self::deck()->countCardInLocation('deck'),
             'market' => array_values(self::deck()->getCardsInLocation(LADDER, null, 'location_arg')),
+            'glade' => array_values(self::getGlade()),
+            'players' => [],
         ];
+
+        $players = Game::get()->loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $result['players'][$player_id] = self::getPlayerBoard($player_id);
+        }
+
+        return $result;
+    }
+
+    static function addToGlade($card, int $player_id) {
+        $cards = self::getGlade();
+        $position = 20 + sizeof($cards);
+        $id = $card['id'];
+        self::deck()->moveCard($card['id'], 'glade', $position);
+    }
+
+    static function addToPlayerBoard($card, int $player_id) {
+        self::deck()->moveCard($card['id'], 'board', $player_id);
     }
 
     static function discardBottomLadder() {
@@ -46,8 +68,35 @@ class Improvements {
         return $deck->getCard($bottomCard['id']);
     }
 
+    static function get(int $card_id) {
+        return self::deck()->getCard($card_id);
+    }
+
+    static function getCardType($card) {
+        return Game::get()->improvement_types[$card['type']];
+    }
+
+    static function getName($card) {
+        $card_type = Game::get()->improvement_types[$card['type']];
+        return $card_type['name'];
+    }
+
+    static function getGlade() {
+        return self::deck()->getCardsInLocation('glade', null, 'card_location');
+    }
+
     static function getLadder() {
-        return array_values(self::deck()->getCardsInLocation('slot', null, 'location_arg'));
+        return array_values(self::deck()->getCardsInLocation(LADDER, null, 'location_arg'));
+    }
+
+    static function getFromLadder($position) {
+        $cards = self::deck()->getCardsInLocation(LADDER, $position);
+        return array_shift($cards);
+    }
+
+    static function getPlayerBoard($player_id) {
+        $cards = self::deck()->getCardsInLocation('board', $player_id);
+        return array_values($cards);
     }
 
     static function refillLadder() {
@@ -63,7 +112,7 @@ class Improvements {
             }
         }
 
-        $slot = $deck->getCardsInLocation('slot', 6);
+        $slot = $deck->getCardsInLocation(LADDER, 6);
         $next_card = array_shift($slot);
         $deck->moveCard($next_card['id'], LADDER, 5);
         $deck->pickCardForLocation('deck', LADDER, 6);
@@ -72,5 +121,4 @@ class Improvements {
     private static function deck() {
         return Game::get()->improvements;
     }
-
 }

@@ -1,82 +1,88 @@
-// .bga-dice_die-face {
-//    background-size: 300% 200%;
-// }
-
-// .bga-dice_die .bga-dice_die-face[data-face='1'] {
-//    background-position: 0% -92%;
-// }
-// .bga-dice_die .bga-dice_die-face[data-face='2'] {
-//    background-position: 0% 0%;
-// }
-// .bga-dice_die .bga-dice_die-face[data-face='3'] {
-//    background-position: -100% -100%;
-// }
-// .bga-dice_die .bga-dice_die-face[data-face='4'] {
-//    background-position: -100% 0%;
-// }
-// .bga-dice_die .bga-dice_die-face[data-face='5'] {
-//    background-position: -200% 0%;
-// }
-// .bga-dice_die .bga-dice_die-face[data-face='6'] {
-//    background-position: -200% -100%;
-// }
-
-// @each $playerColor in $playerColorNames {
-//    .colored-die[data-color='#{$playerColor}'] .bga-dice_die-face {
-//       background-image: url('img/dice_#{$playerColor}.jpg');
-//    }
-// }
-
-// .bga-dice_die6 .bga-dice_die-faces[data-visible-face='1'] {
-//    transform: rotate3d(1, 1, 1, 0deg) rotate(90deg);
-// }
-
-// .bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face='1'] {
-//    transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
-// }
-
 .bga-dice_die-face {
-   background-size: 600% 800%;
-   background-image: url('img/agk_spritesheet_dice1.png');
+   background-size: 300% 200%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face='1'] {
-   background-position-x: -0%;
+   background-position: 0% -92%;
 }
 .bga-dice_die .bga-dice_die-face[data-face='2'] {
-   background-position-x: -100%;
+   background-position: 0% 0%;
 }
 .bga-dice_die .bga-dice_die-face[data-face='3'] {
-   background-position-x: -200%;
+   background-position: -100% -100%;
 }
 .bga-dice_die .bga-dice_die-face[data-face='4'] {
-   background-position-x: -300%;
+   background-position: -100% 0%;
 }
 .bga-dice_die .bga-dice_die-face[data-face='5'] {
-   background-position-x: -400%;
+   background-position: -200% 0%;
 }
 .bga-dice_die .bga-dice_die-face[data-face='6'] {
-   background-position-x: -500%;
+   background-position: -200% -100%;
 }
 
-.colored-die[data-color='yellow'] .bga-dice_die-face {
-   background-position-y: -300%;
+@each $playerColor in $playerColorNames {
+   .colored-die[data-color='#{$playerColor}'] .bga-dice_die-face,
+   .colored-die[data-color='#{$playerColor}'].bga-dice_die-face {
+      background-image: url('img/dice_#{$playerColor}.jpg');
+   }
 }
-.colored-die[data-color='green'] .bga-dice_die-face {
-   background-position-y: -500%;
+
+.colored-die[data-color='white'] .bga-dice_die-face,
+.colored-die[data-color='white'].bga-dice_die-face {
+   background-image: url('img/dice_white.jpg');
 }
-.colored-die[data-color='gray'] .bga-dice_die-face {
-   background-position-y: -0%;
+
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face='1'] {
+   transform: rotate3d(1, 1, 1, 0deg) rotate(90deg);
 }
-.colored-die[data-color='red'] .bga-dice_die-face {
-   background-position-y: -100%;
+
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face='1'] {
+   transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
 }
-.colored-die[data-color='purple'] .bga-dice_die-face {
-   background-position-y: -600%;
-}
-.colored-die[data-color='white'] .bga-dice_die-face {
-   background-position-y: -700%;
-}
+
+// // .bga-dice_die-face {
+// //    background-size: 600% 800%;
+// //    background-image: url('img/agk_spritesheet_dice1.png');
+// // }
+
+// // .bga-dice_die .bga-dice_die-face[data-face='1'] {
+// //    background-position-x: -0%;
+// // }
+// // .bga-dice_die .bga-dice_die-face[data-face='2'] {
+// //    background-position-x: -100%;
+// // }
+// // .bga-dice_die .bga-dice_die-face[data-face='3'] {
+// //    background-position-x: -200%;
+// // }
+// // .bga-dice_die .bga-dice_die-face[data-face='4'] {
+// //    background-position-x: -300%;
+// // }
+// // .bga-dice_die .bga-dice_die-face[data-face='5'] {
+// //    background-position-x: -400%;
+// // }
+// // .bga-dice_die .bga-dice_die-face[data-face='6'] {
+// //    background-position-x: -500%;
+// // }
+
+// // .colored-die[data-color='yellow'] .bga-dice_die-face {
+// //    background-position-y: -300%;
+// // }
+// // .colored-die[data-color='green'] .bga-dice_die-face {
+// //    background-position-y: -500%;
+// // }
+// // .colored-die[data-color='gray'] .bga-dice_die-face {
+// //    background-position-y: -0%;
+// // }
+// // .colored-die[data-color='red'] .bga-dice_die-face {
+// //    background-position-y: -100%;
+// // }
+// // .colored-die[data-color='purple'] .bga-dice_die-face {
+// //    background-position-y: -600%;
+// // }
+// // .colored-die[data-color='white'] .bga-dice_die-face {
+// //    background-position-y: -700%;
+// // }
 
 .dice-icon-log {
    width: 25px;
@@ -84,46 +90,51 @@
    display: inline-block;
    margin: 0 5px;
    vertical-align: middle;
-   
+   border-radius: 5px;
+
    > span {
       display: none;
    }
 
-   &.colored-die[data-color='yellow'] {
-      background-position-y: -300%;
-   }
-   &.colored-die[data-color='green'] {
-      background-position-y: -500%;
-   }
-   &.colored-die[data-color='gray'] {
-      background-position-y: -0%;
-   }
-   &.colored-die[data-color='red'] {
-      background-position-y: -100%;
-   }
-   &.colored-die[data-color='purple'] {
-      background-position-y: -600%;
-   }
    &.colored-die[data-color='white'] {
-      background-position-y: -700%;
+      border: 1px solid black;
    }
 
-   &.bga-dice_die-face[data-face='1'] {
-      background-position-x: -0%;
-   }
-   &.bga-dice_die-face[data-face='2'] {
-      background-position-x: -100%;
-   }
-   &.bga-dice_die-face[data-face='3'] {
-      background-position-x: -200%;
-   }
-   &.bga-dice_die-face[data-face='4'] {
-      background-position-x: -300%;
-   }
-   &.bga-dice_die-face[data-face='5'] {
-      background-position-x: -400%;
-   }
-   &.bga-dice_die-face[data-face='6'] {
-      background-position-x: -500%;
-   }
+   // &.colored-die[data-color='yellow'] {
+   //    background-position-y: -300%;
+   // }
+   // &.colored-die[data-color='green'] {
+   //    background-position-y: -500%;
+   // }
+   // &.colored-die[data-color='gray'] {
+   //    background-position-y: -0%;
+   // }
+   // &.colored-die[data-color='red'] {
+   //    background-position-y: -100%;
+   // }
+   // &.colored-die[data-color='purple'] {
+   //    background-position-y: -600%;
+   // }
+   // &.colored-die[data-color='white'] {
+   //    background-position-y: -700%;
+   // }
+
+   // &.bga-dice_die-face[data-face='1'] {
+   //    background-position-x: -0%;
+   // }
+   // &.bga-dice_die-face[data-face='2'] {
+   //    background-position-x: -100%;
+   // }
+   // &.bga-dice_die-face[data-face='3'] {
+   //    background-position-x: -200%;
+   // }
+   // &.bga-dice_die-face[data-face='4'] {
+   //    background-position-x: -300%;
+   // }
+   // &.bga-dice_die-face[data-face='5'] {
+   //    background-position-x: -400%;
+   // }
+   // &.bga-dice_die-face[data-face='6'] {
+   //    background-position-x: -500%;
+   // }
 }

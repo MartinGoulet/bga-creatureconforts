@@ -17,9 +17,8 @@
  *
  */
 
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Cottages;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Improvements;
 use CreatureConforts\Managers\Players;
@@ -54,6 +53,8 @@ class CreatureConforts extends Table {
     public $improvements;
     /** @var Deck */
     public $conforts;
+    /** @var Deck */
+    public $cottages;
     /** @var Deck */
     public $travelers;
     /** @var Deck */
@@ -104,6 +105,9 @@ class CreatureConforts extends Table {
         $this->conforts = self::getNew("module.common.deck");
         $this->conforts->init("confort");
 
+        $this->cottages = self::getNew("module.common.deck");
+        $this->cottages->init("cottage");
+
         $this->improvements = self::getNew("module.common.deck");
         $this->improvements->init("improvement");
 
@@ -136,6 +140,7 @@ class CreatureConforts extends Table {
     protected function setupNewGame($players, $options = array()) {
         Players::setupNewGame($players, $options);
         Conforts::setupNewGame($players, $options);
+        Cottages::setupNewGame($players, $options);
         Improvements::setupNewGame();
         Travelers::setupNewGame();
         Valleys::setupNewGame($options);
@@ -174,12 +179,14 @@ class CreatureConforts extends Table {
         $result['dice'] = Dice::getUIData();
 
         $result['conforts'] = Conforts::getUIData($current_player_id);
+        $result['cottages'] = Cottages::getUIData();
         $result['improvements'] = Improvements::getUIData();
         $result['travelers'] = Travelers::getUIData();
         $result['valleys'] = Valleys::getUIData();
         $result['workers'] = Worker::getUIData();
 
         $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
+        $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
 
         return $result;
     }

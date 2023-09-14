@@ -21,6 +21,13 @@
       }
    }
 
+   #glade {
+      padding-bottom: 20px;
+      &:empty {
+         padding-bottom: 0;
+      }
+   }
+
    #board {
       position: relative;
       background-image: url('img/gametable.jpg');

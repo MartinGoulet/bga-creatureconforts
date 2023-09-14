@@ -19,6 +19,7 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
 
    dice: Dice[];
    conforts: ConfortUIData;
+   cottages: CottageUIData;
    improvements: ImprovementUIData;
    travelers: TravelerUIData;
    valleys: ValleyUIData;
@@ -49,6 +50,12 @@ interface ConfortUIDataPlayer {
    hand: ConfortCard[];
    board: ConfortCard[];
 }
+
+interface CottageUIData {
+   improvements: CottageCard[];
+   players: { [player_id: number]: CottageCard[] };
+}
+
 interface ImprovementUIData {
    discard: {
       topCard?: ConfortCard;
@@ -56,6 +63,8 @@ interface ImprovementUIData {
    };
    deckCount: number;
    market: ImprovementCard[];
+   glade: ImprovementCard[];
+   players: { [player_id: number]: ImprovementCard[] };
 }
 interface TravelerUIData {
    topCard?: TravelerCard;
@@ -90,12 +99,7 @@ interface ConfortCard extends Card {}
 interface ImprovementCard extends Card {}
 interface TravelerCard extends Card {}
 interface ValleyCard extends Card {}
-
-interface Cottage {
-   player_id: number;
-   token_id: number;
-   location: number;
-}
+interface CottageCard extends Card {}
 
 interface ImprovementType {
    name: string;

@@ -4,10 +4,11 @@ class PlayerTable {
 
    public dice: PlayerDiceStock;
    public hand: HandStock<ConfortCard>;
-   public cottages: LineStock<Cottage>;
+   public cottages: LineStock<CottageCard>;
    public workers: LineStock<Meeple>;
 
    public conforts: LineStock<ConfortCard>;
+   public improvements: LineStock<ImprovementCard>;
 
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
       this.player_id = Number(player.id);
@@ -19,6 +20,7 @@ class PlayerTable {
       this.setupCottage(game, player);
       this.setupWorker(game, player);
       this.setupConfort(game, player);
+      this.setupImprovement(game);
       // if (this.player_id == this.game.getPlayerId()) this.setupResources();
    }
 
@@ -66,15 +68,14 @@ class PlayerTable {
          game.confortManager,
          document.getElementById(`player-table-${this.player_id}-confort`),
          {
-            direction: 'column',
-            gap: '2px',
+            gap: '5px',
          },
       );
       this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
    }
 
    private setupCottage(game: CreatureConforts, player: CreatureConfortsPlayerData) {
-      this.cottages = new LineStock<Cottage>(
+      this.cottages = new LineStock<CottageCard>(
          game.cottageManager,
          document.getElementById(`player-table-${this.player_id}-cottage`),
          {
@@ -82,13 +83,7 @@ class PlayerTable {
             gap: '2px',
          },
       );
-      // TODO remove
-      this.cottages.addCards([
-         { token_id: 1, player_id: Number(player.id), location: 0 } as Cottage,
-         { token_id: 2, player_id: Number(player.id), location: 0 } as Cottage,
-         { token_id: 3, player_id: Number(player.id), location: 0 } as Cottage,
-         { token_id: 4, player_id: Number(player.id), location: 0 } as Cottage,
-      ]);
+      this.cottages.addCards(game.gamedatas.cottages.players[player.id]);
    }
 
    private setupDice(game: CreatureConforts) {
@@ -116,6 +111,18 @@ class PlayerTable {
       );
 
       this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
+   }
+
+   private setupImprovement(game: CreatureConforts) {
+      this.improvements = new LineStock<ImprovementCard>(
+         game.improvementManager,
+         document.getElementById(`player-table-${this.player_id}-improvement`),
+         {
+            gap: '5px',
+         },
+      );
+
+      this.improvements.addCards(game.gamedatas.improvements.players[this.player_id]);
    }
 
    private setupWorker(game: CreatureConforts, player: CreatureConfortsPlayerData) {

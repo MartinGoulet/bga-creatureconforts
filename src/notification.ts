@@ -17,12 +17,14 @@ class NotificationManager {
          ['onNewSeason', 1000],
          ['onRiverDialRotate', 500],
          ['onRefillOwlNest', undefined],
+         ['onRefillLadder', undefined],
          ['onDiscardTraveler', 100],
          ['onNewFirstPlayer', 100],
          ['onTravelerExchangeResources', 100],
          ['onMarketExchangeResources', 100],
          ['onDrawConfort', undefined],
          ['onAddConfortToHand', undefined],
+         ['onBuildImprovement', undefined],
       ];
 
       this.setupNotifications(notifs);
@@ -131,15 +133,18 @@ class NotificationManager {
       await market.addCard(owl_nest[3], { fromStock: deck });
    }
 
-   private notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
+   private async notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
       const { ladder, discard } = args;
       if (discard) {
-         this.game.tableCenter.confort_discard.addCard(discard);
+         await this.game.tableCenter.confort_discard.addCard(discard);
       }
-      const { improvement_deck: deck, confort_market: market, hidden_improvement } = this.game.tableCenter;
-      deck.setCardNumber(deck.getCardNumber(), { id: ladder[5].id } as ImprovementCard);
-      market.addCards(ladder);
-      deck.setCardNumber(deck.getCardNumber(), { ...hidden_improvement });
+      const { improvement_deck: deck, improvement_market: market } = this.game.tableCenter;
+      market.setSelectionMode('none');
+
+      for (const card of ladder.slice(0, 5)) {
+         await market.swapCards([{ ...card }]);
+      }
+      await market.addCard(ladder[5], { fromStock: deck });
    }
 
    private notif_onDiscardTraveler(args: any) {
@@ -179,6 +184,16 @@ class NotificationManager {
          card = { id: card.id } as ConfortCard;
       }
       await this.game.getPlayerTable(player_id).hand.addCard(card);
+   }
+
+   private async notif_onBuildImprovement({ player_id, card, cottage }: BuildImprovementArgs) {
+      if (card.location == 'board') {
+         await this.game.getPlayerTable(player_id).improvements.addCard(card);
+      } else {
+         await this.game.tableCenter.glade.addCard(card);
+      }
+
+      await this.game.improvementManager.addCottage(card, cottage);
    }
 
    private animationMoveResource(
@@ -273,4 +288,10 @@ interface MarketExchangeResourcesArgs {
    player_id: number;
    from: { [type: string]: number }[];
    to: { [type: string]: number }[];
+}
+
+interface BuildImprovementArgs {
+   player_id: number;
+   card: ImprovementCard;
+   cottage: CottageCard;
 }

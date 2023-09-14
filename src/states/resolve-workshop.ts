@@ -23,7 +23,8 @@ class ResolveWorkshopState implements StateHandler {
    }
 
    onLeavingState(): void {
-      const market = this.game.tableCenter.improvement_market;
+      const { worker_locations, improvement_market: market } = this.game.tableCenter;
+      worker_locations.setSelectedLocation([]);
       market.setSelectionMode('none');
       market.onSelectionChange = null;
    }

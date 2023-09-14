@@ -18,6 +18,7 @@ class TableCenter {
    public dice_locations: SlotDiceStock;
 
    public hill: VillageDiceStock;
+   public glade: LineStock<ImprovementCard>;
 
    constructor(private game: CreatureConforts) {
       this.setupConfortCards(game);
@@ -27,6 +28,7 @@ class TableCenter {
       this.setupWorkerLocations(game);
       this.setupDiceLocations(game);
       this.setupHillDice(game);
+      this.setupGlade(game);
       this.setRiverDial(game.gamedatas.river_dial);
    }
 
@@ -86,6 +88,15 @@ class TableCenter {
       });
       const dice = game.gamedatas.dice.filter((die) => die.location > 0);
       this.dice_locations.addDice(dice);
+   }
+
+   private setupGlade(game: CreatureConforts) {
+      this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
+         sort: sortFunction('location_arg'),
+         center: false,
+      });
+
+      this.glade.addCards(game.gamedatas.improvements.glade);
    }
 
    private setupHillDice(game: CreatureConforts) {

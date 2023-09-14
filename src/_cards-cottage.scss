@@ -6,8 +6,8 @@
 
    .card-sides {
       .front {
-         background-image: url('img/houses.png');
-         background-size: 270px 27px;
+         background-image: url('img/houses.png') !important;
+         background-size: 270px 27px !important;
          box-shadow: none;
          
          $positions: (

@@ -3186,12 +3186,14 @@ var NotificationManager = (function () {
             ['onNewSeason', 1000],
             ['onRiverDialRotate', 500],
             ['onRefillOwlNest', undefined],
+            ['onRefillLadder', undefined],
             ['onDiscardTraveler', 100],
             ['onNewFirstPlayer', 100],
             ['onTravelerExchangeResources', 100],
             ['onMarketExchangeResources', 100],
             ['onDrawConfort', undefined],
             ['onAddConfortToHand', undefined],
+            ['onBuildImprovement', undefined],
         ];
         this.setupNotifications(notifs);
         ['message', 'onDrawConfort'].forEach(function (eventName) {
@@ -3336,14 +3338,39 @@ var NotificationManager = (function () {
         });
     };
     NotificationManager.prototype.notif_onRefillLadder = function (args) {
-        var ladder = args.ladder, discard = args.discard;
-        if (discard) {
-            this.game.tableCenter.confort_discard.addCard(discard);
-        }
-        var _a = this.game.tableCenter, deck = _a.improvement_deck, market = _a.confort_market, hidden_improvement = _a.hidden_improvement;
-        deck.setCardNumber(deck.getCardNumber(), { id: ladder[5].id });
-        market.addCards(ladder);
-        deck.setCardNumber(deck.getCardNumber(), __assign({}, hidden_improvement));
+        return __awaiter(this, void 0, void 0, function () {
+            var ladder, discard, _a, deck, market, _i, _b, card;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        ladder = args.ladder, discard = args.discard;
+                        if (!discard) return [3, 2];
+                        return [4, this.game.tableCenter.confort_discard.addCard(discard)];
+                    case 1:
+                        _c.sent();
+                        _c.label = 2;
+                    case 2:
+                        _a = this.game.tableCenter, deck = _a.improvement_deck, market = _a.improvement_market;
+                        market.setSelectionMode('none');
+                        _i = 0, _b = ladder.slice(0, 5);
+                        _c.label = 3;
+                    case 3:
+                        if (!(_i < _b.length)) return [3, 6];
+                        card = _b[_i];
+                        return [4, market.swapCards([__assign({}, card)])];
+                    case 4:
+                        _c.sent();
+                        _c.label = 5;
+                    case 5:
+                        _i++;
+                        return [3, 3];
+                    case 6: return [4, market.addCard(ladder[5], { fromStock: deck })];
+                    case 7:
+                        _c.sent();
+                        return [2];
+                }
+            });
+        });
     };
     NotificationManager.prototype.notif_onDiscardTraveler = function (args) {
         var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
@@ -3396,6 +3423,29 @@ var NotificationManager = (function () {
                         }
                         return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
                     case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onBuildImprovement = function (_a) {
+        var player_id = _a.player_id, card = _a.card, cottage = _a.cottage;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!(card.location == 'board')) return [3, 2];
+                        return [4, this.game.getPlayerTable(player_id).improvements.addCard(card)];
+                    case 1:
+                        _b.sent();
+                        return [3, 4];
+                    case 2: return [4, this.game.tableCenter.glade.addCard(card)];
+                    case 3:
+                        _b.sent();
+                        _b.label = 4;
+                    case 4: return [4, this.game.improvementManager.addCottage(card, cottage)];
+                    case 5:
                         _b.sent();
                         return [2];
                 }
@@ -3831,6 +3881,10 @@ var PlayerTurnCraftState = (function () {
         var _this = this;
         if (!this.game.isCurrentPlayerActive())
             return;
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectionMode('none');
+        worker_locations.setSelectableLocation([]);
+        worker_locations.setSelectedLocation([]);
         var resourceManager = new SelectResources(this.game, this.game.getPlayerId());
         this.resourceManager = resourceManager;
         var hand = this.game.getCurrentPlayerTable().hand;
@@ -4099,7 +4153,8 @@ var ResolveWorkshopState = (function () {
         };
     };
     ResolveWorkshopState.prototype.onLeavingState = function () {
-        var market = this.game.tableCenter.improvement_market;
+        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, market = _a.improvement_market;
+        worker_locations.setSelectedLocation([]);
         market.setSelectionMode('none');
         market.onSelectionChange = null;
     };
@@ -4173,14 +4228,26 @@ var ImprovementManager = (function (_super) {
                 _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
                     return _this.game.modal.displayImprovement(card);
                 });
+                if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage"))) {
+                    div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
+                    _this.cottages[card.id] = new LineStock(_this.game.cottageManager, document.getElementById("".concat(_this.getId(card), "-slot-cottage")));
+                }
+                var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
+                if (cottage) {
+                    _this.cottages[card.id].addCard(cottage);
+                }
             },
             isCardVisible: function (card) { return 'type' in card; },
             cardWidth: 125,
             cardHeight: 125,
         }) || this;
         _this.game = game;
+        _this.cottages = {};
         return _this;
     }
+    ImprovementManager.prototype.addCottage = function (card, cottage) {
+        return this.cottages[card.id].addCard(cottage);
+    };
     ImprovementManager.prototype.getCardType = function (card) {
         return this.game.gamedatas.improvement_types[card.type];
     };
@@ -4245,15 +4312,13 @@ var CottageManager = (function (_super) {
     __extends(CottageManager, _super);
     function CottageManager(game) {
         var _this = _super.call(this, game, {
-            getId: function (card) { return "cottage-".concat(card.player_id, "-").concat(card.token_id); },
+            getId: function (card) { return "cottage-".concat(card.id); },
             setupDiv: function (card, div) {
                 div.classList.add('cottage');
-                div.classList.add();
-                div.dataset.cardId = '' + card.token_id;
+                div.dataset.cardId = '' + card.id;
             },
             setupFrontDiv: function (card, div) {
-                var color = getColorName(game.gamedatas.players[card.player_id].color);
-                div.dataset.type = color;
+                div.dataset.type = getColorName(card.type);
             },
             isCardVisible: function () { return true; },
             cardWidth: 60,
@@ -4327,6 +4392,7 @@ var PlayerTable = (function () {
         this.setupCottage(game, player);
         this.setupWorker(game, player);
         this.setupConfort(game, player);
+        this.setupImprovement(game);
     }
     PlayerTable.prototype.setupBoard = function (game, player) {
         var dataset = ["data-color=\"".concat(player.color, "\"")].join(' ');
@@ -4338,8 +4404,7 @@ var PlayerTable = (function () {
     };
     PlayerTable.prototype.setupConfort = function (game, player) {
         this.conforts = new LineStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-confort")), {
-            direction: 'column',
-            gap: '2px',
+            gap: '5px',
         });
         this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
     };
@@ -4348,12 +4413,7 @@ var PlayerTable = (function () {
             direction: 'column',
             gap: '2px',
         });
-        this.cottages.addCards([
-            { token_id: 1, player_id: Number(player.id), location: 0 },
-            { token_id: 2, player_id: Number(player.id), location: 0 },
-            { token_id: 3, player_id: Number(player.id), location: 0 },
-            { token_id: 4, player_id: Number(player.id), location: 0 },
-        ]);
+        this.cottages.addCards(game.gamedatas.cottages.players[player.id]);
     };
     PlayerTable.prototype.setupDice = function (game) {
         var _this = this;
@@ -4369,6 +4429,12 @@ var PlayerTable = (function () {
             sort: sortFunction('id'),
         });
         this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
+    };
+    PlayerTable.prototype.setupImprovement = function (game) {
+        this.improvements = new LineStock(game.improvementManager, document.getElementById("player-table-".concat(this.player_id, "-improvement")), {
+            gap: '5px',
+        });
+        this.improvements.addCards(game.gamedatas.improvements.players[this.player_id]);
     };
     PlayerTable.prototype.setupWorker = function (game, player) {
         var workers = game.gamedatas.workers.player.filter(function (w) { return w.type_arg == player.id; });
@@ -4390,6 +4456,7 @@ var TableCenter = (function () {
         this.setupWorkerLocations(game);
         this.setupDiceLocations(game);
         this.setupHillDice(game);
+        this.setupGlade(game);
         this.setRiverDial(game.gamedatas.river_dial);
     }
     TableCenter.prototype.getWorkerLocations = function () {
@@ -4429,6 +4496,13 @@ var TableCenter = (function () {
         });
         var dice = game.gamedatas.dice.filter(function (die) { return die.location > 0; });
         this.dice_locations.addDice(dice);
+    };
+    TableCenter.prototype.setupGlade = function (game) {
+        this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
+            sort: sortFunction('location_arg'),
+            center: false,
+        });
+        this.glade.addCards(game.gamedatas.improvements.glade);
     };
     TableCenter.prototype.setupHillDice = function (game) {
         this.hill = new VillageDiceStock(game.diceManager, document.getElementById("hill-dice"));

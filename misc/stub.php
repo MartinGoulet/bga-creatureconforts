@@ -508,6 +508,7 @@ class Deck {
      * @param int $location_arg the card picked will be set with this "location_arg"
      */
     function pickCardForLocation($from_location, $to_location, $location_arg = 0) {
+        return [];
     }
 
     /**

@@ -4,6 +4,7 @@ namespace CreatureConforts\Core;
 
 use BgaSystemException;
 use CreatureConforts\Managers\Conforts;
+use CreatureConforts\Managers\Improvements;
 use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 
@@ -13,6 +14,19 @@ class Notifications extends \APP_DbObject {
         $message = clienttranslate('${player_name} get ${card_name} from the Owl\'s nest');
         $card_args = self::getConfortCardArgs($card, $player_id);
         self::notifyAll('onAddConfortToHand', $message, $card_args);
+    }
+
+    static function buildImprovement(int $player_id, array $card, array $cost, array $cottage) {
+        $message = clienttranslate('${player_name} build ${card_name} from the workshop');
+        self::notifyAll('onBuildImprovement', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'card' => $card,
+            'cost' => $cost,
+            'cottage' => $cottage,
+            'card_name' => Improvements::getName($card),
+            "i18n" => ["card_name"],
+        ]);
     }
 
     static function craftConfort(int $player_id, array $card, array $cost) {

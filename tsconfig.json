@@ -71,7 +71,7 @@
         "src/cards-improvement.ts",
         "src/cards-traveler.ts",
         "src/cards-valley.ts",
-        "src/cottages.ts",
+        "src/cards-cottage.ts",
         "src/workers.ts",
         
         "src/player-panel.ts",

@@ -5,6 +5,11 @@ class PlayerTurnCraftState implements StateHandler {
 
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;
+      const worker_locations = this.game.tableCenter.worker_locations;
+      worker_locations.setSelectionMode('none');
+      worker_locations.setSelectableLocation([]);
+      worker_locations.setSelectedLocation([]);
+
       const resourceManager = new SelectResources(this.game, this.game.getPlayerId());
       this.resourceManager = resourceManager;
       const { hand } = this.game.getCurrentPlayerTable();

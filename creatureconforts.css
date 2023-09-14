@@ -427,6 +427,12 @@ body > .bga-dice_die {
   height: 125px;
   border: 1px solid black;
 }
+#table-center-wrapper #glade {
+  padding-bottom: 20px;
+}
+#table-center-wrapper #glade:empty {
+  padding-bottom: 0;
+}
 #table-center-wrapper #board {
   position: relative;
   background-image: url("img/gametable.jpg");
@@ -1083,6 +1089,37 @@ body > .bga-dice_die {
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
 
+.card.cottage {
+  display: inline-block;
+  position: relative;
+  width: 27px;
+  height: 27px;
+}
+.card.cottage .card-sides .front {
+  background-image: url("img/houses.png") !important;
+  background-size: 270px 27px !important;
+  box-shadow: none;
+}
+.card.cottage .card-sides .front[data-type=yellow] {
+  background-position-x: -600%;
+}
+.card.cottage .card-sides .front[data-type=green] {
+  background-position-x: -100%;
+}
+.card.cottage .card-sides .front[data-type=gray] {
+  background-position-x: -400%;
+}
+.card.cottage .card-sides .front[data-type=red] {
+  background-position-x: -700%;
+}
+.card.cottage .card-sides .front[data-type=purple] {
+  background-position-x: -800%;
+}
+.card.cottage .card-sides .front > * {
+  pointer-events: none;
+  user-select: none;
+}
+
 .card.improvement {
   display: inline-block;
   position: relative;
@@ -1160,6 +1197,22 @@ body > .bga-dice_die {
 .card.improvement .card-sides .front > * {
   pointer-events: none;
   user-select: none;
+}
+.card.improvement .card-sides .front .slot-cottage {
+  position: absolute;
+  top: 36px;
+  right: 5px;
+  width: 27px;
+  height: 27px;
+}
+.card.improvement .card-sides .front .slot-cottage:not(:empty) {
+  outline: 1px solid #000;
+  background: rgba(255, 255, 255, 0.4);
+}
+.card.improvement .card-sides .front .slot-cottage .front {
+  border-radius: 0;
+  box-shadow: none;
+  filter: none;
 }
 .card.improvement.bga-cards_selectable-card:not(.bga-cards_selected-card) .card-sides .front {
   outline: 1px solid #000;
@@ -1333,56 +1386,69 @@ body > .bga-dice_die {
 }
 
 .bga-dice_die-face {
-  background-size: 600% 800%;
-  background-image: url("img/agk_spritesheet_dice1.png");
+  background-size: 300% 200%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="1"] {
-  background-position-x: 0%;
+  background-position: 0% -92%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="2"] {
-  background-position-x: -100%;
+  background-position: 0% 0%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="3"] {
-  background-position-x: -200%;
+  background-position: -100% -100%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="4"] {
-  background-position-x: -300%;
+  background-position: -100% 0%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="5"] {
-  background-position-x: -400%;
+  background-position: -200% 0%;
 }
 
 .bga-dice_die .bga-dice_die-face[data-face="6"] {
-  background-position-x: -500%;
+  background-position: -200% -100%;
 }
 
-.colored-die[data-color=yellow] .bga-dice_die-face {
-  background-position-y: -300%;
+.colored-die[data-color=yellow] .bga-dice_die-face,
+.colored-die[data-color=yellow].bga-dice_die-face {
+  background-image: url("img/dice_yellow.jpg");
 }
 
-.colored-die[data-color=green] .bga-dice_die-face {
-  background-position-y: -500%;
+.colored-die[data-color=green] .bga-dice_die-face,
+.colored-die[data-color=green].bga-dice_die-face {
+  background-image: url("img/dice_green.jpg");
 }
 
-.colored-die[data-color=gray] .bga-dice_die-face {
-  background-position-y: 0%;
+.colored-die[data-color=red] .bga-dice_die-face,
+.colored-die[data-color=red].bga-dice_die-face {
+  background-image: url("img/dice_red.jpg");
 }
 
-.colored-die[data-color=red] .bga-dice_die-face {
-  background-position-y: -100%;
+.colored-die[data-color=gray] .bga-dice_die-face,
+.colored-die[data-color=gray].bga-dice_die-face {
+  background-image: url("img/dice_gray.jpg");
 }
 
-.colored-die[data-color=purple] .bga-dice_die-face {
-  background-position-y: -600%;
+.colored-die[data-color=purple] .bga-dice_die-face,
+.colored-die[data-color=purple].bga-dice_die-face {
+  background-image: url("img/dice_purple.jpg");
 }
 
-.colored-die[data-color=white] .bga-dice_die-face {
-  background-position-y: -700%;
+.colored-die[data-color=white] .bga-dice_die-face,
+.colored-die[data-color=white].bga-dice_die-face {
+  background-image: url("img/dice_white.jpg");
+}
+
+.bga-dice_die6 .bga-dice_die-faces[data-visible-face="1"] {
+  transform: rotate3d(1, 1, 1, 0deg) rotate(90deg);
+}
+
+.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face="1"] {
+  transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
 }
 
 .dice-icon-log {
@@ -1391,76 +1457,13 @@ body > .bga-dice_die {
   display: inline-block;
   margin: 0 5px;
   vertical-align: middle;
+  border-radius: 5px;
 }
 .dice-icon-log > span {
   display: none;
 }
-.dice-icon-log.colored-die[data-color=yellow] {
-  background-position-y: -300%;
-}
-.dice-icon-log.colored-die[data-color=green] {
-  background-position-y: -500%;
-}
-.dice-icon-log.colored-die[data-color=gray] {
-  background-position-y: 0%;
-}
-.dice-icon-log.colored-die[data-color=red] {
-  background-position-y: -100%;
-}
-.dice-icon-log.colored-die[data-color=purple] {
-  background-position-y: -600%;
-}
 .dice-icon-log.colored-die[data-color=white] {
-  background-position-y: -700%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="1"] {
-  background-position-x: 0%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="2"] {
-  background-position-x: -100%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="3"] {
-  background-position-x: -200%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="4"] {
-  background-position-x: -300%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="5"] {
-  background-position-x: -400%;
-}
-.dice-icon-log.bga-dice_die-face[data-face="6"] {
-  background-position-x: -500%;
-}
-
-.card.cottage {
-  display: inline-block;
-  position: relative;
-  width: 27px;
-  height: 27px;
-}
-.card.cottage .card-sides .front {
-  background-image: url("img/houses.png");
-  background-size: 270px 27px;
-  box-shadow: none;
-}
-.card.cottage .card-sides .front[data-type=yellow] {
-  background-position-x: -600%;
-}
-.card.cottage .card-sides .front[data-type=green] {
-  background-position-x: -100%;
-}
-.card.cottage .card-sides .front[data-type=gray] {
-  background-position-x: -400%;
-}
-.card.cottage .card-sides .front[data-type=red] {
-  background-position-x: -700%;
-}
-.card.cottage .card-sides .front[data-type=purple] {
-  background-position-x: -800%;
-}
-.card.cottage .card-sides .front > * {
-  pointer-events: none;
-  user-select: none;
+  border: 1px solid black;
 }
 
 .card.worker {

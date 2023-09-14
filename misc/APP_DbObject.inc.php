@@ -70,6 +70,7 @@ class APP_DbObject extends APP_Object
      */
     static function getObjectFromDB($sql)
     {
+        return [];
     }
 
     /**
