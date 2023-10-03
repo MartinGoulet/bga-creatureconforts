@@ -262,6 +262,51 @@ interface IResourceLineStock {
    isFull(): boolean;
 }
 
+class ResourceTrader {
+   private element: HTMLElement;
+
+   private resources_from: ResourcePlaceholderLineStock;
+   private resources_to: ResourcePlaceholderLineStock;
+
+   constructor(
+      parent: HTMLElement,
+      id: string,
+      private to: string[],
+      private from?: string[],
+      private restriction?: 'same' | 'different',
+   ) {
+      const resource_to_display =
+         this.to[0] !== '*' ? this.to.map((icon) => ResourceHelper.getElement(icon)).join('') : '';
+
+      const html = `<div id="${id}" class="line">
+         <div class="resource-converter-placeholder-from"></div>
+         <div class="wrapper no-border arrow"><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 16 16"><path fill="lime" d="M15.5 8L8 .5V5H0v6h8v4.5z"/></svg></div>
+         <div class="wrapper no-border to">${resource_to_display}</div>
+         <div class="resource-converter-placeholder"></div>
+      </div>`;
+      parent.insertAdjacentHTML('beforeend', html);
+      this.element = document.getElementById(id);
+
+      if (this.from) {
+         this.resources_from = new ResourcePlaceholderLineStock(
+            this.element.querySelector('.resource-converter-placeholder-from'),
+            from.length,
+            {
+               restriction,
+            },
+         );
+      }
+
+      if (this.to[0] == '*') {
+         this.resources_to = new ResourcePlaceholderLineStock(
+            this.element.querySelector('.resource-converter-placeholder'),
+            to.length,
+            {},
+         );
+      }
+   }
+}
+
 class ResourceHelper {
    static getElement(type: string) {
       return `<div class="resource-icon" data-type="${type}"></div>`;

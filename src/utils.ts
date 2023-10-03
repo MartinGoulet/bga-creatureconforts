@@ -16,3 +16,34 @@ function createCounter(id: string, value: number = 0): ebg.counter {
    counter.setValue(value);
    return counter;
 }
+
+function countExtractions(mainArray, targetArray) {
+   var mainArrayCounts = {};
+   var targetArrayCounts = {};
+
+   // Count occurrences of elements in the mainArray
+   for (var i = 0; i < mainArray.length; i++) {
+      var element = mainArray[i];
+      mainArrayCounts[element] = (mainArrayCounts[element] || 0) + 1;
+   }
+
+   // Count occurrences of elements in the targetArray
+   for (var j = 0; j < targetArray.length; j++) {
+      var element = targetArray[j];
+      targetArrayCounts[element] = (targetArrayCounts[element] || 0) + 1;
+   }
+
+   var minExtractions = 10000;
+
+   // Calculate the minimum number of extractions
+   for (var key in mainArrayCounts) {
+      if (mainArrayCounts.hasOwnProperty(key)) {
+         var mainCount = mainArrayCounts[key];
+         var targetCount = targetArrayCounts[key] || 0;
+         var extractions = Math.floor(targetCount / mainCount);
+         minExtractions = Math.min(minExtractions, extractions);
+      }
+   }
+
+   return minExtractions;
+}

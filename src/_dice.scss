@@ -155,3 +155,22 @@
    //    background-position-x: -500%;
    // }
 }
+
+.slot-dice {
+   border-radius: 5px;
+   // transform: translate(-54px, -3px);
+
+   &.selectable {
+      animation: pulseSelectable 1s infinite alternate;
+      pointer-events: initial !important;
+      user-select: initial !important;
+   }
+}
+
+.gamestate_placement {
+   #hill-dice {
+      .bga-dice_die[data-color='white'] {
+         display: none;
+      }
+   }
+}

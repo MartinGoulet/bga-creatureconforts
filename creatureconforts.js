@@ -1,3 +1,197 @@
+var DEFAULT_ZOOM_LEVELS = [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
+function throttle(callback, delay) {
+    var last;
+    var timer;
+    return function () {
+        var context = this;
+        var now = +new Date();
+        var args = arguments;
+        if (last && now < last + delay) {
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                last = now;
+                callback.apply(context, args);
+            }, delay);
+        }
+        else {
+            last = now;
+            callback.apply(context, args);
+        }
+    };
+}
+var ZoomManager = (function () {
+    function ZoomManager(settings) {
+        var _this = this;
+        var _a, _b, _c, _d, _e, _f;
+        this.settings = settings;
+        if (!settings.element) {
+            throw new DOMException('You need to set the element to wrap in the zoom element');
+        }
+        this._zoomLevels = (_a = settings.zoomLevels) !== null && _a !== void 0 ? _a : DEFAULT_ZOOM_LEVELS;
+        this._zoom = this.settings.defaultZoom || 1;
+        if (this.settings.localStorageZoomKey) {
+            var zoomStr = localStorage.getItem(this.settings.localStorageZoomKey);
+            if (zoomStr) {
+                this._zoom = Number(zoomStr);
+            }
+        }
+        this.wrapper = document.createElement('div');
+        this.wrapper.id = 'bga-zoom-wrapper';
+        this.wrapElement(this.wrapper, settings.element);
+        this.wrapper.appendChild(settings.element);
+        settings.element.classList.add('bga-zoom-inner');
+        if ((_b = settings.smooth) !== null && _b !== void 0 ? _b : true) {
+            settings.element.dataset.smooth = 'true';
+            settings.element.addEventListener('transitionend', function () { return _this.zoomOrDimensionChanged(); });
+        }
+        if ((_d = (_c = settings.zoomControls) === null || _c === void 0 ? void 0 : _c.visible) !== null && _d !== void 0 ? _d : true) {
+            this.initZoomControls(settings);
+        }
+        if (this._zoom !== 1) {
+            this.setZoom(this._zoom);
+        }
+        this.throttleTime = (_e = settings.throttleTime) !== null && _e !== void 0 ? _e : 100;
+        window.addEventListener('resize', function () {
+            var _a;
+            _this.zoomOrDimensionChanged();
+            if ((_a = _this.settings.autoZoom) === null || _a === void 0 ? void 0 : _a.expectedWidth) {
+                _this.setAutoZoom();
+            }
+        });
+        if (window.ResizeObserver) {
+            new ResizeObserver(function () { return _this.zoomOrDimensionChanged(); }).observe(settings.element);
+        }
+        if ((_f = this.settings.autoZoom) === null || _f === void 0 ? void 0 : _f.expectedWidth) {
+            this.setAutoZoom();
+        }
+    }
+    Object.defineProperty(ZoomManager.prototype, "zoom", {
+        get: function () {
+            return this._zoom;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(ZoomManager.prototype, "zoomLevels", {
+        get: function () {
+            return this._zoomLevels;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    ZoomManager.prototype.setAutoZoom = function () {
+        var _this = this;
+        var _a, _b, _c;
+        var zoomWrapperWidth = document.getElementById('bga-zoom-wrapper').clientWidth;
+        if (!zoomWrapperWidth) {
+            setTimeout(function () { return _this.setAutoZoom(); }, 200);
+            return;
+        }
+        var expectedWidth = (_a = this.settings.autoZoom) === null || _a === void 0 ? void 0 : _a.expectedWidth;
+        var newZoom = this.zoom;
+        while (newZoom > this._zoomLevels[0] && newZoom > ((_c = (_b = this.settings.autoZoom) === null || _b === void 0 ? void 0 : _b.minZoomLevel) !== null && _c !== void 0 ? _c : 0) && zoomWrapperWidth / newZoom < expectedWidth) {
+            newZoom = this._zoomLevels[this._zoomLevels.indexOf(newZoom) - 1];
+        }
+        if (this._zoom == newZoom) {
+            if (this.settings.localStorageZoomKey) {
+                localStorage.setItem(this.settings.localStorageZoomKey, '' + this._zoom);
+            }
+        }
+        else {
+            this.setZoom(newZoom);
+        }
+    };
+    ZoomManager.prototype.setZoomLevels = function (zoomLevels, newZoom) {
+        if (!zoomLevels || zoomLevels.length <= 0) {
+            return;
+        }
+        this._zoomLevels = zoomLevels;
+        var zoomIndex = newZoom && zoomLevels.includes(newZoom) ? this._zoomLevels.indexOf(newZoom) : this._zoomLevels.length - 1;
+        this.setZoom(this._zoomLevels[zoomIndex]);
+    };
+    ZoomManager.prototype.setZoom = function (zoom) {
+        var _a, _b, _c, _d;
+        if (zoom === void 0) { zoom = 1; }
+        this._zoom = zoom;
+        if (this.settings.localStorageZoomKey) {
+            localStorage.setItem(this.settings.localStorageZoomKey, '' + this._zoom);
+        }
+        var newIndex = this._zoomLevels.indexOf(this._zoom);
+        (_a = this.zoomInButton) === null || _a === void 0 ? void 0 : _a.classList.toggle('disabled', newIndex === this._zoomLevels.length - 1);
+        (_b = this.zoomOutButton) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', newIndex === 0);
+        this.settings.element.style.transform = zoom === 1 ? '' : "scale(".concat(zoom, ")");
+        (_d = (_c = this.settings).onZoomChange) === null || _d === void 0 ? void 0 : _d.call(_c, this._zoom);
+        this.zoomOrDimensionChangedUnsafe();
+    };
+    ZoomManager.prototype.manualHeightUpdate = function () {
+        if (!window.ResizeObserver) {
+            this.zoomOrDimensionChanged();
+        }
+    };
+    ZoomManager.prototype.zoomOrDimensionChanged = function () {
+        var _this = this;
+        throttle(function () { return _this.zoomOrDimensionChangedUnsafe(); }, this.throttleTime);
+    };
+    ZoomManager.prototype.zoomOrDimensionChangedUnsafe = function () {
+        var _a, _b;
+        this.settings.element.style.width = "".concat(this.wrapper.getBoundingClientRect().width / this._zoom, "px");
+        this.wrapper.style.height = "".concat(this.settings.element.getBoundingClientRect().height, "px");
+        (_b = (_a = this.settings).onDimensionsChange) === null || _b === void 0 ? void 0 : _b.call(_a, this._zoom);
+    };
+    ZoomManager.prototype.zoomIn = function () {
+        if (this._zoom === this._zoomLevels[this._zoomLevels.length - 1]) {
+            return;
+        }
+        var newIndex = this._zoomLevels.indexOf(this._zoom) + 1;
+        this.setZoom(newIndex === -1 ? 1 : this._zoomLevels[newIndex]);
+    };
+    ZoomManager.prototype.zoomOut = function () {
+        if (this._zoom === this._zoomLevels[0]) {
+            return;
+        }
+        var newIndex = this._zoomLevels.indexOf(this._zoom) - 1;
+        this.setZoom(newIndex === -1 ? 1 : this._zoomLevels[newIndex]);
+    };
+    ZoomManager.prototype.setZoomControlsColor = function (color) {
+        if (this.zoomControls) {
+            this.zoomControls.dataset.color = color;
+        }
+    };
+    ZoomManager.prototype.initZoomControls = function (settings) {
+        var _this = this;
+        var _a, _b, _c, _d, _e, _f;
+        this.zoomControls = document.createElement('div');
+        this.zoomControls.id = 'bga-zoom-controls';
+        this.zoomControls.dataset.position = (_b = (_a = settings.zoomControls) === null || _a === void 0 ? void 0 : _a.position) !== null && _b !== void 0 ? _b : 'top-right';
+        this.zoomOutButton = document.createElement('button');
+        this.zoomOutButton.type = 'button';
+        this.zoomOutButton.addEventListener('click', function () { return _this.zoomOut(); });
+        if ((_c = settings.zoomControls) === null || _c === void 0 ? void 0 : _c.customZoomOutElement) {
+            settings.zoomControls.customZoomOutElement(this.zoomOutButton);
+        }
+        else {
+            this.zoomOutButton.classList.add("bga-zoom-out-icon");
+        }
+        this.zoomInButton = document.createElement('button');
+        this.zoomInButton.type = 'button';
+        this.zoomInButton.addEventListener('click', function () { return _this.zoomIn(); });
+        if ((_d = settings.zoomControls) === null || _d === void 0 ? void 0 : _d.customZoomInElement) {
+            settings.zoomControls.customZoomInElement(this.zoomInButton);
+        }
+        else {
+            this.zoomInButton.classList.add("bga-zoom-in-icon");
+        }
+        this.zoomControls.appendChild(this.zoomOutButton);
+        this.zoomControls.appendChild(this.zoomInButton);
+        this.wrapper.appendChild(this.zoomControls);
+        this.setZoomControlsColor((_f = (_e = settings.zoomControls) === null || _e === void 0 ? void 0 : _e.color) !== null && _f !== void 0 ? _f : 'black');
+    };
+    ZoomManager.prototype.wrapElement = function (wrapper, element) {
+        element.parentNode.insertBefore(wrapper, element);
+        wrapper.appendChild(element);
+    };
+    return ZoomManager;
+}());
 var BgaAnimation = (function () {
     function BgaAnimation(animationFunction, settings) {
         this.animationFunction = animationFunction;
@@ -556,10 +750,15 @@ var CardStock = (function () {
         });
     };
     CardStock.prototype.removeCard = function (card, settings) {
+        var promise;
         if (this.contains(card) && this.element.contains(this.getCardElement(card))) {
-            this.manager.removeCard(card, settings);
+            promise = this.manager.removeCard(card, settings);
+        }
+        else {
+            promise = Promise.resolve(false);
         }
         this.cardRemoved(card, settings);
+        return promise;
     };
     CardStock.prototype.cardRemoved = function (card, settings) {
         var _this = this;
@@ -572,8 +771,20 @@ var CardStock = (function () {
         }
     };
     CardStock.prototype.removeCards = function (cards, settings) {
-        var _this = this;
-        cards.forEach(function (card) { return _this.removeCard(card, settings); });
+        return __awaiter(this, void 0, void 0, function () {
+            var promises, results;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        promises = cards.map(function (card) { return _this.removeCard(card, settings); });
+                        return [4, Promise.all(promises)];
+                    case 1:
+                        results = _a.sent();
+                        return [2, results.some(function (result) { return result; })];
+                }
+            });
+        });
     };
     CardStock.prototype.removeAll = function (settings) {
         var _this = this;
@@ -603,10 +814,10 @@ var CardStock = (function () {
         var selectableCardsClass = this.getSelectableCardClass();
         var unselectableCardsClass = this.getUnselectableCardClass();
         if (selectableCardsClass) {
-            element.classList.toggle(selectableCardsClass, selectable);
+            element === null || element === void 0 ? void 0 : element.classList.toggle(selectableCardsClass, selectable);
         }
         if (unselectableCardsClass) {
-            element.classList.toggle(unselectableCardsClass, !selectable);
+            element === null || element === void 0 ? void 0 : element.classList.toggle(unselectableCardsClass, !selectable);
         }
         if (!selectable && this.isSelected(card)) {
             this.unselectCard(card, true);
@@ -631,7 +842,7 @@ var CardStock = (function () {
         }
         var element = this.getCardElement(card);
         var selectableCardsClass = this.getSelectableCardClass();
-        if (!element.classList.contains(selectableCardsClass)) {
+        if (!element || !element.classList.contains(selectableCardsClass)) {
             return;
         }
         if (this.selectionMode === 'single') {
@@ -650,7 +861,7 @@ var CardStock = (function () {
         if (silent === void 0) { silent = false; }
         var element = this.getCardElement(card);
         var selectedCardsClass = this.getSelectedCardClass();
-        element.classList.remove(selectedCardsClass);
+        element === null || element === void 0 ? void 0 : element.classList.remove(selectedCardsClass);
         var index = this.selectedCards.findIndex(function (c) { return _this.manager.getId(c) == _this.manager.getId(card); });
         if (index !== -1) {
             this.selectedCards.splice(index, 1);
@@ -768,7 +979,7 @@ var CardStock = (function () {
         var selectableCardsClass = this.getSelectableCardClass();
         var unselectableCardsClass = this.getUnselectableCardClass();
         var selectedCardsClass = this.getSelectedCardClass();
-        cardElement.classList.remove(selectableCardsClass, unselectableCardsClass, selectedCardsClass);
+        cardElement === null || cardElement === void 0 ? void 0 : cardElement.classList.remove(selectableCardsClass, unselectableCardsClass, selectedCardsClass);
     };
     return CardStock;
 }());
@@ -852,9 +1063,7 @@ var Deck = (function (_super) {
     Deck.prototype.setCardNumber = function (cardNumber, topCard) {
         var _this = this;
         if (topCard === void 0) { topCard = null; }
-        if (topCard) {
-            this.addCard(topCard);
-        }
+        var promise = topCard ? this.addCard(topCard) : Promise.resolve(true);
         this.cardNumber = cardNumber;
         this.element.dataset.empty = (this.cardNumber == 0).toString();
         var thickness = 0;
@@ -868,6 +1077,7 @@ var Deck = (function (_super) {
         if (counterDiv) {
             counterDiv.innerHTML = "".concat(cardNumber);
         }
+        return promise;
     };
     Deck.prototype.addCard = function (card, animation, settings) {
         var _this = this;
@@ -998,6 +1208,17 @@ var SlotStock = (function (_super) {
             _this.createSlot(slotId);
         });
     };
+    SlotStock.prototype.addSlotsIds = function (newSlotsIds) {
+        var _a;
+        var _this = this;
+        if (newSlotsIds.length == 0) {
+            return;
+        }
+        (_a = this.slotsIds).push.apply(_a, newSlotsIds);
+        newSlotsIds.forEach(function (slotId) {
+            _this.createSlot(slotId);
+        });
+    };
     SlotStock.prototype.canAddCard = function (card, settings) {
         var _a, _b;
         if (!this.contains(card)) {
@@ -1087,6 +1308,9 @@ var CardManager = (function () {
         this.game = game;
         this.settings = settings;
         this.stocks = [];
+        this.updateMainTimeoutId = [];
+        this.updateFrontTimeoutId = [];
+        this.updateBackTimeoutId = [];
         this.animationManager = (_a = settings.animationManager) !== null && _a !== void 0 ? _a : new AnimationManager(game);
     }
     CardManager.prototype.animationsActive = function () {
@@ -1127,12 +1351,12 @@ var CardManager = (function () {
         var id = this.getId(card);
         var div = document.getElementById(id);
         if (!div) {
-            return false;
+            return Promise.resolve(false);
         }
         div.id = "deleted".concat(id);
         div.remove();
         (_a = this.getCardStock(card)) === null || _a === void 0 ? void 0 : _a.cardRemoved(card, settings);
-        return true;
+        return Promise.resolve(true);
     };
     CardManager.prototype.getCardStock = function (card) {
         return this.stocks.find(function (stock) { return stock.contains(card); });
@@ -1143,32 +1367,54 @@ var CardManager = (function () {
     };
     CardManager.prototype.setCardVisible = function (card, visible, settings) {
         var _this = this;
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
         var element = this.getCardElement(card);
         if (!element) {
             return;
         }
         var isVisible = visible !== null && visible !== void 0 ? visible : this.isCardVisible(card);
         element.dataset.side = isVisible ? 'front' : 'back';
-        if ((_a = settings === null || settings === void 0 ? void 0 : settings.updateFront) !== null && _a !== void 0 ? _a : true) {
-            var updateFrontDelay = (_b = settings === null || settings === void 0 ? void 0 : settings.updateFrontDelay) !== null && _b !== void 0 ? _b : 500;
+        var stringId = JSON.stringify(this.getId(card));
+        if ((_a = settings === null || settings === void 0 ? void 0 : settings.updateMain) !== null && _a !== void 0 ? _a : false) {
+            if (this.updateMainTimeoutId[stringId]) {
+                clearTimeout(this.updateMainTimeoutId[stringId]);
+                delete this.updateMainTimeoutId[stringId];
+            }
+            var updateMainDelay = (_b = settings === null || settings === void 0 ? void 0 : settings.updateMainDelay) !== null && _b !== void 0 ? _b : 0;
+            if (isVisible && updateMainDelay > 0 && this.animationsActive()) {
+                this.updateMainTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element); }, updateMainDelay);
+            }
+            else {
+                (_d = (_c = this.settings).setupDiv) === null || _d === void 0 ? void 0 : _d.call(_c, card, element);
+            }
+        }
+        if ((_e = settings === null || settings === void 0 ? void 0 : settings.updateFront) !== null && _e !== void 0 ? _e : true) {
+            if (this.updateFrontTimeoutId[stringId]) {
+                clearTimeout(this.updateFrontTimeoutId[stringId]);
+                delete this.updateFrontTimeoutId[stringId];
+            }
+            var updateFrontDelay = (_f = settings === null || settings === void 0 ? void 0 : settings.updateFrontDelay) !== null && _f !== void 0 ? _f : 500;
             if (!isVisible && updateFrontDelay > 0 && this.animationsActive()) {
-                setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupFrontDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('front')[0]); }, updateFrontDelay);
+                this.updateFrontTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupFrontDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('front')[0]); }, updateFrontDelay);
             }
             else {
-                (_d = (_c = this.settings).setupFrontDiv) === null || _d === void 0 ? void 0 : _d.call(_c, card, element.getElementsByClassName('front')[0]);
+                (_h = (_g = this.settings).setupFrontDiv) === null || _h === void 0 ? void 0 : _h.call(_g, card, element.getElementsByClassName('front')[0]);
             }
         }
-        if ((_e = settings === null || settings === void 0 ? void 0 : settings.updateBack) !== null && _e !== void 0 ? _e : false) {
-            var updateBackDelay = (_f = settings === null || settings === void 0 ? void 0 : settings.updateBackDelay) !== null && _f !== void 0 ? _f : 0;
+        if ((_j = settings === null || settings === void 0 ? void 0 : settings.updateBack) !== null && _j !== void 0 ? _j : false) {
+            if (this.updateBackTimeoutId[stringId]) {
+                clearTimeout(this.updateBackTimeoutId[stringId]);
+                delete this.updateBackTimeoutId[stringId];
+            }
+            var updateBackDelay = (_k = settings === null || settings === void 0 ? void 0 : settings.updateBackDelay) !== null && _k !== void 0 ? _k : 0;
             if (isVisible && updateBackDelay > 0 && this.animationsActive()) {
-                setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupBackDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('back')[0]); }, updateBackDelay);
+                this.updateBackTimeoutId[stringId] = setTimeout(function () { var _a, _b; return (_b = (_a = _this.settings).setupBackDiv) === null || _b === void 0 ? void 0 : _b.call(_a, card, element.getElementsByClassName('back')[0]); }, updateBackDelay);
             }
             else {
-                (_h = (_g = this.settings).setupBackDiv) === null || _h === void 0 ? void 0 : _h.call(_g, card, element.getElementsByClassName('back')[0]);
+                (_m = (_l = this.settings).setupBackDiv) === null || _m === void 0 ? void 0 : _m.call(_l, card, element.getElementsByClassName('back')[0]);
             }
         }
-        if ((_j = settings === null || settings === void 0 ? void 0 : settings.updateData) !== null && _j !== void 0 ? _j : true) {
+        if ((_o = settings === null || settings === void 0 ? void 0 : settings.updateData) !== null && _o !== void 0 ? _o : true) {
             var stock = this.getCardStock(card);
             var cards = stock.getCards();
             var cardIndex = cards.findIndex(function (c) { return _this.getId(c) === _this.getId(card); });
@@ -1996,6 +2242,7 @@ function sortFunction() {
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.log.bind(window.console) : function () { };
 var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
+var LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 var GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
 var ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 var CreatureConforts = (function () {
@@ -2005,6 +2252,7 @@ var CreatureConforts = (function () {
     CreatureConforts.prototype.setup = function (gamedatas) {
         var _this = this;
         debug(gamedatas);
+        this.animationManager = new AnimationManager(this, { duration: 0 });
         this.confortManager = new ConfortManager(this);
         this.improvementManager = new ImprovementManager(this);
         this.travelerManager = new TravelerManager(this);
@@ -2183,6 +2431,16 @@ var CreatureConforts = (function () {
                 }
                 if (args.nbr_cards !== undefined) {
                     args.nbr_cards = "<div class=\"cc-icon i-cards\"><span>".concat(args.nbr_cards, "</span></div>");
+                }
+                if (args.die_from !== undefined) {
+                    var value = args.die_from;
+                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+                    args.die_from = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
+                }
+                if (args.die_to !== undefined) {
+                    var value = args.die_to;
+                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+                    args.die_to = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
                 }
             }
         }
@@ -2407,6 +2665,26 @@ var ResourcePlaceholderLineStock = (function () {
         }
     };
     return ResourcePlaceholderLineStock;
+}());
+var ResourceTrader = (function () {
+    function ResourceTrader(parent, id, to, from, restriction) {
+        this.to = to;
+        this.from = from;
+        this.restriction = restriction;
+        var resource_to_display = this.to[0] !== '*' ? this.to.map(function (icon) { return ResourceHelper.getElement(icon); }).join('') : '';
+        var html = "<div id=\"".concat(id, "\" class=\"line\">\n         <div class=\"resource-converter-placeholder-from\"></div>\n         <div class=\"wrapper no-border arrow\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg></div>\n         <div class=\"wrapper no-border to\">").concat(resource_to_display, "</div>\n         <div class=\"resource-converter-placeholder\"></div>\n      </div>");
+        parent.insertAdjacentHTML('beforeend', html);
+        this.element = document.getElementById(id);
+        if (this.from) {
+            this.resources_from = new ResourcePlaceholderLineStock(this.element.querySelector('.resource-converter-placeholder-from'), from.length, {
+                restriction: restriction,
+            });
+        }
+        if (this.to[0] == '*') {
+            this.resources_to = new ResourcePlaceholderLineStock(this.element.querySelector('.resource-converter-placeholder'), to.length, {});
+        }
+    }
+    return ResourceTrader;
 }());
 var ResourceHelper = (function () {
     function ResourceHelper() {
@@ -3020,14 +3298,16 @@ var ResourceConverter = (function () {
         this.settings = settings;
     }
     ResourceConverter.prototype.show = function () {
+        var _a;
         this.removeControl();
         var count_any_ressource_to = this.to.filter(function (r) { return r == '*'; }).length;
-        this.addBanner(count_any_ressource_to);
+        this.addBanner(count_any_ressource_to, (_a = this.settings) === null || _a === void 0 ? void 0 : _a.displayTo);
         this.addControlResourcesPlayer();
         this.addControlResourceGive();
         this.addControlResourceBoard(count_any_ressource_to);
         this.addControlResourceGet(count_any_ressource_to);
         this.addResetButton();
+        var test = new ResourceTrader(document.getElementById("resource-converter"), 't1', this.to, this.from);
     };
     ResourceConverter.prototype.hide = function () {
         this.removeControl();
@@ -3046,18 +3326,20 @@ var ResourceConverter = (function () {
             return this.resource_get.getResources();
         }
     };
-    ResourceConverter.prototype.addBanner = function (count_any_ressource_to) {
+    ResourceConverter.prototype.addBanner = function (count_any_ressource_to, displayTo) {
+        if (displayTo === void 0) { displayTo = true; }
         var arrow = count_any_ressource_to > 0
             ? "<div class=\"wrapper no-border arrow\">\n                  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               </div>"
             : '';
-        var html = "<div id=\"resource-converter\">\n         <div class=\"line\">\n            <div id=\"resource-converter-player\"></div>\n            ".concat(arrow, "\n            <div id=\"resource-converter-board-resources\"></div>\n         </div>\n         <div class=\"line\">\n            <div id=\"resource-converter-placeholder-from\"></div>\n            <div class=\"wrapper no-border from\"></div>\n            <div class=\"wrapper no-border arrow\">\n               <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               ").concat(this.times > 1 ? "x".concat(this.times) : '', "\n            </div>\n            <div class=\"wrapper no-border to\">\n               <span id=\"tc-icons-reward-counter\" class=\"counter\">1</span>\n               ").concat(this.to.map(function (icon) { return ResourceHelper.getElement(icon); }), "\n            </div>\n            <div id=\"resource-converter-placeholder\"></div>\n            <div id=\"resource-converter-buttons\"></div>\n         </div>\n      </div>");
+        var html = "<div id=\"resource-converter\" class=\"".concat(displayTo ? '' : 'hideTo', "\">\n         <div class=\"line\">\n            <div id=\"resource-converter-player\"></div>\n            ").concat(arrow, "\n            <div id=\"resource-converter-board-resources\"></div>\n         </div>\n         <div class=\"line\">\n            <div id=\"resource-converter-placeholder-from\"></div>\n            <div class=\"wrapper no-border from\"></div>\n            <div class=\"wrapper no-border arrow\">\n               <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               ").concat(this.times > 1 ? "x".concat(this.times) : '', "\n            </div>\n            <div class=\"wrapper no-border to\">\n               <span id=\"tc-icons-reward-counter\" class=\"counter\">1</span>\n               ").concat(this.to.map(function (icon) { return ResourceHelper.getElement(icon); }).join(''), "\n            </div>\n            <div id=\"resource-converter-placeholder\"></div>\n            <div id=\"resource-converter-buttons\"></div>\n         </div>\n      </div>");
         document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
     };
     ResourceConverter.prototype.addControlResourcesPlayer = function () {
         var _this = this;
         var handleResourceClick = function (type) {
-            var _a, _b, _c, _d;
+            var _a, _b, _c, _d, _e;
             _this.resources_give.add(type);
+            var is_confirm_enabled = undefined;
             if (_this.counter_reward) {
                 if (_this.from.length == 1) {
                     _this.counter_reward.incValue(1);
@@ -3066,11 +3348,9 @@ var ResourceConverter = (function () {
                     _this.counter_reward.setValue(Math.floor(_this.resources_give.getResources().length / _this.from.length));
                 }
                 else {
-                    var values_1 = [];
-                    _this.from.forEach(function (icon) {
-                        values_1.push(_this.resources_give.getResources().filter(function (type) { return type == icon; }).length);
-                    });
-                    _this.counter_reward.setValue(Math.min.apply(null, values_1));
+                    var count = countExtractions(_this.from, _this.resources_give.getResources());
+                    _this.counter_reward.setValue(count);
+                    is_confirm_enabled = count * _this.from.length == _this.resources_give.getResources().length;
                 }
             }
             else {
@@ -3086,6 +3366,10 @@ var ResourceConverter = (function () {
             if ((_d = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.from) === null || _c === void 0 ? void 0 : _c.max) !== null && _d !== void 0 ? _d : 0 == _this.resources_give.getResources().length) {
                 _this.resources_player.disabled();
             }
+            if (is_confirm_enabled == undefined) {
+                is_confirm_enabled = _this.resources_give.isFull() && _this.resource_get.isFull();
+            }
+            (_e = _this.OnEnableConfirm) === null || _e === void 0 ? void 0 : _e.call(_this, is_confirm_enabled == true);
         };
         var element = document.getElementById('resource-converter-player');
         this.resources_player = new PlayerResourceCounter(this.game, element, 'player-counter', {
@@ -3095,7 +3379,7 @@ var ResourceConverter = (function () {
     };
     ResourceConverter.prototype.addControlResourceGive = function () {
         var _a, _b, _c, _d;
-        if ((this.from && this.from.every(function (r) { return r == '*'; }) && this.times == 1) || ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.max)) {
+        if (this.times == 1 || (this.from && this.from.every(function (r) { return r == '*'; })) || ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.max)) {
             var element = document.getElementById('resource-converter-placeholder-from');
             this.resources_give = new ResourcePlaceholderLineStock(element, this.from.length, {
                 restriction: (_d = (_c = this.settings) === null || _c === void 0 ? void 0 : _c.from) === null || _d === void 0 ? void 0 : _d.restriction,
@@ -3133,29 +3417,32 @@ var ResourceConverter = (function () {
     ResourceConverter.prototype.addResetButton = function () {
         var _this = this;
         var handleReset = function () {
-            var _a, _b;
+            var _a, _b, _c;
             _this.resources_give.reset();
             (_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.setValue(0);
             _this.resources_player.reset();
             _this.resource_get.reset();
             (_b = _this.resources_board) === null || _b === void 0 ? void 0 : _b.reset();
+            _this.OnEnableConfirm(((_c = _this.from) === null || _c === void 0 ? void 0 : _c.length) == 0);
         };
         this.game.addActionButtonReset('resource-converter-buttons', handleReset);
     };
     ResourceConverter.prototype.getAllowedResources = function () {
         var _a, _b, _c;
-        if ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.allowed_resources) {
-            return this.settings.from.allowed_resources;
-        }
-        else {
-            return this.from.indexOf('*') >= 0 ? GOODS : (_c = this.from) !== null && _c !== void 0 ? _c : ICONS;
-        }
+        var resources = ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.allowed_resources)
+            ? this.settings.from.allowed_resources
+            : this.from.indexOf('*') >= 0
+                ? GOODS
+                : (_c = this.from) !== null && _c !== void 0 ? _c : ICONS;
+        return resources.filter(function (value, index) { return resources.indexOf(value) == index; });
     };
     ResourceConverter.prototype.handleBoardResourceClick = function (type) {
+        var _a;
         this.resource_get.add(type);
         if (this.resource_get.isFull()) {
             this.resources_board.disabled();
         }
+        (_a = this.OnEnableConfirm) === null || _a === void 0 ? void 0 : _a.call(this, this.resource_get.isFull() && this.resources_give.isFull());
     };
     ResourceConverter.prototype.removeControl = function () {
         var root = document.getElementById('resource-converter');
@@ -3194,6 +3481,7 @@ var NotificationManager = (function () {
             ['onDrawConfort', undefined],
             ['onAddConfortToHand', undefined],
             ['onBuildImprovement', undefined],
+            ['onModifyDieWithLessonLearned', 100],
         ];
         this.setupNotifications(notifs);
         ['message', 'onDrawConfort'].forEach(function (eventName) {
@@ -3458,6 +3746,10 @@ var NotificationManager = (function () {
             });
         });
     };
+    NotificationManager.prototype.notif_onModifyDieWithLessonLearned = function (_a) {
+        var player_id = _a.player_id, nbr_lesson = _a.nbr_lesson;
+        this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
+    };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
         var _this = this;
         var index = 0;
@@ -3721,6 +4013,8 @@ var PlacementState = (function () {
 var PlayerTurnDiceState = (function () {
     function PlayerTurnDiceState(game) {
         this.game = game;
+        this.diceModification = {};
+        this.original_dice = [];
         this.diceHelper = new DiceHelper(game);
     }
     PlayerTurnDiceState.prototype.onEnteringState = function (args) {
@@ -3728,33 +4022,63 @@ var PlayerTurnDiceState = (function () {
         if (!this.game.isCurrentPlayerActive())
             return;
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
-        var handleHillClick = function (selection) {
-            if (selection.length == 1) {
-                var locations = _this.game.tableCenter.getWorkerLocations().filter(function (location_id) {
-                    var count = _this.getDiceFromLocation(location_id).length;
-                    return count < _this.diceHelper.getTotalDiceSlot(location_id);
-                });
-                worker_locations.setSelectableLocation(locations);
+        this.original_dice = hill.getDice().map(function (die) { return Object.assign({}, die); });
+        this.original_dice.forEach(function (die) { return (_this.diceModification[die.id] = 0); });
+        var handleGladeSlotClick = function (slot_id) {
+            var canAddDice = _this.getDiceFromLocation(Number(slot_id)).length == 0 &&
+                hill.getSelection()[0].owner_id;
+            if (canAddDice) {
+                _this.addSelectedDieToSlot(slot_id);
             }
-            else {
-                worker_locations.setSelectableLocation([]);
+        };
+        var handleHillClick = function (selection) {
+            worker_locations.setSelectableLocation([]);
+            document.querySelectorAll('#dice-locations .slot-dice').forEach(function (slot) {
+                slot.classList.remove('selectable');
+            });
+            if (selection.length == 0) {
+                return;
+            }
+            dice_locations.unselectAll();
+            var locations = _this.game.tableCenter.getWorkerLocations().filter(function (location_id) {
+                var count = _this.getDiceFromLocation(location_id).length;
+                var max = _this.diceHelper.getTotalDiceSlot(location_id);
+                return count < max || max == -1;
+            });
+            worker_locations.setSelectableLocation(locations);
+            if (selection[0].owner_id) {
+                _this.game.tableCenter.glade
+                    .getCards()
+                    .map(function (card) { return Number(card.location_arg); })
+                    .forEach(function (location) {
+                    var dice = _this.getDiceFromLocation(location);
+                    document
+                        .querySelector("#dice-locations [data-slot-id=\"".concat(location, "\"]"))
+                        .classList.toggle('selectable', dice.length == 0);
+                });
             }
         };
         var handleWorkerLocationClick = function (slotId) {
-            var _a = hill.getSelection(), die = _a[0], others = _a.slice(1);
-            if (!die)
-                return;
-            var copy = __assign(__assign({}, die), { location: slotId });
-            dice_locations.addDie(copy);
+            _this.addSelectedDieToSlot(slotId);
         };
-        var handleDiceLocationClick = function (die) {
-            hill.unselectAll();
-            hill.addDie(die);
+        var handleDiceLocationClick = function (selection) {
+            if (selection.length == 1) {
+                hill.unselectAll();
+            }
+            _this.game.updatePageTitle();
         };
         hill.setSelectionMode('single');
         hill.onSelectionChange = handleHillClick;
         worker_locations.OnLocationClick = handleWorkerLocationClick;
-        dice_locations.onDieClick = handleDiceLocationClick;
+        dice_locations.setSelectionMode('single');
+        dice_locations.onSelectionChange = handleDiceLocationClick;
+        document.querySelectorAll('#dice-locations .slot-dice').forEach(function (slot) {
+            slot.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                var slot_id = Number(slot.dataset.slotId);
+                handleGladeSlotClick(slot_id);
+            });
+        });
     };
     PlayerTurnDiceState.prototype.onLeavingState = function () {
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
@@ -3762,24 +4086,102 @@ var PlayerTurnDiceState = (function () {
         hill.onSelectionChange = null;
         worker_locations.OnLocationClick = null;
         dice_locations.onDieClick = null;
+        document.querySelectorAll('#dice-locations .lesson-wrapper').forEach(function (value) { return value.remove(); });
     };
     PlayerTurnDiceState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
+        var _a = this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
+        var _b = this.game.tableCenter.dice_locations.getSelection(), die = _b[0], others = _b.slice(1);
         var handleCancel = function () {
-            var _a = _this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
-            hill.addDice(dice_locations.getDice());
+            document.querySelectorAll('#dice-locations .lesson-wrapper').forEach(function (value) { return value.remove(); });
+            _this.original_dice.forEach(function (die) { return (_this.diceModification[die.id] = 0); });
+            var copy = _this.original_dice.map(function (die) { return Object.assign({}, die); });
+            hill.addDice(copy);
         };
         var handleConfirm = function () {
             var dice = _this.game.tableCenter.dice_locations.getDice();
+            if (dice.length == 0)
+                return;
             var args = {
                 dice_ids: dice.map(function (die) { return die.id; }).join(';'),
                 location_ids: dice.map(function (die) { return Number(die.location); }).join(';'),
+                modifiers: dice.map(function (die) { return _this.diceModification[die.id]; }).join(';'),
             };
             console.log(args);
             _this.game.takeAction('confirmPlayerDice', args);
         };
-        this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
-        this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+        if (die) {
+            this.addButtonsLessonLearned(die);
+        }
+        else {
+            this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+        }
+    };
+    PlayerTurnDiceState.prototype.addButtonsLessonLearned = function (die) {
+        var _this = this;
+        var htmlDie = this.game.diceManager.getDieElement(die).childNodes[0];
+        var getDieValue = function () { return Number(die.face); };
+        var getLessonRemaining = function () {
+            var nbr_token = _this.game.getPlayerPanel(_this.game.getPlayerId()).counters['lesson'].getValue();
+            var total = 0;
+            Object.keys(_this.diceModification).forEach(function (dieId) {
+                total += Math.abs(_this.diceModification[dieId]);
+            });
+            return nbr_token - total;
+        };
+        var handleDecrease = function () { return handleModification(1, -1); };
+        var handleIncrease = function () { return handleModification(6, +1); };
+        var handleModification = function (limit, value) {
+            if (getDieValue() + _this.diceModification[die.id] == limit)
+                return;
+            if (getLessonRemaining() <= 0) {
+                var canMakeOppositeMove = (_this.diceModification[die.id] > 0 && value < 0) ||
+                    (_this.diceModification[die.id] < 0 && value > 0);
+                if (!canMakeOppositeMove) {
+                    _this.game.showMessage(_('Not enough lesson learned token remaining'), 'error');
+                    return;
+                }
+            }
+            _this.diceModification[die.id] += value;
+            _this.displayLessonLearnedToken(htmlDie, die);
+            updateButton();
+        };
+        var handleConfirmLesson = function () {
+            _this.game.tableCenter.dice_locations.unselectAll();
+            _this.game.updatePageTitle();
+        };
+        var handleRemoveLesson = function () {
+            _this.diceModification[die.id] = 0;
+            _this.displayLessonLearnedToken(htmlDie, die);
+            updateButton();
+        };
+        var updateButton = function () {
+            var count = _this.diceModification[die.id];
+            _this.game.toggleButtonEnable('btn_minus', getDieValue() + count > 1 && (getLessonRemaining() > 0 || count > 0));
+            _this.game.toggleButtonEnable('btn_plus', getDieValue() + count < 6 && (getLessonRemaining() > 0 || count < 0));
+        };
+        var applyIcon = function (text, icon) {
+            return text.replace('${token}', ResourceHelper.getElement(icon));
+        };
+        var label_minus = applyIcon(_('Use ${token} to decrease die value by 1'), 'lesson-minus');
+        var label_plus = applyIcon(_('Use ${token} to increase die value by 1'), 'lesson-plus');
+        this.game.addActionButton('btn_minus', label_minus, handleDecrease);
+        this.game.addActionButton('btn_plus', label_plus, handleIncrease);
+        this.game.addActionButtonGray('btn_confirm_lesson', _('Confirm token'), handleConfirmLesson);
+        this.game.addActionButtonRed('btn_remove', _('Remove all tokens from this die'), handleRemoveLesson);
+        updateButton();
+    };
+    PlayerTurnDiceState.prototype.displayLessonLearnedToken = function (htmlDie, die) {
+        var lesson_wrapper = htmlDie.parentElement.querySelector('.lesson-wrapper');
+        if (lesson_wrapper) {
+            lesson_wrapper.remove();
+        }
+        var icon = this.diceModification[die.id] > 0 ? 'lesson-plus' : 'lesson-minus';
+        var icons = arrayRange(1, Math.abs(this.diceModification[die.id]))
+            .map(function () { return ResourceHelper.getElement(icon); })
+            .join('');
+        htmlDie.parentElement.insertAdjacentHTML('beforeend', "<div class=\"lesson-wrapper\">".concat(icons, "</div>"));
     };
     PlayerTurnDiceState.prototype.validate = function () {
         var locations = this.game.tableCenter.getWorkerLocations();
@@ -3803,6 +4205,14 @@ var PlayerTurnDiceState = (function () {
             .getDice()
             .filter(function (die) { return die.location == location_id; });
     };
+    PlayerTurnDiceState.prototype.addSelectedDieToSlot = function (slotId) {
+        var _a = this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
+        var _b = hill.getSelection(), die = _b[0], others = _b.slice(1);
+        if (!die)
+            return;
+        var copy = __assign(__assign({}, die), { location: slotId });
+        dice_locations.addDie(copy);
+    };
     return PlayerTurnDiceState;
 }());
 var PlayerTurnResolveState = (function () {
@@ -3813,8 +4223,7 @@ var PlayerTurnResolveState = (function () {
         var _this = this;
         if (!this.game.isCurrentPlayerActive())
             return;
-        var worker_locations = this.game.tableCenter.worker_locations;
-        var locations = this.game.tableCenter.getWorkerLocations();
+        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         var handleWorkerLocationClick = function (slotId) {
             if (worker_locations.isSelectedLocation(slotId)) {
                 worker_locations.setSelectedLocation([]);
@@ -3825,6 +4234,10 @@ var PlayerTurnResolveState = (function () {
                 _this.game.enableButton('btn_resolve');
             }
         };
+        var dices = dice_locations.getDice().map(function (die) { return Number(die.location); });
+        var locations = this.game.tableCenter
+            .getWorkerLocations()
+            .filter(function (location) { return dices.indexOf(location) >= 0; });
         worker_locations.setSelectableLocation(locations);
         worker_locations.OnLocationClick = handleWorkerLocationClick;
     };
@@ -3871,6 +4284,7 @@ var PlayerTurnResolveState = (function () {
         };
         if (this.game.tableCenter.getWorkerLocations().length > 0) {
             this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+            this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
         }
         else {
             this.game.addActionButton('btn_end', _('End'), handleEnd);
@@ -3891,31 +4305,28 @@ var PlayerTurnCraftState = (function () {
         worker_locations.setSelectionMode('none');
         worker_locations.setSelectableLocation([]);
         worker_locations.setSelectedLocation([]);
-        var resourceManager = new SelectResources(this.game, this.game.getPlayerId());
-        this.resourceManager = resourceManager;
         var hand = this.game.getCurrentPlayerTable().hand;
-        var handleResourceChanged = function (resources) {
-            var card = hand.getSelection()[0];
-            if (!card || resources.length == 0) {
-                _this.game.disableButton('btn_craft');
-                return;
-            }
-            var card_type = _this.game.confortManager.getCardType(card);
-            if ('*' in card_type.cost) {
-                _this.game.toggleButtonEnable('btn_craft', card_type.cost['*'] == resources.length);
-            }
-        };
         var handleSelectionChange = function (selection) {
-            _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
+            if (_this.resourceManager) {
+                _this.resourceManager.hide();
+                _this.resourceManager.OnEnableConfirm = null;
+                _this.resourceManager = undefined;
+            }
             if (selection.length == 0)
                 return;
             var card_type = _this.game.confortManager.getCardType(selection[0]);
             if ('*' in card_type.cost) {
-                resourceManager.display(card_type.cost);
+                _this.resourceManager = new ResourceConverter(_this.game, ['*', '*'], [], 1, {
+                    displayTo: false,
+                });
+                _this.resourceManager.show();
+                _this.resourceManager.OnEnableConfirm = function (enable) {
+                    _this.game.toggleButtonEnable('btn_craft', enable);
+                };
                 _this.game.toggleButtonEnable('btn_craft', false);
             }
             else {
-                resourceManager.hide();
+                _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
             }
         };
         var selection = hand.getCards().filter(function (card) {
@@ -3930,7 +4341,6 @@ var PlayerTurnCraftState = (function () {
         hand.setSelectionMode('single');
         hand.setSelectableCards(selection);
         hand.onSelectionChange = handleSelectionChange;
-        resourceManager.OnResourceChanged = handleResourceChanged;
     };
     PlayerTurnCraftState.prototype.onLeavingState = function () { };
     PlayerTurnCraftState.prototype.onUpdateActionButtons = function (args) {
@@ -3946,7 +4356,7 @@ var PlayerTurnCraftState = (function () {
             }
             var resources = [];
             if ('*' in card_type.cost) {
-                resources = _this.resourceManager.getResources();
+                resources = ResourceHelper.convertToInt(_this.resourceManager.getResourcesGive());
             }
             _this.game.takeAction('craftConfort', { card_id: card.id, resources: resources.join(';') });
         };
@@ -4066,13 +4476,18 @@ var ResolveTravelerState = (function () {
     }
     ResolveTravelerState.prototype.onEnteringState = function (args) {
         var _this = this;
-        var _a;
-        var _b = this.game.tableCenter, worker_locations = _b.worker_locations, dice_locations = _b.dice_locations;
+        var _a, _b, _c;
+        var _d = this.game.tableCenter, worker_locations = _d.worker_locations, dice_locations = _d.dice_locations;
         worker_locations.setSelectableLocation([9]);
         worker_locations.setSelectedLocation([9]);
         var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
         var traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
         var reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
+        this.reward = reward;
+        var handleEnabledConfirm = function (enable) {
+            _this.is_confirm_enable = enable;
+            _this.game.toggleButtonEnable('btn_confirm', enable);
+        };
         if (reward.from == null || reward.from.length == 0) {
             this.convert = undefined;
             this.game.takeAction('resolveWorker', { location_id: 9, resources: [], resource2: [] }, null, function () {
@@ -4081,6 +4496,9 @@ var ResolveTravelerState = (function () {
         }
         else {
             this.convert = new ResourceConverter(this.game, (_a = reward.from) !== null && _a !== void 0 ? _a : GOODS, reward.to, reward.times);
+            this.convert.OnEnableConfirm = handleEnabledConfirm;
+            this.game.toggleButtonEnable('btn_confirm', ((_b = reward.from) === null || _b === void 0 ? void 0 : _b.length) == 0);
+            this.is_confirm_enable = ((_c = reward.from) === null || _c === void 0 ? void 0 : _c.length) == 0;
             this.convert.show();
         }
     };
@@ -4093,8 +4511,14 @@ var ResolveTravelerState = (function () {
     ResolveTravelerState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
+            if (!_this.is_confirm_enable)
+                return;
             var resources_give = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
-            _this.game.takeAction('resolveWorker', { location_id: 9, resources: resources_give });
+            var data = { location_id: 9, resources: resources_give };
+            if (_this.reward.to.length == 1 && _this.reward.to[0] === '*') {
+                data['resources2'] = ResourceHelper.convertToInt(_this.convert.getResourcesGet()).join(';');
+            }
+            _this.game.takeAction('resolveWorker', data);
         };
         this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
         this.game.addActionButtonClientCancel();
@@ -4245,6 +4669,13 @@ var ImprovementManager = (function (_super) {
                 var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
                 if (cottage) {
                     _this.cottages[card.id].addCard(cottage);
+                }
+                if (card.location == 'glade') {
+                    var slot = document.querySelector("#dice-locations [data-slot-id=\"".concat(card.location_arg, "\"]"));
+                    if (slot) {
+                        slot.classList.add('slot-dice');
+                        _this.game.placeOnObjectPos(slot, "".concat(_this.getId(card), "-slot-cottage"), -54, -3);
+                    }
                 }
             },
             isCardVisible: function (card) { return 'type' in card; },
@@ -4414,7 +4845,8 @@ var PlayerTable = (function () {
             ? "<div id=\"player-table-".concat(this.player_id, "-resources\" class=\"icons counters\"></div>")
             : '';
         var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n                     <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n                  </div>\n                  ").concat(resourceManager, "\n                  <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n               </div>\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-improvement\" class=\"player-table-improvement\"></div>\n                  <div id=\"player-table-").concat(this.player_id, "-confort\" class=\"player-table-confort\"></div>\n               </div>\n            </div>\n         </div>");
-        document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+        var destination = this.game.getPlayerId() == this.player_id ? 'current-player-table' : 'tables';
+        document.getElementById(destination).insertAdjacentHTML('beforeend', html);
     };
     PlayerTable.prototype.setupConfort = function (game, player) {
         this.conforts = new LineStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-confort")), {
@@ -4504,7 +4936,7 @@ var TableCenter = (function () {
     };
     TableCenter.prototype.setupDiceLocations = function (game) {
         this.dice_locations = new SlotDiceStock(game.diceManager, document.getElementById("dice-locations"), {
-            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+            slotsIds: __spreadArray(__spreadArray([], arrayRange(1, 12), true), arrayRange(20, 40), true).flat(),
             mapDieToSlot: function (die) { return die.location; },
             gap: '0',
         });
@@ -4585,6 +5017,28 @@ function createCounter(id, value) {
     counter.create(id);
     counter.setValue(value);
     return counter;
+}
+function countExtractions(mainArray, targetArray) {
+    var mainArrayCounts = {};
+    var targetArrayCounts = {};
+    for (var i = 0; i < mainArray.length; i++) {
+        var element = mainArray[i];
+        mainArrayCounts[element] = (mainArrayCounts[element] || 0) + 1;
+    }
+    for (var j = 0; j < targetArray.length; j++) {
+        var element = targetArray[j];
+        targetArrayCounts[element] = (targetArrayCounts[element] || 0) + 1;
+    }
+    var minExtractions = 10000;
+    for (var key in mainArrayCounts) {
+        if (mainArrayCounts.hasOwnProperty(key)) {
+            var mainCount = mainArrayCounts[key];
+            var targetCount = targetArrayCounts[key] || 0;
+            var extractions = Math.floor(targetCount / mainCount);
+            minExtractions = Math.min(minExtractions, extractions);
+        }
+    }
+    return minExtractions;
 }
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock"], function (dojo, declare) {
     return declare("bgagame.creatureconforts", [ebg.core.gamegui], new CreatureConforts());

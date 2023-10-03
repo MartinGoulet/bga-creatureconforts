@@ -1,5 +1,7 @@
 class ResolveTravelerState implements StateHandler {
    private convert?: ResourceConverter;
+   private reward: TravelerReward;
+   private is_confirm_enable: boolean;
 
    constructor(private game: CreatureConforts) {}
 
@@ -12,6 +14,11 @@ class ResolveTravelerState implements StateHandler {
 
       const traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
       const reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
+      this.reward = reward;
+      const handleEnabledConfirm = (enable: boolean) => {
+         this.is_confirm_enable = enable;
+         this.game.toggleButtonEnable('btn_confirm', enable);
+      };
 
       if (reward.from == null || reward.from.length == 0) {
          this.convert = undefined;
@@ -21,6 +28,9 @@ class ResolveTravelerState implements StateHandler {
          });
       } else {
          this.convert = new ResourceConverter(this.game, reward.from ?? GOODS, reward.to, reward.times);
+         this.convert.OnEnableConfirm = handleEnabledConfirm;
+         this.game.toggleButtonEnable('btn_confirm', reward.from?.length == 0);
+         this.is_confirm_enable = reward.from?.length == 0;
          this.convert.show();
       }
    }
@@ -33,8 +43,14 @@ class ResolveTravelerState implements StateHandler {
 
    onUpdateActionButtons(args: any): void {
       const handleConfirm = () => {
+         if (!this.is_confirm_enable) return;
+
          const resources_give = ResourceHelper.convertToInt(this.convert.getResourcesGive()).join(';');
-         this.game.takeAction('resolveWorker', { location_id: 9, resources: resources_give });
+         const data = { location_id: 9, resources: resources_give };
+         if (this.reward.to.length == 1 && this.reward.to[0] === '*') {
+            data['resources2'] = ResourceHelper.convertToInt(this.convert.getResourcesGet()).join(';');
+         }
+         this.game.takeAction('resolveWorker', data);
       };
       this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
       this.game.addActionButtonClientCancel();

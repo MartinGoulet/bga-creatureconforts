@@ -1,5 +1,6 @@
 class PlayerTurnCraftState implements StateHandler {
-   private resourceManager: SelectResources;
+   // private resourceManager: SelectResources;
+   private resourceManager?: ResourceConverter;
 
    constructor(private game: CreatureConforts) {}
 
@@ -10,33 +11,42 @@ class PlayerTurnCraftState implements StateHandler {
       worker_locations.setSelectableLocation([]);
       worker_locations.setSelectedLocation([]);
 
-      const resourceManager = new SelectResources(this.game, this.game.getPlayerId());
-      this.resourceManager = resourceManager;
       const { hand } = this.game.getCurrentPlayerTable();
 
-      const handleResourceChanged = (resources: string[]) => {
-         const [card] = hand.getSelection();
-         if (!card || resources.length == 0) {
-            this.game.disableButton('btn_craft');
-            return;
-         }
+      // const handleResourceChanged = (resources: string[]) => {
+      //    const [card] = hand.getSelection();
+      //    if (!card || resources.length == 0) {
+      //       this.game.disableButton('btn_craft');
+      //       return;
+      //    }
 
-         const card_type = this.game.confortManager.getCardType(card);
-         if ('*' in card_type.cost) {
-            this.game.toggleButtonEnable('btn_craft', card_type.cost['*'] == resources.length);
-         }
-      };
+      //    const card_type = this.game.confortManager.getCardType(card);
+      //    if ('*' in card_type.cost) {
+      //       this.game.toggleButtonEnable('btn_craft', card_type.cost['*'] == resources.length);
+      //    }
+      // };
 
       const handleSelectionChange = (selection: ConfortCard[]) => {
-         this.game.toggleButtonEnable('btn_craft', selection.length == 1);
+         if (this.resourceManager) {
+            this.resourceManager.hide();
+            this.resourceManager.OnEnableConfirm = null;
+            this.resourceManager = undefined;
+         }
          if (selection.length == 0) return;
 
          const card_type = this.game.confortManager.getCardType(selection[0]);
+
          if ('*' in card_type.cost) {
-            resourceManager.display(card_type.cost);
+            this.resourceManager = new ResourceConverter(this.game, ['*', '*'], [], 1, {
+               displayTo: false,
+            });
+            this.resourceManager.show();
+            this.resourceManager.OnEnableConfirm = (enable) => {
+               this.game.toggleButtonEnable('btn_craft', enable);
+            };
             this.game.toggleButtonEnable('btn_craft', false);
          } else {
-            resourceManager.hide();
+            this.game.toggleButtonEnable('btn_craft', selection.length == 1);
          }
       };
 
@@ -54,7 +64,7 @@ class PlayerTurnCraftState implements StateHandler {
       hand.setSelectionMode('single');
       hand.setSelectableCards(selection);
       hand.onSelectionChange = handleSelectionChange;
-      resourceManager.OnResourceChanged = handleResourceChanged;
+      // resourceManager.OnResourceChanged = handleResourceChanged;
    }
    onLeavingState(): void {}
    onUpdateActionButtons(args: any): void {
@@ -71,7 +81,7 @@ class PlayerTurnCraftState implements StateHandler {
          let resources: number[] = [];
 
          if ('*' in card_type.cost) {
-            resources = this.resourceManager.getResources();
+            resources = ResourceHelper.convertToInt(this.resourceManager.getResourcesGive());
          }
 
          this.game.takeAction('craftConfort', { card_id: card.id, resources: resources.join(';') });

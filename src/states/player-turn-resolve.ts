@@ -3,8 +3,7 @@ class PlayerTurnResolveState implements StateHandler {
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;
 
-      const { worker_locations } = this.game.tableCenter;
-      const locations = this.game.tableCenter.getWorkerLocations();
+      const { worker_locations, dice_locations } = this.game.tableCenter;
 
       const handleWorkerLocationClick = (slotId: SlotId) => {
          if (worker_locations.isSelectedLocation(slotId)) {
@@ -16,6 +15,10 @@ class PlayerTurnResolveState implements StateHandler {
          }
       };
 
+      const dices = dice_locations.getDice().map((die: Dice) => Number(die.location));
+      const locations = this.game.tableCenter
+         .getWorkerLocations()
+         .filter((location) => dices.indexOf(location) >= 0);
       worker_locations.setSelectableLocation(locations);
       worker_locations.OnLocationClick = handleWorkerLocationClick;
    }
@@ -60,6 +63,7 @@ class PlayerTurnResolveState implements StateHandler {
 
       if (this.game.tableCenter.getWorkerLocations().length > 0) {
          this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
+         this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
       } else {
          this.game.addActionButton('btn_end', _('End'), handleEnd);
       }

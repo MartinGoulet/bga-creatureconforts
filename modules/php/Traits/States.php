@@ -2,6 +2,7 @@
 
 namespace CreatureConforts\Traits;
 
+use BgaUserException;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
@@ -26,11 +27,12 @@ trait States {
     }
 
     function stNewTraveler() {
-        $isFirstTurn = Travelers::count() == 15;
+        Game::get()->incStat(1, STAT_TURN_NUMBER);
+
+        $isFirstTurn = Game::get()->getStat(STAT_TURN_NUMBER) == 1;
         if (!$isFirstTurn) {
             Travelers::discardTopCard();
         }
-        Travelers::revealTopCard();
         Notifications::newTraveler();
 
         $players = Game::get()->loadPlayersBasicInfos();
@@ -82,6 +84,21 @@ trait States {
         $dice = Dice::getDiceFromPlayer($player_id);
         Notifications::moveDiceToHill($dice);
         Game::get()->undoSavepoint();
+        Game::get()->gamestate->nextState();
+    }
+
+    function stPlayerReturnUnresolvedWorker() {
+        $player_id = Players::getPlayerId();
+        $workers = Worker::getWorkersFromPlayer($player_id );
+        foreach ($workers as $worker) {
+            $location_id = intval($worker['location_arg']);
+            if($location_id > 0) {
+                Worker::returnToPlayerBoard($player_id, $location_id);
+                Notifications::returnToPlayerBoard($worker);
+                Players::addResources($player_id, [LESSON_LEARNED => 1]);
+                Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
+            }
+        }
         Game::get()->gamestate->nextState();
     }
 

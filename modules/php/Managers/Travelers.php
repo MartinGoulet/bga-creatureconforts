@@ -41,20 +41,16 @@ class Travelers {
     }
 
     static function getUIData() {
-        $cards = self::deck()->getCardsInLocation('revealed');
+        $isGameJustStarted = Game::get()->getStat(STAT_TURN_NUMBER) == 0;
         return [
-            'topCard' => array_shift($cards),
-            'count' => self::deck()->countCardInLocation('deck') + self::deck()->countCardInLocation('revealed'),
+            'topCard' => $isGameJustStarted ? null : self::deck()->getCardOnTop('deck'),
+            'count' => self::deck()->countCardInLocation('deck'),
             'types' => Game::get()->traveler_types,
         ];
     }
 
     static function getTopCard() {
         return self::getUIData()['topCard'];
-    }
-
-    static function revealTopCard() {
-        self::deck()->pickCardForLocation('deck', 'revealed');
     }
 
     private static function deck() {

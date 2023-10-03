@@ -155,10 +155,19 @@ $machinestates = $basicGameStates + array(
         "description" => clienttranslate('${actplayer} must resolve their workers'),
         "type" => "activeplayer",
         "possibleactions" => array("resolveWorker", "confirmResolveWorker", "undo"),
-        "transitions" => [  
+        "transitions" => [
             "undo" => ST_PLAYER_TURN_DICE,
             "next" => ST_PLAYER_TURN_RESOLVE,
-            "end" => ST_PLAYER_TURN_CRAFT_CONFORT,
+            "end" => ST_PLAYER_RETURN_UNRESOLVED_WORKER,
+        ]
+    ],
+
+    ST_PLAYER_RETURN_UNRESOLVED_WORKER => [
+        "name" => "playerReturnUnresolvedWorker",
+        "type" => "game",
+        "action" => "stPlayerReturnUnresolvedWorker",
+        "transitions" => [
+            "" => ST_PLAYER_TURN_CRAFT_CONFORT,
         ]
     ],
 

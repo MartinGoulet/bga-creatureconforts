@@ -25,6 +25,7 @@ class NotificationManager {
          ['onDrawConfort', undefined],
          ['onAddConfortToHand', undefined],
          ['onBuildImprovement', undefined],
+         ['onModifyDieWithLessonLearned', 100],
       ];
 
       this.setupNotifications(notifs);
@@ -203,6 +204,10 @@ class NotificationManager {
       });
    }
 
+   private notif_onModifyDieWithLessonLearned({ player_id, nbr_lesson }: ModifyDieWithLessonLearnedArgs) {
+      this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
+   }
+
    private animationMoveResource(
       player_id: number,
       resources: { [type: string]: number }[],
@@ -302,4 +307,9 @@ interface BuildImprovementArgs {
    card: ImprovementCard;
    cottage: CottageCard;
    cost: { [type: string]: number }[];
+}
+
+interface ModifyDieWithLessonLearnedArgs {
+   player_id: number;
+   nbr_lesson: number;
 }

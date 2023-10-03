@@ -60,7 +60,8 @@ class PlayerTable {
             </div>
          </div>`;
 
-      document.getElementById('tables').insertAdjacentHTML('beforeend', html);
+      const destination = this.game.getPlayerId() == this.player_id ? 'current-player-table' : 'tables';
+      document.getElementById(destination).insertAdjacentHTML('beforeend', html);
    }
 
    private setupConfort(game: CreatureConforts, player: CreatureConfortsPlayerData) {

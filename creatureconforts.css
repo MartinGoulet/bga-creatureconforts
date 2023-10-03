@@ -1,3 +1,65 @@
+#bga-zoom-wrapper {
+  position: relative;
+}
+
+#bga-zoom-wrapper .bga-zoom-inner {
+  transform-origin: left top;
+}
+
+#bga-zoom-wrapper .bga-zoom-inner[data-smooth=true] {
+  transition: transform 0.5s;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls {
+  position: absolute;
+  top: 0;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls[data-position=top-left] {
+  left: 0;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls[data-position=top-right] {
+  right: 0;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls button {
+  border: 0;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls button:not(.disabled) {
+  cursor: pointer;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls button.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+#bga-zoom-wrapper #bga-zoom-controls .bga-zoom-out-icon {
+  width: 40px;
+  height: 40px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="65 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"><g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M118,118C122.1,113.8 124.3,108.7 124.3,102.8C124.3,96.8 122.1,91.8 118,87.6C113.8,83.4 108.7,81.3 102.8,81.3C96.8,81.3 91.8,83.4 87.6,87.6C83.3,91.8 81.3,96.8 81.3,102.8C81.3,108.7 83.3,113.8 87.6,118C91.8,122.2 96.8,124.3 102.8,124.3C108.7,124.3 113.8,122.2 118,118" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M118,118L132.3,132.3" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M114.5,102.1L90.8,102.1" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g></g></svg>');
+}
+
+#bga-zoom-wrapper #bga-zoom-controls .bga-zoom-in-icon {
+  width: 40px;
+  height: 40px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"><g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M23.8,102.1L35.7,102.1" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,102.1L47.5,102.1" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,102.1L35.7,90.3" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M51,118C55.2,113.8 57.3,108.7 57.3,102.8C57.3,96.8 55.2,91.8 51,87.6C46.8,83.4 41.7,81.3 35.8,81.3C29.9,81.3 24.8,83.4 20.6,87.6C16.4,91.8 14.3,96.8 14.3,102.8C14.3,108.7 16.4,113.8 20.6,118C24.8,122.2 29.9,124.3 35.8,124.3C41.7,124.3 46.8,122.2 51,118" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,113.9L35.7,102.1" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M65.3,132.3L51,118" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:7px;"/></g></g></svg>');
+}
+
+#bga-zoom-wrapper #bga-zoom-controls[data-color=white] .bga-zoom-out-icon {
+  width: 40px;
+  height: 40px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="65 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"><g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M118,118C122.1,113.8 124.3,108.7 124.3,102.8C124.3,96.8 122.1,91.8 118,87.6C113.8,83.4 108.7,81.3 102.8,81.3C96.8,81.3 91.8,83.4 87.6,87.6C83.3,91.8 81.3,96.8 81.3,102.8C81.3,108.7 83.3,113.8 87.6,118C91.8,122.2 96.8,124.3 102.8,124.3C108.7,124.3 113.8,122.2 118,118" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M118,118L132.3,132.3" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-4.97116,-76.2244)"><path d="M114.5,102.1L90.8,102.1" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g></g></svg>');
+}
+
+#bga-zoom-wrapper #bga-zoom-controls[data-color=white] .bga-zoom-in-icon {
+  width: 40px;
+  height: 40px;
+  background: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" viewBox="0 0 70 70" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"><g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M23.8,102.1L35.7,102.1" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,102.1L47.5,102.1" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,102.1L35.7,90.3" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M51,118C55.2,113.8 57.3,108.7 57.3,102.8C57.3,96.8 55.2,91.8 51,87.6C46.8,83.4 41.7,81.3 35.8,81.3C29.9,81.3 24.8,83.4 20.6,87.6C16.4,91.8 14.3,96.8 14.3,102.8C14.3,108.7 16.4,113.8 20.6,118C24.8,122.2 29.9,124.3 35.8,124.3C41.7,124.3 46.8,122.2 51,118" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M35.7,113.9L35.7,102.1" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g><g transform="matrix(1,0,0,1,-7.91703,-76.2244)"><path d="M65.3,132.3L51,118" style="fill:none;fill-rule:nonzero;stroke:white;stroke-width:7px;"/></g></g></svg>');
+}
+
 body > .card {
   position: absolute;
   left: -9999px;
@@ -162,7 +224,7 @@ body > .card {
 .bga-cards_deck-counter {
   --bga-cards-deck-counter-size: 20px;
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   width: var(--bga-cards-deck-counter-size);
   height: var(--bga-cards-deck-counter-size);
   left: calc(var(--bga-cards-deck-left) - var(--bga-cards-deck-counter-size) / 2);
@@ -195,26 +257,48 @@ body > .card {
 .card-stock.all-visible-deck {
   position: absolute;
   --tile-count: 1;
-  width: calc(var(--width) + var(--tile-count) * var(--shift));
-  transition: height 0.5s ease-in-out, background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+  width: calc(var(--width) + (var(--tile-count) - 1) * var(--horizontal-shift));
+  height: calc(var(--height) + (var(--tile-count) - 1) * var(--vertical-shift));
+  transition: width 0.5s ease-in-out, height 0.5s ease-in-out, background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
   opacity: var(--tile-count);
 }
 
-.card-stock.all-visible-deck > * {
+.card-stock.all-visible-deck > .card {
   position: absolute;
   margin: 0;
   transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
-  top: calc(var(--shift) * var(--order));
-  left: calc(var(--shift) * var(--order));
+  top: calc(var(--vertical-shift) * var(--order));
+  left: calc(var(--horizontal-shift) * var(--order));
 }
 
-.card-stock.all-visible-deck:hover, .card-stock.all-visible-deck:active, .card-stock.all-visible-deck.opened {
-  height: calc((var(--height) + var(--shift)) * var(--tile-count) - var(--shift));
+.card-stock.all-visible-deck.vertical:hover, .card-stock.all-visible-deck.vertical:active, .card-stock.all-visible-deck.vertical.opened {
+  height: calc((var(--height) + var(--vertical-shift)) * var(--tile-count) - var(--vertical-shift));
   z-index: 1;
 }
 
-.card-stock.all-visible-deck:hover > *, .card-stock.all-visible-deck:active > *, .card-stock.all-visible-deck.opened > * {
-  top: calc((var(--height) + var(--shift)) * var(--order));
+.card-stock.all-visible-deck.vertical:hover > .card, .card-stock.all-visible-deck.vertical:active > .card, .card-stock.all-visible-deck.vertical.opened > .card {
+  top: calc((var(--height) + var(--vertical-shift)) * var(--order));
+}
+
+.card-stock.all-visible-deck.horizontal:hover, .card-stock.all-visible-deck.horizontal:active, .card-stock.all-visible-deck.horizontal.opened {
+  width: calc((var(--width) + var(--horizontal-shift)) * var(--tile-count) - var(--horizontal-shift));
+  z-index: 1;
+}
+
+.card-stock.all-visible-deck.horizontal:hover > .card, .card-stock.all-visible-deck.horizontal:active > .card, .card-stock.all-visible-deck.horizontal.opened > .card {
+  left: calc((var(--width) + var(--horizontal-shift)) * var(--order));
+}
+
+.card-stock.all-visible-deck .bga-cards_deck-counter {
+  transition: left 0.5s ease-in-out, top 0.5s ease-in-out;
+}
+
+.card-stock.all-visible-deck[data-empty=true] > .card {
+  visibility: hidden;
+}
+
+.card-stock.all-visible-deck[data-empty=true] .bga-cards_deck-counter.hide-when-empty {
+  display: none;
 }
 
 body > .bga-dice_die {
@@ -411,13 +495,12 @@ body > .bga-dice_die {
 }
 
 #table-center-wrapper {
-  min-width: 900px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  grid-template-areas: "empty glade" "ladder board";
+  padding: 0 10px;
 }
 #table-center-wrapper #table-improvements {
+  grid-area: ladder;
   align-self: self-start;
   margin-top: 213px;
   margin-right: 6px;
@@ -428,12 +511,14 @@ body > .bga-dice_die {
   border: 1px solid black;
 }
 #table-center-wrapper #glade {
+  grid-area: glade;
   padding-bottom: 20px;
 }
 #table-center-wrapper #glade:empty {
   padding-bottom: 0;
 }
 #table-center-wrapper #board {
+  grid-area: board;
   position: relative;
   background-image: url("img/gametable.jpg");
   background-size: cover;
@@ -547,6 +632,13 @@ body > .bga-dice_die {
   justify-content: center;
   align-items: center;
   gap: 5px;
+}
+#table-center-wrapper #board #dice-locations .slot .lesson-wrapper {
+  margin-top: 5px;
+  display: inline-flex;
+}
+#table-center-wrapper #board #dice-locations .slot .lesson-wrapper .resource-icon:not(:first-child) {
+  margin-left: -16px;
 }
 #table-center-wrapper #board #dice-locations [data-slot-id="1"] {
   top: 54px;
@@ -711,6 +803,19 @@ body > .bga-dice_die {
   width: 29px;
   background-position: -207px -3px;
   border-radius: 50%;
+  rotate: 45deg;
+}
+.resource-icon[data-type=lesson-plus] {
+  height: 29px;
+  width: 29px;
+  background-position: -207px -3px;
+  border-radius: 50%;
+}
+.resource-icon[data-type=lesson-minus] {
+  height: 29px;
+  width: 29px;
+  background-position: -242px -3px;
+  border-radius: 50%;
 }
 .resource-icon[data-type=coin] {
   height: 28px;
@@ -754,20 +859,23 @@ body > .bga-dice_die {
 }
 
 .player-table {
-  width: 100%;
+  width: 860px;
   padding: 10px 0 30px;
   border-radius: 8px;
   border: 4px solid var(--player-color);
   background-color: hsla(0, 0%, 100%, 0.4);
+  position: relative;
 }
 .player-table .name-wrapper {
+  background: white;
   color: var(--player-color);
-  display: flex;
-  padding: 5px 5px 20px;
-  justify-content: center;
-  align-items: center;
-  font-size: 20pt;
+  left: 20px;
+  top: -15px;
+  border: 4px solid var(--player-color);
+  border-radius: 5px;
   font-weight: 600;
+  padding: 3px 10px;
+  position: absolute;
 }
 .player-table .cols {
   display: flex;
@@ -788,13 +896,12 @@ body > .bga-dice_die {
   left: 20px;
 }
 .player-table .player-table-board {
-  margin: 0 auto;
+  margin: 10px auto 20px;
   background-size: 400px 220px;
   width: 400px;
   height: 220px;
   border-radius: 10px;
   position: relative;
-  margin-bottom: 20px;
 }
 .player-table .player-table-board .player-table-dice {
   position: absolute;
@@ -1484,6 +1591,19 @@ body > .bga-dice_die {
   background-position: -200% -100%;
 }
 
+.slot-dice {
+  border-radius: 5px;
+}
+.slot-dice.selectable {
+  animation: pulseSelectable 1s infinite alternate;
+  pointer-events: initial !important;
+  user-select: initial !important;
+}
+
+.gamestate_placement #hill-dice .bga-dice_die[data-color=white] {
+  display: none;
+}
+
 .card.worker {
   display: inline-block;
   position: relative;
@@ -1610,6 +1730,11 @@ body > .bga-dice_die {
   margin-top: 10px;
   padding-top: 10px;
 }
+#resource-converter.hideTo #resource-converter-board-resources,
+#resource-converter.hideTo .wrapper.no-border.arrow,
+#resource-converter.hideTo .wrapper.no-border.to {
+  display: none !important;
+}
 #resource-converter .line {
   flex-basis: 100%;
   display: flex;
@@ -1620,6 +1745,13 @@ body > .bga-dice_die {
 #resource-converter #resource-converter-board-resources,
 #resource-converter #resource-converter-buttons,
 #resource-converter #resource-converter-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+#resource-converter .resource-converter-placeholder-from,
+#resource-converter .resource-converter-placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1665,11 +1797,8 @@ body > .bga-dice_die {
 #resource-converter .wrapper.from {
   min-width: 0;
 }
-#resource-converter .resource-icon {
-  height: 32px;
-}
 #resource-converter .resource-icon[data-type=lesson] {
-  zoom: 0.7;
+  zoom: 0.9;
 }
 #resource-converter #resource-converter-board-resources .wrapper {
   background-color: #edcfa7;
@@ -1700,6 +1829,9 @@ body > .bga-dice_die {
 .log .resource-icon {
   display: inline-block;
   vertical-align: middle;
+}
+.log .resource-icon[data-type=lesson] {
+  rotate: 45deg;
 }
 
 .modal_open {
@@ -1819,8 +1951,6 @@ body > .bga-dice_die {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  flex-grow: 1;
-  flex-direction: column;
   gap: 20px;
 }
 
@@ -1830,6 +1960,11 @@ body > .bga-dice_die {
   box-shadow: none;
   color: #9090af;
   text-shadow: none;
+}
+.bgabutton .resource-icon {
+  display: inline-block;
+  vertical-align: middle;
+  zoom: 0.6;
 }
 
 .title {
@@ -1901,4 +2036,21 @@ body > .bga-dice_die {
   pointer-events: initial !important;
   user-select: initial !important;
   font-size: 20px;
+}
+
+@media screen and (min-width: 2033px) {
+  #tables-and-center {
+    display: grid;
+    grid-template-areas: "board player" "board players";
+    grid-template-rows: 0fr 1fr;
+  }
+  #tables-and-center #current-player-table {
+    grid-area: player;
+  }
+  #tables-and-center #table-center-wrapper {
+    grid-area: board;
+  }
+  #tables-and-center #tables {
+    grid-area: players;
+  }
 }

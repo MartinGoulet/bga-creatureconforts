@@ -14,6 +14,11 @@ interface ResourceConverterSettings {
 
       max?: number;
    };
+
+   /**
+    * Display the arrow and the resource get section: Default: true
+    */
+   displayTo: boolean;
 }
 
 class ResourceConverter {
@@ -25,11 +30,11 @@ class ResourceConverter {
    private resources_give?: IResourceLineStock;
    // Bottom right
    private counter_reward: ebg.counter;
-   private resource_reward: string;
 
    private resource_get: ResourcePlaceholderLineStock;
 
    public OnResourceChanged?: (resources: string[]) => void;
+   public OnEnableConfirm?: (enable: boolean) => void;
 
    constructor(
       public game: CreatureConforts,
@@ -44,7 +49,7 @@ class ResourceConverter {
 
       const count_any_ressource_to = this.to.filter((r) => r == '*').length;
       // Add container
-      this.addBanner(count_any_ressource_to);
+      this.addBanner(count_any_ressource_to, this.settings?.displayTo);
       // Top left
       this.addControlResourcesPlayer();
       // Bottom left
@@ -55,6 +60,13 @@ class ResourceConverter {
       this.addControlResourceGet(count_any_ressource_to);
       // Add buttons
       this.addResetButton();
+
+      const test = new ResourceTrader(
+         document.getElementById(`resource-converter`),
+         't1',
+         this.to,
+         this.from,
+      );
    }
 
    hide() {
@@ -75,7 +87,7 @@ class ResourceConverter {
       }
    }
 
-   private addBanner(count_any_ressource_to: number) {
+   private addBanner(count_any_ressource_to: number, displayTo = true) {
       const arrow =
          count_any_ressource_to > 0
             ? `<div class="wrapper no-border arrow">
@@ -83,7 +95,7 @@ class ResourceConverter {
                </div>`
             : '';
 
-      const html = `<div id="resource-converter">
+      const html = `<div id="resource-converter" class="${displayTo ? '' : 'hideTo'}">
          <div class="line">
             <div id="resource-converter-player"></div>
             ${arrow}
@@ -98,7 +110,7 @@ class ResourceConverter {
             </div>
             <div class="wrapper no-border to">
                <span id="tc-icons-reward-counter" class="counter">1</span>
-               ${this.to.map((icon) => ResourceHelper.getElement(icon))}
+               ${this.to.map((icon) => ResourceHelper.getElement(icon)).join('')}
             </div>
             <div id="resource-converter-placeholder"></div>
             <div id="resource-converter-buttons"></div>
@@ -112,6 +124,8 @@ class ResourceConverter {
       const handleResourceClick = (type: string) => {
          this.resources_give.add(type);
 
+         let is_confirm_enabled: boolean | undefined = undefined;
+
          if (this.counter_reward) {
             if (this.from.length == 1) {
                this.counter_reward.incValue(1);
@@ -120,12 +134,9 @@ class ResourceConverter {
                   Math.floor(this.resources_give.getResources().length / this.from.length),
                );
             } else {
-               // Get min count of type
-               const values: number[] = [];
-               this.from.forEach((icon) => {
-                  values.push(this.resources_give.getResources().filter((type) => type == icon).length);
-               });
-               this.counter_reward.setValue(Math.min.apply(null, values));
+               const count = countExtractions(this.from, this.resources_give.getResources());
+               this.counter_reward.setValue(count);
+               is_confirm_enabled = count * this.from.length == this.resources_give.getResources().length;
             }
          } else {
             if (
@@ -143,6 +154,11 @@ class ResourceConverter {
          if (this.settings?.from?.max ?? 0 == this.resources_give.getResources().length) {
             this.resources_player.disabled();
          }
+         if (is_confirm_enabled == undefined) {
+            is_confirm_enabled = this.resources_give.isFull() && this.resource_get.isFull();
+         }
+
+         this.OnEnableConfirm?.(is_confirm_enabled == true);
       };
 
       const element = document.getElementById('resource-converter-player');
@@ -153,7 +169,8 @@ class ResourceConverter {
    }
 
    private addControlResourceGive() {
-      if ((this.from && this.from.every((r) => r == '*') && this.times == 1) || this.settings?.from?.max) {
+      // if ((this.from && this.from.every((r) => r == '*') && this.times == 1) || this.settings?.from?.max) {
+      if (this.times == 1 || (this.from && this.from.every((r) => r == '*')) || this.settings?.from?.max) {
          const element = document.getElementById('resource-converter-placeholder-from');
          this.resources_give = new ResourcePlaceholderLineStock(element, this.from.length, {
             restriction: this.settings?.from?.restriction,
@@ -196,16 +213,19 @@ class ResourceConverter {
          this.resources_player.reset();
          this.resource_get.reset();
          this.resources_board?.reset();
+         this.OnEnableConfirm(this.from?.length == 0);
       };
       this.game.addActionButtonReset('resource-converter-buttons', handleReset);
    }
 
    private getAllowedResources(): string[] {
-      if (this.settings?.from?.allowed_resources) {
-         return this.settings.from.allowed_resources;
-      } else {
-         return this.from.indexOf('*') >= 0 ? GOODS : this.from ?? ICONS;
-      }
+      const resources = this.settings?.from?.allowed_resources
+         ? this.settings.from.allowed_resources
+         : this.from.indexOf('*') >= 0
+         ? GOODS
+         : this.from ?? ICONS;
+
+      return resources.filter((value, index) => resources.indexOf(value) == index);
    }
 
    private handleBoardResourceClick(type: string) {
@@ -213,6 +233,7 @@ class ResourceConverter {
       if (this.resource_get.isFull()) {
          this.resources_board.disabled();
       }
+      this.OnEnableConfirm?.(this.resource_get.isFull() && this.resources_give.isFull());
    }
 
    private removeControl() {

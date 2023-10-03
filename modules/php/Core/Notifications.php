@@ -115,6 +115,21 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson) {
+        $message = clienttranslate('${player_name} uses ${resources_to} to change ${die_from} for ${die_to}');
+        $new_dice = $die;
+        $new_dice['face'] = $new_value;
+        self::notifyAll('onModifyDieWithLessonLearned', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'die_from' => intval($die['face']),
+            'die_to' => $new_value,
+            'die_color' => $die['type'],
+            'nbr_lesson' => $nbr_lesson,
+            'resources_to' => [LESSON_LEARNED => 1],
+        ]);
+    }
+
     static function newTraveler() {
         $message = clienttranslate('${card_name} is revealed as the new traveler');
         $info = Travelers::getUIData();

@@ -1,15 +1,12 @@
 #table-center-wrapper {
-   min-width: 900px;
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-   align-items: center;
-
-   // &.double-column {
-   //    flex-direction: row;
-   // }
+   display: grid;
+   grid-template-areas:
+      'empty glade'
+      'ladder board';
+   padding: 0 10px;
 
    #table-improvements {
+      grid-area: ladder;
       align-self: self-start;
       margin-top: 213px;
       margin-right: 6px;
@@ -22,6 +19,7 @@
    }
 
    #glade {
+      grid-area: glade;
       padding-bottom: 20px;
       &:empty {
          padding-bottom: 0;
@@ -29,6 +27,7 @@
    }
 
    #board {
+      grid-area: board;
       position: relative;
       background-image: url('img/gametable.jpg');
       background-size: cover;
@@ -172,6 +171,15 @@
             justify-content: center;
             align-items: center;
             gap: 5px;
+
+            .lesson-wrapper {
+               margin-top: 5px;
+               display: inline-flex;
+
+               .resource-icon:not(:first-child) {
+                  margin-left: -16px;
+               }
+            }
          }
 
          [data-slot-id='1'] {

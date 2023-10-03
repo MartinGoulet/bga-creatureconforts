@@ -2,5 +2,9 @@
     .resource-icon {
         display: inline-block;
         vertical-align: middle;
+
+        &[data-type='lesson'] {
+            rotate: 45deg;
+        }
     }
 }

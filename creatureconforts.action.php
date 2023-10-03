@@ -79,11 +79,14 @@ class action_creatureconforts extends APP_GameAction {
       // Retrieve arguments
       $dice_ids = self::getArg("dice_ids", AT_numberlist, true);
       $location_ids = self::getArg("location_ids", AT_numberlist, true);
+      $modifiers = self::getArg("modifiers", AT_numberlist, true);
+
       $dice_ids = self::getArrayArgs($dice_ids);
       $location_ids = self::getArrayArgs($location_ids);
+      $modifiers = self::getArrayArgs($modifiers);
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmPlayerDice');
-      $this->game->confirmPlayerDice($dice_ids, $location_ids);
+      $this->game->confirmPlayerDice($dice_ids, $location_ids, $modifiers);
       self::ajaxResponse();
    }
 

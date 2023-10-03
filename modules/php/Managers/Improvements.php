@@ -113,8 +113,10 @@ class Improvements extends \APP_DbObject {
         }
 
         $slot = $deck->getCardsInLocation(LADDER, 6);
-        $next_card = array_shift($slot);
-        $deck->moveCard($next_card['id'], LADDER, 5);
+        if(sizeof($slot) == 1) {
+            $next_card = array_shift($slot);
+            $deck->moveCard($next_card['id'], LADDER, 5);
+        }
         $deck->pickCardForLocation('deck', LADDER, 6);
     }
 

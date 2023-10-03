@@ -1,13 +1,18 @@
 <?php
 
 /*
+ * Statistic variables 
+ */
+const STAT_TURN_NUMBER = "turns_number";
+
+/*
  * Game options
  */
 
- const OPTION_SHORT_GAME = "short_game";
- const OPTION_SHORT_GAME_ID = 101;
- const OPTION_SHORT_GAME_ENABLED = 0;
- const OPTION_SHORT_GAME_DISABLED = 1;
+const OPTION_SHORT_GAME = "short_game";
+const OPTION_SHORT_GAME_ID = 101;
+const OPTION_SHORT_GAME_ENABLED = 0;
+const OPTION_SHORT_GAME_DISABLED = 1;
 
 /**
  * States
@@ -35,6 +40,7 @@ const ST_PLAYER_TURN_NEXT = 52;
 const ST_PLAYER_TURN_CRAFT_CONFORT = 53;
 const ST_PLAYER_TURN_END = 54;
 const ST_PLAYER_TURN_DISCARD = 55;
+const ST_PLAYER_RETURN_UNRESOLVED_WORKER = 56;
 
 const ST_UNKEEP = 60;
 
@@ -66,14 +72,14 @@ const CARD = 'card';
  * Confort type
  */
 
- const CLOTHING = "clothing";
- const FOOD = "food";
- const LIGHTING = "lighting";
- const OUTDOOR = "outdoor";
+const CLOTHING = "clothing";
+const FOOD = "food";
+const LIGHTING = "lighting";
+const OUTDOOR = "outdoor";
 
- /**
-  * Valley
-  */
+/**
+ * Valley
+ */
 const SPRING = "spring";
 const SUMMER = "summer";
 const FALL = "fall";
@@ -81,7 +87,7 @@ const FALL = "fall";
 const FOREST = "forest";
 const MEADOW = "meadow";
 
-CONST RULE_3_OR_UNDER = "3_OR_UNDER";
+const RULE_3_OR_UNDER = "3_OR_UNDER";
 const RULE_4_OR_HIGHER = "4_OR_HIGHER";
 const RULE_TOTAL_5_OR_LOWER = "TOTAL_5_OR_LOWER";
 const RULE_TOTAL_6_OR_LOWER = "TOTAL_6_OR_LOWER";

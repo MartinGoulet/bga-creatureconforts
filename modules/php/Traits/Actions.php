@@ -72,20 +72,54 @@ trait Actions {
         Globals::setWorkerPlacement($current_player_id, []);
     }
 
-    function confirmPlayerDice(array $dice_ids, array $location_ids) {
+    function confirmPlayerDice(array $dice_ids, array $location_ids, array $modifiers) {
+
+        $sum_modifier = array_sum(array_values($modifiers));
+        if ($sum_modifier > 0 ) {
+            if(!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier])) {
+            throw new BgaUserException("Not enough lesson learned");
+            }
+            Players::removeResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier]);
+        }
+
+        $dice = Dice::getDice($dice_ids);
         $dice_by_locations = [];
+        $dice_value_by_location = [];
         // Group dice by location
+
+        $error = [];
         for ($i = 0; $i < sizeof($dice_ids); $i++) {
             $location_id = intval($location_ids[$i]);
+            $modifier = intval($modifiers[$i]);
+            $die_id = intval($dice_ids[$i]);
+            $die = array_values(array_filter($dice, function ($die) use ($die_id) {
+                return $die['id'] == $die_id;
+            }))[0];
+            $dice_value = intval($die['face']);
+
             if (!array_key_exists($location_id, $dice_by_locations)) {
                 $dice_by_locations[$location_id] = [];
+                $dice_value_by_location[$location_id] = [];
             }
-            $dice_by_locations[$location_id][] = intval($dice_ids[$i]);
+            $dice_by_locations[$location_id][] = $die_id;
+            $dice_value_by_location[$location_id][] = $dice_value + $modifier;
+
+            if($modifier != 0) {
+                Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $dice_value + $modifier, $modifier);
+            }
+
+            if (!in_array($location_id, [1, 2, 3, 4, 5, 6, 7, 9, 10, 12]) && $modifier !== 0) {
+                $error[] = $location_id;
+            }
+        }
+
+        if (sizeof($error) > 0) {
+            throw new BgaUserException("You cannot use modifier on this location " . implode(",", $error));
         }
 
         $error = [];
         foreach ($dice_by_locations as $location_id => $dice) {
-            if (!DiceHelper::isRequirementMet($location_id, $dice)) {
+            if (!DiceHelper::isRequirementMet($location_id, $dice, $dice_value_by_location[$location_id])) {
                 $error[] = $location_id;
             } else {
                 Dice::moveDiceToLocation($dice, $location_id);
@@ -112,10 +146,7 @@ trait Actions {
         $dice = Dice::getDiceInLocation($location_id);
 
         if (sizeof($dice) == 0) {
-            Players::addResources($player_id, [LESSON_LEARNED => 1]);
-            Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
-            $this->resolveWorkerNextStep();
-            return;
+            throw new BgaUserException("No dice here");
         }
 
         if ($location_id >= 1 && $location_id <= 4) {
@@ -149,7 +180,8 @@ trait Actions {
         if ($location_id == 9) {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
-            TravelerHelper::resolve($die, $converted_resources);
+            $converted_resources_get = ResourcesHelper::convertNumberToResource($resources2);
+            TravelerHelper::resolve($die, $converted_resources, $converted_resources_get);
             $this->resolveWorkerNextStep();
             return;
         }
@@ -157,14 +189,14 @@ trait Actions {
         if ($location_id == 10) {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
-            WorkshopHelper::resolve(intval($die['face']),intval(array_shift($resources)));
+            WorkshopHelper::resolve(intval($die['face']), intval(array_shift($resources)));
             $this->resolveWorkerNextStep();
             return;
         }
 
         if ($location_id == 11) {
             $slot_id = intval(array_shift($resources));
-            if($slot_id < 1 || $slot_id > 4) {
+            if ($slot_id < 1 || $slot_id > 4) {
                 throw new BgaUserException("Slot id must be between 1 and 4");
             }
             $card = Conforts::addToHand(Conforts::getFromMarket($slot_id), $player_id);
@@ -177,7 +209,7 @@ trait Actions {
 
         if ($location_id == 12) {
             $die = array_shift($dice);
-            if(intval($die['face']) <= 2) {
+            if (intval($die['face']) <= 2) {
                 $cards = Conforts::draw(Players::getPlayerId(), 2);
                 Notifications::drawConfort(Players::getPlayerId(), $cards);
             } else {
@@ -253,7 +285,7 @@ trait Actions {
         $player_id = Players::getPlayerId();
         $cards = Conforts::getCards($card_ids);
         foreach ($cards as $card_id => $card) {
-            if($card['location'] !== 'hand' || intval($card['location_arg']) !== $player_id) {
+            if ($card['location'] !== 'hand' || intval($card['location_arg']) !== $player_id) {
                 var_dump($card);
                 throw new BgaUserException("The card is not in your hand");
             }

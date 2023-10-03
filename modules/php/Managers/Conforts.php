@@ -147,8 +147,10 @@ class Conforts {
         }
 
         $slot = $deck->getCardsInLocation('slot', 4);
-        $next_card = array_shift($slot);
-        $deck->moveCard($next_card['id'], 'slot', 3);
+        if(sizeof($slot) == 1) {
+            $next_card = array_shift($slot);
+            $deck->moveCard($next_card['id'], 'slot', 3);
+        }
         $deck->pickCardForLocation('deck', 'slot', 4);
     }
 

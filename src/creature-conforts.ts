@@ -3,6 +3,7 @@ const isDebug =
 const debug = isDebug ? console.log.bind(window.console) : function () {};
 // const LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
+const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 
 const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
 const ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
@@ -50,10 +51,12 @@ class CreatureConforts
    public notifManager: NotificationManager;
    public stateManager: StateManager;
 
+   public animationManager: AnimationManager;
+
    public tableCenter: TableCenter;
    public playersPanels: PlayerPanel[];
    public playersTables: PlayerTable[];
-   // public zoomManager: ZoomManager;
+   public zoomManager: ZoomManager;
 
    public modal: Modal;
 
@@ -73,6 +76,8 @@ class CreatureConforts
     */
    public setup(gamedatas: CreatureConfortsGamedatas) {
       debug(gamedatas);
+
+      this.animationManager = new AnimationManager(this, { duration: 0 });
 
       this.confortManager = new ConfortManager(this);
       this.improvementManager = new ImprovementManager(this);
@@ -107,12 +112,12 @@ class CreatureConforts
       //       color: 'white',
       //    },
       //    localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
-      //    onDimensionsChange: () => {
-      //       const tablesAndCenter = document.getElementById('tables-and-center');
-      //       const clientWidth = document.getElementById('table').clientWidth;
-      //       const tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
-      //       tablesAndCenter.classList.toggle('double-column', clientWidth > 921 + tablesWidth); // 900 + 21 + tablesWidth
-      //    },
+      //    // onDimensionsChange: () => {
+      //    //    const tablesAndCenter = document.getElementById('tables-and-center');
+      //    //    const clientWidth = document.getElementById('table').clientWidth;
+      //    //    const tablesWidth = Math.max(640 /*, document.getElementById('tables').clientWidth*/);
+      //    //    tablesAndCenter.classList.toggle('double-column', clientWidth > 921 + tablesWidth); // 900 + 21 + tablesWidth
+      //    // },
       //    // zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1],
       // });
 
@@ -337,6 +342,18 @@ class CreatureConforts
 
             if (args.nbr_cards !== undefined) {
                args.nbr_cards = `<div class="cc-icon i-cards"><span>${args.nbr_cards}</span></div>`;
+            }
+
+            if (args.die_from !== undefined) {
+               const value = args.die_from;
+               const color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+               args.die_from = `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`;
+            }
+
+            if (args.die_to !== undefined) {
+               const value = args.die_to;
+               const color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+               args.die_to = `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`;
             }
          }
       } catch (e) {

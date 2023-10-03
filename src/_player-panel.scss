@@ -31,6 +31,19 @@
       width: 29px;
       background-position: -207px -3px;
       border-radius: 50%;
+      rotate: 45deg;
+   }
+   &[data-type='lesson-plus'] {
+      height: 29px;
+      width: 29px;
+      background-position: -207px -3px;
+      border-radius: 50%;
+   }
+   &[data-type='lesson-minus'] {
+      height: 29px;
+      width: 29px;
+      background-position: -242px -3px;
+      border-radius: 50%;
    }
    &[data-type='coin'] {
       height: 28px;

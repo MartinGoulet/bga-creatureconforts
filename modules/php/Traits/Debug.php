@@ -3,6 +3,7 @@
 namespace CreatureConforts\Traits;
 
 use CreatureConforts\Core\Game;
+use CreatureConforts\Core\Notifications;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Cottages;
 use CreatureConforts\Managers\Dice;
@@ -24,6 +25,7 @@ trait Debug {
     //     Valleys::setup();
     // }
 
+
     function setupCottages() {
         self::DbQuery('DELETE FROM cottage');
         Cottages::setupNewGame(Game::get()->loadPlayersBasicInfos(), []);
@@ -32,9 +34,9 @@ trait Debug {
     function setupVar() {
         Game::get()->setGameStateInitialValue(VAR_RIVER_DIAL, 1);
     }
-    function addResource() {
+    function addResources(string $type, int $nbr) {
         $player_id = intval(Game::get()->getCurrentPlayerId());
-        Players::addResources($player_id, [STORY => 1]);
+        Players::addResources($player_id, [$type => $nbr]);
     }
 
     function debugSavepoint() {

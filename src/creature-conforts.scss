@@ -14,7 +14,7 @@ $purple: '650e41';
 
 $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 
-// @import '../node_modules/bga-zoom/bga-zoom';
+@import '../node_modules/bga-zoom/bga-zoom';
 @import '../node_modules/bga-cards/bga-cards';
 @import '../node_modules/bga-dice/bga-dice';
 @import 'table-center';
@@ -64,8 +64,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
-      flex-grow: 1;
-      flex-direction: column;
+      // flex-grow: 1;
+      // flex-direction: column;
       gap: 20px;
    }
 
@@ -90,6 +90,12 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       box-shadow: none;
       color: #9090af;
       text-shadow: none;
+   }
+
+   .resource-icon {
+      display: inline-block;
+      vertical-align: middle;
+      zoom: 0.6;
    }
 }
 
@@ -175,4 +181,26 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    pointer-events: initial !important;
    user-select: initial !important;
    font-size: 20px;
+}
+
+@media screen and (min-width: 2033px) {
+   #tables-and-center {
+      display: grid;
+      grid-template-areas:
+         'board player'
+         'board players';
+      grid-template-rows: 0fr 1fr;
+
+      #current-player-table {
+         grid-area: player;
+      }
+
+      #table-center-wrapper {
+         grid-area: board;
+      }
+
+      #tables {
+         grid-area: players;
+      }
+   }
 }

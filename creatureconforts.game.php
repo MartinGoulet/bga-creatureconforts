@@ -148,6 +148,9 @@ class CreatureConforts extends Table {
         Worker::setupNewGame();
         self::setGameStateInitialValue(VAR_RIVER_DIAL, bga_rand(1, 6));
         $this->activeNextPlayer();
+
+        // Init game statistics
+        self::initStat('table', STAT_TURN_NUMBER, 0);
     }
 
     /*

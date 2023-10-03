@@ -36,6 +36,14 @@ class ImprovementManager extends CardManager<ImprovementCard> {
             if (cottage) {
                this.cottages[card.id].addCard(cottage);
             }
+
+            if (card.location == 'glade') {
+               const slot = document.querySelector(`#dice-locations [data-slot-id="${card.location_arg}"]`);
+               if (slot) {
+                  slot.classList.add('slot-dice');
+                  this.game.placeOnObjectPos(slot as any, `${this.getId(card)}-slot-cottage`, -54, -3);
+               }
+            }
          },
          isCardVisible: (card) => 'type' in card,
          cardWidth: 125,

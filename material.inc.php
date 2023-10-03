@@ -126,7 +126,7 @@ $this->confort_types = [
       'name' => clienttranslate("Toboggan"),
       'type' => OUTDOOR,
       'score' => 5,
-      'cost' => [WOOD => 2, STONE => 3],
+      'cost' => [WOOD => 2, YARN => 1],
    ],
    20 => [
       'name' => clienttranslate("Mandolin"),
@@ -276,6 +276,14 @@ $this->traveler_types = [
    1 => [
       'name' => clienttranslate("Canada Lynx"),
       'timing' => "IMMEDIATELY",
+      'reward' => [
+         1 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
+         2 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
+         3 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
+         4 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
+         5 => ["from" => [], 'to' => [STORY], 'times' => 1],
+         6 => ["from" => [], 'to' => [STORY], 'times' => 1],
+      ],
    ],
    2 => [
       'name' => clienttranslate("Leopard Frog"),
@@ -300,6 +308,14 @@ $this->traveler_types = [
    5 => [
       'name' => clienttranslate("Hairy-tailed Hole"),
       'timing' => "ALL_MONTH_LONG",
+      'reward' => [
+         1 => ["from" => [STONE], 'to' => [ANY_RESOURCE], 'times' => 1],
+         2 => ["from" => [STONE], 'to' => [ANY_RESOURCE], 'times' => 1],
+         3 => ["from" => [STONE], 'to' => [ANY_RESOURCE], 'times' => 1],
+         4 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
+         5 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
+         6 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
+      ],
    ],
    6 => [
       'name' => clienttranslate("Common Raven"),
@@ -344,6 +360,14 @@ $this->traveler_types = [
    14 => [
       'name' => clienttranslate("Blue Jay"),
       'timing' => "END_OF_MONTH",
+      'reward' => [
+         1 => ["from" => [], 'to' => [COIN, COIN], 'times' => 1],
+         2 => ["from" => [], 'to' => [COIN, COIN], 'times' => 1],
+         3 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
+         4 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
+         5 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
+         6 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
+      ],
    ],
    15 => [
       'name' => clienttranslate("Wild Turkey"),

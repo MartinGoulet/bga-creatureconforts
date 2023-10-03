@@ -14,7 +14,7 @@ interface DiceRequirement {
 
 class DiceHelper {
 
-    public static function isRequirementMet(int $location_id, array $dice_ids) {
+    public static function isRequirementMet(int $location_id, array $dice_ids, array $dice_values) {
         if (sizeof($dice_ids) == 0) return true;
 
         /** @var DiceRequirement */
@@ -26,28 +26,33 @@ class DiceHelper {
             if ($info['count'] > 0 && $info['count'] !== sizeof($dice_ids)) return false;
             // Get requirement
             $requirement = self::getValleyRequirement($info);
-            $result = $requirement->isRequirementMet(self::getDiceValue($dice_ids));
+            $result = $requirement->isRequirementMet(self::sortValue($dice_values));
             // if(!$result) {
             //     var_dump($result['values']);
-            //     var_dump(self::getDiceValue($dice_ids));
+            //     var_dump($dice_values);
             // }
             return $result;
         } else if ($location_id >= 5 && $location_id <= 7) {
             $requirement = new DialRequirement(Globals::getRiverDialValue(), $location_id);
-            return $requirement->isRequirementMet(self::getDiceValue($dice_ids));
+            return $requirement->isRequirementMet(self::sortValue($dice_values));
         }
 
         return true;
     }
 
-    private static function getDiceValue($dice_ids) {
-        $dice = Dice::getDice($dice_ids);
-        $dice_values = array_map(function ($die) {
-            return $die['face'];
-        }, $dice);
+    private static function sortValue($dice_values) {
         sort($dice_values);
         return $dice_values;
     }
+
+    // private static function getDiceValue($dice_ids) {
+    //     $dice = Dice::getDice($dice_ids);
+    //     $dice_values = array_map(function ($die) {
+    //         return $die['face'];
+    //     }, $dice);
+    //     sort($dice_values);
+    //     return $dice_values;
+    // }
 
     private static function getValleyRequirement(array $info): DiceRequirement {
         if (array_key_exists('values', $info)) {

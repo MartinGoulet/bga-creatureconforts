@@ -3,7 +3,6 @@
 namespace CreatureConforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Notifications;
 use CreatureConforts\Helpers\ResourcesHelper;
 use CreatureConforts\Managers\Players;

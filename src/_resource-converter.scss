@@ -14,6 +14,14 @@
    margin-top: 10px;
    padding-top: 10px;
 
+   &.hideTo {
+      #resource-converter-board-resources,
+      .wrapper.no-border.arrow,
+      .wrapper.no-border.to {
+         display: none !important;
+      }
+   }
+
    .line {
       flex-basis: 100%;
       display: flex;
@@ -25,6 +33,14 @@
    #resource-converter-board-resources,
    #resource-converter-buttons,
    #resource-converter-placeholder {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+   }
+
+   .resource-converter-placeholder-from,
+   .resource-converter-placeholder {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -82,10 +98,8 @@
    }
 
    .resource-icon {
-      height: 32px;
-
       &[data-type='lesson'] {
-         zoom: 0.7;
+         zoom: 0.9;
       }
    }
 
