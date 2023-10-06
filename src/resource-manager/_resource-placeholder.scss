@@ -1,0 +1,29 @@
+.resource-container {
+   .resource-placeholder-line-stock {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+   }
+}
+
+.resource-container {
+   .placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 0 5px;
+      user-select: none;
+      background-color: #edcfa7;
+      min-width: 40px;
+      min-height: 35px;
+
+      &:empty:before {
+         content: '#';
+         color: #ae8f62;
+      }
+   }
+}

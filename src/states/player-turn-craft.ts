@@ -1,6 +1,6 @@
 class PlayerTurnCraftState implements StateHandler {
-   // private resourceManager: SelectResources;
-   private resourceManager?: ResourceConverter;
+   private resourceManager?: ResourceManagerPay<IconsType>;
+   private toolbar: ToolbarContainer = new ToolbarContainer('craft');
 
    constructor(private game: CreatureConforts) {}
 
@@ -13,40 +13,25 @@ class PlayerTurnCraftState implements StateHandler {
 
       const { hand } = this.game.getCurrentPlayerTable();
 
-      // const handleResourceChanged = (resources: string[]) => {
-      //    const [card] = hand.getSelection();
-      //    if (!card || resources.length == 0) {
-      //       this.game.disableButton('btn_craft');
-      //       return;
-      //    }
-
-      //    const card_type = this.game.confortManager.getCardType(card);
-      //    if ('*' in card_type.cost) {
-      //       this.game.toggleButtonEnable('btn_craft', card_type.cost['*'] == resources.length);
-      //    }
-      // };
-
       const handleSelectionChange = (selection: ConfortCard[]) => {
          if (this.resourceManager) {
-            this.resourceManager.hide();
-            this.resourceManager.OnEnableConfirm = null;
-            this.resourceManager = undefined;
+            this.toolbar.removeContainer();
+            this.resourceManager.reset();
+            this.resourceManager = null;
          }
+
+         this.game.toggleButtonEnable('btn_craft', selection.length == 1);
+         this.game.disableButton('btn_reset');
          if (selection.length == 0) return;
 
          const card_type = this.game.confortManager.getCardType(selection[0]);
 
          if ('*' in card_type.cost) {
-            this.resourceManager = new ResourceConverter(this.game, ['*', '*'], [], 1, {
-               displayTo: false,
+            this.game.enableButton('btn_reset', 'gray');
+            this.resourceManager = new ResourceManagerPay(this.toolbar.addContainer(), {
+               player_resources: this.game.getPlayerResources([...GOODS]),
+               resource_count: 2,
             });
-            this.resourceManager.show();
-            this.resourceManager.OnEnableConfirm = (enable) => {
-               this.game.toggleButtonEnable('btn_craft', enable);
-            };
-            this.game.toggleButtonEnable('btn_craft', false);
-         } else {
-            this.game.toggleButtonEnable('btn_craft', selection.length == 1);
          }
       };
 
@@ -56,7 +41,7 @@ class PlayerTurnCraftState implements StateHandler {
             console.warn('No cost for', card_type);
             return false;
          }
-         return ResourceHelper.isRequirementMet(this.game, card_type.cost);
+         return ResourceRequirement.isRequirementMet(this.game, card_type.cost);
       });
 
       this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
@@ -64,9 +49,13 @@ class PlayerTurnCraftState implements StateHandler {
       hand.setSelectionMode('single');
       hand.setSelectableCards(selection);
       hand.onSelectionChange = handleSelectionChange;
-      // resourceManager.OnResourceChanged = handleResourceChanged;
    }
-   onLeavingState(): void {}
+   onLeavingState(): void {
+      const { hand } = this.game.getCurrentPlayerTable();
+      hand.setSelectionMode('none');
+      hand.setSelectableCards([]);
+      hand.onSelectionChange = null;
+   }
    onUpdateActionButtons(args: any): void {
       const { hand } = this.game.getCurrentPlayerTable();
       const handleCraft = () => {
@@ -74,14 +63,14 @@ class PlayerTurnCraftState implements StateHandler {
          if (!card) return;
          const card_type = this.game.confortManager.getCardType(card);
 
-         if (!ResourceHelper.isRequirementMet(this.game, card_type.cost)) {
+         if (!ResourceRequirement.isRequirementMet(this.game, card_type.cost)) {
             this.game.showMessage('Requirement not met', 'error');
          }
 
          let resources: number[] = [];
 
          if ('*' in card_type.cost) {
-            resources = ResourceHelper.convertToInt(this.resourceManager.getResourcesGive());
+            resources = ResourceHelper.convertToInt(this.resourceManager.getResourcesFrom());
          }
 
          this.game.takeAction('craftConfort', { card_id: card.id, resources: resources.join(';') });
@@ -89,9 +78,13 @@ class PlayerTurnCraftState implements StateHandler {
       const handlePass = () => {
          this.game.takeAction('passCraftConfort');
       };
+      const handleReset = () => {
+         this.resourceManager?.reset();
+      };
 
       this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
       this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
+      this.game.addActionButtonDisabled('btn_reset', _('Reset'), handleReset);
       this.game.addActionButtonUndo();
    }
 }

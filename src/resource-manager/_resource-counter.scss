@@ -1,0 +1,32 @@
+.resource-container {
+    .resource-counter-line-stock {
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       gap: 5px;
+    }
+ }
+ 
+ .resource-container {
+   .resource-counter-wrapper {
+      min-width: 40px;
+      min-height: 37.5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      align-self: stretch;
+      gap: 2px;
+      border: 1px solid black;
+      border-radius: 5px;
+      padding: 0 5px;
+      user-select: none;
+      cursor: pointer;
+
+      &.disabled {
+         cursor: default;
+         filter: grayscale(80%);
+         filter: opacity(0.2);
+         cursor: not-allowed;
+      }
+   }
+}

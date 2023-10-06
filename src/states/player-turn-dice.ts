@@ -126,7 +126,7 @@ class PlayerTurnDiceState implements StateHandler {
          this.addButtonsLessonLearned(die);
       } else {
          this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
-         this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+         this.game.addActionButtonGray('btn_cancel', _('Reset'), handleCancel);
       }
    }
 
@@ -239,7 +239,7 @@ class PlayerTurnDiceState implements StateHandler {
 
    private addSelectedDieToSlot(slotId: SlotId) {
       const { hill, dice_locations } = this.game.tableCenter;
-      const [die, ...others] = hill.getSelection();
+      const die = hill.getSelection()[0];
       if (!die) return;
       const copy = { ...die, location: slotId };
       dice_locations.addDie(copy);

@@ -1,136 +1,136 @@
-#resource-converter {
-   background: #f5f5f5;
-   margin-left: -5px;
-   padding: 5px;
-   position: relative;
-   width: 100%;
-   z-index: 10;
-   min-height: 35px;
-   display: flex;
-   justify-content: center;
-   gap: 10px;
-   flex-wrap: wrap;
-   border-top: 1px solid black;
-   margin-top: 10px;
-   padding-top: 10px;
+// #resource-converter {
+//    background: #f5f5f5;
+//    margin-left: -5px;
+//    padding: 5px;
+//    position: relative;
+//    width: 100%;
+//    z-index: 10;
+//    min-height: 35px;
+//    display: flex;
+//    justify-content: center;
+//    gap: 10px;
+//    flex-wrap: wrap;
+//    border-top: 1px solid black;
+//    margin-top: 10px;
+//    padding-top: 10px;
 
-   &.hideTo {
-      #resource-converter-board-resources,
-      .wrapper.no-border.arrow,
-      .wrapper.no-border.to {
-         display: none !important;
-      }
-   }
+//    &.hideTo {
+//       #resource-converter-board-resources,
+//       .wrapper.no-border.arrow,
+//       .wrapper.no-border.to {
+//          display: none !important;
+//       }
+//    }
 
-   .line {
-      flex-basis: 100%;
-      display: flex;
-      justify-content: center;
-   }
+//    .line {
+//       flex-basis: 100%;
+//       display: flex;
+//       justify-content: center;
+//    }
 
-   #resource-converter-player,
-   #resource-converter-placeholder-from,
-   #resource-converter-board-resources,
-   #resource-converter-buttons,
-   #resource-converter-placeholder {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-   }
+//    #resource-converter-player,
+//    #resource-converter-placeholder-from,
+//    #resource-converter-board-resources,
+//    #resource-converter-buttons,
+//    #resource-converter-placeholder {
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       gap: 10px;
+//    }
 
-   .resource-converter-placeholder-from,
-   .resource-converter-placeholder {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-   }
+//    .resource-converter-placeholder-from,
+//    .resource-converter-placeholder {
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       gap: 10px;
+//    }
 
 
    
 
-   .from,
-   .to {
-      gap: 5px;
-   }
+//    .from,
+//    .to {
+//       gap: 5px;
+//    }
 
-   .arrow {
-      font-size: 12px;
-      > svg {
-         position: absolute;
-         z-index: -1;
-      }
-   }
+//    .arrow {
+//       font-size: 12px;
+//       > svg {
+//          position: absolute;
+//          z-index: -1;
+//       }
+//    }
 
-   .wrapper {
-      zoom: 1.2;
-      min-width: 40px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      align-self: stretch;
-      gap: 2px;
-      border: 1px solid black;
-      border-radius: 5px;
-      padding: 0 5px;
-      user-select: none;
-      cursor: pointer;
+//    .wrapper {
+//       zoom: 1.2;
+//       min-width: 40px;
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       align-self: stretch;
+//       gap: 2px;
+//       border: 1px solid black;
+//       border-radius: 5px;
+//       padding: 0 5px;
+//       user-select: none;
+//       cursor: pointer;
 
-      &.disabled {
-         cursor: default;
-         filter: grayscale(80%);
-         filter: opacity(0.2);
-         cursor: not-allowed;
-      }
+//       &.disabled {
+//          cursor: default;
+//          filter: grayscale(80%);
+//          filter: opacity(0.2);
+//          cursor: not-allowed;
+//       }
 
-      &.no-border {
-         border: none;
-      }
+//       &.no-border {
+//          border: none;
+//       }
 
-      &[data-type='lesson'] {
-         margin-left: 30px;
-      }
+//       &[data-type='lesson'] {
+//          margin-left: 30px;
+//       }
 
-      &.from {
-         min-width: 0;
-      }
-   }
+//       &.from {
+//          min-width: 0;
+//       }
+//    }
 
-   .resource-icon {
-      &[data-type='lesson'] {
-         zoom: 0.9;
-      }
-   }
+//    .resource-icon {
+//       &[data-type='lesson'] {
+//          zoom: 0.9;
+//       }
+//    }
 
-   #resource-converter-board-resources {
-      .wrapper {
-         background-color: #edcfa7;
-         min-width: 32px;
+//    #resource-converter-board-resources {
+//       .wrapper {
+//          background-color: #edcfa7;
+//          min-width: 32px;
 
-         .counter {
-            display: none;
-         }
-      }
-   }
+//          .counter {
+//             display: none;
+//          }
+//       }
+//    }
 
-   .placeholder {
-      zoom: 1.2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      border: 1px solid black;
-      border-radius: 5px;
-      padding: 0 5px;
-      user-select: none;
-      background-color: #edcfa7;
-      min-width: 32px;
-      min-height: 32px;
+//    .placeholder {
+//       zoom: 1.2;
+//       display: flex;
+//       align-items: center;
+//       justify-content: center;
+//       gap: 5px;
+//       border: 1px solid black;
+//       border-radius: 5px;
+//       padding: 0 5px;
+//       user-select: none;
+//       background-color: #edcfa7;
+//       min-width: 32px;
+//       min-height: 32px;
 
-      &:empty:before {
-         content: '#';
-         color: #ae8f62;
-      }
-   }
-}
+//       &:empty:before {
+//          content: '#';
+//          color: #ae8f62;
+//       }
+//    }
+// }

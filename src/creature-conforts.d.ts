@@ -75,13 +75,14 @@ interface TravelerUIData {
 interface TravelerType {
    name: string;
    timing: string;
-   reward: TravelerReward[];
+   // reward: TravelerReward[];
+   trade: ResourceManagerPayForSettings<IconsType>;
 }
-interface TravelerReward {
-   from?: string[];
-   to: string[];
-   times: number;
-}
+// interface TravelerReward {
+//    from?: string[];
+//    to: string[];
+//    times: number;
+// }
 
 interface ValleyUIData {
    forest: TopCardCount<ValleyCard>;

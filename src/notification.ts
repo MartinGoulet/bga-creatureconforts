@@ -137,7 +137,7 @@ class NotificationManager {
    private async notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
       const { ladder, discard } = args;
       if (discard) {
-         await this.game.tableCenter.confort_discard.addCard(discard);
+         await this.game.tableCenter.improvement_discard.addCard(discard);
       }
       const { improvement_deck: deck, improvement_market: market } = this.game.tableCenter;
       market.setSelectionMode('none');

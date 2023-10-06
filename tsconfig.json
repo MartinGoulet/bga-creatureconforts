@@ -43,6 +43,20 @@
         "node_modules/bga-dice/src/dice-manager.ts",
         "node_modules/bga-dice/src/sort.ts",
 
+        "src/resource-manager/resource-manager.d.ts",
+        "src/resource-manager/constants.ts",
+        "src/resource-manager/resource-counter-line-stock.ts",
+        "src/resource-manager/resource-counter.ts",
+        "src/resource-manager/resource-helper.ts",
+        "src/resource-manager/resource-manager-pay-for.ts",
+        "src/resource-manager/resource-manager-pay.ts",
+        "src/resource-manager/resource-placeholder-line-stock.ts",
+        "src/resource-manager/resource-placeholder.ts",
+        "src/resource-manager/resource-trader.ts",
+
+        "src/resource-requirement.ts",
+        "src/toolbar-container.ts",
+
         "src/creature-conforts.d.ts",
         "src/creature-conforts.ts",
         "src/controls.ts",

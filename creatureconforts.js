@@ -2239,12 +2239,535 @@ function sortFunction() {
         return 0;
     };
 }
+var GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+var ICONS = __spreadArray(__spreadArray([], GOODS, true), ['lesson', 'story', 'coin', 'card'], false);
+var ResourceCounterLineStock = (function () {
+    function ResourceCounterLineStock(parent, settings) {
+        var _this = this;
+        this.parent = parent;
+        this.settings = settings;
+        this.counters = [];
+        this.element = this.createElement();
+        parent.appendChild(this.element);
+        settings.resources.forEach(function (_a) {
+            var resource = _a.resource, initialValue = _a.initialValue, disabled = _a.disabled;
+            var counter = new ResourceCounter(_this.element, resource, {
+                initialValue: initialValue,
+                disabled: disabled !== null && disabled !== void 0 ? disabled : (initialValue !== null && initialValue !== void 0 ? initialValue : 0) === 0,
+            });
+            counter.onClick = function () { return _this.onClick(resource); };
+            _this.counters.push(counter);
+        });
+    }
+    ResourceCounterLineStock.prototype.createElement = function () {
+        var _a;
+        var element = document.createElement('div');
+        element.classList.add('resource-counter-line-stock');
+        if (this.settings.classList) {
+            (_a = element.classList).add.apply(_a, this.settings.classList);
+        }
+        return element;
+    };
+    ResourceCounterLineStock.prototype.disable = function () {
+        this.counters.forEach(function (counter) { return counter.disabled(true); });
+    };
+    ResourceCounterLineStock.prototype.disableResource = function (type) {
+        var _a;
+        (_a = this.counters.find(function (counter) { return counter.icon === type; })) === null || _a === void 0 ? void 0 : _a.disabled(true);
+    };
+    ResourceCounterLineStock.prototype.reset = function () {
+        this.counters.forEach(function (counter) { return counter.reset(); });
+    };
+    return ResourceCounterLineStock;
+}());
+var ResourceCounter = (function () {
+    function ResourceCounter(parent, icon, settings) {
+        this.icon = icon;
+        this.settings = settings;
+        var resource_counter = this.createCounter();
+        this.element = this.createWrapper(icon, [resource_counter, this.createIcon(icon)]);
+        parent.appendChild(this.element);
+        var initialValue = settings.initialValue, disabled = settings.disabled;
+        this.counter = createCounter(resource_counter, initialValue !== null && initialValue !== void 0 ? initialValue : 0);
+        this.disabled(disabled !== null && disabled !== void 0 ? disabled : false);
+    }
+    ResourceCounter.prototype.createWrapper = function (icon, children) {
+        var _this = this;
+        var element = document.createElement('div');
+        element.classList.add('resource-counter-wrapper');
+        element.dataset.type = '' + icon;
+        element.onclick = function () { return _this.handleClick(); };
+        children.forEach(function (child) { return element.appendChild(child); });
+        return element;
+    };
+    ResourceCounter.prototype.createCounter = function () {
+        var element = document.createElement('span');
+        element.classList.add('counter');
+        return element;
+    };
+    ResourceCounter.prototype.createIcon = function (icon) {
+        var element = document.createElement('div');
+        element.classList.add('resource-icon');
+        element.dataset.type = '' + icon;
+        return element;
+    };
+    ResourceCounter.prototype.handleClick = function () {
+        var _a;
+        var notifyClick = this.onClick !== undefined &&
+            this.counter.getValue() > 0 &&
+            this.element.classList.contains('disabled') === false;
+        if (notifyClick) {
+            var handled = (_a = this.onClick) === null || _a === void 0 ? void 0 : _a.call(this);
+            if (handled !== false) {
+                this.counter.incValue(-1);
+                if (this.counter.getValue() === 0) {
+                    this.disabled(true);
+                }
+            }
+        }
+    };
+    ResourceCounter.prototype.disabled = function (value) {
+        this.element.classList.toggle('disabled', value === true);
+    };
+    ResourceCounter.prototype.getValue = function () {
+        return this.counter.getValue();
+    };
+    ResourceCounter.prototype.incValue = function (value) {
+        this.counter.incValue(value);
+        if (this.counter.getValue() === 0)
+            this.disabled(true);
+    };
+    ResourceCounter.prototype.setValue = function (value) {
+        this.counter.setValue(value);
+        if (this.counter.getValue() === 0)
+            this.disabled(true);
+    };
+    ResourceCounter.prototype.reset = function () {
+        var _a = this.settings, initialValue = _a.initialValue, disabled = _a.disabled;
+        this.counter.setValue(initialValue !== null && initialValue !== void 0 ? initialValue : 0);
+        this.disabled(disabled);
+    };
+    return ResourceCounter;
+}());
+var ResourceHelper = (function () {
+    function ResourceHelper() {
+    }
+    ResourceHelper.getElement = function (type) {
+        return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>");
+    };
+    ResourceHelper.getIconSame = function () {
+        return '<div class="resource-icon same"></div>';
+    };
+    ResourceHelper.getIconDifferent = function () {
+        return '<div class="resource-icon different"></div>';
+    };
+    ResourceHelper.convertToInt = function (icons) {
+        return icons.map(function (type) { return ICONS.indexOf(type) + 1; });
+    };
+    return ResourceHelper;
+}());
+var ResourceManagerPayFor = (function () {
+    function ResourceManagerPayFor(root, settings) {
+        var _this = this;
+        this.settings = settings;
+        this.resource_trader = [];
+        root.classList.add('resource-container');
+        root.classList.add('resource-manager-pay-for');
+        this.resource_player = new ResourceCounterLineStock(root, {
+            resources: settings.from.available,
+        });
+        if (settings.to.available) {
+            root.appendChild(this.createArrow());
+            this.resource_board = new ResourceCounterLineStock(root, {
+                resources: settings.to.available.map(function (p) {
+                    return {
+                        resource: p,
+                        initialValue: 1,
+                    };
+                }),
+                classList: ['resource-board'],
+            });
+            this.resource_board.onClick = function (type) { return _this.handleResourceBoardClick(type); };
+        }
+        root.appendChild(this.createSpacer());
+        this.traders = this.createTraders();
+        root.appendChild(this.traders);
+        this.addResourceTrader();
+        this.resource_player.onClick = function (type) { return _this.handleResourcePlayerClick(type); };
+    }
+    ResourceManagerPayFor.prototype.getResourcesFrom = function () {
+        return this.resource_trader.filter(function (t) { return t.isComplete(); }).flatMap(function (t) { return t.getFrom(); });
+    };
+    ResourceManagerPayFor.prototype.getResourcesTo = function () {
+        return this.resource_trader.filter(function (t) { return t.isComplete(); }).flatMap(function (t) { return t.getTo(); });
+    };
+    ResourceManagerPayFor.prototype.reset = function () {
+        var _a;
+        (_a = this.resource_board) === null || _a === void 0 ? void 0 : _a.reset();
+        this.resource_player.reset();
+        this.resource_trader.forEach(function (t) { return t.destroy(); });
+        this.resource_trader.splice(0);
+        this.addResourceTrader();
+    };
+    ResourceManagerPayFor.prototype.hasTradePending = function () {
+        return !this.resource_trader.every(function (t) { return t.isComplete(); });
+    };
+    ResourceManagerPayFor.prototype.addResourceTrader = function () {
+        var _a = this.settings, from = _a.from, to = _a.to;
+        var trader = new ResourceTrader(this.traders, {
+            from: {
+                count: from.count,
+                resources: from.requirement,
+                restriction: from.restriction,
+            },
+            to: {
+                count: to.count,
+                resources: to.resources,
+                restriction: to.restriction,
+            },
+        });
+        this.resource_trader.push(trader);
+        if (from.restriction) {
+            if (from.restriction === 'all_different') {
+                console.log(from.restriction);
+                trader.element.insertAdjacentElement('afterbegin', this.createDifferentIcon());
+            }
+            if (from.restriction === 'all_same') {
+                trader.element.insertAdjacentElement('afterbegin', this.createSameIcon());
+            }
+        }
+        if (to.restriction) {
+            if (to.restriction === 'all_different') {
+                trader.element.appendChild(this.createDifferentIcon());
+            }
+            if (to.restriction === 'all_same') {
+                trader.element.appendChild(this.createSameIcon());
+            }
+        }
+        return trader;
+    };
+    ResourceManagerPayFor.prototype.createArrow = function () {
+        var divSpacer = document.createElement('div');
+        divSpacer.classList.add('arrow');
+        return divSpacer;
+    };
+    ResourceManagerPayFor.prototype.createSpacer = function () {
+        var divSpacer = document.createElement('div');
+        divSpacer.classList.add('spacer');
+        return divSpacer;
+    };
+    ResourceManagerPayFor.prototype.createTraders = function () {
+        var divTrader = document.createElement('div');
+        divTrader.classList.add('resource-traders');
+        return divTrader;
+    };
+    ResourceManagerPayFor.prototype.handleResourceBoardClick = function (type) {
+        var _this = this;
+        var _a;
+        var trader = this.resource_trader.find(function (p) { return !p.isFullTo() && p.canAddTo(type); });
+        if (trader) {
+            trader.addTo(type);
+        }
+        if (this.settings.to.restriction === 'all_same') {
+            (_a = this.settings.to.available) === null || _a === void 0 ? void 0 : _a.filter(function (p) { return p !== type; }).forEach(function (p) {
+                _this.resource_board.disableResource(p);
+            });
+            this.resource_player.disableResource(type);
+        }
+        return false;
+    };
+    ResourceManagerPayFor.prototype.handleResourcePlayerClick = function (type) {
+        var trader = this.resource_trader.find(function (p) { return !p.isFullFrom() && p.canAddFrom(type); });
+        if (trader === undefined) {
+            if (this.resource_trader.length < this.settings.times) {
+                trader = this.addResourceTrader();
+            }
+            else {
+                return false;
+            }
+        }
+        trader.addFrom(type);
+        var last_trader = this.resource_trader.find(function (p) { return !p.isFullFrom() && p.canAddFrom(type); });
+        if (last_trader === undefined && this.resource_trader.length < this.settings.times) {
+            last_trader = this.addResourceTrader();
+        }
+        if (!(last_trader === null || last_trader === void 0 ? void 0 : last_trader.canAddFrom(type)) || this.settings.from.restriction === 'all_different') {
+            this.resource_player.disableResource(type);
+        }
+        if (this.resource_trader.every(function (p) { return p.isFullFrom(); })) {
+            this.resource_player.disable();
+        }
+    };
+    ResourceManagerPayFor.prototype.createDifferentIcon = function () {
+        var icon = document.createElement('div');
+        icon.classList.add('restriction-icon', 'different');
+        return icon;
+    };
+    ResourceManagerPayFor.prototype.createSameIcon = function () {
+        var icon = document.createElement('div');
+        icon.classList.add('restriction-icon', 'same');
+        return icon;
+    };
+    return ResourceManagerPayFor;
+}());
+var ResourceManagerPay = (function () {
+    function ResourceManagerPay(root, settings) {
+        var _this = this;
+        var player_resources = settings.player_resources, resource_count = settings.resource_count;
+        root.classList.add('resource-container');
+        root.classList.add('resource-manager-pay');
+        this.resource_player = new ResourceCounterLineStock(root, {
+            resources: player_resources,
+        });
+        root.appendChild(this.createSpacer());
+        this.resource_paid = new ResourcePlaceholderLineStock(root, resource_count);
+        this.resource_player.onClick = function (type) {
+            _this.resource_paid.add(type);
+            if (_this.resource_paid.isFull()) {
+                _this.resource_player.disable();
+            }
+            return undefined;
+        };
+    }
+    ResourceManagerPay.prototype.getResourcesFrom = function () {
+        var res = this.resource_paid.get();
+        return res;
+    };
+    ResourceManagerPay.prototype.getResourcesTo = function () {
+        return [];
+    };
+    ResourceManagerPay.prototype.reset = function () {
+        this.resource_player.reset();
+        this.resource_paid.reset();
+    };
+    ResourceManagerPay.prototype.createSpacer = function () {
+        var divSpacer = document.createElement('div');
+        divSpacer.classList.add('spacer');
+        return divSpacer;
+    };
+    return ResourceManagerPay;
+}());
+var ResourcePlaceholderLineStock = (function () {
+    function ResourcePlaceholderLineStock(parent, count, settings) {
+        this.parent = parent;
+        this.settings = settings;
+        this.placeholders = [];
+        this.element = this.createElement();
+        parent.appendChild(this.element);
+        for (var index = 0; index < count; index++) {
+            this.placeholders.push(new ResourcePlaceholder(this.element, {
+                allowed: (settings === null || settings === void 0 ? void 0 : settings.resources) ? [settings.resources[index]] : undefined,
+            }));
+            if ((settings === null || settings === void 0 ? void 0 : settings.restriction) && index < count - 1) {
+                this.addRestrictionIcon();
+            }
+        }
+    }
+    ResourcePlaceholderLineStock.prototype.createElement = function () {
+        var element = document.createElement('div');
+        element.classList.add('resource-placeholder-line-stock');
+        return element;
+    };
+    ResourcePlaceholderLineStock.prototype.get = function () {
+        return this.placeholders.filter(function (p) { return !p.isEmpty(); }).map(function (p) { return p.getResource(); });
+    };
+    ResourcePlaceholderLineStock.prototype.add = function (resource) {
+        var firstEmpty = this.placeholders.find(function (p) { return p.isEmpty() && p.isResourceAllowed(resource); });
+        if (firstEmpty) {
+            firstEmpty.add(resource);
+        }
+        return firstEmpty !== undefined;
+    };
+    ResourcePlaceholderLineStock.prototype.canAdd = function (resource) {
+        var _a;
+        var firstEmpty = this.placeholders.find(function (p) { return p.isEmpty() && p.isResourceAllowed(resource); });
+        if (firstEmpty === undefined)
+            return false;
+        if ((_a = this.settings) === null || _a === void 0 ? void 0 : _a.restriction) {
+            var current_resources = this.placeholders.filter(function (p) { return !p.isEmpty(); }).map(function (p) { return p.getResource(); });
+            if (current_resources.length === 0)
+                return true;
+            if (this.settings.restriction === 'different') {
+                return current_resources.indexOf(resource) < 0;
+            }
+            if (this.settings.restriction === 'same') {
+                return current_resources.indexOf(resource) >= 0;
+            }
+        }
+        return true;
+    };
+    ResourcePlaceholderLineStock.prototype.isFull = function () {
+        return this.placeholders.find(function (p) { return p.isEmpty(); }) === undefined;
+    };
+    ResourcePlaceholderLineStock.prototype.reset = function () {
+        return this.placeholders.forEach(function (p) { return p.reset(); });
+    };
+    ResourcePlaceholderLineStock.prototype.createDifferentIcon = function () {
+        var icon = document.createElement('div');
+        icon.classList.add('restriction-icon', 'different');
+        return icon;
+    };
+    ResourcePlaceholderLineStock.prototype.createSameIcon = function () {
+        var icon = document.createElement('div');
+        icon.classList.add('restriction-icon', 'same');
+        return icon;
+    };
+    ResourcePlaceholderLineStock.prototype.addRestrictionIcon = function () {
+        var _a, _b;
+        if (((_a = this.settings) === null || _a === void 0 ? void 0 : _a.restriction) === 'different') {
+            this.element.appendChild(this.createDifferentIcon());
+        }
+        else if (((_b = this.settings) === null || _b === void 0 ? void 0 : _b.restriction) === 'same') {
+            this.element.appendChild(this.createSameIcon());
+        }
+    };
+    return ResourcePlaceholderLineStock;
+}());
+var ResourcePlaceholder = (function () {
+    function ResourcePlaceholder(parent, settings) {
+        this.settings = settings;
+        this.element = document.createElement('div');
+        this.element.classList.add('placeholder');
+        parent.insertAdjacentElement('beforeend', this.element);
+    }
+    ResourcePlaceholder.prototype.getResource = function () {
+        return this.resource;
+    };
+    ResourcePlaceholder.prototype.destroy = function () {
+        this.element.remove();
+    };
+    ResourcePlaceholder.prototype.reset = function () {
+        this.resource = undefined;
+        while (this.element.children.length > 0) {
+            this.element.removeChild(this.element.childNodes[0]);
+        }
+    };
+    ResourcePlaceholder.prototype.add = function (type) {
+        this.resource = type;
+        this.element.insertAdjacentHTML('beforeend', ResourceHelper.getElement(type));
+    };
+    ResourcePlaceholder.prototype.isEmpty = function () {
+        return this.resource === undefined;
+    };
+    ResourcePlaceholder.prototype.isResourceAllowed = function (type) {
+        var _a;
+        return ((_a = this.settings) === null || _a === void 0 ? void 0 : _a.allowed) === undefined || this.settings.allowed.indexOf(type) >= 0;
+    };
+    return ResourcePlaceholder;
+}());
+var ResourceTrader = (function () {
+    function ResourceTrader(parent, _a) {
+        var _this = this;
+        var from = _a.from, to = _a.to;
+        var _b;
+        this.element = this.createElement();
+        parent.appendChild(this.element);
+        this.from = new ResourcePlaceholderLineStock(this.element, from.count, {
+            resources: from.resources,
+            restriction: from.restriction,
+        });
+        this.element.append(this.createArrow());
+        console.log(to);
+        this.to = new ResourcePlaceholderLineStock(this.element, (_b = to.count) !== null && _b !== void 0 ? _b : to.resources.length, {
+            restriction: to.restriction,
+        });
+        if (to.resources) {
+            to.resources.forEach(function (r) { return _this.to.add(r); });
+        }
+    }
+    ResourceTrader.prototype.addFrom = function (resource) {
+        this.from.add(resource);
+    };
+    ResourceTrader.prototype.addTo = function (resource) {
+        this.to.add(resource);
+    };
+    ResourceTrader.prototype.canAddFrom = function (resource) {
+        return this.from.canAdd(resource);
+    };
+    ResourceTrader.prototype.canAddTo = function (resource) {
+        return this.to.canAdd(resource);
+    };
+    ResourceTrader.prototype.destroy = function () {
+        this.element.remove();
+    };
+    ResourceTrader.prototype.disable = function (value) {
+        this.element.classList.toggle('disabled', value);
+    };
+    ResourceTrader.prototype.getFrom = function () {
+        return this.from.get();
+    };
+    ResourceTrader.prototype.getTo = function () {
+        return this.to.get();
+    };
+    ResourceTrader.prototype.isFullFrom = function () {
+        return this.from.isFull();
+    };
+    ResourceTrader.prototype.isFullTo = function () {
+        return this.to.isFull();
+    };
+    ResourceTrader.prototype.isComplete = function () {
+        return this.isFullFrom() && this.isFullTo();
+    };
+    ResourceTrader.prototype.createElement = function () {
+        var element = document.createElement('div');
+        element.classList.add('resource-trader');
+        return element;
+    };
+    ResourceTrader.prototype.createArrow = function () {
+        var divSpacer = document.createElement('div');
+        divSpacer.classList.add('arrow');
+        return divSpacer;
+    };
+    return ResourceTrader;
+}());
+var ResourceRequirement = (function () {
+    function ResourceRequirement() {
+    }
+    ResourceRequirement.isRequirementMet = function (game, cost) {
+        var counters = game.getPlayerPanel(game.getPlayerId()).counters;
+        for (var _i = 0, _a = Object.keys(cost); _i < _a.length; _i++) {
+            var type = _a[_i];
+            if (type !== '*' && counters[type].getValue() < cost[type]) {
+                return false;
+            }
+        }
+        if ('*' in cost) {
+            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
+            var total_cost = Object.keys(cost)
+                .filter(function (type) { return ICONS.indexOf(type) >= 0; })
+                .map(function (type) { return cost[type]; })
+                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            return total_goods >= total_cost;
+        }
+        return true;
+    };
+    return ResourceRequirement;
+}());
+var ToolbarContainer = (function () {
+    function ToolbarContainer(name) {
+        this.container_name = "resource_manager_".concat(name);
+    }
+    ToolbarContainer.prototype.addContainer = function () {
+        this.removeContainer();
+        document
+            .getElementById("maintitlebar_content")
+            .insertAdjacentHTML('beforeend', "<div id=\"".concat(this.container_name, "\"></div>"));
+        return this.getContainer();
+    };
+    ToolbarContainer.prototype.removeContainer = function () {
+        var element = document.getElementById(this.container_name);
+        if (element)
+            element.remove();
+    };
+    ToolbarContainer.prototype.getContainer = function () {
+        return document.getElementById(this.container_name);
+    };
+    return ToolbarContainer;
+}());
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.log.bind(window.console) : function () { };
 var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
 var LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
-var GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-var ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 var CreatureConforts = (function () {
     function CreatureConforts() {
         this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
@@ -2383,6 +2906,18 @@ var CreatureConforts = (function () {
     CreatureConforts.prototype.getCurrentPlayerTable = function () {
         return this.getPlayerTable(this.getPlayerId());
     };
+    CreatureConforts.prototype.getPlayerResources = function (filter) {
+        if (filter === void 0) { filter = []; }
+        var counters = this.getPlayerPanel(this.getPlayerId()).counters;
+        var hand = this.getCurrentPlayerTable().hand;
+        var resources = ICONS.map(function (icon) {
+            return {
+                resource: icon,
+                initialValue: icon == 'card' ? hand.getCards().length : counters[icon].getValue(),
+            };
+        });
+        return filter.length == 0 ? resources : resources.filter(function (r) { return filter.indexOf(r.resource) >= 0; });
+    };
     CreatureConforts.prototype.restoreGameState = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -2475,251 +3010,6 @@ var CreatureConforts = (function () {
         return values.join('');
     };
     return CreatureConforts;
-}());
-var ResourceCounter = (function () {
-    function ResourceCounter(id, parent, icon, settings) {
-        var _this = this;
-        this.id = id;
-        this.icon = icon;
-        this.settings = settings;
-        var initialValue = settings.initialValue, disabled = settings.disabled;
-        var html = "<div id=\"".concat(id, "-").concat(icon, "\" class=\"wrapper\" data-type=\"").concat(icon, "\">\n         <span id=\"").concat(id, "-").concat(icon, "-counter\" class=\"counter\">-</span>\n         <div class=\"resource-icon\" data-type=\"").concat(icon, "\"></div>\n      </div>");
-        parent.insertAdjacentHTML('beforeend', html);
-        this.counter = new ebg.counter();
-        this.counter.create("".concat(id, "-").concat(icon, "-counter"));
-        this.counter.setValue(initialValue !== null && initialValue !== void 0 ? initialValue : 0);
-        document.getElementById("".concat(id, "-").concat(icon)).addEventListener('click', function () {
-            if (_this.onClick &&
-                _this.counter.getValue() > 0 &&
-                !document.getElementById("".concat(_this.id, "-").concat(_this.icon)).classList.contains('disabled')) {
-                _this.onClick();
-                _this.counter.incValue(-1);
-                if (_this.counter.getValue() == 0) {
-                    _this.disabled(true);
-                }
-            }
-        });
-        if (disabled)
-            this.disabled(true);
-    }
-    ResourceCounter.prototype.disabled = function (value) {
-        document.getElementById("".concat(this.id, "-").concat(this.icon)).classList.toggle('disabled', value == true);
-    };
-    ResourceCounter.prototype.getValue = function () {
-        return this.counter.getValue();
-    };
-    ResourceCounter.prototype.incValue = function (value) {
-        this.counter.incValue(value);
-        if (this.counter.getValue() == 0)
-            this.disabled(true);
-    };
-    ResourceCounter.prototype.setValue = function (value) {
-        this.counter.setValue(value);
-        if (this.counter.getValue() == 0)
-            this.disabled(true);
-    };
-    ResourceCounter.prototype.reset = function () {
-        var _a = this.settings, initialValue = _a.initialValue, enabled = _a.disabled;
-        this.counter.setValue(initialValue !== null && initialValue !== void 0 ? initialValue : 0);
-        this.disabled(enabled);
-    };
-    return ResourceCounter;
-}());
-var PlayerResourceCounter = (function () {
-    function PlayerResourceCounter(game, element, id, settings) {
-        var _this = this;
-        if (settings === void 0) { settings = {}; }
-        var _a, _b;
-        this.counters = {};
-        var player_id = (_a = settings.player_id) !== null && _a !== void 0 ? _a : game.getPlayerId();
-        var player_counters = game.getPlayerPanel(player_id).counters;
-        var handleResourceClick = function (type, counter) {
-            if (_this.onResourceClick)
-                _this.onResourceClick(type);
-        };
-        var icons = (_b = settings.icons) !== null && _b !== void 0 ? _b : ICONS;
-        icons.forEach(function (icon) {
-            var _a;
-            var value = (_a = settings.initialValue) !== null && _a !== void 0 ? _a : player_counters[icon].getValue();
-            _this.counters[icon] = new ResourceCounter(id, element, icon, {
-                initialValue: value,
-                disabled: value == 0 || icons.indexOf(icon) < 0,
-            });
-            _this.counters[icon].onClick = function () { return handleResourceClick(icon, _this.counters[icon]); };
-        });
-    }
-    PlayerResourceCounter.prototype.reset = function () {
-        var _this = this;
-        Object.keys(this.counters).forEach(function (type) {
-            _this.counters[type].reset();
-        });
-    };
-    PlayerResourceCounter.prototype.disabled = function () {
-        var _this = this;
-        Object.keys(this.counters).forEach(function (type) {
-            _this.counters[type].disabled(true);
-        });
-    };
-    return PlayerResourceCounter;
-}());
-var ResourceLineStock = (function () {
-    function ResourceLineStock(element, settings) {
-        if (settings === void 0) { settings = {}; }
-        this.element = element;
-        this.settings = settings;
-        this.resources = [];
-    }
-    ResourceLineStock.prototype.add = function (resource) {
-        this.resources.push(resource);
-        this.element.insertAdjacentHTML('beforeend', ResourceHelper.getElement(resource));
-    };
-    ResourceLineStock.prototype.getResources = function () {
-        return __spreadArray([], this.resources, true);
-    };
-    ResourceLineStock.prototype.isFull = function () {
-        return false;
-    };
-    ResourceLineStock.prototype.reset = function () {
-        this.resources = [];
-        while (this.element.children.length > 0) {
-            this.element.removeChild(this.element.childNodes[0]);
-        }
-    };
-    return ResourceLineStock;
-}());
-var ResourcePlaceholder = (function () {
-    function ResourcePlaceholder(parent) {
-        this.resource = null;
-        this.element = document.createElement('div');
-        this.element.classList.add('placeholder');
-        parent.insertAdjacentElement('beforeend', this.element);
-    }
-    ResourcePlaceholder.prototype.getResource = function () {
-        return this.resource;
-    };
-    ResourcePlaceholder.prototype.destroy = function () {
-        this.element.remove();
-    };
-    ResourcePlaceholder.prototype.reset = function () {
-        this.resource = null;
-        while (this.element.children.length > 0) {
-            this.element.removeChild(this.element.childNodes[0]);
-        }
-    };
-    ResourcePlaceholder.prototype.add = function (type) {
-        this.resource = type;
-        this.element.insertAdjacentHTML('beforeend', ResourceHelper.getElement(type));
-    };
-    return ResourcePlaceholder;
-}());
-var ResourcePlaceholderLineStock = (function () {
-    function ResourcePlaceholderLineStock(element, count, settings) {
-        var _a, _b;
-        this.element = element;
-        this.count = count;
-        this.settings = settings;
-        this.placeholders = [];
-        var restriction = (_a = settings === null || settings === void 0 ? void 0 : settings.restriction) !== null && _a !== void 0 ? _a : 'none';
-        if ((_b = settings.expandable) !== null && _b !== void 0 ? _b : false) {
-        }
-        else {
-            for (var index = 0; index < count; index++) {
-                this.placeholders.push(new ResourcePlaceholder(element));
-                if (restriction == 'same') {
-                    element.insertAdjacentHTML('beforeend', ResourceHelper.getIconSame());
-                }
-                else if (restriction == 'different') {
-                    element.insertAdjacentHTML('beforeend', ResourceHelper.getIconDifferent());
-                }
-            }
-        }
-    }
-    ResourcePlaceholderLineStock.prototype.addPlaceholder = function () {
-        this.placeholders.push(new ResourcePlaceholder(this.element));
-    };
-    ResourcePlaceholderLineStock.prototype.countPlaceholder = function () {
-        return this.placeholders.length;
-    };
-    ResourcePlaceholderLineStock.prototype.isExpandable = function () {
-        var _a, _b;
-        return (_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.expandable) !== null && _b !== void 0 ? _b : false;
-    };
-    ResourcePlaceholderLineStock.prototype.add = function (resource) {
-        var count = this.getResources().length;
-        this.placeholders[count].add(resource);
-    };
-    ResourcePlaceholderLineStock.prototype.isFull = function () {
-        return this.placeholders.every(function (p) { return p.getResource() != null; });
-    };
-    ResourcePlaceholderLineStock.prototype.getResources = function () {
-        return this.placeholders.map(function (p) { return p.getResource(); }).filter(function (r) { return r !== null; });
-    };
-    ResourcePlaceholderLineStock.prototype.reset = function () {
-        var _a, _b;
-        if ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.expandable) !== null && _b !== void 0 ? _b : false) {
-            this.placeholders.forEach(function (p) { return p.destroy(); });
-            this.placeholders = [];
-        }
-        else {
-            this.placeholders.forEach(function (p) { return p.reset(); });
-        }
-    };
-    return ResourcePlaceholderLineStock;
-}());
-var ResourceTrader = (function () {
-    function ResourceTrader(parent, id, to, from, restriction) {
-        this.to = to;
-        this.from = from;
-        this.restriction = restriction;
-        var resource_to_display = this.to[0] !== '*' ? this.to.map(function (icon) { return ResourceHelper.getElement(icon); }).join('') : '';
-        var html = "<div id=\"".concat(id, "\" class=\"line\">\n         <div class=\"resource-converter-placeholder-from\"></div>\n         <div class=\"wrapper no-border arrow\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg></div>\n         <div class=\"wrapper no-border to\">").concat(resource_to_display, "</div>\n         <div class=\"resource-converter-placeholder\"></div>\n      </div>");
-        parent.insertAdjacentHTML('beforeend', html);
-        this.element = document.getElementById(id);
-        if (this.from) {
-            this.resources_from = new ResourcePlaceholderLineStock(this.element.querySelector('.resource-converter-placeholder-from'), from.length, {
-                restriction: restriction,
-            });
-        }
-        if (this.to[0] == '*') {
-            this.resources_to = new ResourcePlaceholderLineStock(this.element.querySelector('.resource-converter-placeholder'), to.length, {});
-        }
-    }
-    return ResourceTrader;
-}());
-var ResourceHelper = (function () {
-    function ResourceHelper() {
-    }
-    ResourceHelper.getElement = function (type) {
-        return "<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>");
-    };
-    ResourceHelper.getIconSame = function () {
-        return '<div class="resource-icon same"></div>';
-    };
-    ResourceHelper.getIconDifferent = function () {
-        return '<div class="resource-icon different"></div>';
-    };
-    ResourceHelper.convertToInt = function (icons) {
-        return icons.map(function (type) { return ICONS.indexOf(type) + 1; });
-    };
-    ResourceHelper.isRequirementMet = function (game, cost) {
-        var counters = game.getPlayerPanel(game.getPlayerId()).counters;
-        for (var _i = 0, _a = Object.keys(cost); _i < _a.length; _i++) {
-            var type = _a[_i];
-            if (type !== '*' && counters[type].getValue() < cost[type]) {
-                return false;
-            }
-        }
-        if ('*' in cost) {
-            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
-            var total_cost = Object.keys(cost)
-                .filter(function (type) { return GOODS.indexOf(type) >= 0; })
-                .map(function (type) { return cost[type]; })
-                .reduce(function (prev, curr) { return prev + curr; }, 0);
-            return total_goods >= total_cost;
-        }
-        return true;
-    };
-    return ResourceHelper;
 }());
 var HiddenDeck = (function (_super) {
     __extends(HiddenDeck, _super);
@@ -3289,169 +3579,6 @@ var SelectResources = (function () {
     };
     return SelectResources;
 }());
-var ResourceConverter = (function () {
-    function ResourceConverter(game, from, to, times, settings) {
-        this.game = game;
-        this.from = from;
-        this.to = to;
-        this.times = times;
-        this.settings = settings;
-    }
-    ResourceConverter.prototype.show = function () {
-        var _a;
-        this.removeControl();
-        var count_any_ressource_to = this.to.filter(function (r) { return r == '*'; }).length;
-        this.addBanner(count_any_ressource_to, (_a = this.settings) === null || _a === void 0 ? void 0 : _a.displayTo);
-        this.addControlResourcesPlayer();
-        this.addControlResourceGive();
-        this.addControlResourceBoard(count_any_ressource_to);
-        this.addControlResourceGet(count_any_ressource_to);
-        this.addResetButton();
-        var test = new ResourceTrader(document.getElementById("resource-converter"), 't1', this.to, this.from);
-    };
-    ResourceConverter.prototype.hide = function () {
-        this.removeControl();
-    };
-    ResourceConverter.prototype.getResourcesGive = function () {
-        return this.resources_give.getResources();
-    };
-    ResourceConverter.prototype.getResourcesGet = function () {
-        var _this = this;
-        if (this.counter_reward && this.counter_reward.getValue() > 0) {
-            return arrayRange(1, this.counter_reward.getValue())
-                .map(function () { return _this.to; })
-                .flat();
-        }
-        else {
-            return this.resource_get.getResources();
-        }
-    };
-    ResourceConverter.prototype.addBanner = function (count_any_ressource_to, displayTo) {
-        if (displayTo === void 0) { displayTo = true; }
-        var arrow = count_any_ressource_to > 0
-            ? "<div class=\"wrapper no-border arrow\">\n                  <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               </div>"
-            : '';
-        var html = "<div id=\"resource-converter\" class=\"".concat(displayTo ? '' : 'hideTo', "\">\n         <div class=\"line\">\n            <div id=\"resource-converter-player\"></div>\n            ").concat(arrow, "\n            <div id=\"resource-converter-board-resources\"></div>\n         </div>\n         <div class=\"line\">\n            <div id=\"resource-converter-placeholder-from\"></div>\n            <div class=\"wrapper no-border from\"></div>\n            <div class=\"wrapper no-border arrow\">\n               <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"36\" height=\"36\" viewBox=\"0 0 16 16\"><path fill=\"lime\" d=\"M15.5 8L8 .5V5H0v6h8v4.5z\"/></svg>\n               ").concat(this.times > 1 ? "x".concat(this.times) : '', "\n            </div>\n            <div class=\"wrapper no-border to\">\n               <span id=\"tc-icons-reward-counter\" class=\"counter\">1</span>\n               ").concat(this.to.map(function (icon) { return ResourceHelper.getElement(icon); }).join(''), "\n            </div>\n            <div id=\"resource-converter-placeholder\"></div>\n            <div id=\"resource-converter-buttons\"></div>\n         </div>\n      </div>");
-        document.getElementById("maintitlebar_content").insertAdjacentHTML('beforeend', html);
-    };
-    ResourceConverter.prototype.addControlResourcesPlayer = function () {
-        var _this = this;
-        var handleResourceClick = function (type) {
-            var _a, _b, _c, _d, _e;
-            _this.resources_give.add(type);
-            var is_confirm_enabled = undefined;
-            if (_this.counter_reward) {
-                if (_this.from.length == 1) {
-                    _this.counter_reward.incValue(1);
-                }
-                else if (_this.from.length > 1 && _this.from.every(function (icon) { return icon == '*'; })) {
-                    _this.counter_reward.setValue(Math.floor(_this.resources_give.getResources().length / _this.from.length));
-                }
-                else {
-                    var count = countExtractions(_this.from, _this.resources_give.getResources());
-                    _this.counter_reward.setValue(count);
-                    is_confirm_enabled = count * _this.from.length == _this.resources_give.getResources().length;
-                }
-            }
-            else {
-                if (_this.resource_get.isExpandable() &&
-                    _this.resource_get.countPlaceholder() < _this.resources_give.getResources().length) {
-                    _this.resource_get.addPlaceholder();
-                    _this.resources_board.reset();
-                }
-            }
-            if (((_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.getValue()) >= _this.times || _this.resources_give.isFull()) {
-                _this.resources_player.disabled();
-            }
-            if ((_d = (_c = (_b = _this.settings) === null || _b === void 0 ? void 0 : _b.from) === null || _c === void 0 ? void 0 : _c.max) !== null && _d !== void 0 ? _d : 0 == _this.resources_give.getResources().length) {
-                _this.resources_player.disabled();
-            }
-            if (is_confirm_enabled == undefined) {
-                is_confirm_enabled = _this.resources_give.isFull() && _this.resource_get.isFull();
-            }
-            (_e = _this.OnEnableConfirm) === null || _e === void 0 ? void 0 : _e.call(_this, is_confirm_enabled == true);
-        };
-        var element = document.getElementById('resource-converter-player');
-        this.resources_player = new PlayerResourceCounter(this.game, element, 'player-counter', {
-            icons: this.getAllowedResources(),
-        });
-        this.resources_player.onResourceClick = function (type) { return handleResourceClick(type); };
-    };
-    ResourceConverter.prototype.addControlResourceGive = function () {
-        var _a, _b, _c, _d;
-        if (this.times == 1 || (this.from && this.from.every(function (r) { return r == '*'; })) || ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.max)) {
-            var element = document.getElementById('resource-converter-placeholder-from');
-            this.resources_give = new ResourcePlaceholderLineStock(element, this.from.length, {
-                restriction: (_d = (_c = this.settings) === null || _c === void 0 ? void 0 : _c.from) === null || _d === void 0 ? void 0 : _d.restriction,
-            });
-        }
-        else {
-            this.resources_give = new ResourceLineStock(document.querySelector('#resource-converter .from'));
-        }
-    };
-    ResourceConverter.prototype.addControlResourceBoard = function (count_any_ressource_to) {
-        var _this = this;
-        if (count_any_ressource_to == 0) {
-            document.getElementById('resource-converter-placeholder').remove();
-        }
-        else {
-            var element = document.getElementById('resource-converter-board-resources');
-            this.resources_board = new PlayerResourceCounter(this.game, element, 'board-resources', {
-                icons: GOODS,
-                initialValue: 20,
-            });
-            this.resources_board.onResourceClick = function (type) { return _this.handleBoardResourceClick(type); };
-            document.querySelector('#resource-converter .wrapper.to').remove();
-        }
-    };
-    ResourceConverter.prototype.addControlResourceGet = function (count_any_ressource_to) {
-        if (document.getElementById('tc-icons-reward-counter')) {
-            this.counter_reward = createCounter('tc-icons-reward-counter');
-        }
-        var element = document.getElementById('resource-converter-placeholder');
-        var expandable = this.to[0] == '*' && this.to.length == 1 && this.times > 1;
-        this.resource_get = new ResourcePlaceholderLineStock(element, count_any_ressource_to, {
-            expandable: expandable,
-        });
-    };
-    ResourceConverter.prototype.addResetButton = function () {
-        var _this = this;
-        var handleReset = function () {
-            var _a, _b, _c;
-            _this.resources_give.reset();
-            (_a = _this.counter_reward) === null || _a === void 0 ? void 0 : _a.setValue(0);
-            _this.resources_player.reset();
-            _this.resource_get.reset();
-            (_b = _this.resources_board) === null || _b === void 0 ? void 0 : _b.reset();
-            _this.OnEnableConfirm(((_c = _this.from) === null || _c === void 0 ? void 0 : _c.length) == 0);
-        };
-        this.game.addActionButtonReset('resource-converter-buttons', handleReset);
-    };
-    ResourceConverter.prototype.getAllowedResources = function () {
-        var _a, _b, _c;
-        var resources = ((_b = (_a = this.settings) === null || _a === void 0 ? void 0 : _a.from) === null || _b === void 0 ? void 0 : _b.allowed_resources)
-            ? this.settings.from.allowed_resources
-            : this.from.indexOf('*') >= 0
-                ? GOODS
-                : (_c = this.from) !== null && _c !== void 0 ? _c : ICONS;
-        return resources.filter(function (value, index) { return resources.indexOf(value) == index; });
-    };
-    ResourceConverter.prototype.handleBoardResourceClick = function (type) {
-        var _a;
-        this.resource_get.add(type);
-        if (this.resource_get.isFull()) {
-            this.resources_board.disabled();
-        }
-        (_a = this.OnEnableConfirm) === null || _a === void 0 ? void 0 : _a.call(this, this.resource_get.isFull() && this.resources_give.isFull());
-    };
-    ResourceConverter.prototype.removeControl = function () {
-        var root = document.getElementById('resource-converter');
-        if (root)
-            root.remove();
-        this.resources_player = null;
-    };
-    return ResourceConverter;
-}());
 var NotificationManager = (function () {
     function NotificationManager(game) {
         this.game = game;
@@ -3633,7 +3760,7 @@ var NotificationManager = (function () {
                     case 0:
                         ladder = args.ladder, discard = args.discard;
                         if (!discard) return [3, 2];
-                        return [4, this.game.tableCenter.confort_discard.addCard(discard)];
+                        return [4, this.game.tableCenter.improvement_discard.addCard(discard)];
                     case 1:
                         _c.sent();
                         _c.label = 2;
@@ -4115,7 +4242,7 @@ var PlayerTurnDiceState = (function () {
         }
         else {
             this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
-            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+            this.game.addActionButtonGray('btn_cancel', _('Reset'), handleCancel);
         }
     };
     PlayerTurnDiceState.prototype.addButtonsLessonLearned = function (die) {
@@ -4207,7 +4334,7 @@ var PlayerTurnDiceState = (function () {
     };
     PlayerTurnDiceState.prototype.addSelectedDieToSlot = function (slotId) {
         var _a = this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
-        var _b = hill.getSelection(), die = _b[0], others = _b.slice(1);
+        var die = hill.getSelection()[0];
         if (!die)
             return;
         var copy = __assign(__assign({}, die), { location: slotId });
@@ -4296,6 +4423,7 @@ var PlayerTurnResolveState = (function () {
 var PlayerTurnCraftState = (function () {
     function PlayerTurnCraftState(game) {
         this.game = game;
+        this.toolbar = new ToolbarContainer('craft');
     }
     PlayerTurnCraftState.prototype.onEnteringState = function (args) {
         var _this = this;
@@ -4308,25 +4436,21 @@ var PlayerTurnCraftState = (function () {
         var hand = this.game.getCurrentPlayerTable().hand;
         var handleSelectionChange = function (selection) {
             if (_this.resourceManager) {
-                _this.resourceManager.hide();
-                _this.resourceManager.OnEnableConfirm = null;
-                _this.resourceManager = undefined;
+                _this.toolbar.removeContainer();
+                _this.resourceManager.reset();
+                _this.resourceManager = null;
             }
+            _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
+            _this.game.disableButton('btn_reset');
             if (selection.length == 0)
                 return;
             var card_type = _this.game.confortManager.getCardType(selection[0]);
             if ('*' in card_type.cost) {
-                _this.resourceManager = new ResourceConverter(_this.game, ['*', '*'], [], 1, {
-                    displayTo: false,
+                _this.game.enableButton('btn_reset', 'gray');
+                _this.resourceManager = new ResourceManagerPay(_this.toolbar.addContainer(), {
+                    player_resources: _this.game.getPlayerResources(__spreadArray([], GOODS, true)),
+                    resource_count: 2,
                 });
-                _this.resourceManager.show();
-                _this.resourceManager.OnEnableConfirm = function (enable) {
-                    _this.game.toggleButtonEnable('btn_craft', enable);
-                };
-                _this.game.toggleButtonEnable('btn_craft', false);
-            }
-            else {
-                _this.game.toggleButtonEnable('btn_craft', selection.length == 1);
             }
         };
         var selection = hand.getCards().filter(function (card) {
@@ -4335,14 +4459,19 @@ var PlayerTurnCraftState = (function () {
                 console.warn('No cost for', card_type);
                 return false;
             }
-            return ResourceHelper.isRequirementMet(_this.game, card_type.cost);
+            return ResourceRequirement.isRequirementMet(_this.game, card_type.cost);
         });
         this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
         hand.setSelectionMode('single');
         hand.setSelectableCards(selection);
         hand.onSelectionChange = handleSelectionChange;
     };
-    PlayerTurnCraftState.prototype.onLeavingState = function () { };
+    PlayerTurnCraftState.prototype.onLeavingState = function () {
+        var hand = this.game.getCurrentPlayerTable().hand;
+        hand.setSelectionMode('none');
+        hand.setSelectableCards([]);
+        hand.onSelectionChange = null;
+    };
     PlayerTurnCraftState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var hand = this.game.getCurrentPlayerTable().hand;
@@ -4351,20 +4480,25 @@ var PlayerTurnCraftState = (function () {
             if (!card)
                 return;
             var card_type = _this.game.confortManager.getCardType(card);
-            if (!ResourceHelper.isRequirementMet(_this.game, card_type.cost)) {
+            if (!ResourceRequirement.isRequirementMet(_this.game, card_type.cost)) {
                 _this.game.showMessage('Requirement not met', 'error');
             }
             var resources = [];
             if ('*' in card_type.cost) {
-                resources = ResourceHelper.convertToInt(_this.resourceManager.getResourcesGive());
+                resources = ResourceHelper.convertToInt(_this.resourceManager.getResourcesFrom());
             }
             _this.game.takeAction('craftConfort', { card_id: card.id, resources: resources.join(';') });
         };
         var handlePass = function () {
             _this.game.takeAction('passCraftConfort');
         };
+        var handleReset = function () {
+            var _a;
+            (_a = _this.resourceManager) === null || _a === void 0 ? void 0 : _a.reset();
+        };
         this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
         this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
+        this.game.addActionButtonDisabled('btn_reset', _('Reset'), handleReset);
         this.game.addActionButtonUndo();
     };
     return PlayerTurnCraftState;
@@ -4413,14 +4547,18 @@ var ResolveMarketState = (function () {
     function ResolveMarketState(game) {
         this.game = game;
         this.isModeResource = false;
+        this.toolbar = new ToolbarContainer('market');
     }
     ResolveMarketState.prototype.onEnteringState = function (args) {
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectableLocation([8]);
         worker_locations.setSelectedLocation([8]);
+        this.toolbar.addContainer();
     };
     ResolveMarketState.prototype.onLeavingState = function () {
-        this.convert.hide();
+        this.toolbar.removeContainer();
+        this.resource_manager.reset();
+        this.resource_manager = null;
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectedLocation([]);
         this.isModeResource = false;
@@ -4428,38 +4566,66 @@ var ResolveMarketState = (function () {
     ResolveMarketState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
-            var resources = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
-            var resources2 = ResourceHelper.convertToInt(_this.convert.getResourcesGet()).join(';');
+            var resources = ResourceHelper.convertToInt(_this.resource_manager.getResourcesFrom()).join(';');
+            var resources2 = ResourceHelper.convertToInt(_this.resource_manager.getResourcesTo()).join(';');
             _this.game.takeAction('resolveWorker', { location_id: 8, resources: resources, resources2: resources2 }, function () {
                 _this.game.restoreGameState();
             });
         };
         var handleChoice1 = function () {
-            _this.convert = new ResourceConverter(_this.game, ['coin'], ['*'], 1, {
-                from: { allowed_resources: ['coin'], max: 1 },
+            _this.resource_manager = new ResourceManagerPayFor(_this.toolbar.getContainer(), {
+                from: {
+                    available: _this.game.getPlayerResources(['coin']),
+                    count: 1,
+                    requirement: ['coin'],
+                },
+                to: {
+                    count: 1,
+                    available: __spreadArray([], GOODS, true),
+                },
+                times: 1,
             });
             handleChoice();
         };
         var handleChoice2 = function () {
-            _this.convert = new ResourceConverter(_this.game, ['*', '*'], ['*'], 1, {
-                from: { restriction: 'same', allowed_resources: GOODS },
+            _this.resource_manager = new ResourceManagerPayFor(_this.toolbar.getContainer(), {
+                from: {
+                    available: _this.game.getPlayerResources(__spreadArray([], GOODS, true)),
+                    count: 2,
+                    restriction: 'same',
+                },
+                to: {
+                    count: 1,
+                    resources: __spreadArray([], GOODS, true),
+                },
+                times: 1,
             });
             handleChoice();
         };
         var handleChoice3 = function () {
-            _this.convert = new ResourceConverter(_this.game, ['*', '*', '*'], ['coin'], 1, {
-                from: { allowed_resources: GOODS },
+            _this.resource_manager = new ResourceManagerPayFor(_this.toolbar.getContainer(), {
+                from: {
+                    available: _this.game.getPlayerResources(__spreadArray([], GOODS, true)),
+                    count: 3,
+                },
+                to: {
+                    resources: ['coin'],
+                },
+                times: 1,
             });
             handleChoice();
         };
         var handleChoice = function () {
-            _this.convert.show();
             _this.isModeResource = true;
             _this.game.updatePageTitle();
+        };
+        var handleReset = function () {
+            _this.resource_manager.reset();
         };
         if (this.isModeResource) {
             this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
             this.game.addActionButtonClientCancel();
+            this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
         }
         else {
             this.game.addActionButton('btn_confirm1', _('Convert Coin to any good'), handleChoice1);
@@ -4473,55 +4639,60 @@ var ResolveMarketState = (function () {
 var ResolveTravelerState = (function () {
     function ResolveTravelerState(game) {
         this.game = game;
+        this.toolbar = new ToolbarContainer('traveler');
     }
     ResolveTravelerState.prototype.onEnteringState = function (args) {
         var _this = this;
-        var _a, _b, _c;
-        var _d = this.game.tableCenter, worker_locations = _d.worker_locations, dice_locations = _d.dice_locations;
+        var _a;
+        var _b = this.game.tableCenter, worker_locations = _b.worker_locations, dice_locations = _b.dice_locations;
         worker_locations.setSelectableLocation([9]);
         worker_locations.setSelectedLocation([9]);
         var die = dice_locations.getDice().find(function (die) { return die.location == 9; });
         var traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
-        var reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
-        this.reward = reward;
-        var handleEnabledConfirm = function (enable) {
-            _this.is_confirm_enable = enable;
-            _this.game.toggleButtonEnable('btn_confirm', enable);
-        };
-        if (reward.from == null || reward.from.length == 0) {
-            this.convert = undefined;
+        var trade = this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
+        this.trade = trade;
+        if (trade.from.count === 0) {
+            this.resource_manager = undefined;
             this.game.takeAction('resolveWorker', { location_id: 9, resources: [], resource2: [] }, null, function () {
                 _this.game.restoreGameState();
             });
         }
         else {
-            this.convert = new ResourceConverter(this.game, (_a = reward.from) !== null && _a !== void 0 ? _a : GOODS, reward.to, reward.times);
-            this.convert.OnEnableConfirm = handleEnabledConfirm;
-            this.game.toggleButtonEnable('btn_confirm', ((_b = reward.from) === null || _b === void 0 ? void 0 : _b.length) == 0);
-            this.is_confirm_enable = ((_c = reward.from) === null || _c === void 0 ? void 0 : _c.length) == 0;
-            this.convert.show();
+            this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), __assign(__assign({}, trade), { from: __assign(__assign({}, trade.from), { available: this.game.getPlayerResources((_a = trade.from.requirement) !== null && _a !== void 0 ? _a : __spreadArray([], GOODS, true)) }) }));
         }
     };
     ResolveTravelerState.prototype.onLeavingState = function () {
         var _a;
-        (_a = this.convert) === null || _a === void 0 ? void 0 : _a.hide();
+        this.toolbar.removeContainer();
+        (_a = this.resource_manager) === null || _a === void 0 ? void 0 : _a.reset();
+        this.resource_manager = null;
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectedLocation([]);
     };
     ResolveTravelerState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
+        var toArray = function (resources) {
+            return ResourceHelper.convertToInt(resources).join(';');
+        };
         var handleConfirm = function () {
-            if (!_this.is_confirm_enable)
+            var rm = _this.resource_manager;
+            if (rm.hasTradePending() || rm.getResourcesFrom().length === 0) {
+                _this.game.showMessage(_('You have trade that was incomplete'), 'error');
                 return;
-            var resources_give = ResourceHelper.convertToInt(_this.convert.getResourcesGive()).join(';');
-            var data = { location_id: 9, resources: resources_give };
-            if (_this.reward.to.length == 1 && _this.reward.to[0] === '*') {
-                data['resources2'] = ResourceHelper.convertToInt(_this.convert.getResourcesGet()).join(';');
             }
+            var data = {
+                location_id: 9,
+                resources: toArray(rm.getResourcesFrom()),
+                resources2: toArray(rm.getResourcesTo()),
+            };
             _this.game.takeAction('resolveWorker', data);
+        };
+        var handleReset = function () {
+            _this.resource_manager.reset();
         };
         this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
         this.game.addActionButtonClientCancel();
+        this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
     };
     return ResolveTravelerState;
 }());
@@ -4576,7 +4747,7 @@ var ResolveWorkshopState = (function () {
             if (Number(card.location_arg) > die.face)
                 return false;
             var type = _this.game.improvementManager.getCardType(card);
-            return ResourceHelper.isRequirementMet(_this.game, type.cost);
+            return ResourceRequirement.isRequirementMet(_this.game, type.cost);
         }));
         market.onSelectionChange = function (selection) {
             _this.game.toggleButtonEnable('btn_confirm', selection.length == 1);

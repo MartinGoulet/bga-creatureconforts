@@ -17,7 +17,6 @@ class TravelerHelper {
 
     static function resolve($die, $resources, $resources_get) {
         $traveler_type = Travelers::getTopCard()['type'];
-        $reward = Game::get()->traveler_types[$traveler_type]['reward'][$die['face']];
         $group = ResourcesHelper::groupByType($resources);
         if (!Players::hasEnoughResource(Players::getPlayerId(), $group)) {
             throw new BgaUserException("You dont have those resources");
@@ -39,7 +38,7 @@ class TravelerHelper {
                 BlueJay::resolve($die['face'], $group);
                 break;
             case 15:
-                WildTurkey::resolve($die['face'], $resources, $group, $reward);
+                WildTurkey::resolve($die['face'], $resources, $group);
                 break;
             default:
                 throw new BgaUserException("Ok");

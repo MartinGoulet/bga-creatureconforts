@@ -32,6 +32,12 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'log';
 @import 'modal';
 
+@import "./resource-manager/resource-icons";
+@import "./resource-manager/resource-counter";
+@import "./resource-manager/resource-placeholder";
+@import "./resource-manager/resource-manager";
+@import "./resource-manager/resource-trader";
+
 #game_play_area {
    #bga-zoom-wrapper {
       padding-top: 50px;
@@ -203,4 +209,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
          grid-area: players;
       }
    }
+}
+
+.resource-container {
+   padding: 10px 0;
 }

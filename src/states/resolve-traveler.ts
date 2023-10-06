@@ -1,7 +1,8 @@
 class ResolveTravelerState implements StateHandler {
-   private convert?: ResourceConverter;
-   private reward: TravelerReward;
-   private is_confirm_enable: boolean;
+   private resource_manager?: ResourceManagerPayFor<IconsType>;
+   private toolbar: ToolbarContainer = new ToolbarContainer('traveler');
+
+   private trade: ResourceManagerPayForSettings<IconsType>;
 
    constructor(private game: CreatureConforts) {}
 
@@ -13,50 +14,62 @@ class ResolveTravelerState implements StateHandler {
       const die = dice_locations.getDice().find((die: Dice) => die.location == 9);
 
       const traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
-      const reward = this.game.gamedatas.travelers.types[traveler_type].reward[die.face];
-      this.reward = reward;
-      const handleEnabledConfirm = (enable: boolean) => {
-         this.is_confirm_enable = enable;
-         this.game.toggleButtonEnable('btn_confirm', enable);
-      };
+      const trade = this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
+      this.trade = trade;
 
-      if (reward.from == null || reward.from.length == 0) {
-         this.convert = undefined;
+      if (trade.from.count === 0) {
+         this.resource_manager = undefined;
          // Resolve automatically
          this.game.takeAction('resolveWorker', { location_id: 9, resources: [], resource2: [] }, null, () => {
             this.game.restoreGameState();
          });
       } else {
-         this.convert = new ResourceConverter(this.game, reward.from ?? GOODS, reward.to, reward.times);
-         this.convert.OnEnableConfirm = handleEnabledConfirm;
-         this.game.toggleButtonEnable('btn_confirm', reward.from?.length == 0);
-         this.is_confirm_enable = reward.from?.length == 0;
-         this.convert.show();
+         this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
+            ...trade,
+            from: {
+               ...trade.from,
+               available: this.game.getPlayerResources(trade.from.requirement ?? [...GOODS]),
+            },
+         });
       }
    }
 
    onLeavingState(): void {
-      this.convert?.hide();
+      this.toolbar.removeContainer();
+      this.resource_manager?.reset();
+      this.resource_manager = null;
+
       const { worker_locations } = this.game.tableCenter;
       worker_locations.setSelectedLocation([]);
    }
 
    onUpdateActionButtons(args: any): void {
-      const handleConfirm = () => {
-         if (!this.is_confirm_enable) return;
+      const toArray = (resources: IconsType[]) => {
+         return ResourceHelper.convertToInt(resources).join(';');
+      };
 
-         const resources_give = ResourceHelper.convertToInt(this.convert.getResourcesGive()).join(';');
-         const data = { location_id: 9, resources: resources_give };
-         if (this.reward.to.length == 1 && this.reward.to[0] === '*') {
-            data['resources2'] = ResourceHelper.convertToInt(this.convert.getResourcesGet()).join(';');
+      const handleConfirm = () => {
+         const rm = this.resource_manager;
+
+         if (rm.hasTradePending() || rm.getResourcesFrom().length === 0) {
+            this.game.showMessage(_('You have trade that was incomplete'), 'error');
+            return;
          }
+
+         const data = {
+            location_id: 9,
+            resources: toArray(rm.getResourcesFrom()),
+            resources2: toArray(rm.getResourcesTo()),
+         };
          this.game.takeAction('resolveWorker', data);
       };
+
+      const handleReset = () => {
+         this.resource_manager.reset();
+      };
+
       this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
       this.game.addActionButtonClientCancel();
+      this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
    }
-}
-
-interface ResolveTravelerState {
-   // card_type: TravelerType;
 }

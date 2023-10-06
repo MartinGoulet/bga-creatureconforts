@@ -5,8 +5,8 @@ const debug = isDebug ? console.log.bind(window.console) : function () {};
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 
-const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-const ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
+// const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
+// const ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
 
 interface CreatureConforts
    extends ebg.core.gamegui,
@@ -265,6 +265,20 @@ class CreatureConforts
 
    public getCurrentPlayerTable() {
       return this.getPlayerTable(this.getPlayerId());
+   }
+
+   public getPlayerResources(filter: IconsType[] = []): IResourceCounterSettings<IconsType>[] {
+      const { counters } = this.getPlayerPanel(this.getPlayerId());
+      const { hand } = this.getCurrentPlayerTable();
+
+      const resources = ICONS.map((icon: IconsType) => {
+         return {
+            resource: icon,
+            initialValue: icon == 'card' ? hand.getCards().length : counters[icon].getValue(),
+         } as IResourceCounterSettings<IconsType>;
+      });
+
+      return filter.length == 0 ? resources : resources.filter((r) => filter.indexOf(r.resource) >= 0);
    }
 
    async restoreGameState() {

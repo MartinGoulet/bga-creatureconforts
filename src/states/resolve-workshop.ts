@@ -14,7 +14,7 @@ class ResolveWorkshopState implements StateHandler {
             if (Number(card.location_arg) > die.face) return false;
 
             const type = this.game.improvementManager.getCardType(card);
-            return ResourceHelper.isRequirementMet(this.game, type.cost);
+            return ResourceRequirement.isRequirementMet(this.game, type.cost);
          }),
       );
       market.onSelectionChange = (selection: ConfortCard[]) => {

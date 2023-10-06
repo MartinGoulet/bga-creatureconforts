@@ -1,0 +1,40 @@
+.resource-container {
+   display: flex;
+   flex-wrap: wrap;
+   gap: 5px;
+ }
+
+.resource-manager-pay {
+   justify-content: center;
+
+   .spacer {
+      margin: 0 15px;
+   }
+}
+
+.resource-manager-pay-for {
+   justify-content: center;
+
+   .arrow {
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 16 16'%3E%3Cpath fill='lime' d='M15.5 8L8 .5V5H0v6h8v4.5z'/%3E%3C/svg%3E");
+      width: 36px;
+      height: 32px;
+      margin: 0 10px;
+   }
+
+   .resource-traders {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+   }
+
+   .resource-board {
+      .counter {
+         display: none;
+      }
+   }
+
+   .spacer {
+      flex-basis: 100%;
+   }
+}

@@ -284,6 +284,22 @@ $this->traveler_types = [
          5 => ["from" => [], 'to' => [STORY], 'times' => 1],
          6 => ["from" => [], 'to' => [STORY], 'times' => 1],
       ],
+      "trade" => [
+         1 => [
+            "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
+         ],
+         2 => [
+            "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
+         ],
+         3 => [
+            "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
+         ],
+         4 => [
+            "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
+         ],
+         5 => ["from" => ["count" => 0], "to" => ["resources" => [STORY]], "times" => 1],
+         6 => ["from" => ["count" => 0], "to" => ["resources" => [STORY]], "times" => 1],
+      ],
    ],
    2 => [
       'name' => clienttranslate("Leopard Frog"),
@@ -296,13 +312,25 @@ $this->traveler_types = [
    4 => [
       'name' => clienttranslate("Gray Wolf"),
       'timing' => "IMMEDIATELY",
-      'reward' => [
-         1 => ["from" => [COIN], 'to' => [LESSON_LEARNED, LESSON_LEARNED], 'times' => 1],
-         2 => ["from" => [COIN], 'to' => [LESSON_LEARNED, LESSON_LEARNED], 'times' => 1],
-         3 => ["from" => [], 'to' => [COIN], 'times' => 1],
-         4 => ["from" => [], 'to' => [COIN], 'times' => 1],
-         5 => ["from" => [], 'to' => [COIN], 'times' => 1],
-         6 => ["from" => [LESSON_LEARNED], 'to' => [STORY], 'times' => 2],
+      "trade" => [
+         1 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [LESSON_LEARNED, LESSON_LEARNED]],
+            "times" => 1,
+         ],
+         2 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [LESSON_LEARNED, LESSON_LEARNED]],
+            "times" => 1,
+         ],
+         3 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
+         4 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
+         5 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
+         6 => [
+            "from" => ["count" => 1, "requirement" => [LESSON_LEARNED]],
+            "to" => ["resources" => [STORY]],
+            "times" => 2,
+         ],
       ],
    ],
    5 => [
@@ -360,13 +388,29 @@ $this->traveler_types = [
    14 => [
       'name' => clienttranslate("Blue Jay"),
       'timing' => "END_OF_MONTH",
-      'reward' => [
-         1 => ["from" => [], 'to' => [COIN, COIN], 'times' => 1],
-         2 => ["from" => [], 'to' => [COIN, COIN], 'times' => 1],
-         3 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
-         4 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
-         5 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
-         6 => ["from" => [COIN], 'to' => [LESSON_LEARNED], 'times' => 2],
+      "trade" => [
+         1 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
+         2 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
+         3 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [STORY]],
+            "times" => 2,
+         ],
+         4 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [STORY]],
+            "times" => 2,
+         ],
+         5 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [STORY]],
+            "times" => 2,
+         ],
+         6 => [
+            "from" => ["count" => 1, "requirement" => [COIN]],
+            "to" => ["resources" => [STORY]],
+            "times" => 2,
+         ],
       ],
    ],
    15 => [

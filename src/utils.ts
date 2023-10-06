@@ -10,7 +10,7 @@ function getColorName(code: string) {
    return colors[code];
 }
 
-function createCounter(id: string, value: number = 0): ebg.counter {
+function createCounter(id: string | HTMLElement, value: number = 0): ebg.counter {
    const counter = new ebg.counter();
    counter.create(id);
    counter.setValue(value);
