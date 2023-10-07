@@ -24,7 +24,8 @@ class ResourcePlaceholderLineStock<TResource> {
       for (let index = 0; index < count; index++) {
          this.placeholders.push(
             new ResourcePlaceholder(this.element, {
-               allowed: settings?.resources ? [settings.resources[index]] : undefined,
+               allowed:
+                  settings?.resources && settings.resources[index] ? [settings.resources[index]] : undefined,
             }),
          );
          if (settings?.restriction && index < count - 1) {

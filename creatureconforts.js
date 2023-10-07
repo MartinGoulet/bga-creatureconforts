@@ -2556,7 +2556,7 @@ var ResourcePlaceholderLineStock = (function () {
         parent.appendChild(this.element);
         for (var index = 0; index < count; index++) {
             this.placeholders.push(new ResourcePlaceholder(this.element, {
-                allowed: (settings === null || settings === void 0 ? void 0 : settings.resources) ? [settings.resources[index]] : undefined,
+                allowed: (settings === null || settings === void 0 ? void 0 : settings.resources) && settings.resources[index] ? [settings.resources[index]] : undefined,
             }));
             if ((settings === null || settings === void 0 ? void 0 : settings.restriction) && index < count - 1) {
                 this.addRestrictionIcon();

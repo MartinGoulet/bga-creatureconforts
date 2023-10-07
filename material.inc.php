@@ -276,14 +276,6 @@ $this->traveler_types = [
    1 => [
       'name' => clienttranslate("Canada Lynx"),
       'timing' => "IMMEDIATELY",
-      'reward' => [
-         1 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
-         2 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
-         3 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
-         4 => ["from" => [ANY_RESOURCE, ANY_RESOURCE], 'to' => [COIN], 'times' => 4, 'restriction' => 'different'],
-         5 => ["from" => [], 'to' => [STORY], 'times' => 1],
-         6 => ["from" => [], 'to' => [STORY], 'times' => 1],
-      ],
       "trade" => [
          1 => [
             "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
@@ -304,10 +296,26 @@ $this->traveler_types = [
    2 => [
       'name' => clienttranslate("Leopard Frog"),
       'timing' => "IMMEDIATELY",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 3],
+         4 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 4],
+         5 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 5],
+         6 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 6],
+      ],
    ],
    3 => [
       'name' => clienttranslate("Pileated Woodpecker"),
       'timing' => "ALL_MONTH_LONG",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [YARN, YARN]], "times" => 2],
+         2 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [YARN, YARN]], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [YARN]], "to" => ["resources" => [MUSHROOM, MUSHROOM]], "times" => 2],
+         4 => ["from" => ["count" => 1, "requirement" => [YARN]], "to" => ["resources" => [MUSHROOM, MUSHROOM]], "times" => 2],
+         4 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
+         4 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
+      ],
    ],
    4 => [
       'name' => clienttranslate("Gray Wolf"),
@@ -326,11 +334,7 @@ $this->traveler_types = [
          3 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
          4 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
          5 => ["from" => ["count" => 1], "to" => ["resources" => [COIN]], "times" => 1],
-         6 => [
-            "from" => ["count" => 1, "requirement" => [LESSON_LEARNED]],
-            "to" => ["resources" => [STORY]],
-            "times" => 2,
-         ],
+         6 => ["from" => ["count" => 1, "requirement" => [LESSON_LEARNED]], "to" => ["resources" => [STORY]], "times" => 2],
       ],
    ],
    5 => [
@@ -344,46 +348,111 @@ $this->traveler_types = [
          5 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
          6 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
       ],
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 3],
+         4 => ["from" => ["count" => 2, "requirement" => [STONE, STONE]], "to" => ["resource" => [STORY]], "times" => 3],
+         5 => ["from" => ["count" => 2, "requirement" => [STONE, STONE]], "to" => ["resource" => [STORY]], "times" => 3],
+         6 => ["from" => ["count" => 2, "requirement" => [STONE, STONE]], "to" => ["resource" => [STORY]], "times" => 3],
+      ],
    ],
    6 => [
       'name' => clienttranslate("Common Raven"),
       'timing' => "IMMEDIATELY",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [STORY]], "times" => 2],
+         2 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [STORY]], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [CARD, LESSON_LEARNED]], "times" => 1],
+         4 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resource" => [COIN]], "times" => 3],
+         5 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resource" => [COIN]], "times" => 3],
+         6 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resource" => [COIN]], "times" => 3],
+      ],
    ],
    7 => [
       'name' => clienttranslate("Striped Skunk"),
       'timing' => "ALL_MONTH_LONG",
+      "trade" => [
+         1 => ["from" => ["count" => 0], "to" => ["resource" => [STORY]], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
+         4 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
+         5 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
+         6 => ["from" => ["count" => 2, "requirement" => [CARD, CARD]], "to" => ["resource" => [COIN, STORY]], "times" => 2],
+      ],
    ],
    8 => [
       'name' => clienttranslate("American Beaver"),
       'timing' => "ALL_MONTH_LONG",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resource" => [COIN]], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resource" => [COIN]], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resource" => [COIN]], "times" => 3],
+         4 => ["from" => ["count" => 2, "requirement" => [WOOD]], "to" => ["resource" => [STORY]], "times" => 3],
+         5 => ["from" => ["count" => 2, "requirement" => [WOOD]], "to" => ["resource" => [STORY]], "times" => 3],
+         6 => ["from" => ["count" => 2, "requirement" => [WOOD]], "to" => ["resource" => [STORY]], "times" => 3],
+      ],
    ],
    9 => [
       'name' => clienttranslate("Common Loon"),
       'timing' => "IMMEDIATELY",
+      "trade" => [
+         1 => ["from" => ["count" => 0], "to" => ["resource" => [LESSON_LEARNED, LESSON_LEARNED]], "times" => 1],
+         2 => ["from" => ["count" => 0], "to" => ["resource" => [LESSON_LEARNED, LESSON_LEARNED]], "times" => 1],
+         3 => ["from" => ["count" => 1, "restriction" => "all_different"], "to" => ["count" => 1, "restriction" => "all_same"], "times" => 3],
+         4 => ["from" => ["count" => 1, "restriction" => "all_different"], "to" => ["count" => 1, "restriction" => "all_same"], "times" => 4],
+         5 => ["from" => ["count" => 1, "restriction" => "all_different"], "to" => ["count" => 1, "restriction" => "all_same"], "times" => 5],
+         6 => ["from" => ["count" => 1, "restriction" => "all_different"], "to" => ["count" => 1, "restriction" => "all_same"], "times" => 6],
+      ],
    ],
    10 => [
       'name' => clienttranslate("Snapping Turtle"),
       'timing' => "ALL_MONTH_LONG",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
+         3 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
+         3 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["resource" => [COIN, COIN]], "times" => 1],
+         4 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [STORY]], "times" => 1],
+         5 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [STORY]], "times" => 1],
+         6 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resource" => [STORY]], "times" => 1],
+      ],
    ],
    11 => [
       'name' => clienttranslate("Pine Marten"),
       'timing' => "ALL_MONTH_LONG",
-      'reward' => [
-         1 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
-         2 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
-         3 => ["from" => [ANY_RESOURCE], 'to' => [WOOD], 'times' => 5],
-         4 => ["from" => [LESSON_LEARNED], 'to' => [COIN], 'times' => 3],
-         5 => ["from" => [LESSON_LEARNED], 'to' => [COIN], 'times' => 3],
-         6 => ["from" => [FRUIT, MUSHROOM], 'to' => [STORY], 'times' => 5],
+      "trade" => [
+         1 => ["from" => ["count" => 1], "to" => ["resource" => [WOOD]], "times" => 5],
+         2 => ["from" => ["count" => 1], "to" => ["resource" => [WOOD]], "times" => 5],
+         3 => ["from" => ["count" => 1], "to" => ["resource" => [WOOD]], "times" => 1],
+         4 => ["from" => ["count" => 1, "requirement" => [LESSON_LEARNED]], "to" => ["resource" => [COIN]], "times" => 3],
+         5 => ["from" => ["count" => 1, "requirement" => [LESSON_LEARNED]], "to" => ["resource" => [COIN]], "times" => 3],
+         6 => ["from" => ["count" => 2, "requirement" => [FRUIT, MUSHROOM]], "to" => ["resource" => [STORY]], "times" => 3],
       ],
    ],
    12 => [
       'name' => clienttranslate("Black Bear"),
       'timing' => "ALL_MONTH_LONG",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 1],
+         2 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 2],
+         3 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 3],
+         4 => ["from" => ["count" => 0], "to" => ["resource" => [STORY]], "times" => 1],
+         5 => ["from" => ["count" => 0], "to" => ["resource" => [STORY]], "times" => 1],
+         6 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["resource" => [COIN]], "times" => 3],
+      ],
    ],
    13 => [
       'name' => clienttranslate("Moose"),
       'timing' => "END_OF_MONTH",
+      "trade" => [
+         1 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["count" => 2, "restriction" => "different"], "times" => 2],
+         2 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["count" => 2, "restriction" => "different"], "times" => 2],
+         3 => ["from" => ["count" => 0], "to" => ["resource" => [STORY]], "times" => 1],
+         4 => ["from" => ["count" => 2, "restriction" => "same"], "to" => ["resource" => [STORY, STORY]], "times" => 2],
+         5 => ["from" => ["count" => 2, "restriction" => "same"], "to" => ["resource" => [STORY, STORY]], "times" => 2],
+         6 => ["from" => ["count" => 2, "restriction" => "same"], "to" => ["resource" => [STORY, STORY]], "times" => 2],
+      ],
    ],
    14 => [
       'name' => clienttranslate("Blue Jay"),
@@ -391,38 +460,22 @@ $this->traveler_types = [
       "trade" => [
          1 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
          2 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
-         3 => [
-            "from" => ["count" => 1, "requirement" => [COIN]],
-            "to" => ["resources" => [STORY]],
-            "times" => 2,
-         ],
-         4 => [
-            "from" => ["count" => 1, "requirement" => [COIN]],
-            "to" => ["resources" => [STORY]],
-            "times" => 2,
-         ],
-         5 => [
-            "from" => ["count" => 1, "requirement" => [COIN]],
-            "to" => ["resources" => [STORY]],
-            "times" => 2,
-         ],
-         6 => [
-            "from" => ["count" => 1, "requirement" => [COIN]],
-            "to" => ["resources" => [STORY]],
-            "times" => 2,
-         ],
+         3 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
+         4 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
+         5 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
+         6 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
       ],
    ],
    15 => [
       'name' => clienttranslate("Wild Turkey"),
       'timing' => "AFTER_ROLLING_FAMILY_DICE",
-      'reward' => [
-         1 => ["from" => [], 'to' => ['draw', STORY], 'times' => 1],
-         2 => ["from" => [], 'to' => [MUSHROOM, GRAIN, FRUIT], 'times' => 1],
-         3 => ["from" => [], 'to' => [MUSHROOM, GRAIN, FRUIT], 'times' => 1],
-         4 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 4],
-         5 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 5],
-         6 => ["from" => [ANY_RESOURCE], 'to' => [ANY_RESOURCE], 'times' => 6],
+      "trade" => [
+         1 => ["from" => ["count" => 0], "to" => ["resources" => [CARD, STORY]], "times" => 1],
+         2 => ["from" => ["count" => 0], "to" => ["resources" => [MUSHROOM, GRAIN, FRUIT]], "times" => 1],
+         3 => ["from" => ["count" => 0], "to" => ["resources" => [MUSHROOM, GRAIN, FRUIT]], "times" => 1],
+         4 => ["from" => ["count" => 1], "to" => ["count" => 1], "times" => 4],
+         5 => ["from" => ["count" => 1], "to" => ["count" => 1], "times" => 5],
+         6 => ["from" => ["count" => 1], "to" => ["count" => 1], "times" => 6],
       ],
    ],
 ];
