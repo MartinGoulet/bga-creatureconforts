@@ -51,7 +51,7 @@ class PlacementState implements StateHandler {
       if (!this.game.isSpectator) {
          if (this.game.isCurrentPlayerActive()) {
             this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirmPlacement);
-            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancelLocal);
+            this.game.addActionButtonGray('btn_cancel', _('Reset'), handleCancelLocal);
          } else {
             this.game.addActionButtonGray('btn_restart', _('Cancel'), handleRestartPlacement);
          }

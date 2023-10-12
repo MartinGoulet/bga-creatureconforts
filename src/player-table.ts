@@ -3,7 +3,7 @@ class PlayerTable {
    public player_color: string;
 
    public dice: PlayerDiceStock;
-   public hand: HandStock<ConfortCard>;
+   public hand: Hand<ConfortCard>;
    public cottages: LineStock<CottageCard>;
    public workers: LineStock<Meeple>;
 
@@ -100,15 +100,11 @@ class PlayerTable {
    }
 
    private setupHand(game: CreatureConforts) {
-      this.hand = new HandStock<ConfortCard>(
+      this.hand = new Hand<ConfortCard>(
          game.confortManager,
          document.getElementById(`player-table-${this.player_id}-hand`),
-         {
-            cardOverlap: '10px',
-            cardShift: '5px',
-            inclination: 6,
-            sort: sortFunction('id'),
-         },
+         this.player_id === game.getPlayerId(),
+         game.getPlayerPanel(this.player_id).counters['card'],
       );
 
       this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);

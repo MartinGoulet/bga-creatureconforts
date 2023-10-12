@@ -14,6 +14,7 @@
                 <div id="worker-locations"></div>
                 <div id="dice-locations"></div>
                 <div id="hill-dice"></div>
+                <div id="reserved-zones"></div>
 
                 <div id="decks">
                     <div>

@@ -26,6 +26,9 @@ class NotificationManager {
          ['onAddConfortToHand', undefined],
          ['onBuildImprovement', undefined],
          ['onModifyDieWithLessonLearned', 100],
+         ['onNewRavenLocationTaken', 100],
+         ['onAddAlmanac', 100],
+         ['onAddWheelbarrow', 100],
       ];
 
       this.setupNotifications(notifs);
@@ -48,7 +51,7 @@ class NotificationManager {
       if (count < 15) {
          deck.removeCard(deck.getTopCard());
       }
-      deck.setCardNumber(count, { id: card.id } as TravelerCard);
+      deck.setCardNumber(count + 1, { id: card.id } as TravelerCard);
       setTimeout(() => deck.flipCard(card), 500);
    }
 
@@ -206,6 +209,18 @@ class NotificationManager {
 
    private notif_onModifyDieWithLessonLearned({ player_id, nbr_lesson }: ModifyDieWithLessonLearnedArgs) {
       this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
+   }
+
+   private notif_onNewRavenLocationTaken({ location_id }: { location_id: number }) {
+      this.game.tableCenter.addRavenToken(location_id);
+   }
+
+   private notif_onAddAlmanac({ player_id }: { player_id: number }) {
+      this.game.getPlayerPanel(player_id).addAlmanac();
+   }
+
+   private notif_onAddWheelbarrow({ player_id }: { player_id: number }) {
+      this.game.getPlayerPanel(player_id).addWheelbarrow();
    }
 
    private animationMoveResource(

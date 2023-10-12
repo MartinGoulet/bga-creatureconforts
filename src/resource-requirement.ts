@@ -4,7 +4,15 @@ class ResourceRequirement {
 
       for (const type of Object.keys(cost)) {
          if (type !== '*' && counters[type].getValue() < cost[type]) {
-            return false;
+            if (['stone', 'coin'].includes(type) && TravelerHelper.isHairyTailedHoleActive()) {
+               const sumResource = counters['stone'].getValue() + counters['coin'].getValue();
+               const sumCost = (cost?.stone ?? 0) + (cost?.coin ?? 0);
+               if (sumResource < sumCost) {
+                  return false;
+               }
+            } else {
+               return false;
+            }
          }
       }
 

@@ -30,6 +30,18 @@ class TableCenter {
       this.setupHillDice(game);
       this.setupGlade(game);
       this.setRiverDial(game.gamedatas.river_dial);
+      this.setupReservedZones(game);
+   }
+
+   public addRavenToken(location_id: number) {
+      const zone = document.querySelector(`#reserved-zones [data-zone-id="${location_id}"]`);
+      zone.innerHTML = ResourceHelper.getElement<IconsType>('coin');
+   }
+
+   public clearReservedZones() {
+      document.querySelectorAll('#reserved-zones .cc-zone').forEach((zone) => {
+         zone.childNodes.forEach((item) => item.remove());
+      });
    }
 
    public getWorkerLocations(): number[] {
@@ -140,6 +152,14 @@ class TableCenter {
       );
 
       this.improvement_market.addCards(market);
+   }
+
+   private setupReservedZones(game: CreatureConforts) {
+      document.getElementById('reserved-zones').innerHTML = arrayRange(1, 12)
+         .map((value) => `<div class="cc-zone" data-zone-id="${value}"></div>`)
+         .join('');
+
+      game.gamedatas.raven_location.forEach((location_id) => this.addRavenToken(location_id));
    }
 
    private setupTravelerCards(game: CreatureConforts) {

@@ -3,7 +3,7 @@ interface ResourceTraderSettings<TResource> {
       /**
        * Allowed resources, Default: all
        */
-      resources?: TResource[];
+      resources?: TResource[] | TResource[][];
       count: number;
       restriction?: 'same' | 'different' | 'all_same' | 'all_different';
    };
@@ -19,7 +19,9 @@ class ResourceTrader<TResource> {
    private readonly from: ResourcePlaceholderLineStock<TResource>;
    private readonly to: ResourcePlaceholderLineStock<TResource>;
 
-   constructor(parent: HTMLElement, { from, to }: ResourceTraderSettings<TResource>) {
+   constructor(parent: HTMLElement, private settings: ResourceTraderSettings<TResource>) {
+      const { from, to } = settings;
+
       this.element = this.createElement();
       parent.appendChild(this.element);
 
@@ -28,7 +30,6 @@ class ResourceTrader<TResource> {
          restriction: from.restriction,
       });
       this.element.append(this.createArrow());
-      console.log(to);
       this.to = new ResourcePlaceholderLineStock(this.element, to.count ?? to.resources!.length, {
          restriction: to.restriction,
       });
@@ -79,6 +80,13 @@ class ResourceTrader<TResource> {
 
    isComplete(): boolean {
       return this.isFullFrom() && this.isFullTo();
+   }
+
+   isTradePending(): boolean {
+      return (
+         (!this.isFullFrom() && this.getFrom().length > 0) ||
+         (!this.isFullTo() && this.settings.to.resources === undefined)
+      );
    }
 
    private createElement(): HTMLElement {

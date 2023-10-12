@@ -6,6 +6,7 @@ use BgaUserException;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
+use CreatureConforts\Helpers\TravelerHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Improvements;
@@ -40,7 +41,13 @@ trait States {
             Globals::setWorkerPlacement(intval($player_id), []);
         }
 
-        Game::get()->gamestate->nextState();
+        if(TravelerHelper::isActiveGrayWolf()) {
+            Game::get()->gamestate->nextState("gray_wolf");
+        } else if(TravelerHelper::isActiveCommonRaven()) {
+            Game::get()->gamestate->nextState("common_raven");
+        } else {
+            Game::get()->gamestate->nextState("family");
+        }
     }
 
     function stFamilyDice() {
@@ -83,7 +90,7 @@ trait States {
 
         $dice = Dice::getDiceFromPlayer($player_id);
         Notifications::moveDiceToHill($dice);
-        Game::get()->undoSavepoint();
+        Game::undoSavepoint();
         Game::get()->gamestate->nextState();
     }
 
@@ -127,7 +134,23 @@ trait States {
         }
     }
 
+    function stPlayerTurnNextTraveler() {
+        $current_player_id = $this->getActivePlayerId();
+        $next_player_id = intval(Game::get()->getNextPlayerTable()[$current_player_id]);
+        Game::get()->giveExtraTime($current_player_id);
+        Game::get()->activeNextPlayer();
+        if ($next_player_id == Globals::getFirstPlayerId()) {
+            // All player has played their turn
+            Game::get()->gamestate->nextState('end');
+        } else {
+            Game::get()->gamestate->nextState('next');
+        }
+    }
+
     function stUnkeep() {
+
+        Globals::setRavenLocationIds([]);
+
         // Discard the top Forest and Meadow cards on the Valley stacks from the game,
         // revealing the new ones for the upcoming month and progressing further
         // through the seasons.

@@ -1,18 +1,18 @@
-id|name|score|cost|glade|glade_reward|power|spot
-1|Barrel Sauna|2|[WOOD => 1, STONE => 1]|false||Gain ::heart-2:: for every Outdoor Comfort owned by all other players|
-2|Writing Desk|2|[WOOD => 1, STONE => 1]|false|||
-3|Spinning Wheel|2|[WOOD => 1, YARN => 1]|false|||
-4|Bicycle|2|[WOOD => 2, STONE => 1]|false|||
-5|Pattern Book|3|[YARN => 1, FRUIT => 1, STORY => 1]|false|||
-6|Tool Shed|2|[WOOD => 2]|false|||
-7|Guest Cottage|4|[WOOD => 1, STONE => 2, GRAIN => 1]|true|[STORY => 1, ANY_RESOURCE => 1]||
-8|Orchard|2|[WOOD => 2, STONE => 1]|true|[FRUIT => 2]||
-9|Umbrella|3|[COIN => 2]|false|||
-10|Almanac|3|[WOOD => 1, STONE => 1, COIN => 2]|false|||
-11|Wheelbarrow|2|[WOOD => 2, COIN => 1]|false|||
-12|Recipe Book|3|[GRAIN => 1, MUSHROOM => 1, STORY => 1]|false|||
-13|Weathervane|3|[STONE => 2, COIN => 1]|false|||
-14|Wildwood|2|[WOOD => 2, STONE => 1]|true|[MUSHROOM => 2]||
-15|Scale|1|[WOOD => 1, STONE => 2]|false|||
-16|Field|2|[WOOD => 1, STONE => 2]|true|[GRAIN => 2]||
-17|Herb Garden|1|[WOOD => 2]|false|||
+id|name|score|cost|glade|glade_reward|power|solo
+1|Barrel Sauna|2|[WOOD => 1, STONE => 1]|false||Gain ::heart-2:: for every Outdoor Comfort owned by all other players|false
+2|Writing Desk|2|[WOOD => 1, STONE => 1]|false|||false
+3|Spinning Wheel|2|[WOOD => 1, YARN => 1]|false|||false
+4|Bicycle|2|[WOOD => 2, STONE => 1]|false|||true
+5|Pattern Book|3|[YARN => 1, FRUIT => 1, STORY => 1]|false|||true
+6|Tool Shed|2|[WOOD => 2]|false|||true
+7|Guest Cottage|4|[WOOD => 1, STONE => 2, GRAIN => 1]|true|[STORY => 1, ANY_RESOURCE => 1]||false
+8|Orchard|2|[WOOD => 2, STONE => 1]|true|[FRUIT => 2]||true
+9|Umbrella|3|[COIN => 2]|false|||true
+10|Almanac|3|[WOOD => 1, STONE => 1, COIN => 2]|false|||true
+11|Wheelbarrow|2|[WOOD => 2, COIN => 1]|false|||true
+12|Recipe Book|3|[GRAIN => 1, MUSHROOM => 1, STORY => 1]|false|||true
+13|Weathervane|3|[STONE => 2, COIN => 1]|false|||true
+14|Wildwood|2|[WOOD => 2, STONE => 1]|true|[MUSHROOM => 2]||true
+15|Scale|1|[WOOD => 1, STONE => 2]|false|||true
+16|Field|2|[WOOD => 1, STONE => 2]|true|[GRAIN => 2]||true
+17|Herb Garden|1|[WOOD => 2]|false|||false

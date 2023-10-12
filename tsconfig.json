@@ -77,9 +77,14 @@
         "src/states/player-turn-craft.ts",
         "src/states/player-turn-discard.ts",
         "src/states/resolve-market.ts",
-        "src/states/resolve-traveler.ts",
+        "src/states/resolve-traveler.ts", 
+        "src/states/resolve-traveler-discard.ts", 
         "src/states/resolve-owl-nest.ts",
         "src/states/resolve-workshop.ts",
+        "src/states/upkeep.ts",
+
+        "src/states/gray-wolf.ts",
+        "src/states/common-raven.ts",
 
         "src/cards-conforts.ts",
         "src/cards-improvement.ts",
@@ -92,6 +97,7 @@
         "src/player-table.ts",
         "src/table-center.ts",
 
+        "src/traveler-helper.ts",
         "src/utils.ts",
 
         "src/define.ts"

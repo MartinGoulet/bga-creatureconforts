@@ -63,7 +63,7 @@ $g_index = 1;
 $g_trans = [ 'name','tooltip','tooltip_action','gametext', 'ability' ];
 $g_separator = '|';
 $g_separator_sub = '';
-$g_noquotes = [ 'type', 'activation', 'icon', "cost", "season", "glade", "glade_reward" ];
+$g_noquotes = [ 'type', 'activation', 'icon', "cost", "season", "glade", "glade_reward", 'solo' ];
 
 function handle_header($fields) {
     global $g_field_names;

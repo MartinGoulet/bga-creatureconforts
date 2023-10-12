@@ -72,7 +72,47 @@ $basicGameStates = [
     ],
 ];
 
-$machinestates = $basicGameStates + array(
+$travelerStates = [
+    ST_GRAY_WOLF => [
+        "name" => "grayWolf",
+        "descriptionmyturn" => clienttranslate('${you} must choose a face-up Comfort form the Owl\'s Nest'),
+        "description" => clienttranslate('Waiting for others to choose a face-up Comfort form the Owl\'s Nest'),
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmGrayWolf"],
+        "transitions" => ["" => ST_GRAY_WOLF_NEXT_PLAYER]
+    ],
+
+    ST_GRAY_WOLF_NEXT_PLAYER => [
+        "name" => "grayWolfNextPlayer",
+        "type" => "game",
+        "action" => "stPlayerTurnNextTraveler",
+        "transitions" => [
+            "next" => ST_GRAY_WOLF,
+            "end" => ST_FAMILY_DICE,
+        ]
+    ],
+
+    ST_COMMON_RAVEN => [
+        "name" => "commonRaven",
+        "descriptionmyturn" => clienttranslate('${you} must place a ::coin:: in a location'),
+        "description" => clienttranslate('${actplayer} must place a ::coin:: in a location'),
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmCommonRaven"],
+        "transitions" => ["" => ST_COMMON_RAVEN_NEXT_PLAYER]
+    ],
+
+    ST_COMMON_RAVEN_NEXT_PLAYER => [
+        "name" => "commonRavenNextPlayer",
+        "type" => "game",
+        "action" => "stPlayerTurnNextTraveler",
+        "transitions" => [
+            "next" => ST_COMMON_RAVEN,
+            "end" => ST_FAMILY_DICE,
+        ]
+    ],
+];
+
+$machinestates = $basicGameStates + $travelerStates + array(
 
     ST_START_HAND => [
         "name" => "startHand",
@@ -94,13 +134,19 @@ $machinestates = $basicGameStates + array(
 
     ST_NEW_TRAVELER => [
         "name" => "newTraveler",
+        "description" => "Step 1 : New Traveler",
         "type" => "game",
         "action" => "stNewTraveler",
-        "transitions" => ["" => ST_FAMILY_DICE]
+        "transitions" => [
+            "family" => ST_FAMILY_DICE,
+            "gray_wolf" => ST_GRAY_WOLF,
+            "common_raven" => ST_COMMON_RAVEN,
+        ]
     ],
 
     ST_FAMILY_DICE => [
         "name" => "familyDice",
+        "description" => "Step 2 : Family Dice",
         "type" => "game",
         "action" => "stFamilyDice",
         "transitions" => ["" => ST_PLACEMENT]
@@ -212,12 +258,21 @@ $machinestates = $basicGameStates + array(
         "action" => "stPlayerTurnNext",
         "transitions" => [
             "next" => ST_PLAYER_TURN_START,
-            "end" => ST_UNKEEP
+            "end" => ST_PRE_UPKEEP
         ]
     ],
 
-    ST_UNKEEP => [
-        "name" => "unkeep",
+    ST_PRE_UPKEEP => [
+        "name" => "preUpkeep",
+        "description" => "Step 6 : Unkeep",
+        "type" => "game",
+        "action" => "stUnkeep",
+        "transitions" => ["" => ST_NEW_TRAVELER]
+    ],
+
+    ST_UPKEEP => [
+        "name" => "upkeep",
+        "description" => "Step 6 : Unkeep",
         "type" => "game",
         "action" => "stUnkeep",
         "transitions" => ["" => ST_NEW_TRAVELER]

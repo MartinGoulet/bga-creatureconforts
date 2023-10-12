@@ -42,7 +42,13 @@ const ST_PLAYER_TURN_END = 54;
 const ST_PLAYER_TURN_DISCARD = 55;
 const ST_PLAYER_RETURN_UNRESOLVED_WORKER = 56;
 
-const ST_UNKEEP = 60;
+const ST_PRE_UPKEEP = 59;
+const ST_UPKEEP = 60;
+
+const ST_GRAY_WOLF = 70;
+const ST_GRAY_WOLF_NEXT_PLAYER = 71;
+const ST_COMMON_RAVEN = 72;
+const ST_COMMON_RAVEN_NEXT_PLAYER = 73;
 
 const ST_START_TURN = 90;
 
@@ -58,6 +64,7 @@ const YARN = "yarn";
 const GRAIN = "grain";
 
 const ANY_RESOURCE = "*";
+const GOODS = [WOOD, STONE, FRUIT, MUSHROOM, YARN, GRAIN];
 
 /**
  * Tokens

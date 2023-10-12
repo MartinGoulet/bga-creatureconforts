@@ -13,11 +13,13 @@ const GLADE = 'glade';
  */
 class Improvements extends \APP_DbObject {
 
-    static function setupNewGame() {
+    static function setupNewGame(array $players) {
+        $is_solo = count($players) == 1;
         $cards = [];
-        foreach (range(1, 17) as $id) {
-            $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => 1];
-            $cards[] = ['type' => $id, 'type_arg' => 2, 'nbr' => 1];
+        foreach (Game::get()->improvement_types as $id => $improvement) {
+            if ($is_solo && $improvement['solo'] == true || !$is_solo) {
+                $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => $is_solo ? 1 : 2];
+            }
         }
         self::deck()->createCards($cards);
         self::deck()->shuffle('deck');
@@ -113,7 +115,7 @@ class Improvements extends \APP_DbObject {
         }
 
         $slot = $deck->getCardsInLocation(LADDER, 6);
-        if(sizeof($slot) == 1) {
+        if (sizeof($slot) == 1) {
             $next_card = array_shift($slot);
             $deck->moveCard($next_card['id'], LADDER, 5);
         }

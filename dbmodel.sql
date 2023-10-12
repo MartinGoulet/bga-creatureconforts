@@ -88,4 +88,6 @@ ALTER TABLE `player`
   ADD `yarn` smallint UNSIGNED NOT NULL DEFAULT 0,
   ADD `coin` smallint UNSIGNED NOT NULL DEFAULT 0,
   ADD `lesson` smallint UNSIGNED NOT NULL DEFAULT 0,
-  ADD `story` smallint UNSIGNED NOT NULL DEFAULT 0;
+  ADD `story` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `almanac` smallint UNSIGNED NOT NULL DEFAULT 0,
+  ADD `wheelbarrow` smallint UNSIGNED NOT NULL DEFAULT 0;

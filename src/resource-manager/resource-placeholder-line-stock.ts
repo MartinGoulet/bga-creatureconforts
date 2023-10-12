@@ -2,7 +2,7 @@ interface ResourcePlaceholderLineStockSettings<TResource> {
    /**
     * Allowed resources, default: all
     */
-   resources?: TResource[];
+   resources?: TResource[] | TResource[][];
    /**
     * Add restriction for resource groupe
     */
@@ -22,12 +22,16 @@ class ResourcePlaceholderLineStock<TResource> {
       parent.appendChild(this.element);
 
       for (let index = 0; index < count; index++) {
-         this.placeholders.push(
-            new ResourcePlaceholder(this.element, {
-               allowed:
-                  settings?.resources && settings.resources[index] ? [settings.resources[index]] : undefined,
-            }),
-         );
+         let allowed: TResource[] = undefined;
+         if (settings?.resources && settings.resources[index]) {
+            if (Array.isArray(settings.resources[index])) {
+               allowed = settings.resources[index] as TResource[];
+            } else {
+               allowed = [settings.resources[index] as TResource];
+            }
+         }
+         this.placeholders.push(new ResourcePlaceholder(this.element, { allowed }));
+
          if (settings?.restriction && index < count - 1) {
             this.addRestrictionIcon();
          }

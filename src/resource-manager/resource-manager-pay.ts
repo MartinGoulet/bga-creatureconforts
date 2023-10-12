@@ -1,6 +1,7 @@
 interface ResourceManagerPaySettings<TResource> {
    player_resources: IResourceCounterSettings<TResource>[];
    resource_count: number;
+   requirement?: TResource[] | TResource[][];
 }
 
 class ResourceManagerPay<TResource> implements IResourceManager<TResource> {
@@ -19,10 +20,15 @@ class ResourceManagerPay<TResource> implements IResourceManager<TResource> {
 
       root.appendChild(this.createSpacer());
 
-      this.resource_paid = new ResourcePlaceholderLineStock(root, resource_count);
+      this.resource_paid = new ResourcePlaceholderLineStock(root, resource_count, {
+         resources: settings.requirement,
+      });
 
       this.resource_player.onClick = (type: TResource): boolean | undefined => {
          this.resource_paid.add(type);
+         if (!this.resource_paid.canAdd(type)) {
+            this.resource_player.disableResource(type);
+         }
          if (this.resource_paid.isFull()) {
             this.resource_player.disable();
          }

@@ -27,16 +27,14 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'cards-valley';
 @import 'dice';
 @import 'workers';
-@import 'select-resources';
-@import 'resource-converter';
 @import 'log';
 @import 'modal';
 
-@import "./resource-manager/resource-icons";
-@import "./resource-manager/resource-counter";
-@import "./resource-manager/resource-placeholder";
-@import "./resource-manager/resource-manager";
-@import "./resource-manager/resource-trader";
+@import './resource-manager/resource-icons';
+@import './resource-manager/resource-counter';
+@import './resource-manager/resource-placeholder';
+@import './resource-manager/resource-manager';
+@import './resource-manager/resource-trader';
 
 #game_play_area {
    #bga-zoom-wrapper {
@@ -176,6 +174,19 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
          text-align: center;
       }
    }
+
+   .almanac {
+      height: 35px;
+      width: 35px;
+      display: inline-block;
+      vertical-align: middle;
+   }
+   .wheelbarrow {
+      height: 35px;
+      width: 40px;
+      display: inline-block;
+      vertical-align: middle;
+   }
 }
 
 .help-marker {
@@ -213,4 +224,11 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 
 .resource-container {
    padding: 10px 0;
+}
+
+#pagemaintitletext {
+   .resource-icon {
+      display: inline-block;
+      vertical-align: middle;
+   }
 }

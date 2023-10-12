@@ -381,6 +381,13 @@ class Gamestate {
     }
 
     /**
+     * Get the id of the current game state (rarely useful, its best to use name, unless you use constants for state ids)
+     */
+    function state_id() {
+        return 0;
+    }
+
+    /**
      * Change current state to a new state. Important: the $transition parameter is the name of the transition, and NOT the name of the target game state,
      * see Your game state machine: states.inc.php for more information about states
      */

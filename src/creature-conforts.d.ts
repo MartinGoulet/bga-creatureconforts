@@ -8,6 +8,8 @@ interface CreatureConfortsPlayerData extends BgaPlayer {
    stone: string;
    wood: string;
    yarn: string;
+   almanac: string;
+   wheelbarrow: string;
 }
 
 type PlayerBoardObject = { [player_id: number]: PlayerBoardInfo };
@@ -29,6 +31,7 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
 
    first_player_id: number;
    river_dial: number;
+   raven_location: number[];
 }
 
 type TopCardCount<T> = {

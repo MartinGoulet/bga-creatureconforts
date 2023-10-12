@@ -16,6 +16,24 @@ class Notifications extends \APP_DbObject {
         self::notifyAll('onAddConfortToHand', $message, $card_args);
     }
 
+    static function addAlmanac(int $player_id) {
+        $message = clienttranslate('${player_name} receives ${token}');
+        self::notifyAll('onAddAlmanac', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'token' => 'almanac',
+        ]);
+    }
+
+    static function addWheelbarrow(int $player_id) {
+        $message = clienttranslate('${player_name} receives ${token}');
+        self::notifyAll('onAddWheelbarrow', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'token' => 'wheelbarrow',
+        ]);
+    }
+
     static function buildImprovement(int $player_id, array $card, array $cost, array $cottage) {
         $message = clienttranslate('${player_name} build ${card_name} from the workshop');
         self::notifyAll('onBuildImprovement', $message, [
@@ -30,7 +48,7 @@ class Notifications extends \APP_DbObject {
     }
 
     static function craftConfort(int $player_id, array $card, array $cost) {
-        $message = clienttranslate('${player_name} crafts ${card_name}');
+        $message = clienttranslate('${player_name} spends ${resources_to} to craft ${card_name}');
 
         self::notifyAll('onCraftConfort', $message, [
             'player_id' => $player_id,
@@ -38,6 +56,7 @@ class Notifications extends \APP_DbObject {
             'card' => $card,
             'cost' => $cost,
             'card_name' => Conforts::getName($card),
+            'resources_to' => $cost,
             'i18n' => ['card_name'],
         ]);
     }
@@ -127,6 +146,12 @@ class Notifications extends \APP_DbObject {
             'die_color' => $die['type'],
             'nbr_lesson' => $nbr_lesson,
             'resources_to' => [LESSON_LEARNED => 1],
+        ]);
+    }
+
+    static function newRavenLocationTaken(int $location_id) {
+        self::notifyAll('onNewRavenLocationTaken', '', [
+            'location_id' => $location_id,
         ]);
     }
 
@@ -251,6 +276,23 @@ class Notifications extends \APP_DbObject {
             'player_name' => self::getPlayerName($player_id),
             'dice' => $dice,
             'rolledDice' => implode(',', array_column($dice, 'face')),
+        ]);
+    }
+
+    /**************************
+     **** TRAVELER ABILITY ****
+     **************************/
+
+    static function abilityBlackBear(int $player_id, int $location_id, array $resources) {
+        $message = clienttranslate('${player_name} get ${resources_to} from ${card_name}');
+        self::notifyAll('onGetResourcesFromLocation', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'location_id' => $location_id,
+            'resources' => $resources,
+            'resources_to' => $resources,
+            'card_name' => clienttranslate("Black Bear"),
+            'i18n' => ['card_name']
         ]);
     }
 

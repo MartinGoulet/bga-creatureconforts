@@ -34,6 +34,18 @@ class WorkshopHelper {
         $cottage = Cottages::addToImprovement($card['id'], $player_id);
         Notifications::buildImprovement($player_id, Improvements::get($card['id']), $card_type['cost'], $cottage);
 
+
+        switch ($card['type']) {
+            case 10: // Almanac
+                Players::addResources($player_id, ['almanac' => 1]);
+                Notifications::addAlmanac($player_id);
+                break;
+            case 11: // Wheelbarrow
+                Players::addResources($player_id, ['wheelbarrow' => 1]);
+                Notifications::addWheelbarrow($player_id);
+                break;
+        }
+
         Improvements::refillLadder();
         Notifications::refillLadder(Improvements::getLadder());
     }

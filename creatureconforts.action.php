@@ -96,11 +96,13 @@ class action_creatureconforts extends APP_GameAction {
       $location_id = self::getArg("location_id", AT_posint, true);
       $resources = self::getArg("resources", AT_numberlist, false, '');
       $resources2 = self::getArg("resources2", AT_numberlist, false, '');
+      $card_ids = self::getArg("card_ids", AT_numberlist, false, '');
       $resources = self::getArrayArgs($resources);
       $resources2 = self::getArrayArgs($resources2);
+      $card_ids = self::getArrayArgs($card_ids);
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('resolveWorker');
-      $this->game->resolveWorker($location_id, $resources, $resources2);
+      $this->game->resolveWorker($location_id, $resources, $resources2, $card_ids);
       self::ajaxResponse();
    }
 
@@ -151,6 +153,27 @@ class action_creatureconforts extends APP_GameAction {
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('discardConfort');
       $this->game->discardConfort($card_ids);
+      self::ajaxResponse();
+   }
+
+
+   public function confirmGrayWolf() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $slot_id = intval(self::getArg("slot_id", AT_int));
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmGrayWolf');
+      $this->game->confirmGrayWolf($slot_id);
+      self::ajaxResponse();
+   }
+
+   public function confirmCommonRaven() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $location_id = intval(self::getArg("location_id", AT_int));
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmCommonRaven');
+      $this->game->confirmCommonRaven($location_id);
       self::ajaxResponse();
    }
 

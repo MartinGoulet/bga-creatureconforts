@@ -23,7 +23,7 @@ use CreatureConforts\Managers\Travelers;
 
 class TravelerHelper {
 
-    static function resolve($die, $resources, $resources_get) {
+    static function resolve($die, $resources, $resources_get, $card_ids) {
         $traveler_type = Travelers::getTopCard()['type'];
         $group = ResourcesHelper::groupByType($resources);
         if (!Players::hasEnoughResource(Players::getPlayerId(), $group)) {
@@ -52,7 +52,7 @@ class TravelerHelper {
                 break;
             case 7:
                 $group2 = ResourcesHelper::groupByType($resources_get);
-                StripedSkunk::resolve($die['face'], $resources, $group, $resources_get, $group2);
+                StripedSkunk::resolve($die['face'], $resources, $group, $resources_get, $group2, $card_ids);
                 break;
             case 8:
                 AmericanBeaver::resolve($die['face'], $resources, $group);
@@ -85,5 +85,26 @@ class TravelerHelper {
             default:
                 throw new BgaUserException("Traveler not found");
         }
+    }
+
+    static function isActiveGrayWolf() {
+        return self::isTravelerActive(4);
+    }
+
+    static function isActiveHairyTailedHole() {
+        return self::isTravelerActive(5);
+    }
+
+    static function isActiveCommonRaven() {
+        return self::isTravelerActive(6);
+    }
+
+    static function isActiveBlackBear() {
+        return self::isTravelerActive(12);
+    }
+
+    private static function isTravelerActive(int $type) {
+        $traveler_type = Travelers::getTopCard()['type'];
+        return $traveler_type == $type;
     }
 }

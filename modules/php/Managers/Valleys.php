@@ -10,7 +10,7 @@ use CreatureConforts\Core\Game;
 
 class Valleys {
 
-    static function setupNewGame($options = []) {
+    static function setupNewGame() {
         $forest = [];
         $meadow = [];
         foreach (Game::get()->valley_types as $id => $card_type) {
@@ -24,7 +24,8 @@ class Valleys {
         self::deck()->createCards($forest, FOREST . "temp");
         self::deck()->createCards($meadow, MEADOW . "temp");
 
-        $isShortGame = ($options[OPTION_SHORT_GAME] ?? 1) == OPTION_SHORT_GAME_ENABLED;
+        $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
+        $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
 
         foreach ([FOREST, MEADOW] as $region) {
             foreach ([FALL, SUMMER, SPRING] as $season) {
@@ -39,6 +40,9 @@ class Valleys {
                 }
             }
         }
+
+        self::deck()->moveAllCardsInLocation(FOREST . "temp", "box");
+        self::deck()->moveAllCardsInLocation(MEADOW . "temp", "box");
     }
 
     static function getUIData() {

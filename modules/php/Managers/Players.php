@@ -108,13 +108,25 @@ class Players extends \APP_DbObject {
     }
 
     static function hasEnoughResource(int $player_id, array $cost) {
+        $card = 0;
         $values = ["player_id = $player_id"];
         foreach ($cost as $type => $count) {
-            $values[] = "$type >= $count";
+            if($type == 'card') {
+                $card = $count;
+            } else {
+                $values[] = "$type >= $count";
+            }
         }
         $criteria = implode(' AND ', $values);
-        $sql = "SELECT Count(1) FROM player WHERE $criteria";
-        return intval(self::getUniqueValueFromDB($sql)) == 1;
+        $hasEnough = true;
+        if($criteria !== "") {
+            $sql = "SELECT Count(1) FROM player WHERE $criteria";
+            $hasEnough = intval(self::getUniqueValueFromDB($sql)) == 1;
+        }
+        if($card > 0) {
+            $hasEnough = $hasEnough && sizeof(Conforts::getHand($player_id)) >= $card;
+        }
+        return $hasEnough;
     }
 
     static function removeResource(int $player_id, array $cost) {

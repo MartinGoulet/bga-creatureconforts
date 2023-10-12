@@ -278,6 +278,10 @@ class CreatureConforts
          } as IResourceCounterSettings<IconsType>;
       });
 
+      if (filter.length > 0 && TravelerHelper.isHairyTailedHoleActive()) {
+         filter = [...filter, 'coin', 'stone'];
+      }
+
       return filter.length == 0 ? resources : resources.filter((r) => filter.indexOf(r.resource) >= 0);
    }
 
@@ -335,6 +339,10 @@ class CreatureConforts
    /* @Override */
    format_string_recursive(log: string, args: any) {
       try {
+         if (log.indexOf('::coin::') >= 0) {
+            log = log.replace('::coin::', `<div class="resource-icon" data-type="coin"></div>`);
+         }
+
          if (log && args && !args.processed) {
             args.processed = true;
 
@@ -368,6 +376,10 @@ class CreatureConforts
                const value = args.die_to;
                const color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
                args.die_to = `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`;
+            }
+
+            if (args.token !== undefined) {
+               args.token = `<div class="${args.token}"></div>`;
             }
          }
       } catch (e) {

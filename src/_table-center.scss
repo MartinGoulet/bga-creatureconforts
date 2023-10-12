@@ -14,7 +14,7 @@
       .slot {
          width: 125px;
          height: 125px;
-         border: 1px solid black;
+         border: 1px solid transparent;
       }
    }
 
@@ -295,6 +295,79 @@
                z-index: 1;
             }
          }
+      }
+   }
+
+   #reserved-zones {
+      .cc-zone {
+         width: 80px;
+         height: 40px;
+         position: absolute;
+         display: flex;
+         justify-content: center;
+      }
+
+      [data-zone-id='1'] {
+         top: 175px;
+         left: 55px;
+         width: 130px;
+      }
+      [data-zone-id='2'] {
+         top: 175px;
+         left: 211px;
+         width: 130px;
+      }
+      [data-zone-id='3'] {
+         top: 175px;
+         left: 397px;
+         width: 130px;
+      }
+      [data-zone-id='4'] {
+         top: 175px;
+         left: 553px;
+         width: 130px;
+      }
+
+      [data-zone-id='5'] {
+         top: 270px;
+         left: 664px;
+         justify-content: flex-start;
+      }
+      [data-zone-id='6'] {
+         top: 410px;
+         left: 640px;
+         justify-content: flex-start;
+      }
+      [data-zone-id='7'] {
+         top: 356px;
+         left: 392px;
+         justify-content: flex-start;
+      }
+
+      [data-zone-id='8'] {
+         top: 429px;
+         left: 456px;
+      }
+      [data-zone-id='9'] {
+         top: 540px;
+         left: 354px;
+         justify-content: flex-start;
+      }
+
+      [data-zone-id='10'] {
+         top: 815px;
+         left: 157px;
+         justify-content: flex-start;
+      }
+      [data-zone-id='11'] {
+         top: 752px;
+         left: 365px;
+         justify-content: flex-start;
+      }
+      [data-zone-id='12'] {
+         top: 752px;
+         left: 530px;
+         justify-content: flex-start;
       }
    }
 

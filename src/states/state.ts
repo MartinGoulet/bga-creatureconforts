@@ -11,10 +11,15 @@ class StateManager {
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
          resolveTraveler: new ResolveTravelerState(game),
+         resolveTravelerDiscard: new ResolveTravelerDiscardState(game),
          resolveMarket: new ResolveMarketState(game),
          resolveOwnNest: new ResolveOwlNestState(game),
          resolveWorkshop: new ResolveWorkshopState(game),
          playerTurnDiscard: new PlayerTurnDiscardState(game),
+         upkeep: new UpkeepState(game),
+
+         grayWolf: new GrayWolfState(game),
+         commonRaven: new CommonRavenState(game),
       };
    }
 

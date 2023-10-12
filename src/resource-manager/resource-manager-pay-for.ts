@@ -1,7 +1,7 @@
 interface ResourceManagerPayForSettings<TResource> {
    from: {
       available: IResourceCounterSettings<TResource>[];
-      requirement?: TResource[];
+      requirement?: TResource[] | TResource[][];
       count: number;
       /**
        * Add restriction for resource groupe
@@ -69,7 +69,7 @@ class ResourceManagerPayFor<TResource> implements IResourceManager<TResource> {
       this.addResourceTrader();
    }
    hasTradePending(): boolean {
-      return !this.resource_trader.every((t) => t.isComplete());
+      return !this.resource_trader.every((t) => !t.isTradePending());
    }
 
    private addResourceTrader(): ResourceTrader<TResource> {

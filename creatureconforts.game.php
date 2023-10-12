@@ -17,6 +17,7 @@
  *
  */
 
+use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Cottages;
 use CreatureConforts\Managers\Dice;
@@ -141,8 +142,8 @@ class CreatureConforts extends Table {
         Players::setupNewGame($players, $options);
         Conforts::setupNewGame($players, $options);
         Cottages::setupNewGame($players, $options);
-        Improvements::setupNewGame();
-        Travelers::setupNewGame();
+        Improvements::setupNewGame($players);
+        Travelers::setupNewGame($players);
         Valleys::setupNewGame($options);
         Dice::setupNewGame($players, $options);
         Worker::setupNewGame();
@@ -169,7 +170,7 @@ class CreatureConforts extends Table {
 
         // Get information about players
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
-        $sql = "SELECT player_id id, player_score score, wood, stone, fruit, mushroom, yarn, grain, lesson, story, coin FROM player ";
+        $sql = "SELECT player_id id, player_score score, wood, stone, fruit, mushroom, yarn, grain, lesson, story, coin, almanac, wheelbarrow FROM player ";
         $result['players'] = self::getCollectionFromDb($sql);
         $result['first_player_id'] = intval(self::getGameStateValue(VAR_FIRST_PLAYER));
         $result['river_dial'] = intval(self::getGameStateValue(VAR_RIVER_DIAL));
@@ -188,8 +189,14 @@ class CreatureConforts extends Table {
         $result['valleys'] = Valleys::getUIData();
         $result['workers'] = Worker::getUIData();
 
-        $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
-        $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
+        // $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
+        // $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
+        $result['debug_valley'] = array_values(self::getCollectionFromDB("SELECT * FROM valley WHERE card_location != 'box' ORDER BY card_location, card_location_arg desc"));
+        $result['debug_traveler'] = self::getCollectionFromDB("SELECT * FROM traveler");
+        $result['debug_short_game'] = intval(self::getGameStateValue(OPTION_SHORT_GAME));
+        $result['raven_location'] = Globals::getRavenLocationIds();
+
+        $result['turn_number'] = self::getStat(STAT_TURN_NUMBER);
 
         return $result;
     }

@@ -40,11 +40,11 @@ trait Debug {
     }
 
     function debugSavepoint() {
-        Game::get()->setGameStateInitialValue(VAR_SAVEPOINT_TRANSITION, 0);
-        Game::get()->undoSavepoint();
+        Game::undoSavepoint();
     }
 
     function addColumn() {
-        self::DbQuery('ALTER TABLE `improvement` ADD `card_owner` int(11) NULL');
+        self::DbQuery('ALTER TABLE `player` ADD `almanac` smallint UNSIGNED NOT NULL DEFAULT 0');
+        self::DbQuery('ALTER TABLE `player` ADD `wheelbarrow` smallint UNSIGNED NOT NULL DEFAULT 0');
     }
 }

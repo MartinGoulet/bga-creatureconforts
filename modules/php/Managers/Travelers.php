@@ -18,10 +18,15 @@ class Travelers {
         }, $cards);
     }
 
-    static function setupNewGame() {
-        $cards = [];
+    static function setupNewGame(array $players) {
+        
+        $is_solo = count($players) == 1;
         foreach (Game::get()->traveler_types as $id => $card_type) {
-            $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => 1];
+            // 1 - Canada Lynx, 9 - Common Loon, 13 - Moose
+            $exclude = $is_solo && in_array($id, [1, 9, 13]);
+            if(!$exclude) {
+                $cards[] = ['type' => $id, 'type_arg' => 1, 'nbr' => 1];
+            }
         }
         self::deck()->createCards($cards);
         self::deck()->shuffle('deck');

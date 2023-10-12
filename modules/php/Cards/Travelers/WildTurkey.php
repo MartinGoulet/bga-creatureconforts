@@ -20,13 +20,13 @@ class WildTurkey {
     }
     static function resolve_first() {
         $player_id = Players::getPlayerId();
-        $card = Conforts::draw($player_id);
-        Game::undoSavepoint(); // For drawing
-
+        
         Players::addResources($player_id, [STORY => 1]);
-
+        Notifications::travelerReceivedResources([CARD => 1, STORY => 1]);
+        
+        Game::undoSavepoint(); // For drawing
+        $card = Conforts::draw($player_id);
         Notifications::drawConfort($player_id, [$card]);
-        Notifications::travelerReceivedResources([STORY => 1]);
     }
     static function resolve_second() {
         $player_id = Players::getPlayerId();

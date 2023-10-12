@@ -14,8 +14,17 @@ class ResolveTravelerState implements StateHandler {
       const die = dice_locations.getDice().find((die: Dice) => die.location == 9);
 
       const traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
-      const trade = this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
+      const trade: ResourceManagerPayForSettings<IconsType> =
+         this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
       this.trade = trade;
+
+      const getRequirementFrom = (): IconsType[] | IconsType[][] => {
+         if (TravelerHelper.isHairyTailedHoleActive()) {
+            return trade.from.requirement.map((icon) => [icon, 'coin']);
+         } else {
+            return trade.from.requirement;
+         }
+      };
 
       if (trade.from.count === 0) {
          this.resource_manager = undefined;
@@ -28,7 +37,14 @@ class ResolveTravelerState implements StateHandler {
             ...trade,
             from: {
                ...trade.from,
-               available: this.game.getPlayerResources(trade.from.requirement ?? [...GOODS]),
+               available: this.game.getPlayerResources(
+                  trade.from.requirement !== undefined ? (trade.from.requirement as IconsType[]) : [...GOODS],
+               ),
+               requirement: getRequirementFrom(),
+            },
+            to: {
+               ...trade.to,
+               available: trade.to.resources !== undefined ? undefined : [...GOODS],
             },
          });
       }
@@ -61,7 +77,24 @@ class ResolveTravelerState implements StateHandler {
             resources: toArray(rm.getResourcesFrom()),
             resources2: toArray(rm.getResourcesTo()),
          };
-         this.game.takeAction('resolveWorker', data);
+
+         const cardDiscardCount = rm.getResourcesFrom().filter((icon) => icon === 'card').length;
+
+         if (cardDiscardCount > 0) {
+            this.game.setClientState('resolveTravelerDiscard', {
+               descriptionmyturn: _('${you} must discard ${nbr} card(s) from your hand').replace(
+                  '${nbr}',
+                  cardDiscardCount.toString(),
+               ),
+               args: {
+                  data,
+                  action: 'resolveWorker',
+                  count: cardDiscardCount,
+               },
+            });
+         } else {
+            this.game.takeAction('resolveWorker', data);
+         }
       };
 
       const handleReset = () => {

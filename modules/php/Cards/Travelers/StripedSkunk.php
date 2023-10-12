@@ -9,47 +9,66 @@ use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Players;
 
 class StripedSkunk {
-    static function resolve(int $die_value, array $resources, array $group, array $resources2, array $group2) {
+    static function resolve(int $die_value, array $resources, array $group, array $resources2, array $group2, array $card_ids) {
         if ($die_value <= 1) {
             self::resolve_first($resources, $group);
         } else if ($die_value <= 5) {
-            self::resolve_second($resources, $group, $group2);
+            self::resolve_second($resources2, $group2, $card_ids);
         } else {
-            self::resolve_third($resources, $group);
+            self::resolve_third($card_ids);
         }
     }
     static function resolve_first(array $resources, array $group) {
         Players::addResources(Players::getPlayerId(), [STORY => 1]);
         Notifications::travelerReceivedResources([STORY => 1]);
     }
-    static function resolve_second(array $resources, array $group) {
-        // TODO Implement when card discard was implemented
-
-        // if (!ResourcesHelper::isGroupLimitedTo($group, [COIN])) {
-        //     throw new BgaUserException("Wrong type of resource");
-        // }
-        // if ($group[COIN] > 1) {
-        //     throw new BgaUserException('Too many resources');
-        // }
-        // $player_id = Players::getPlayerId();
-        // Players::removeResource($player_id, $group);
-        // Players::addResources($player_id, [LESSON_LEARNED => 1]);
-        // Notifications::travelerExchangeResources($group, [LESSON_LEARNED => 1]);
-        // $card = Conforts::draw($player_id);
-        // Notifications::drawConfort($player_id, [$card]);
+    static function resolve_second(array $resources2, array $group2, array $card_ids) {
+        if (sizeof($card_ids) > 2) {
+            throw new BgaUserException('Too many resources');
+        }
+        if (sizeof($resources2) != sizeof($card_ids) * 2) {
+            throw new BgaUserException("Wrong number of resource to get");
+        }
+        if (!ResourcesHelper::isGroupLimitedTo($group2, GOODS)) {
+            throw new BgaUserException("Wrong type of resource");
+        }
+        $player_id = Players::getPlayerId();
+        $hand = Conforts::getHand($player_id);
+        $cards = [];
+        foreach ($card_ids as $card_id) {
+            $filter = array_filter($hand, function ($card) use ($card_id) {
+                return $card['id'] == $card_id;
+            });
+            if (sizeof($filter) == 0) {
+                throw new BgaUserException("Card not in your hand " . $card_id);
+            }
+            Conforts::addCardToDiscard($card_id);
+            $cards[] = array_shift($filter);
+        }
+        Notifications::discardConfort($cards);
+        Players::addResources($player_id, $group2);
+        Notifications::travelerExchangeResources([CARD => sizeof($card_ids)], $group2);
     }
-    static function resolve_third(array $resources, array $group) {
-        // TODO Implement when card discard was implemented
+    static function resolve_third(array $card_ids) {
+        if (sizeof($card_ids) !== 2) {
+            throw new BgaUserException('Not enough cards');
+        }
 
-        // if (!ResourcesHelper::isGroupLimitedTo($group, [GRAIN])) {
-        //     throw new BgaUserException("Wrong type of resource");
-        // }
-        // if ($group[GRAIN] > 3) {
-        //     throw new BgaUserException('Too many resources');
-        // }
-        // $player_id = Players::getPlayerId();
-        // Players::removeResource($player_id, $group);
-        // Players::addResources($player_id, [COIN => $group[GRAIN]]);
-        // Notifications::travelerExchangeResources($group, [LESSON_LEARNED => $group[GRAIN]]);
+        $player_id = Players::getPlayerId();
+        $hand = Conforts::getHand($player_id);
+        $cards = [];
+        foreach ($card_ids as $card_id) {
+            $filter = array_filter($hand, function ($card) use ($card_id) {
+                return $card['id'] == $card_id;
+            });
+            if (sizeof($filter) == 0) {
+                throw new BgaUserException("Card not in your hand " . $card_id);
+            }
+            Conforts::addCardToDiscard($card_id);
+            $cards[] = array_shift($filter);
+        }
+        Notifications::discardConfort($cards);
+        Players::addResources($player_id, [COIN => 1, STORY => 1]);
+        Notifications::travelerExchangeResources([CARD => sizeof($card_ids)], [COIN => 1, STORY => 1]);
     }
 }

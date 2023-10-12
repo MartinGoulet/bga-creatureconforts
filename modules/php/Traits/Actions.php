@@ -14,7 +14,6 @@ use CreatureConforts\Helpers\WorkshopHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
 use CreatureConforts\Managers\Valleys;
 use CreatureConforts\Managers\Worker;
 
@@ -75,9 +74,9 @@ trait Actions {
     function confirmPlayerDice(array $dice_ids, array $location_ids, array $modifiers) {
 
         $sum_modifier = array_sum(array_values($modifiers));
-        if ($sum_modifier > 0 ) {
-            if(!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier])) {
-            throw new BgaUserException("Not enough lesson learned");
+        if ($sum_modifier > 0) {
+            if (!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier])) {
+                throw new BgaUserException("Not enough lesson learned");
             }
             Players::removeResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier]);
         }
@@ -104,7 +103,7 @@ trait Actions {
             $dice_by_locations[$location_id][] = $die_id;
             $dice_value_by_location[$location_id][] = $dice_value + $modifier;
 
-            if($modifier != 0) {
+            if ($modifier != 0) {
                 Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $dice_value + $modifier, $modifier);
             }
 
@@ -121,6 +120,7 @@ trait Actions {
         foreach ($dice_by_locations as $location_id => $dice) {
             if (!DiceHelper::isRequirementMet($location_id, $dice, $dice_value_by_location[$location_id])) {
                 $error[] = $location_id;
+                $error[] = "(" . json_encode($dice_value_by_location[$location_id]) . ")";
             } else {
                 Dice::moveDiceToLocation($dice, $location_id);
             }
@@ -133,7 +133,7 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
-    function resolveWorker(int $location_id, array $resources, array $resources2) {
+    function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids) {
         $player_id = $this->getActivePlayerId();
 
         $worker = Worker::returnToPlayerBoard($player_id, $location_id);
@@ -153,7 +153,11 @@ trait Actions {
             $valley = Valleys::getValleyLocationInfo($location_id);
             Players::addResources($player_id, $valley['resources']);
             Notifications::getResourcesFromLocation($player_id, $location_id, $valley['resources']);
-            $this->resolveWorkerNextStep();
+            if (TravelerHelper::isActiveBlackBear()) {
+                Players::addResources($player_id, [FRUIT => 1]);
+                Notifications::abilityBlackBear($player_id, $location_id, [FRUIT => 1]);
+            }
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -165,7 +169,7 @@ trait Actions {
             ];
             Players::addResources($player_id, $resources[$location_id]);
             Notifications::getResourcesFromLocation($player_id, $location_id, $resources[$location_id]);
-            $this->resolveWorkerNextStep();
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -173,7 +177,7 @@ trait Actions {
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             $converted_resources2 = ResourcesHelper::convertNumberToResource($resources2);
             MarketHelper::resolve($converted_resources, $converted_resources2);
-            $this->resolveWorkerNextStep();
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -181,8 +185,8 @@ trait Actions {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             $converted_resources_get = ResourcesHelper::convertNumberToResource($resources2);
-            TravelerHelper::resolve($die, $converted_resources, $converted_resources_get);
-            $this->resolveWorkerNextStep();
+            TravelerHelper::resolve($die, $converted_resources, $converted_resources_get, $card_ids);
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -190,7 +194,7 @@ trait Actions {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             WorkshopHelper::resolve(intval($die['face']), intval(array_shift($resources)));
-            $this->resolveWorkerNextStep();
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -203,7 +207,8 @@ trait Actions {
             Notifications::addConfortToHand(Players::getPlayerId(), $card);
             Conforts::refillOwlNest();
             Notifications::refillOwlNest(Conforts::getOwlNest());
-            $this->resolveWorkerNextStep();
+            Game::undoSavepoint();
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -216,20 +221,30 @@ trait Actions {
                 $card = Conforts::draw(Players::getPlayerId());
                 Notifications::drawConfort(Players::getPlayerId(), [$card]);
             }
-            $this->resolveWorkerNextStep();
+            Game::undoSavepoint();
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
         throw new BgaUserException("Not implemented yet");
     }
 
-    private function resolveWorkerNextStep() {
+    private function resolveWorkerNextStep(int $location_id) {
         $player_id = $this->getActivePlayerId();
+
+        if(TravelerHelper::isActiveCommonRaven()) {
+            $raven_location_ids = Globals::getRavenLocationIds();
+            if(in_array($location_id, $raven_location_ids)) {
+                Players::addResources(Players::getPlayerId(), [COIN => 1]);
+                Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [COIN => 1]);
+            }
+        }
 
         $workers_not_home = array_filter(Worker::getWorkersFromPlayer($player_id), function ($worker) {
             return $worker['location'] !== 'player';
         });
 
+        // TODO Glade
         $next_step = count($workers_not_home) > 0 ? "next" : "end";
         Game::get()->gamestate->nextState($next_step);
     }
@@ -264,6 +279,27 @@ trait Actions {
             }
         }
 
+        if (TravelerHelper::isActiveHairyTailedHole() && sizeof($resources) > 0) {
+            $group = ResourcesHelper::groupByType(ResourcesHelper::convertNumberToResource($resources));
+            $isOk = true;
+            $sumStoneCoin = 0;
+            foreach($cost as $resource => $count) {
+                if(!in_array($resource, [STONE, COIN])) {
+                    $isOk = $isOk && (array_key_exists($resource, $group) && $group[$resource] == $count);
+                } else {
+                    $sumStoneCoin += $count;
+                }
+            }
+            if(!$isOk) {
+                throw new BgaUserException("Resources does not match 1");
+            }
+            $isOk = $isOk && (($group[STONE] ?? 0) + ($group[COIN] ?? 0) === $sumStoneCoin);
+            if(!$isOk) {
+                throw new BgaUserException("Resources does not match");
+            }
+            $cost = $group;
+        }
+
         if (!Players::hasEnoughResource($player_id, $cost)) {
             throw new BgaUserException("Not enough resource");
         }
@@ -292,6 +328,29 @@ trait Actions {
             Conforts::addCardToDiscard($card_id);
         }
         Notifications::discardConfort($cards);
+        Game::get()->gamestate->nextState();
+    }
+
+    function confirmGrayWolf(int $slot_id) {
+        if ($slot_id < 1 || $slot_id > 4) {
+            throw new BgaUserException("Slot id must be between 1 and 4");
+        }
+        $player_id = Players::getPlayerId();
+        $card = Conforts::addToHand(Conforts::getFromMarket($slot_id), $player_id);
+        Notifications::addConfortToHand(Players::getPlayerId(), $card);
+        Conforts::refillOwlNest();
+        Notifications::refillOwlNest(Conforts::getOwlNest());
+        Game::get()->gamestate->nextState();
+    }
+
+    function confirmCommonRaven(int $location_id) {
+        $raven_location_ids = Globals::getRavenLocationIds() ?? [];
+        if(in_array($location_id, $raven_location_ids)) {
+            throw new BgaUserException("The location was already taken");
+        }
+        $raven_location_ids[] = $location_id;
+        Globals::setRavenLocationIds($raven_location_ids);
+        Notifications::newRavenLocationTaken($location_id);
         Game::get()->gamestate->nextState();
     }
 

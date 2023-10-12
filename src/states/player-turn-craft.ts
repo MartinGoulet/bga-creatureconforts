@@ -32,6 +32,34 @@ class PlayerTurnCraftState implements StateHandler {
                player_resources: this.game.getPlayerResources([...GOODS]),
                resource_count: 2,
             });
+         } else if (TravelerHelper.isHairyTailedHoleActive()) {
+            this.game.enableButton('btn_reset', 'gray');
+
+            const requirement: IconsType[][] = [];
+            const resource_type: IconsType[] = [];
+            let hasStoneOrCoin = false;
+
+            for (const icon in card_type.cost) {
+               const count: number = card_type.cost[icon];
+               for (let index = 0; index < count; index++) {
+                  if (['stone', 'coin'].includes(icon)) {
+                     requirement.push(['coin', 'stone']);
+                     resource_type.push('coin', 'stone');
+                     hasStoneOrCoin = true;
+                  } else {
+                     requirement.push([icon as IconsType]);
+                     resource_type.push(icon as IconsType);
+                  }
+               }
+            }
+
+            if (hasStoneOrCoin) {
+               this.resourceManager = new ResourceManagerPay(this.toolbar.addContainer(), {
+                  player_resources: this.game.getPlayerResources(resource_type),
+                  resource_count: requirement.length,
+                  requirement,
+               });
+            }
          }
       };
 
@@ -69,7 +97,8 @@ class PlayerTurnCraftState implements StateHandler {
 
          let resources: number[] = [];
 
-         if ('*' in card_type.cost) {
+         // if ('*' in card_type.cost) {
+         if (this.resourceManager) {
             resources = ResourceHelper.convertToInt(this.resourceManager.getResourcesFrom());
          }
 

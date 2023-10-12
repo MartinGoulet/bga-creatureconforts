@@ -40,7 +40,7 @@ class CommonRaven {
         $player_id = Players::getPlayerId();
         Players::removeResource($player_id, $group);
         Players::addResources($player_id, [LESSON_LEARNED => 1]);
-        Notifications::travelerExchangeResources($group, [LESSON_LEARNED => 1]);
+        Notifications::travelerExchangeResources($group, [CARD => 1, LESSON_LEARNED => 1]);
         $card = Conforts::draw($player_id);
         Notifications::drawConfort($player_id, [$card]);
     }

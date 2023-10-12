@@ -2,6 +2,7 @@
 
 namespace CreatureConforts\Core;
 
+use BgaUserException;
 
 /*
  * Game: a wrapper over table object to allow more generic modules
@@ -14,7 +15,7 @@ class Game extends \APP_DbObject {
 
     public static function undoSavepoint() {
         self::get()->undoSavepoint();
-        $stateNum = intval(Game::get()->gamestate->state()['id']);
+        $stateNum = Game::get()->gamestate->state_id();
         self::get()->setGameStateValue(VAR_SAVEPOINT_TRANSITION, $stateNum);
     }
 

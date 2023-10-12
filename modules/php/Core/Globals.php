@@ -16,6 +16,14 @@ class Globals extends \APP_DbObject {
         Game::get()->setGameStateValue(VAR_FIRST_PLAYER, $player_id);
     }
 
+    public static function getRavenLocationIds() {
+        return self::get("raven_locations_ids", true) ?? [];
+    }
+
+    public static function setRavenLocationIds(array $locations_ids) {
+        self::set("raven_locations_ids", $locations_ids);
+    }
+
     public static function getRiverDialValue() {
         return intval(Game::get()->getGameStateValue(VAR_RIVER_DIAL));
     }
