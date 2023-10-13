@@ -2,7 +2,8 @@
    display: grid;
    grid-template-areas:
       'empty glade'
-      'ladder board';
+      'ladder board'
+      'discard discard';
    padding: 0 10px;
 
    #table-improvements {
@@ -34,7 +35,7 @@
       width: 720px;
       height: 1036px;
       border-radius: 10px;
-      margin-bottom: 170px;
+      margin-bottom: 210px;
 
       #table-conforts {
          position: absolute;
@@ -395,5 +396,38 @@
             zoom: unset !important;
          }
       }
+   }
+}
+
+#discard-conforts-wrapper {
+   grid-area: discard;
+   flex-grow: 1;
+   position: relative;
+   min-height: 160px;
+   border: 4px solid black;
+   border-radius: 5px;
+   display: none;
+
+   .title {
+      background: white;
+      color: black;
+      left: 20px;
+      top: -18px;
+      border: 4px solid black;
+      border-radius: 5px;
+      font-weight: 600;
+      padding: 3px 10px;
+      position: absolute;
+   }
+
+   #discard-conforts-line {
+      row-gap: 10px;
+      margin-top: 10px;
+   }
+}
+
+.discard-conforts-opened, .gamestate_stripedSkunk {
+   #discard-conforts-wrapper {
+      display: block;
    }
 }

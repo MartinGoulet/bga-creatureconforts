@@ -65,10 +65,7 @@ class Conforts {
     static function getUIData(int $current_player_id) {
 
         $result = [
-            'discard' => [
-                'topCard' => self::deck()->getCardOnTop('discard'),
-                'count' => self::deck()->countCardInLocation('discard'),
-            ],
+            'discard' => array_values(self::deck()->getCardsInLocation('discard', null, 'location_arg')),
             'deckCount' => self::deck()->countCardInLocation('deck'),
             'market' => array_values(self::deck()->getCardsInLocation('slot', null, 'location_arg')),
             'players' => [],

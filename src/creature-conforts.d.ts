@@ -40,10 +40,7 @@ type TopCardCount<T> = {
 };
 
 interface ConfortUIData {
-   discard: {
-      topCard?: ConfortCard;
-      count: number;
-   };
+   discard: ConfortCard[];
    deckCount: number;
    market: ConfortCard[];
    players: { [player_id: number]: ConfortUIDataPlayer };

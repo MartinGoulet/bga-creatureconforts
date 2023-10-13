@@ -110,6 +110,15 @@ $travelerStates = [
             "end" => ST_FAMILY_DICE,
         ]
     ],
+
+    ST_STRIPED_SKUNK => [
+        "name" => "stripedSkunk",
+        "descriptionmyturn" => clienttranslate('${you} may claim one Comfort from the discard pile'),
+        "description" => clienttranslate('${actplayer} may claim one Comfort from the discard pile'),
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmStripedSkunk"],
+        "transitions" => ["" => ST_PLAYER_TURN_RESOLVE]
+    ],
 ];
 
 $machinestates = $basicGameStates + $travelerStates + array(
@@ -205,6 +214,7 @@ $machinestates = $basicGameStates + $travelerStates + array(
             "undo" => ST_PLAYER_TURN_DICE,
             "next" => ST_PLAYER_TURN_RESOLVE,
             "end" => ST_PLAYER_RETURN_UNRESOLVED_WORKER,
+            "striped_skunk" => ST_STRIPED_SKUNK,
         ]
     ],
 

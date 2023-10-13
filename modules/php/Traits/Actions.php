@@ -14,6 +14,7 @@ use CreatureConforts\Helpers\WorkshopHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Players;
+use CreatureConforts\Managers\Travelers;
 use CreatureConforts\Managers\Valleys;
 use CreatureConforts\Managers\Worker;
 
@@ -238,6 +239,11 @@ trait Actions {
                 Players::addResources(Players::getPlayerId(), [COIN => 1]);
                 Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [COIN => 1]);
             }
+        }
+
+        if(TravelerHelper::isActiveStripedSkunk() && in_array($location_id, [11, 12])) {
+            Game::get()->gamestate->nextState('striped_skunk');
+            return;
         }
 
         $workers_not_home = array_filter(Worker::getWorkersFromPlayer($player_id), function ($worker) {

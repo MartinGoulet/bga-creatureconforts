@@ -24,6 +24,7 @@
         "node_modules/bga-animations/src/animations/slide-to-animation.ts",
         "node_modules/bga-animations/src/animations-utils.ts",
         "node_modules/bga-animations/src/animation-manager.ts",
+
         "node_modules/bga-cards/src/animations.ts",
         "node_modules/bga-cards/src/stocks/card-stock.ts",
         "node_modules/bga-cards/src/stocks/deck.ts",
@@ -32,7 +33,6 @@
         "node_modules/bga-cards/src/stocks/hand-stock.ts",
         "node_modules/bga-cards/src/card-manager.ts",
         "node_modules/bga-cards/src/sort.ts",
-
 
         "node_modules/bga-dice/src/animations.ts",
         "node_modules/bga-dice/src/die.ts",
@@ -54,22 +54,23 @@
         "src/resource-manager/resource-placeholder.ts",
         "src/resource-manager/resource-trader.ts",
 
-        "src/resource-requirement.ts",
-        "src/toolbar-container.ts",
+        "src/stocks/discard-stock.ts",
+        "src/stocks/hand-stock.ts",
+        "src/stocks/location-stock.ts",
 
-        "src/creature-conforts.d.ts",
-        "src/creature-conforts.ts",
-        "src/controls.ts",
-        "src/deck.ts",
-        "src/dice.ts",
-        "src/dice-helper.ts",
-        "src/modal.ts",
-        "src/select-resources.ts",
-        "src/resource-converter.ts",
-        
-        "src/notification.ts",
+        "src/managers/cards-conforts.ts",
+        "src/managers/cards-improvement.ts",
+        "src/managers/cards-traveler.ts",
+        "src/managers/cards-valley.ts",
+        "src/managers/cards-cottage.ts",
+        "src/managers/dice.ts",
+        "src/managers/workers.ts",
+
+        "src/helpers/dice-helper.ts",
+        "src/helpers/resource-requirement.ts",
+        "src/helpers/traveler-helper.ts",
+
         "src/states/state.ts",
-
         "src/states/start-hand.ts",
         "src/states/placement.ts",
         "src/states/player-turn-dice.ts",
@@ -85,19 +86,16 @@
 
         "src/states/gray-wolf.ts",
         "src/states/common-raven.ts",
-
-        "src/cards-conforts.ts",
-        "src/cards-improvement.ts",
-        "src/cards-traveler.ts",
-        "src/cards-valley.ts",
-        "src/cards-cottage.ts",
-        "src/workers.ts",
+        "src/states/striped-skunk.ts",
         
+        "src/toolbar-container.ts",
+        "src/creature-conforts.d.ts",
+        "src/creature-conforts.ts",
+        "src/modal.ts",
+        "src/notification.ts",
         "src/player-panel.ts",
         "src/player-table.ts",
         "src/table-center.ts",
-
-        "src/traveler-helper.ts",
         "src/utils.ts",
 
         "src/define.ts"

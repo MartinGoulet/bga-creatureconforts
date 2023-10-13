@@ -27,6 +27,10 @@
                     </div>
                 </div>
             </div>
+            <div id="discard-conforts-wrapper" class="whiteblock">
+                <div class="title">Discard</div>
+                <div id="discard-conforts-line"></div>
+            </div>
         </div>
         <div id="tables"></div>
     </div>

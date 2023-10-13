@@ -99,6 +99,10 @@ class TravelerHelper {
         return self::isTravelerActive(6);
     }
 
+    static function isActiveStripedSkunk() {
+        return self::isTravelerActive(7);
+    }
+
     static function isActiveBlackBear() {
         return self::isTravelerActive(12);
     }

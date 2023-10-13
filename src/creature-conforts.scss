@@ -20,21 +20,24 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'table-center';
 @import 'player-panel';
 @import 'player-table';
-@import 'cards-confort';
-@import 'cards-cottage';
-@import 'cards-improvement';
-@import 'cards-traveler';
-@import 'cards-valley';
-@import 'dice';
-@import 'workers';
 @import 'log';
 @import 'modal';
+
+@import './managers/cards-confort';
+@import './managers/cards-cottage';
+@import './managers/cards-improvement';
+@import './managers/cards-traveler';
+@import './managers/cards-valley';
+@import './managers/dice';
+@import './managers/workers';
 
 @import './resource-manager/resource-icons';
 @import './resource-manager/resource-counter';
 @import './resource-manager/resource-placeholder';
 @import './resource-manager/resource-manager';
 @import './resource-manager/resource-trader';
+
+@import './stocks/discard-stock';
 
 #game_play_area {
    #bga-zoom-wrapper {
@@ -101,16 +104,6 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       vertical-align: middle;
       zoom: 0.6;
    }
-}
-
-.title {
-   position: absolute;
-   margin: -36px 0 0 0;
-   border: 3px solid var(--color);
-   border-radius: 5px;
-   padding: 3px 10px;
-   font-weight: 600;
-   background-color: white;
 }
 
 .bga-cards_selected-card .front {

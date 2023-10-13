@@ -2736,316 +2736,44 @@ var ResourceTrader = (function () {
     };
     return ResourceTrader;
 }());
-var ResourceRequirement = (function () {
-    function ResourceRequirement() {
+var DiscardStock = (function (_super) {
+    __extends(DiscardStock, _super);
+    function DiscardStock(manager, element, linestock) {
+        var _this = _super.call(this, manager, element, {
+            cardNumber: 0,
+            counter: {
+                hideWhenEmpty: false,
+            },
+            autoRemovePreviousCards: false,
+        }) || this;
+        _this.linestock = linestock;
+        _this.eyeIcon = document.createElement('div');
+        _this.eyeIcon.classList.add('eye-icon', 'closed');
+        _this.eyeIcon.onclick = function () { return _this.onEyeClick(); };
+        element.classList.add('discard');
+        element.appendChild(_this.eyeIcon);
+        return _this;
     }
-    ResourceRequirement.isRequirementMet = function (game, cost) {
-        var _a, _b;
-        var counters = game.getPlayerPanel(game.getPlayerId()).counters;
-        for (var _i = 0, _c = Object.keys(cost); _i < _c.length; _i++) {
-            var type = _c[_i];
-            if (type !== '*' && counters[type].getValue() < cost[type]) {
-                if (['stone', 'coin'].includes(type) && TravelerHelper.isHairyTailedHoleActive()) {
-                    var sumResource = counters['stone'].getValue() + counters['coin'].getValue();
-                    var sumCost = ((_a = cost === null || cost === void 0 ? void 0 : cost.stone) !== null && _a !== void 0 ? _a : 0) + ((_b = cost === null || cost === void 0 ? void 0 : cost.coin) !== null && _b !== void 0 ? _b : 0);
-                    if (sumResource < sumCost) {
-                        return false;
-                    }
-                }
-                else {
-                    return false;
-                }
-            }
-        }
-        if ('*' in cost) {
-            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
-            var total_cost = Object.keys(cost)
-                .filter(function (type) { return ICONS.indexOf(type) >= 0; })
-                .map(function (type) { return cost[type]; })
-                .reduce(function (prev, curr) { return prev + curr; }, 0);
-            return total_goods >= total_cost;
-        }
-        return true;
+    DiscardStock.prototype.addCard = function (card, animation, settings) {
+        var _a;
+        var promise = _super.prototype.addCard.call(this, card, animation, settings);
+        (_a = this.linestock) === null || _a === void 0 ? void 0 : _a.addCard(__assign({}, card));
+        return promise;
     };
-    return ResourceRequirement;
-}());
-var ToolbarContainer = (function () {
-    function ToolbarContainer(name) {
-        this.container_name = "resource_manager_".concat(name);
-    }
-    ToolbarContainer.prototype.addContainer = function () {
-        this.removeContainer();
-        document
-            .getElementById("maintitlebar_content")
-            .insertAdjacentHTML('beforeend', "<div id=\"".concat(this.container_name, "\"></div>"));
-        return this.getContainer();
+    DiscardStock.prototype.removeCard = function (card, settings) {
+        var _a;
+        var promise = _super.prototype.removeCard.call(this, card, settings);
+        (_a = this.linestock) === null || _a === void 0 ? void 0 : _a.removeCard(__assign({}, card));
+        return promise;
     };
-    ToolbarContainer.prototype.removeContainer = function () {
-        var element = document.getElementById(this.container_name);
-        if (element)
-            element.remove();
+    DiscardStock.prototype.onEyeClick = function () {
+        this.eyeIcon.classList.toggle('closed');
+        var opened = !this.eyeIcon.classList.contains('closed');
+        var classCss = "".concat(this.element.id, "-opened");
+        document.getElementById('table').classList.toggle(classCss, opened);
     };
-    ToolbarContainer.prototype.getContainer = function () {
-        return document.getElementById(this.container_name);
-    };
-    return ToolbarContainer;
-}());
-var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
-var debug = isDebug ? console.log.bind(window.console) : function () { };
-var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
-var LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
-var CreatureConforts = (function () {
-    function CreatureConforts() {
-        this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
-    }
-    CreatureConforts.prototype.setup = function (gamedatas) {
-        var _this = this;
-        debug(gamedatas);
-        this.animationManager = new AnimationManager(this, { duration: 0 });
-        this.confortManager = new ConfortManager(this);
-        this.improvementManager = new ImprovementManager(this);
-        this.travelerManager = new TravelerManager(this);
-        this.valleyManager = new ValleyManager(this);
-        this.diceManager = new MyDiceManager(this);
-        this.cottageManager = new CottageManager(this);
-        this.workerManager = new WorkerManager(this);
-        this.notifManager = new NotificationManager(this);
-        this.stateManager = new StateManager(this);
-        this.tableCenter = new TableCenter(this);
-        this.modal = new Modal(this);
-        ['red', 'yellow', 'green', 'gray', 'purple'].forEach(function (color) {
-            _this.dontPreloadImage("board_".concat(color, ".jpg"));
-            _this.dontPreloadImage("dice_".concat(color, ".jpg"));
-        });
-        this.dontPreloadImage('improvements.jpg');
-        this.createPlayerPanels(gamedatas);
-        this.createPlayerTables(gamedatas);
-        this.setupNotifications();
-    };
-    CreatureConforts.prototype.onEnteringState = function (stateName, args) {
-        this.stateManager.onEnteringState(stateName, args);
-    };
-    CreatureConforts.prototype.onLeavingState = function (stateName) {
-        this.stateManager.onLeavingState(stateName);
-    };
-    CreatureConforts.prototype.onUpdateActionButtons = function (stateName, args) {
-        this.stateManager.onUpdateActionButtons(stateName, args);
-    };
-    CreatureConforts.prototype.addActionButtonDisabled = function (id, label, action) {
-        this.addActionButton(id, label, action);
-        this.disableButton(id);
-    };
-    CreatureConforts.prototype.addActionButtonClientCancel = function () {
-        var _this = this;
-        var handleCancel = function (evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            _this.restoreGameState();
-        };
-        this.addActionButtonGray('btnCancelAction', _('Cancel'), handleCancel);
-    };
-    CreatureConforts.prototype.addActionButtonPass = function () {
-        var _this = this;
-        var handlePass = function () {
-            _this.takeAction('pass');
-        };
-        this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
-    };
-    CreatureConforts.prototype.addActionButtonUndo = function () {
-        var _this = this;
-        var handleUndo = function () {
-            _this.takeAction('undo');
-        };
-        this.addActionButtonGray('btn_undo', _('Undo'), handleUndo);
-    };
-    CreatureConforts.prototype.addActionButtonGray = function (id, label, action) {
-        this.addActionButton(id, label, action, null, null, 'gray');
-    };
-    CreatureConforts.prototype.addActionButtonRed = function (id, label, action) {
-        this.addActionButton(id, label, action, null, null, 'red');
-    };
-    CreatureConforts.prototype.addActionButtonReset = function (parent, handle) {
-        this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
-    };
-    CreatureConforts.prototype.addModalToCard = function (div, helpMarkerId, callback) {
-        if (!document.getElementById(helpMarkerId)) {
-            div.insertAdjacentHTML('afterbegin', "<div id=\"".concat(helpMarkerId, "\" class=\"help-marker\">\n                     <i class=\"fa fa-search\" style=\"color: white\"></i>\n                  </div>"));
-            document.getElementById(helpMarkerId).addEventListener('click', function (evt) {
-                evt.stopPropagation();
-                evt.preventDefault();
-                callback();
-            });
-        }
-    };
-    CreatureConforts.prototype.createPlayerPanels = function (gamedatas) {
-        var _this = this;
-        this.playersPanels = [];
-        gamedatas.playerorder.forEach(function (player_id) {
-            var player = gamedatas.players[Number(player_id)];
-            var panel = new PlayerPanel(_this, player);
-            _this.playersPanels.push(panel);
-        });
-    };
-    CreatureConforts.prototype.createPlayerTables = function (gamedatas) {
-        var _this = this;
-        this.playersTables = [];
-        gamedatas.playerorder.forEach(function (player_id) {
-            var player = gamedatas.players[Number(player_id)];
-            var table = new PlayerTable(_this, player);
-            _this.playersTables.push(table);
-        });
-    };
-    CreatureConforts.prototype.toggleButtonEnable = function (id, enabled, color) {
-        if (color === void 0) { color = 'blue'; }
-        if (enabled) {
-            this.enableButton(id, color);
-        }
-        else {
-            this.disableButton(id);
-        }
-    };
-    CreatureConforts.prototype.disableButton = function (id) {
-        var el = document.getElementById(id);
-        if (el) {
-            el.classList.remove('bgabutton_blue');
-            el.classList.remove('bgabutton_red');
-            el.classList.add('bgabutton_disabled');
-        }
-    };
-    CreatureConforts.prototype.enableButton = function (id, color) {
-        if (color === void 0) { color = 'blue'; }
-        var el = document.getElementById(id);
-        if (el) {
-            el.classList.add("bgabutton_".concat(color));
-            el.classList.remove('bgabutton_disabled');
-        }
-    };
-    CreatureConforts.prototype.getPlayerId = function () {
-        return Number(this.player_id);
-    };
-    CreatureConforts.prototype.getPlayerPanel = function (playerId) {
-        return this.playersPanels.find(function (playerPanel) { return playerPanel.player_id === playerId; });
-    };
-    CreatureConforts.prototype.getPlayerTable = function (playerId) {
-        return this.playersTables.find(function (playerTable) { return playerTable.player_id === playerId; });
-    };
-    CreatureConforts.prototype.getCurrentPlayerTable = function () {
-        return this.getPlayerTable(this.getPlayerId());
-    };
-    CreatureConforts.prototype.getPlayerResources = function (filter) {
-        if (filter === void 0) { filter = []; }
-        var counters = this.getPlayerPanel(this.getPlayerId()).counters;
-        var hand = this.getCurrentPlayerTable().hand;
-        var resources = ICONS.map(function (icon) {
-            return {
-                resource: icon,
-                initialValue: icon == 'card' ? hand.getCards().length : counters[icon].getValue(),
-            };
-        });
-        if (filter.length > 0 && TravelerHelper.isHairyTailedHoleActive()) {
-            filter = __spreadArray(__spreadArray([], filter, true), ['coin', 'stone'], false);
-        }
-        return filter.length == 0 ? resources : resources.filter(function (r) { return filter.indexOf(r.resource) >= 0; });
-    };
-    CreatureConforts.prototype.restoreGameState = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        debug('restoreGameState');
-                        return [4, this.stateManager.restoreGameState()];
-                    case 1:
-                        _a.sent();
-                        this.clearSelection();
-                        this.restoreServerGameState();
-                        return [2];
-                }
-            });
-        });
-    };
-    CreatureConforts.prototype.clearSelection = function () {
-        debug('clearSelection');
-    };
-    CreatureConforts.prototype.takeAction = function (action, data, onSuccess, onComplete) {
-        data = data || {};
-        data.lock = true;
-        onSuccess = onSuccess !== null && onSuccess !== void 0 ? onSuccess : function (result) { };
-        onComplete = onComplete !== null && onComplete !== void 0 ? onComplete : function (is_error) { };
-        this.ajaxcall("/creatureconforts/creatureconforts/".concat(action, ".html"), data, this, onSuccess, onComplete);
-    };
-    CreatureConforts.prototype.setupNotifications = function () {
-        debug('notifications subscriptions setup');
-        this.notifManager.setup();
-    };
-    CreatureConforts.prototype.format_string_recursive = function (log, args) {
-        try {
-            if (log.indexOf('::coin::') >= 0) {
-                log = log.replace('::coin::', "<div class=\"resource-icon\" data-type=\"coin\"></div>");
-            }
-            if (log && args && !args.processed) {
-                args.processed = true;
-                if (args.card_name !== undefined) {
-                    args.card_name = '<b>' + _(args.card_name) + '</b>';
-                }
-                if (args.rolledDice !== undefined) {
-                    args.rolledDice = this.formatTextDice(args.player_id, args.rolledDice);
-                }
-                if (args.resources_from !== undefined) {
-                    args.resources_from = this.formatResourceIcons(args.resources_from);
-                }
-                if (args.resources_to !== undefined) {
-                    args.resources_to = this.formatResourceIcons(args.resources_to);
-                }
-                if (args.nbr_cards !== undefined) {
-                    args.nbr_cards = "<div class=\"cc-icon i-cards\"><span>".concat(args.nbr_cards, "</span></div>");
-                }
-                if (args.die_from !== undefined) {
-                    var value = args.die_from;
-                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
-                    args.die_from = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
-                }
-                if (args.die_to !== undefined) {
-                    var value = args.die_to;
-                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
-                    args.die_to = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
-                }
-                if (args.token !== undefined) {
-                    args.token = "<div class=\"".concat(args.token, "\"></div>");
-                }
-            }
-        }
-        catch (e) {
-            console.error(log, args, 'Exception thrown', e.stack);
-        }
-        try {
-            return this.inherited(arguments);
-        }
-        catch (_a) {
-            debugger;
-        }
-    };
-    CreatureConforts.prototype.formatTextDice = function (player_id, rawText) {
-        if (!rawText)
-            return '';
-        var dice = rawText.split(',');
-        var values = [];
-        var color = dice.length == 2 ? this.getPlayerTable(player_id).player_color : 'white';
-        dice.forEach(function (value) {
-            values.push("<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>"));
-        });
-        return values.join('');
-    };
-    CreatureConforts.prototype.formatResourceIcons = function (group) {
-        var values = [];
-        Object.keys(group).forEach(function (icon) {
-            for (var index = 0; index < group[icon]; index++) {
-                values.push("<div class=\"resource-icon\" data-type=\"".concat(icon, "\"></div>"));
-            }
-        });
-        return values.join('');
-    };
-    return CreatureConforts;
-}());
+    return DiscardStock;
+}(Deck));
 var Hand = (function (_super) {
     __extends(Hand, _super);
     function Hand(manager, element, current_player, hand_counter) {
@@ -3133,6 +2861,177 @@ var LocationStock = (function (_super) {
     };
     return LocationStock;
 }(SlotStock));
+var ConfortManager = (function (_super) {
+    __extends(ConfortManager, _super);
+    function ConfortManager(game, prefix) {
+        if (prefix === void 0) { prefix = 'conforts'; }
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "".concat(prefix, "-").concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('confort');
+                div.dataset.cardId = '' + card.id;
+            },
+            setupFrontDiv: function (card, div) {
+                div.dataset.type = card.type;
+                div.dataset.pos = card.type_arg;
+                div.classList.toggle('background_1', Number(card.type) <= 12);
+                div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
+                if (card.type_arg) {
+                }
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayConfort(card);
+                    });
+                }
+            },
+            isCardVisible: function (card) { return 'type' in card; },
+            cardWidth: 110,
+            cardHeight: 154,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    ConfortManager.prototype.markAsSelected = function (card_id) {
+        if (card_id > 0) {
+            this.getCardElement({ id: card_id.toString() }).classList.add('bga-cards_selected-card');
+        }
+    };
+    ConfortManager.prototype.getCardType = function (card) {
+        return this.game.gamedatas.confort_types[card.type];
+    };
+    return ConfortManager;
+}(CardManager));
+var ImprovementManager = (function (_super) {
+    __extends(ImprovementManager, _super);
+    function ImprovementManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "improvement-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('improvement');
+                div.dataset.cardId = '' + card.id;
+            },
+            setupFrontDiv: function (card, div) {
+                div.dataset.type = card.type;
+                div.dataset.pos = card.type_arg;
+                if (card.type_arg) {
+                }
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayImprovement(card);
+                    });
+                }
+                if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage"))) {
+                    div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
+                    _this.cottages[card.id] = new LineStock(_this.game.cottageManager, document.getElementById("".concat(_this.getId(card), "-slot-cottage")));
+                }
+                var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
+                if (cottage) {
+                    _this.cottages[card.id].addCard(cottage);
+                }
+                if (card.location == 'glade') {
+                    var slot = document.querySelector("#dice-locations [data-slot-id=\"".concat(card.location_arg, "\"]"));
+                    if (slot) {
+                        slot.classList.add('slot-dice');
+                        _this.game.placeOnObjectPos(slot, "".concat(_this.getId(card), "-slot-cottage"), -54, -3);
+                    }
+                }
+            },
+            isCardVisible: function (card) { return 'type' in card; },
+            cardWidth: 125,
+            cardHeight: 125,
+        }) || this;
+        _this.game = game;
+        _this.cottages = {};
+        return _this;
+    }
+    ImprovementManager.prototype.addCottage = function (card, cottage) {
+        return this.cottages[card.id].addCard(cottage);
+    };
+    ImprovementManager.prototype.getCardType = function (card) {
+        return this.game.gamedatas.improvement_types[card.type];
+    };
+    return ImprovementManager;
+}(CardManager));
+var TravelerManager = (function (_super) {
+    __extends(TravelerManager, _super);
+    function TravelerManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "traveler-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('traveler');
+                div.dataset.cardId = '' + card.id;
+            },
+            setupFrontDiv: function (card, div) {
+                div.dataset.type = card.type;
+                div.dataset.pos = card.type_arg;
+                if (card.type_arg) {
+                }
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayTraveler(card);
+                    });
+                }
+            },
+            isCardVisible: function (card) { return 'type' in card; },
+            cardWidth: 212,
+            cardHeight: 142,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    return TravelerManager;
+}(CardManager));
+var ValleyManager = (function (_super) {
+    __extends(ValleyManager, _super);
+    function ValleyManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "valley-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('valley');
+                div.dataset.cardId = '' + card.id;
+                div.classList.add(card.location);
+            },
+            setupFrontDiv: function (card, div) {
+                div.dataset.type = card.type;
+                div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
+                if (card.type_arg) {
+                }
+                if ('type' in card) {
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                        return _this.game.modal.displayValley(card);
+                    });
+                }
+            },
+            isCardVisible: function () { return true; },
+            cardWidth: 250,
+            cardHeight: 150,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    return ValleyManager;
+}(CardManager));
+var CottageManager = (function (_super) {
+    __extends(CottageManager, _super);
+    function CottageManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "cottage-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('cottage');
+                div.dataset.cardId = '' + card.id;
+            },
+            setupFrontDiv: function (card, div) {
+                div.dataset.type = getColorName(card.type);
+            },
+            isCardVisible: function () { return true; },
+            cardWidth: 60,
+            cardHeight: 60,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    return CottageManager;
+}(CardManager));
 var ColoredDie6 = (function (_super) {
     __extends(ColoredDie6, _super);
     function ColoredDie6(color, size) {
@@ -3209,6 +3108,31 @@ var VillageDiceStock = (function (_super) {
     };
     return VillageDiceStock;
 }(LineDiceStock));
+var WorkerManager = (function (_super) {
+    __extends(WorkerManager, _super);
+    function WorkerManager(game) {
+        var _this = _super.call(this, game, {
+            getId: function (card) { return "worker-".concat(card.id); },
+            setupDiv: function (card, div) {
+                div.classList.add('worker');
+                div.classList.add();
+                div.dataset.cardId = '' + card.id;
+                var color = getColorName(card.type);
+                div.dataset.type = color;
+            },
+            setupFrontDiv: function (card, div) {
+                var color = getColorName(card.type);
+                div.dataset.type = color;
+            },
+            isCardVisible: function () { return true; },
+            cardWidth: 50,
+            cardHeight: 50,
+        }) || this;
+        _this.game = game;
+        return _this;
+    }
+    return WorkerManager;
+}(CardManager));
 var DiceHelper = (function () {
     function DiceHelper(game) {
         this.game = game;
@@ -3375,430 +3299,50 @@ var DialRequirement = (function () {
     };
     return DialRequirement;
 }());
-var Modal = (function () {
-    function Modal(game) {
-        var _this = this;
-        this.game = game;
-        var display = document.getElementById('modal-display');
-        if (display) {
-            display.parentElement.removeChild(display);
-        }
-        var html = "<div id=\"modal-display\">\n         <div id=\"modal-display-card\"></div>\n        </div>";
-        var elBody = document.getElementById('ebd-body');
-        elBody.insertAdjacentHTML('beforeend', html);
-        var handleKeyboard = function (ev) {
-            if (elBody.classList.contains('modal_open')) {
-                if (ev.key == 'Escape') {
-                    _this.close();
+var ResourceRequirement = (function () {
+    function ResourceRequirement() {
+    }
+    ResourceRequirement.isRequirementMet = function (game, cost) {
+        var _a, _b;
+        var counters = game.getPlayerPanel(game.getPlayerId()).counters;
+        for (var _i = 0, _c = Object.keys(cost); _i < _c.length; _i++) {
+            var type = _c[_i];
+            if (type !== '*' && counters[type].getValue() < cost[type]) {
+                if (['stone', 'coin'].includes(type) && TravelerHelper.isHairyTailedHoleActive()) {
+                    var sumResource = counters['stone'].getValue() + counters['coin'].getValue();
+                    var sumCost = ((_a = cost === null || cost === void 0 ? void 0 : cost.stone) !== null && _a !== void 0 ? _a : 0) + ((_b = cost === null || cost === void 0 ? void 0 : cost.coin) !== null && _b !== void 0 ? _b : 0);
+                    if (sumResource < sumCost) {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
                 }
             }
-        };
-        document.getElementById('modal-display').addEventListener('click', function () { return _this.close(); });
-        elBody.addEventListener('keydown', handleKeyboard);
-    }
-    Modal.prototype.displayImprovement = function (card) {
-        var front = this.addDivCard('improvement');
-        front.dataset.type = card.type;
-        this.adjustPosition();
+        }
+        if ('*' in cost) {
+            var total_goods = GOODS.map(function (type) { return counters[type].getValue(); }).reduce(function (prev, curr) { return prev + curr; }, 0);
+            var total_cost = Object.keys(cost)
+                .filter(function (type) { return ICONS.indexOf(type) >= 0; })
+                .map(function (type) { return cost[type]; })
+                .reduce(function (prev, curr) { return prev + curr; }, 0);
+            return total_goods >= total_cost;
+        }
+        return true;
     };
-    Modal.prototype.displayTraveler = function (card) {
-        var front = this.addDivCard('traveler');
-        front.dataset.type = card.type;
-        this.adjustPosition();
-    };
-    Modal.prototype.displayValley = function (card) {
-        var front = this.addDivCard('valley');
-        front.parentElement.parentElement.classList.add(card.location);
-        front.dataset.type = card.type;
-        front.dataset.image_pos = '' + this.game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
-        this.adjustPosition();
-    };
-    Modal.prototype.displayConfort = function (card) {
-        var front = this.addDivCard('confort');
-        front.dataset.type = card.type;
-        front.dataset.pos = card.type_arg;
-        front.classList.toggle('background_1', Number(card.type) <= 12);
-        front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
-        this.adjustPosition();
-    };
-    Modal.prototype.addDivCard = function (type) {
-        var _a;
-        var html = "<div id=\"modal-card\" class=\"card ".concat(type, "\">\n         <div class=\"card-sides\">\n            <div id=\"modal-card-front\" class=\"card-side front\"></div>\n         </div>\n      </div>");
-        (_a = document.getElementById('modal-card')) === null || _a === void 0 ? void 0 : _a.remove();
-        document.getElementById('modal-display-card').insertAdjacentHTML('beforeend', html);
-        return document.getElementById('modal-card-front');
-    };
-    Modal.prototype.adjustPosition = function () {
-        var scrollY = window.scrollY;
-        var body = document.getElementById('ebd-body');
-        body.classList.toggle('modal_open', true);
-        body.style.top = "-".concat(scrollY, "px");
-        var display = document.getElementById('modal-display');
-        display.style.top = "".concat(scrollY, "px");
-    };
-    Modal.prototype.close = function () {
-        var body = document.getElementById('ebd-body');
-        body.classList.toggle('modal_open', false);
-        body.style.top = "";
-        var display = document.getElementById('modal-display');
-        var scrollY = Number(display.style.top.replace('px', ''));
-        display.style.top = "".concat(scrollY, "px");
-        window.scroll(0, scrollY);
-    };
-    return Modal;
+    return ResourceRequirement;
 }());
-var NotificationManager = (function () {
-    function NotificationManager(game) {
-        this.game = game;
+var TravelerHelper = (function () {
+    function TravelerHelper() {
     }
-    NotificationManager.prototype.setup = function () {
-        var _this = this;
-        var notifs = [
-            ['onDiscardStartHand'],
-            ['onNewTraveler', 1000],
-            ['onFamilyDice', undefined],
-            ['onRevealPlacement', 1000],
-            ['onVillageDice', 1200],
-            ['onMoveDiceToHill', 1000],
-            ['onMoveDiceToLocation', 1000],
-            ['onReturnWorkerToPlayerBoard'],
-            ['onGetResourcesFromLocation', 1200],
-            ['onCraftConfort', 1000],
-            ['onReturnDice', 1200],
-            ['onNewSeason', 1000],
-            ['onRiverDialRotate', 500],
-            ['onRefillOwlNest', undefined],
-            ['onRefillLadder', undefined],
-            ['onDiscardTraveler', 100],
-            ['onNewFirstPlayer', 100],
-            ['onTravelerExchangeResources', 100],
-            ['onMarketExchangeResources', 100],
-            ['onDrawConfort', undefined],
-            ['onAddConfortToHand', undefined],
-            ['onBuildImprovement', undefined],
-            ['onModifyDieWithLessonLearned', 100],
-            ['onNewRavenLocationTaken', 100],
-            ['onAddAlmanac', 100],
-            ['onAddWheelbarrow', 100],
-        ];
-        this.setupNotifications(notifs);
-        ['message', 'onDrawConfort'].forEach(function (eventName) {
-            _this.game.notifqueue.setIgnoreNotificationCheck(eventName, function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
-        });
+    TravelerHelper.isHairyTailedHoleActive = function () {
+        return this.isTravelerActive(5);
     };
-    NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, this.game.tableCenter.confort_discard.addCard(args.card)];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
+    TravelerHelper.isTravelerActive = function (type) {
+        var game = window.gameui;
+        return Number(game.tableCenter.traveler_deck.getTopCard().type) === type;
     };
-    NotificationManager.prototype.notif_onNewTraveler = function (args) {
-        var card = args.card, count = args.count;
-        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
-        if (count < 15) {
-            deck.removeCard(deck.getTopCard());
-        }
-        deck.setCardNumber(count + 1, { id: card.id });
-        setTimeout(function () { return deck.flipCard(card); }, 500);
-    };
-    NotificationManager.prototype.notif_onFamilyDice = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            var stack;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        stack = this.game.getPlayerTable(Number(args.player_id)).dice;
-                        stack.removeAll();
-                        return [4, stack.addDice(args.dice)];
-                    case 1:
-                        _a.sent();
-                        stack.rollDice(args.dice, { duration: [500, 900], effect: 'rollIn' });
-                        return [4, new Promise(function (resolve) { return setTimeout(function () { return resolve(true); }, 1000); })];
-                    case 2:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onRevealPlacement = function (_a) {
-        var workers = _a.workers;
-        this.game.tableCenter.worker_locations.addCards(workers.board);
-    };
-    NotificationManager.prototype.notif_onVillageDice = function (_a) {
-        var dice = _a.dice;
-        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
-        var stack = this.game.tableCenter.hill;
-        stack.addDice(white_dice);
-        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
-    };
-    NotificationManager.prototype.notif_onMoveDiceToHill = function (_a) {
-        var dice = _a.dice;
-        this.game.tableCenter.hill.addDice(dice);
-    };
-    NotificationManager.prototype.notif_onMoveDiceToLocation = function (_a) {
-        var dice = _a.dice;
-        this.game.tableCenter.dice_locations.addDice(dice);
-    };
-    NotificationManager.prototype.notif_onReturnWorkerToPlayerBoard = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4, this.game.getPlayerTable(args.player_id).workers.addCard(args.worker)];
-                    case 1:
-                        _a.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onGetResourcesFromLocation = function (_a) {
-        var location_id = _a.location_id, resources = _a.resources, player_id = _a.player_id;
-        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"".concat(location_id, "\"]"))[0];
-        this.animationMoveResource(player_id, resources, fromElement);
-    };
-    NotificationManager.prototype.notif_onCraftConfort = function (_a) {
-        var player_id = _a.player_id, card = _a.card, cost = _a.cost;
-        var counters = this.game.getPlayerPanel(player_id).counters;
-        var conforts = this.game.getPlayerTable(player_id).conforts;
-        conforts.addCard(card);
-        Object.keys(cost).forEach(function (type) {
-            var value = -cost[type];
-            counters[type].incValue(value);
-        });
-    };
-    NotificationManager.prototype.notif_onReturnDice = function (_a) {
-        var player_id = _a.player_id, dice = _a.dice;
-        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
-        var player_dice = dice.filter(function (die) { return Number(die.owner_id) == player_id; });
-        this.game.tableCenter.hill.addDice(white_dice);
-        this.game.getPlayerTable(player_id).dice.addDice(player_dice);
-    };
-    NotificationManager.prototype.notif_onNewSeason = function (args) {
-        var _a = args.info, forest = _a.forest, meadow = _a.meadow;
-        this.game.tableCenter.valley.removeAll();
-        this.game.tableCenter.valley.addCards([forest.topCard, meadow.topCard]);
-    };
-    NotificationManager.prototype.notif_onRiverDialRotate = function (_a) {
-        var value = _a.value;
-        this.game.tableCenter.setRiverDial(value);
-    };
-    NotificationManager.prototype.notif_onRefillOwlNest = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            var owl_nest, discard, _a, deck, market, _i, _b, card;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        owl_nest = args.owl_nest, discard = args.discard;
-                        if (!discard) return [3, 2];
-                        return [4, this.game.tableCenter.confort_discard.addCard(discard)];
-                    case 1:
-                        _c.sent();
-                        _c.label = 2;
-                    case 2:
-                        _a = this.game.tableCenter, deck = _a.confort_deck, market = _a.confort_market;
-                        _i = 0, _b = owl_nest.slice(0, 3);
-                        _c.label = 3;
-                    case 3:
-                        if (!(_i < _b.length)) return [3, 6];
-                        card = _b[_i];
-                        return [4, market.swapCards([__assign({}, card)])];
-                    case 4:
-                        _c.sent();
-                        _c.label = 5;
-                    case 5:
-                        _i++;
-                        return [3, 3];
-                    case 6: return [4, market.addCard(owl_nest[3], { fromStock: deck })];
-                    case 7:
-                        _c.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onRefillLadder = function (args) {
-        return __awaiter(this, void 0, void 0, function () {
-            var ladder, discard, _a, deck, market, _i, _b, card;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        ladder = args.ladder, discard = args.discard;
-                        if (!discard) return [3, 2];
-                        return [4, this.game.tableCenter.improvement_discard.addCard(discard)];
-                    case 1:
-                        _c.sent();
-                        _c.label = 2;
-                    case 2:
-                        _a = this.game.tableCenter, deck = _a.improvement_deck, market = _a.improvement_market;
-                        market.setSelectionMode('none');
-                        _i = 0, _b = ladder.slice(0, 5);
-                        _c.label = 3;
-                    case 3:
-                        if (!(_i < _b.length)) return [3, 6];
-                        card = _b[_i];
-                        return [4, market.swapCards([__assign({}, card)])];
-                    case 4:
-                        _c.sent();
-                        _c.label = 5;
-                    case 5:
-                        _i++;
-                        return [3, 3];
-                    case 6: return [4, market.addCard(ladder[5], { fromStock: deck })];
-                    case 7:
-                        _c.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onDiscardTraveler = function (args) {
-        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
-        deck.setCardNumber(deck.getCardNumber() - 1, __assign({}, hidden_traveler));
-    };
-    NotificationManager.prototype.notif_onNewFirstPlayer = function (_a) {
-        var player_id = _a.player_id;
-        this.game.getPlayerPanel(player_id).addFirstTokenPlayer();
-    };
-    NotificationManager.prototype.notif_onTravelerExchangeResources = function (_a) {
-        var from = _a.from, to = _a.to, player_id = _a.player_id;
-        var counters = this.game.getPlayerPanel(player_id).counters;
-        Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
-        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"9\"]")[0];
-        this.animationMoveResource(player_id, to, fromElement);
-    };
-    NotificationManager.prototype.notif_onMarketExchangeResources = function (_a) {
-        var from = _a.from, to = _a.to, player_id = _a.player_id;
-        var counters = this.game.getPlayerPanel(player_id).counters;
-        Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
-        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"8\"]")[0];
-        this.animationMoveResource(player_id, to, fromElement);
-    };
-    NotificationManager.prototype.notif_onDrawConfort = function (_a) {
-        var player_id = _a.player_id, card = _a.card;
-        return __awaiter(this, void 0, void 0, function () {
-            var _b, deck, hidden_confort;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        _b = this.game.tableCenter, deck = _b.confort_deck, hidden_confort = _b.hidden_confort;
-                        deck.setCardNumber(deck.getCardNumber(), __assign({}, card));
-                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
-                    case 1:
-                        _c.sent();
-                        deck.setCardNumber(deck.getCardNumber(), __assign({}, hidden_confort));
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onAddConfortToHand = function (_a) {
-        var player_id = _a.player_id, card = _a.card;
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (player_id !== this.game.getPlayerId()) {
-                            card = { id: card.id };
-                        }
-                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
-                    case 1:
-                        _b.sent();
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onBuildImprovement = function (_a) {
-        var player_id = _a.player_id, card = _a.card, cost = _a.cost, cottage = _a.cottage;
-        return __awaiter(this, void 0, void 0, function () {
-            var counters;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!(card.location == 'board')) return [3, 2];
-                        return [4, this.game.getPlayerTable(player_id).improvements.addCard(card)];
-                    case 1:
-                        _b.sent();
-                        return [3, 4];
-                    case 2: return [4, this.game.tableCenter.glade.addCard(card)];
-                    case 3:
-                        _b.sent();
-                        _b.label = 4;
-                    case 4: return [4, this.game.improvementManager.addCottage(card, cottage)];
-                    case 5:
-                        _b.sent();
-                        counters = this.game.getPlayerPanel(player_id).counters;
-                        Object.keys(cost).forEach(function (type) {
-                            var value = -cost[type];
-                            counters[type].incValue(value);
-                        });
-                        return [2];
-                }
-            });
-        });
-    };
-    NotificationManager.prototype.notif_onModifyDieWithLessonLearned = function (_a) {
-        var player_id = _a.player_id, nbr_lesson = _a.nbr_lesson;
-        this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
-    };
-    NotificationManager.prototype.notif_onNewRavenLocationTaken = function (_a) {
-        var location_id = _a.location_id;
-        this.game.tableCenter.addRavenToken(location_id);
-    };
-    NotificationManager.prototype.notif_onAddAlmanac = function (_a) {
-        var player_id = _a.player_id;
-        this.game.getPlayerPanel(player_id).addAlmanac();
-    };
-    NotificationManager.prototype.notif_onAddWheelbarrow = function (_a) {
-        var player_id = _a.player_id;
-        this.game.getPlayerPanel(player_id).addWheelbarrow();
-    };
-    NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
-        var _this = this;
-        var index = 0;
-        Object.keys(resources).forEach(function (type) {
-            var count = resources[type];
-            for (var i = 0; i < count; i++) {
-                _this.game.slideTemporaryObject("<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"), 'overall-content', fromElement, "player-panel-".concat(player_id, "-icons-").concat(type, "-counter"), 1000, 250 * index++);
-            }
-            _this.game.getPlayerPanel(player_id).counters[type].incValue(count);
-        });
-    };
-    NotificationManager.prototype.setupNotifications = function (notifs) {
-        var _this = this;
-        notifs.forEach(function (_a) {
-            var eventName = _a[0], duration = _a[1];
-            dojo.subscribe(eventName, _this, function (notifDetails) {
-                debug("notif_".concat(eventName), notifDetails.args);
-                var promise = _this["notif_".concat(eventName)](notifDetails.args);
-                promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.game.notifqueue.onSynchronousNotificationEnd(); });
-            });
-            _this.game.notifqueue.setSynchronous(eventName, duration);
-        });
-        if (isDebug) {
-            notifs.forEach(function (notif) {
-                if (!_this["notif_".concat(notif[0])]) {
-                    console.warn("notif_".concat(notif[0], " function is not declared, but listed in setupNotifications"));
-                }
-            });
-            Object.getOwnPropertyNames(CreatureConforts.prototype)
-                .filter(function (item) { return item.startsWith('notif_'); })
-                .map(function (item) { return item.slice(6); })
-                .forEach(function (item) {
-                if (!notifs.some(function (notif) { return notif[0] == item; })) {
-                    console.warn("notif_".concat(item, " function is declared, but not listed in setupNotifications"));
-                }
-            });
-        }
-    };
-    return NotificationManager;
+    return TravelerHelper;
 }());
 var StateManager = (function () {
     function StateManager(game) {
@@ -4830,201 +4374,729 @@ var CommonRavenState = (function () {
     };
     return CommonRavenState;
 }());
-var ConfortManager = (function (_super) {
-    __extends(ConfortManager, _super);
-    function ConfortManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "conforts-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('confort');
-                div.dataset.cardId = '' + card.id;
-            },
-            setupFrontDiv: function (card, div) {
-                div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
-                div.classList.toggle('background_1', Number(card.type) <= 12);
-                div.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
-                if (card.type_arg) {
-                }
-                if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayConfort(card);
-                    });
-                }
-            },
-            isCardVisible: function (card) { return 'type' in card; },
-            cardWidth: 110,
-            cardHeight: 154,
-        }) || this;
-        _this.game = game;
-        return _this;
+var StripedSkunkStates = (function () {
+    function StripedSkunkStates(game) {
+        this.game = game;
     }
-    ConfortManager.prototype.markAsSelected = function (card_id) {
-        if (card_id > 0) {
-            this.getCardElement({ id: card_id.toString() }).classList.add('bga-cards_selected-card');
+    StripedSkunkStates.prototype.onEnteringState = function (args) { };
+    StripedSkunkStates.prototype.onLeavingState = function () { };
+    StripedSkunkStates.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var market = _this.game.tableCenter.confort_market;
+            if (market.getSelection().length == 0)
+                return;
+            _this.game.takeAction('confirmGrayWolf', {
+                slot_id: market.getSelection()[0].location_arg,
+            });
+        };
+        this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+    };
+    return StripedSkunkStates;
+}());
+var ToolbarContainer = (function () {
+    function ToolbarContainer(name) {
+        this.container_name = "resource_manager_".concat(name);
+    }
+    ToolbarContainer.prototype.addContainer = function () {
+        this.removeContainer();
+        document
+            .getElementById("maintitlebar_content")
+            .insertAdjacentHTML('beforeend', "<div id=\"".concat(this.container_name, "\"></div>"));
+        return this.getContainer();
+    };
+    ToolbarContainer.prototype.removeContainer = function () {
+        var element = document.getElementById(this.container_name);
+        if (element)
+            element.remove();
+    };
+    ToolbarContainer.prototype.getContainer = function () {
+        return document.getElementById(this.container_name);
+    };
+    return ToolbarContainer;
+}());
+var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
+var debug = isDebug ? console.log.bind(window.console) : function () { };
+var arrayRange = function (start, end) { return Array.from(Array(end - start + 1).keys()).map(function (x) { return x + start; }); };
+var LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
+var CreatureConforts = (function () {
+    function CreatureConforts() {
+        this.TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
+    }
+    CreatureConforts.prototype.setup = function (gamedatas) {
+        var _this = this;
+        debug(gamedatas);
+        this.animationManager = new AnimationManager(this, { duration: 0 });
+        this.confortManager = new ConfortManager(this);
+        this.confortManagerDiscard = new ConfortManager(this, 'conforts-discard');
+        this.improvementManager = new ImprovementManager(this);
+        this.travelerManager = new TravelerManager(this);
+        this.valleyManager = new ValleyManager(this);
+        this.diceManager = new MyDiceManager(this);
+        this.cottageManager = new CottageManager(this);
+        this.workerManager = new WorkerManager(this);
+        this.notifManager = new NotificationManager(this);
+        this.stateManager = new StateManager(this);
+        this.tableCenter = new TableCenter(this);
+        this.modal = new Modal(this);
+        ['red', 'yellow', 'green', 'gray', 'purple'].forEach(function (color) {
+            _this.dontPreloadImage("board_".concat(color, ".jpg"));
+            _this.dontPreloadImage("dice_".concat(color, ".jpg"));
+        });
+        this.dontPreloadImage('improvements.jpg');
+        this.createPlayerPanels(gamedatas);
+        this.createPlayerTables(gamedatas);
+        this.setupNotifications();
+    };
+    CreatureConforts.prototype.onEnteringState = function (stateName, args) {
+        this.stateManager.onEnteringState(stateName, args);
+    };
+    CreatureConforts.prototype.onLeavingState = function (stateName) {
+        this.stateManager.onLeavingState(stateName);
+    };
+    CreatureConforts.prototype.onUpdateActionButtons = function (stateName, args) {
+        this.stateManager.onUpdateActionButtons(stateName, args);
+    };
+    CreatureConforts.prototype.addActionButtonDisabled = function (id, label, action) {
+        this.addActionButton(id, label, action);
+        this.disableButton(id);
+    };
+    CreatureConforts.prototype.addActionButtonClientCancel = function () {
+        var _this = this;
+        var handleCancel = function (evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            _this.restoreGameState();
+        };
+        this.addActionButtonGray('btnCancelAction', _('Cancel'), handleCancel);
+    };
+    CreatureConforts.prototype.addActionButtonPass = function () {
+        var _this = this;
+        var handlePass = function () {
+            _this.takeAction('pass');
+        };
+        this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
+    };
+    CreatureConforts.prototype.addActionButtonUndo = function () {
+        var _this = this;
+        var handleUndo = function () {
+            _this.takeAction('undo');
+        };
+        this.addActionButtonGray('btn_undo', _('Undo'), handleUndo);
+    };
+    CreatureConforts.prototype.addActionButtonGray = function (id, label, action) {
+        this.addActionButton(id, label, action, null, null, 'gray');
+    };
+    CreatureConforts.prototype.addActionButtonRed = function (id, label, action) {
+        this.addActionButton(id, label, action, null, null, 'red');
+    };
+    CreatureConforts.prototype.addActionButtonReset = function (parent, handle) {
+        this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
+    };
+    CreatureConforts.prototype.addModalToCard = function (div, helpMarkerId, callback) {
+        if (!document.getElementById(helpMarkerId)) {
+            div.insertAdjacentHTML('afterbegin', "<div id=\"".concat(helpMarkerId, "\" class=\"help-marker\">\n                     <i class=\"fa fa-search\" style=\"color: white\"></i>\n                  </div>"));
+            document.getElementById(helpMarkerId).addEventListener('click', function (evt) {
+                evt.stopPropagation();
+                evt.preventDefault();
+                callback();
+            });
         }
     };
-    ConfortManager.prototype.getCardType = function (card) {
-        return this.game.gamedatas.confort_types[card.type];
+    CreatureConforts.prototype.createPlayerPanels = function (gamedatas) {
+        var _this = this;
+        this.playersPanels = [];
+        gamedatas.playerorder.forEach(function (player_id) {
+            var player = gamedatas.players[Number(player_id)];
+            var panel = new PlayerPanel(_this, player);
+            _this.playersPanels.push(panel);
+        });
     };
-    return ConfortManager;
-}(CardManager));
-var ImprovementManager = (function (_super) {
-    __extends(ImprovementManager, _super);
-    function ImprovementManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "improvement-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('improvement');
-                div.dataset.cardId = '' + card.id;
-            },
-            setupFrontDiv: function (card, div) {
-                div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
-                if (card.type_arg) {
-                }
-                if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayImprovement(card);
-                    });
-                }
-                if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage"))) {
-                    div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
-                    _this.cottages[card.id] = new LineStock(_this.game.cottageManager, document.getElementById("".concat(_this.getId(card), "-slot-cottage")));
-                }
-                var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
-                if (cottage) {
-                    _this.cottages[card.id].addCard(cottage);
-                }
-                if (card.location == 'glade') {
-                    var slot = document.querySelector("#dice-locations [data-slot-id=\"".concat(card.location_arg, "\"]"));
-                    if (slot) {
-                        slot.classList.add('slot-dice');
-                        _this.game.placeOnObjectPos(slot, "".concat(_this.getId(card), "-slot-cottage"), -54, -3);
-                    }
-                }
-            },
-            isCardVisible: function (card) { return 'type' in card; },
-            cardWidth: 125,
-            cardHeight: 125,
-        }) || this;
-        _this.game = game;
-        _this.cottages = {};
-        return _this;
-    }
-    ImprovementManager.prototype.addCottage = function (card, cottage) {
-        return this.cottages[card.id].addCard(cottage);
+    CreatureConforts.prototype.createPlayerTables = function (gamedatas) {
+        var _this = this;
+        this.playersTables = [];
+        gamedatas.playerorder.forEach(function (player_id) {
+            var player = gamedatas.players[Number(player_id)];
+            var table = new PlayerTable(_this, player);
+            _this.playersTables.push(table);
+        });
     };
-    ImprovementManager.prototype.getCardType = function (card) {
-        return this.game.gamedatas.improvement_types[card.type];
+    CreatureConforts.prototype.toggleButtonEnable = function (id, enabled, color) {
+        if (color === void 0) { color = 'blue'; }
+        if (enabled) {
+            this.enableButton(id, color);
+        }
+        else {
+            this.disableButton(id);
+        }
     };
-    return ImprovementManager;
-}(CardManager));
-var TravelerManager = (function (_super) {
-    __extends(TravelerManager, _super);
-    function TravelerManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "traveler-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('traveler');
-                div.dataset.cardId = '' + card.id;
-            },
-            setupFrontDiv: function (card, div) {
-                div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
-                if (card.type_arg) {
+    CreatureConforts.prototype.disableButton = function (id) {
+        var el = document.getElementById(id);
+        if (el) {
+            el.classList.remove('bgabutton_blue');
+            el.classList.remove('bgabutton_red');
+            el.classList.add('bgabutton_disabled');
+        }
+    };
+    CreatureConforts.prototype.enableButton = function (id, color) {
+        if (color === void 0) { color = 'blue'; }
+        var el = document.getElementById(id);
+        if (el) {
+            el.classList.add("bgabutton_".concat(color));
+            el.classList.remove('bgabutton_disabled');
+        }
+    };
+    CreatureConforts.prototype.getPlayerId = function () {
+        return Number(this.player_id);
+    };
+    CreatureConforts.prototype.getPlayerPanel = function (playerId) {
+        return this.playersPanels.find(function (playerPanel) { return playerPanel.player_id === playerId; });
+    };
+    CreatureConforts.prototype.getPlayerTable = function (playerId) {
+        return this.playersTables.find(function (playerTable) { return playerTable.player_id === playerId; });
+    };
+    CreatureConforts.prototype.getCurrentPlayerTable = function () {
+        return this.getPlayerTable(this.getPlayerId());
+    };
+    CreatureConforts.prototype.getPlayerResources = function (filter) {
+        if (filter === void 0) { filter = []; }
+        var counters = this.getPlayerPanel(this.getPlayerId()).counters;
+        var hand = this.getCurrentPlayerTable().hand;
+        var resources = ICONS.map(function (icon) {
+            return {
+                resource: icon,
+                initialValue: icon == 'card' ? hand.getCards().length : counters[icon].getValue(),
+            };
+        });
+        if (filter.length > 0 && TravelerHelper.isHairyTailedHoleActive()) {
+            filter = __spreadArray(__spreadArray([], filter, true), ['coin', 'stone'], false);
+        }
+        return filter.length == 0 ? resources : resources.filter(function (r) { return filter.indexOf(r.resource) >= 0; });
+    };
+    CreatureConforts.prototype.restoreGameState = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        debug('restoreGameState');
+                        return [4, this.stateManager.restoreGameState()];
+                    case 1:
+                        _a.sent();
+                        this.clearSelection();
+                        this.restoreServerGameState();
+                        return [2];
                 }
-                if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayTraveler(card);
-                    });
+            });
+        });
+    };
+    CreatureConforts.prototype.clearSelection = function () {
+        debug('clearSelection');
+    };
+    CreatureConforts.prototype.takeAction = function (action, data, onSuccess, onComplete) {
+        data = data || {};
+        data.lock = true;
+        onSuccess = onSuccess !== null && onSuccess !== void 0 ? onSuccess : function (result) { };
+        onComplete = onComplete !== null && onComplete !== void 0 ? onComplete : function (is_error) { };
+        this.ajaxcall("/creatureconforts/creatureconforts/".concat(action, ".html"), data, this, onSuccess, onComplete);
+    };
+    CreatureConforts.prototype.setupNotifications = function () {
+        debug('notifications subscriptions setup');
+        this.notifManager.setup();
+    };
+    CreatureConforts.prototype.format_string_recursive = function (log, args) {
+        try {
+            if (log.indexOf('::coin::') >= 0) {
+                log = log.replace('::coin::', "<div class=\"resource-icon\" data-type=\"coin\"></div>");
+            }
+            if (log && args && !args.processed) {
+                args.processed = true;
+                if (args.card_name !== undefined) {
+                    args.card_name = '<b>' + _(args.card_name) + '</b>';
                 }
-            },
-            isCardVisible: function (card) { return 'type' in card; },
-            cardWidth: 212,
-            cardHeight: 142,
-        }) || this;
-        _this.game = game;
-        return _this;
-    }
-    return TravelerManager;
-}(CardManager));
-var ValleyManager = (function (_super) {
-    __extends(ValleyManager, _super);
-    function ValleyManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "valley-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('valley');
-                div.dataset.cardId = '' + card.id;
-                div.classList.add(card.location);
-            },
-            setupFrontDiv: function (card, div) {
-                div.dataset.type = card.type;
-                div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
-                if (card.type_arg) {
+                if (args.rolledDice !== undefined) {
+                    args.rolledDice = this.formatTextDice(args.player_id, args.rolledDice);
                 }
-                if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayValley(card);
-                    });
+                if (args.resources_from !== undefined) {
+                    args.resources_from = this.formatResourceIcons(args.resources_from);
                 }
-            },
-            isCardVisible: function () { return true; },
-            cardWidth: 250,
-            cardHeight: 150,
-        }) || this;
-        _this.game = game;
-        return _this;
+                if (args.resources_to !== undefined) {
+                    args.resources_to = this.formatResourceIcons(args.resources_to);
+                }
+                if (args.nbr_cards !== undefined) {
+                    args.nbr_cards = "<div class=\"cc-icon i-cards\"><span>".concat(args.nbr_cards, "</span></div>");
+                }
+                if (args.die_from !== undefined) {
+                    var value = args.die_from;
+                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+                    args.die_from = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
+                }
+                if (args.die_to !== undefined) {
+                    var value = args.die_to;
+                    var color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
+                    args.die_to = "<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>");
+                }
+                if (args.token !== undefined) {
+                    args.token = "<div class=\"".concat(args.token, "\"></div>");
+                }
+            }
+        }
+        catch (e) {
+            console.error(log, args, 'Exception thrown', e.stack);
+        }
+        try {
+            return this.inherited(arguments);
+        }
+        catch (_a) {
+            debugger;
+        }
+    };
+    CreatureConforts.prototype.formatTextDice = function (player_id, rawText) {
+        if (!rawText)
+            return '';
+        var dice = rawText.split(',');
+        var values = [];
+        var color = dice.length == 2 ? this.getPlayerTable(player_id).player_color : 'white';
+        dice.forEach(function (value) {
+            values.push("<div class=\"dice-icon-log bga-dice_die colored-die bga-dice_die-face\" data-face=\"".concat(value, "\" data-color=\"").concat(color, "\"><span>").concat(value, "<span></div>"));
+        });
+        return values.join('');
+    };
+    CreatureConforts.prototype.formatResourceIcons = function (group) {
+        var values = [];
+        Object.keys(group).forEach(function (icon) {
+            for (var index = 0; index < group[icon]; index++) {
+                values.push("<div class=\"resource-icon\" data-type=\"".concat(icon, "\"></div>"));
+            }
+        });
+        return values.join('');
+    };
+    return CreatureConforts;
+}());
+var Modal = (function () {
+    function Modal(game) {
+        var _this = this;
+        this.game = game;
+        var display = document.getElementById('modal-display');
+        if (display) {
+            display.parentElement.removeChild(display);
+        }
+        var html = "<div id=\"modal-display\">\n         <div id=\"modal-display-card\"></div>\n        </div>";
+        var elBody = document.getElementById('ebd-body');
+        elBody.insertAdjacentHTML('beforeend', html);
+        var handleKeyboard = function (ev) {
+            if (elBody.classList.contains('modal_open')) {
+                if (ev.key == 'Escape') {
+                    _this.close();
+                }
+            }
+        };
+        document.getElementById('modal-display').addEventListener('click', function () { return _this.close(); });
+        elBody.addEventListener('keydown', handleKeyboard);
     }
-    return ValleyManager;
-}(CardManager));
-var CottageManager = (function (_super) {
-    __extends(CottageManager, _super);
-    function CottageManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "cottage-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('cottage');
-                div.dataset.cardId = '' + card.id;
-            },
-            setupFrontDiv: function (card, div) {
-                div.dataset.type = getColorName(card.type);
-            },
-            isCardVisible: function () { return true; },
-            cardWidth: 60,
-            cardHeight: 60,
-        }) || this;
-        _this.game = game;
-        return _this;
+    Modal.prototype.displayImprovement = function (card) {
+        var front = this.addDivCard('improvement');
+        front.dataset.type = card.type;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayTraveler = function (card) {
+        var front = this.addDivCard('traveler');
+        front.dataset.type = card.type;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayValley = function (card) {
+        var front = this.addDivCard('valley');
+        front.parentElement.parentElement.classList.add(card.location);
+        front.dataset.type = card.type;
+        front.dataset.image_pos = '' + this.game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
+        this.adjustPosition();
+    };
+    Modal.prototype.displayConfort = function (card) {
+        var front = this.addDivCard('confort');
+        front.dataset.type = card.type;
+        front.dataset.pos = card.type_arg;
+        front.classList.toggle('background_1', Number(card.type) <= 12);
+        front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
+        this.adjustPosition();
+    };
+    Modal.prototype.addDivCard = function (type) {
+        var _a;
+        var html = "<div id=\"modal-card\" class=\"card ".concat(type, "\">\n         <div class=\"card-sides\">\n            <div id=\"modal-card-front\" class=\"card-side front\"></div>\n         </div>\n      </div>");
+        (_a = document.getElementById('modal-card')) === null || _a === void 0 ? void 0 : _a.remove();
+        document.getElementById('modal-display-card').insertAdjacentHTML('beforeend', html);
+        return document.getElementById('modal-card-front');
+    };
+    Modal.prototype.adjustPosition = function () {
+        var scrollY = window.scrollY;
+        var body = document.getElementById('ebd-body');
+        body.classList.toggle('modal_open', true);
+        body.style.top = "-".concat(scrollY, "px");
+        var display = document.getElementById('modal-display');
+        display.style.top = "".concat(scrollY, "px");
+    };
+    Modal.prototype.close = function () {
+        var body = document.getElementById('ebd-body');
+        body.classList.toggle('modal_open', false);
+        body.style.top = "";
+        var display = document.getElementById('modal-display');
+        var scrollY = Number(display.style.top.replace('px', ''));
+        display.style.top = "".concat(scrollY, "px");
+        window.scroll(0, scrollY);
+    };
+    return Modal;
+}());
+var NotificationManager = (function () {
+    function NotificationManager(game) {
+        this.game = game;
     }
-    return CottageManager;
-}(CardManager));
-var WorkerManager = (function (_super) {
-    __extends(WorkerManager, _super);
-    function WorkerManager(game) {
-        var _this = _super.call(this, game, {
-            getId: function (card) { return "worker-".concat(card.id); },
-            setupDiv: function (card, div) {
-                div.classList.add('worker');
-                div.classList.add();
-                div.dataset.cardId = '' + card.id;
-                var color = getColorName(card.type);
-                div.dataset.type = color;
-            },
-            setupFrontDiv: function (card, div) {
-                var color = getColorName(card.type);
-                div.dataset.type = color;
-            },
-            isCardVisible: function () { return true; },
-            cardWidth: 50,
-            cardHeight: 50,
-        }) || this;
-        _this.game = game;
-        return _this;
-    }
-    return WorkerManager;
-}(CardManager));
+    NotificationManager.prototype.setup = function () {
+        var _this = this;
+        var notifs = [
+            ['onDiscardStartHand'],
+            ['onNewTraveler', 1000],
+            ['onFamilyDice', undefined],
+            ['onRevealPlacement', 1000],
+            ['onVillageDice', 1200],
+            ['onMoveDiceToHill', 1000],
+            ['onMoveDiceToLocation', 1000],
+            ['onReturnWorkerToPlayerBoard'],
+            ['onGetResourcesFromLocation', 1200],
+            ['onCraftConfort', 1000],
+            ['onReturnDice', 1200],
+            ['onNewSeason', 1000],
+            ['onRiverDialRotate', 500],
+            ['onRefillOwlNest', undefined],
+            ['onRefillLadder', undefined],
+            ['onDiscardTraveler', 100],
+            ['onNewFirstPlayer', 100],
+            ['onTravelerExchangeResources', 100],
+            ['onMarketExchangeResources', 100],
+            ['onDrawConfort', undefined],
+            ['onAddConfortToHand', undefined],
+            ['onBuildImprovement', undefined],
+            ['onModifyDieWithLessonLearned', 100],
+            ['onNewRavenLocationTaken', 100],
+            ['onAddAlmanac', 100],
+            ['onAddWheelbarrow', 100],
+        ];
+        this.setupNotifications(notifs);
+        ['message', 'onDrawConfort'].forEach(function (eventName) {
+            _this.game.notifqueue.setIgnoreNotificationCheck(eventName, function (notif) { return notif.args.excluded_player_id && notif.args.excluded_player_id == _this.game.player_id; });
+        });
+    };
+    NotificationManager.prototype.notif_onDiscardStartHand = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.game.tableCenter.confort_discard.addCard(args.card)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onNewTraveler = function (args) {
+        var card = args.card, count = args.count;
+        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
+        if (count < 15) {
+            deck.removeCard(deck.getTopCard());
+        }
+        deck.setCardNumber(count + 1, { id: card.id });
+        setTimeout(function () { return deck.flipCard(card); }, 500);
+    };
+    NotificationManager.prototype.notif_onFamilyDice = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            var stack;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        stack = this.game.getPlayerTable(Number(args.player_id)).dice;
+                        stack.removeAll();
+                        return [4, stack.addDice(args.dice)];
+                    case 1:
+                        _a.sent();
+                        stack.rollDice(args.dice, { duration: [500, 900], effect: 'rollIn' });
+                        return [4, new Promise(function (resolve) { return setTimeout(function () { return resolve(true); }, 1000); })];
+                    case 2:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onRevealPlacement = function (_a) {
+        var workers = _a.workers;
+        this.game.tableCenter.worker_locations.addCards(workers.board);
+    };
+    NotificationManager.prototype.notif_onVillageDice = function (_a) {
+        var dice = _a.dice;
+        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
+        var stack = this.game.tableCenter.hill;
+        stack.addDice(white_dice);
+        stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
+    };
+    NotificationManager.prototype.notif_onMoveDiceToHill = function (_a) {
+        var dice = _a.dice;
+        this.game.tableCenter.hill.addDice(dice);
+    };
+    NotificationManager.prototype.notif_onMoveDiceToLocation = function (_a) {
+        var dice = _a.dice;
+        this.game.tableCenter.dice_locations.addDice(dice);
+    };
+    NotificationManager.prototype.notif_onReturnWorkerToPlayerBoard = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this.game.getPlayerTable(args.player_id).workers.addCard(args.worker)];
+                    case 1:
+                        _a.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onGetResourcesFromLocation = function (_a) {
+        var location_id = _a.location_id, resources = _a.resources, player_id = _a.player_id;
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"".concat(location_id, "\"]"))[0];
+        this.animationMoveResource(player_id, resources, fromElement);
+    };
+    NotificationManager.prototype.notif_onCraftConfort = function (_a) {
+        var player_id = _a.player_id, card = _a.card, cost = _a.cost;
+        var counters = this.game.getPlayerPanel(player_id).counters;
+        var conforts = this.game.getPlayerTable(player_id).conforts;
+        conforts.addCard(card);
+        Object.keys(cost).forEach(function (type) {
+            var value = -cost[type];
+            counters[type].incValue(value);
+        });
+    };
+    NotificationManager.prototype.notif_onReturnDice = function (_a) {
+        var player_id = _a.player_id, dice = _a.dice;
+        var white_dice = dice.filter(function (die) { return die.type == 'white'; });
+        var player_dice = dice.filter(function (die) { return Number(die.owner_id) == player_id; });
+        this.game.tableCenter.hill.addDice(white_dice);
+        this.game.getPlayerTable(player_id).dice.addDice(player_dice);
+    };
+    NotificationManager.prototype.notif_onNewSeason = function (args) {
+        var _a = args.info, forest = _a.forest, meadow = _a.meadow;
+        this.game.tableCenter.valley.removeAll();
+        this.game.tableCenter.valley.addCards([forest.topCard, meadow.topCard]);
+    };
+    NotificationManager.prototype.notif_onRiverDialRotate = function (_a) {
+        var value = _a.value;
+        this.game.tableCenter.setRiverDial(value);
+    };
+    NotificationManager.prototype.notif_onRefillOwlNest = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            var owl_nest, discard, _a, deck, market, _i, _b, card;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        owl_nest = args.owl_nest, discard = args.discard;
+                        if (!discard) return [3, 2];
+                        return [4, this.game.tableCenter.confort_discard.addCard(discard)];
+                    case 1:
+                        _c.sent();
+                        _c.label = 2;
+                    case 2:
+                        _a = this.game.tableCenter, deck = _a.confort_deck, market = _a.confort_market;
+                        _i = 0, _b = owl_nest.slice(0, 3);
+                        _c.label = 3;
+                    case 3:
+                        if (!(_i < _b.length)) return [3, 6];
+                        card = _b[_i];
+                        return [4, market.swapCards([__assign({}, card)])];
+                    case 4:
+                        _c.sent();
+                        _c.label = 5;
+                    case 5:
+                        _i++;
+                        return [3, 3];
+                    case 6: return [4, market.addCard(owl_nest[3], { fromStock: deck })];
+                    case 7:
+                        _c.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onRefillLadder = function (args) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ladder, discard, _a, deck, market, _i, _b, card;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        ladder = args.ladder, discard = args.discard;
+                        if (!discard) return [3, 2];
+                        return [4, this.game.tableCenter.improvement_discard.addCard(discard)];
+                    case 1:
+                        _c.sent();
+                        _c.label = 2;
+                    case 2:
+                        _a = this.game.tableCenter, deck = _a.improvement_deck, market = _a.improvement_market;
+                        market.setSelectionMode('none');
+                        _i = 0, _b = ladder.slice(0, 5);
+                        _c.label = 3;
+                    case 3:
+                        if (!(_i < _b.length)) return [3, 6];
+                        card = _b[_i];
+                        return [4, market.swapCards([__assign({}, card)])];
+                    case 4:
+                        _c.sent();
+                        _c.label = 5;
+                    case 5:
+                        _i++;
+                        return [3, 3];
+                    case 6: return [4, market.addCard(ladder[5], { fromStock: deck })];
+                    case 7:
+                        _c.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onDiscardTraveler = function (args) {
+        var _a = this.game.tableCenter, deck = _a.traveler_deck, hidden_traveler = _a.hidden_traveler;
+        deck.setCardNumber(deck.getCardNumber() - 1, __assign({}, hidden_traveler));
+    };
+    NotificationManager.prototype.notif_onNewFirstPlayer = function (_a) {
+        var player_id = _a.player_id;
+        this.game.getPlayerPanel(player_id).addFirstTokenPlayer();
+    };
+    NotificationManager.prototype.notif_onTravelerExchangeResources = function (_a) {
+        var from = _a.from, to = _a.to, player_id = _a.player_id;
+        var counters = this.game.getPlayerPanel(player_id).counters;
+        Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"9\"]")[0];
+        this.animationMoveResource(player_id, to, fromElement);
+    };
+    NotificationManager.prototype.notif_onMarketExchangeResources = function (_a) {
+        var from = _a.from, to = _a.to, player_id = _a.player_id;
+        var counters = this.game.getPlayerPanel(player_id).counters;
+        Object.keys(from).forEach(function (type) { return counters[type].incValue(-from[type]); });
+        var fromElement = document.querySelectorAll("#worker-locations *[data-slot-id=\"8\"]")[0];
+        this.animationMoveResource(player_id, to, fromElement);
+    };
+    NotificationManager.prototype.notif_onDrawConfort = function (_a) {
+        var player_id = _a.player_id, card = _a.card;
+        return __awaiter(this, void 0, void 0, function () {
+            var _b, deck, hidden_confort;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        _b = this.game.tableCenter, deck = _b.confort_deck, hidden_confort = _b.hidden_confort;
+                        deck.setCardNumber(deck.getCardNumber(), __assign({}, card));
+                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
+                    case 1:
+                        _c.sent();
+                        deck.setCardNumber(deck.getCardNumber(), __assign({}, hidden_confort));
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onAddConfortToHand = function (_a) {
+        var player_id = _a.player_id, card = _a.card;
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (player_id !== this.game.getPlayerId()) {
+                            card = { id: card.id };
+                        }
+                        return [4, this.game.getPlayerTable(player_id).hand.addCard(card)];
+                    case 1:
+                        _b.sent();
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onBuildImprovement = function (_a) {
+        var player_id = _a.player_id, card = _a.card, cost = _a.cost, cottage = _a.cottage;
+        return __awaiter(this, void 0, void 0, function () {
+            var counters;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        if (!(card.location == 'board')) return [3, 2];
+                        return [4, this.game.getPlayerTable(player_id).improvements.addCard(card)];
+                    case 1:
+                        _b.sent();
+                        return [3, 4];
+                    case 2: return [4, this.game.tableCenter.glade.addCard(card)];
+                    case 3:
+                        _b.sent();
+                        _b.label = 4;
+                    case 4: return [4, this.game.improvementManager.addCottage(card, cottage)];
+                    case 5:
+                        _b.sent();
+                        counters = this.game.getPlayerPanel(player_id).counters;
+                        Object.keys(cost).forEach(function (type) {
+                            var value = -cost[type];
+                            counters[type].incValue(value);
+                        });
+                        return [2];
+                }
+            });
+        });
+    };
+    NotificationManager.prototype.notif_onModifyDieWithLessonLearned = function (_a) {
+        var player_id = _a.player_id, nbr_lesson = _a.nbr_lesson;
+        this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
+    };
+    NotificationManager.prototype.notif_onNewRavenLocationTaken = function (_a) {
+        var location_id = _a.location_id;
+        this.game.tableCenter.addRavenToken(location_id);
+    };
+    NotificationManager.prototype.notif_onAddAlmanac = function (_a) {
+        var player_id = _a.player_id;
+        this.game.getPlayerPanel(player_id).addAlmanac();
+    };
+    NotificationManager.prototype.notif_onAddWheelbarrow = function (_a) {
+        var player_id = _a.player_id;
+        this.game.getPlayerPanel(player_id).addWheelbarrow();
+    };
+    NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
+        var _this = this;
+        var index = 0;
+        Object.keys(resources).forEach(function (type) {
+            var count = resources[type];
+            for (var i = 0; i < count; i++) {
+                _this.game.slideTemporaryObject("<div class=\"resource-icon\" data-type=\"".concat(type, "\"></div>"), 'overall-content', fromElement, "player-panel-".concat(player_id, "-icons-").concat(type, "-counter"), 1000, 250 * index++);
+            }
+            _this.game.getPlayerPanel(player_id).counters[type].incValue(count);
+        });
+    };
+    NotificationManager.prototype.setupNotifications = function (notifs) {
+        var _this = this;
+        notifs.forEach(function (_a) {
+            var eventName = _a[0], duration = _a[1];
+            dojo.subscribe(eventName, _this, function (notifDetails) {
+                debug("notif_".concat(eventName), notifDetails.args);
+                var promise = _this["notif_".concat(eventName)](notifDetails.args);
+                promise === null || promise === void 0 ? void 0 : promise.then(function () { return _this.game.notifqueue.onSynchronousNotificationEnd(); });
+            });
+            _this.game.notifqueue.setSynchronous(eventName, duration);
+        });
+        if (isDebug) {
+            notifs.forEach(function (notif) {
+                if (!_this["notif_".concat(notif[0])]) {
+                    console.warn("notif_".concat(notif[0], " function is not declared, but listed in setupNotifications"));
+                }
+            });
+            Object.getOwnPropertyNames(CreatureConforts.prototype)
+                .filter(function (item) { return item.startsWith('notif_'); })
+                .map(function (item) { return item.slice(6); })
+                .forEach(function (item) {
+                if (!notifs.some(function (notif) { return notif[0] == item; })) {
+                    console.warn("notif_".concat(item, " function is declared, but not listed in setupNotifications"));
+                }
+            });
+        }
+    };
+    return NotificationManager;
+}());
 var PlayerPanel = (function () {
     function PlayerPanel(game, player) {
         var _this = this;
@@ -5175,11 +5247,12 @@ var TableCenter = (function () {
             topCard: this.hidden_confort,
             counter: {},
         });
-        this.confort_discard = new Deck(game.confortManager, document.getElementById("discard-conforts"), {
-            cardNumber: Number(discard.count),
-            topCard: discard.topCard,
-            counter: {},
+        this.confort_discard_line = new LineStock(game.confortManagerDiscard, document.getElementById("discard-conforts-line"), {
+            gap: '2px',
+            center: false,
         });
+        this.confort_discard = new DiscardStock(game.confortManager, document.getElementById("discard-conforts"), this.confort_discard_line);
+        this.confort_discard.addCards(discard);
         this.confort_market.addCards(market);
     };
     TableCenter.prototype.setupDiceLocations = function (game) {
@@ -5255,18 +5328,6 @@ var TableCenter = (function () {
         this.worker_locations.addCards(game.gamedatas.workers.board);
     };
     return TableCenter;
-}());
-var TravelerHelper = (function () {
-    function TravelerHelper() {
-    }
-    TravelerHelper.isHairyTailedHoleActive = function () {
-        return this.isTravelerActive(5);
-    };
-    TravelerHelper.isTravelerActive = function (type) {
-        var game = window.gameui;
-        return Number(game.tableCenter.traveler_deck.getTopCard().type) === type;
-    };
-    return TravelerHelper;
 }());
 var colors = {
     dcac28: 'yellow',

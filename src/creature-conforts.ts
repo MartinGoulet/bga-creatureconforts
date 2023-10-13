@@ -39,6 +39,7 @@ class CreatureConforts
    private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
    public confortManager: ConfortManager;
+   public confortManagerDiscard: ConfortManager;
    public improvementManager: ImprovementManager;
    public travelerManager: TravelerManager;
    public valleyManager: ValleyManager;
@@ -80,6 +81,7 @@ class CreatureConforts
       this.animationManager = new AnimationManager(this, { duration: 0 });
 
       this.confortManager = new ConfortManager(this);
+      this.confortManagerDiscard = new ConfortManager(this, 'conforts-discard');
       this.improvementManager = new ImprovementManager(this);
       this.travelerManager = new TravelerManager(this);
       this.valleyManager = new ValleyManager(this);

@@ -4,7 +4,8 @@ class TableCenter {
    public hidden_improvement: ImprovementCard = { id: '1002' } as ImprovementCard;
 
    public confort_market: SlotStock<ConfortCard>;
-   public confort_discard: Deck<ConfortCard>;
+   public confort_discard: DiscardStock<ConfortCard>;
+   public confort_discard_line: LineStock<ConfortCard>;
    public confort_deck: Deck<ConfortCard>;
 
    public improvement_market: SlotStock<ImprovementCard>;
@@ -79,16 +80,22 @@ class TableCenter {
          },
       );
 
-      this.confort_discard = new Deck<ConfortCard>(
-         game.confortManager,
-         document.getElementById(`discard-conforts`),
+      this.confort_discard_line = new LineStock<ConfortCard>(
+         game.confortManagerDiscard,
+         document.getElementById(`discard-conforts-line`),
          {
-            cardNumber: Number(discard.count),
-            topCard: discard.topCard,
-            counter: {},
+            gap: '2px',
+            center: false,
          },
       );
 
+      this.confort_discard = new DiscardStock<ConfortCard>(
+         game.confortManager,
+         document.getElementById(`discard-conforts`),
+         this.confort_discard_line,
+      );
+
+      this.confort_discard.addCards(discard);
       this.confort_market.addCards(market);
    }
 
