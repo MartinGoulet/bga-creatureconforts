@@ -19,12 +19,20 @@ class WorkshopHelper {
         $player_id = Players::getPlayerId();
         $card = Improvements::getFromLadder($position);
         $card_type = Improvements::getCardType($card);
+        $cost = $card_type['cost'];
 
-        if (!Players::hasEnoughResource(Players::getPlayerId(), $card_type['cost'])) {
+        if (TravelerHelper::isActivePileatedWoodpecker() && array_key_exists(WOOD, $cost)) {
+            $cost[WOOD] -= 1;
+            if ($cost[WOOD] === 0) {
+                unset($cost[WOOD]);
+            }
+        }
+
+        if (!Players::hasEnoughResource(Players::getPlayerId(), $cost)) {
             throw new BgaUserException("You dont have those resources");
         }
 
-        Players::removeResource($player_id, $card_type['cost']);
+        Players::removeResource($player_id, $cost);
 
         if ($card_type['glade'] == true) {
             Improvements::addToGlade($card, $player_id);
@@ -32,7 +40,7 @@ class WorkshopHelper {
             Improvements::addToPlayerBoard($card, $player_id);
         }
         $cottage = Cottages::addToImprovement($card['id'], $player_id);
-        Notifications::buildImprovement($player_id, Improvements::get($card['id']), $card_type['cost'], $cottage);
+        Notifications::buildImprovement($player_id, Improvements::get($card['id']), $cost, $cottage);
 
 
         switch ($card['type']) {

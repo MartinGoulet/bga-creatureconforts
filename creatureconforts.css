@@ -752,74 +752,82 @@ body > .bga-dice_die {
 #table-center-wrapper #board #decks #discard-conforts .card:nth-child(1) {
   z-index: 1;
 }
-#table-center-wrapper #reserved-zones .cc-zone {
+#table-center-wrapper .cc-zone {
   width: 80px;
   height: 40px;
   position: absolute;
   display: flex;
   justify-content: center;
+  gap: 3px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="1"] {
+#table-center-wrapper [data-zone-id="1"] {
   top: 175px;
   left: 55px;
   width: 130px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="2"] {
+#table-center-wrapper [data-zone-id="2"] {
   top: 175px;
   left: 211px;
   width: 130px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="3"] {
+#table-center-wrapper [data-zone-id="3"] {
   top: 175px;
   left: 397px;
   width: 130px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="4"] {
+#table-center-wrapper [data-zone-id="4"] {
   top: 175px;
   left: 553px;
   width: 130px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="5"] {
+#table-center-wrapper [data-zone-id="5"] {
   top: 270px;
   left: 664px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="6"] {
+#table-center-wrapper [data-zone-id="6"] {
   top: 410px;
   left: 640px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="7"] {
+#table-center-wrapper [data-zone-id="7"] {
   top: 356px;
   left: 392px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="8"] {
+#table-center-wrapper [data-zone-id="8"] {
   top: 429px;
   left: 456px;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="9"] {
+#table-center-wrapper [data-zone-id="9"] {
   top: 540px;
   left: 354px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="10"] {
+#table-center-wrapper [data-zone-id="10"] {
   top: 815px;
   left: 157px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="11"] {
+#table-center-wrapper [data-zone-id="11"] {
   top: 752px;
   left: 365px;
   justify-content: flex-start;
 }
-#table-center-wrapper #reserved-zones [data-zone-id="12"] {
+#table-center-wrapper [data-zone-id="12"] {
   top: 752px;
   left: 530px;
   justify-content: flex-start;
 }
+#table-center-wrapper #american-beaver-zones {
+  display: none;
+}
 #table-center-wrapper .bga-dice_die.bga-dice_die6.colored-die {
   zoom: 0.8;
+}
+
+[data-traveler="8"] #table-center-wrapper #american-beaver-zones {
+  display: block;
 }
 
 .gamestate_placement .slot.selectable {
@@ -861,7 +869,8 @@ body > .bga-dice_die {
   margin-top: 10px;
 }
 
-.discard-conforts-opened #discard-conforts-wrapper, .gamestate_stripedSkunk #discard-conforts-wrapper {
+.discard-conforts-opened #discard-conforts-wrapper,
+.current_player_is_active .gamestate_stripedSkunk #discard-conforts-wrapper {
   display: block;
 }
 
@@ -1985,6 +1994,9 @@ body > .bga-dice_die {
   background-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cg fill="none" stroke="black" stroke-width="2"%3E%3Cpath stroke-linecap="round" d="M16 14H8m8-4H8"%2F%3E%3Ccircle cx="12" cy="12" r="10"%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
 }
 
+.deck.discard[data-empty=true] .eye-icon {
+  display: none;
+}
 .deck.discard .eye-icon {
   cursor: zoom-in;
   position: absolute;

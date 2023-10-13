@@ -1,4 +1,4 @@
-class GrayWolfState implements StateHandler {
+class TravelerGrayWolfState implements StateHandler {
    constructor(private game: CreatureConforts) {}
 
    onEnteringState(args: any): void {

@@ -1,4 +1,4 @@
-class CommonRavenState implements StateHandler {
+class TravelerCommonRavenState implements StateHandler {
    constructor(private game: CreatureConforts) {}
 
    onEnteringState(args: any): void {

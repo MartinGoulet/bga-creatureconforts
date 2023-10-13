@@ -5,9 +5,6 @@ const debug = isDebug ? console.log.bind(window.console) : function () {};
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 
-// const GOODS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain'];
-// const ICONS = ['wood', 'stone', 'fruit', 'mushroom', 'yarn', 'grain', 'lesson', 'story', 'coin'];
-
 interface CreatureConforts
    extends ebg.core.gamegui,
       BgaGame<CreatureConfortsPlayerData, CreatureConfortsGamedatas> {
@@ -123,6 +120,8 @@ class CreatureConforts
       //    // zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1],
       // });
 
+      TravelerHelper.setTravelerToTable();
+
       this.setupNotifications();
    }
 
@@ -167,9 +166,9 @@ class CreatureConforts
       this.addActionButtonGray('btnCancelAction', _('Cancel'), handleCancel);
    }
 
-   public addActionButtonPass() {
+   public addActionButtonPass(notification = false) {
       const handlePass = () => {
-         this.takeAction('pass');
+         this.takeAction('pass', { notification });
       };
       this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
    }
@@ -272,7 +271,6 @@ class CreatureConforts
    public getPlayerResources(filter: IconsType[] = []): IResourceCounterSettings<IconsType>[] {
       const { counters } = this.getPlayerPanel(this.getPlayerId());
       const { hand } = this.getCurrentPlayerTable();
-
       const resources = ICONS.map((icon: IconsType) => {
          return {
             resource: icon,
@@ -280,7 +278,7 @@ class CreatureConforts
          } as IResourceCounterSettings<IconsType>;
       });
 
-      if (filter.length > 0 && TravelerHelper.isHairyTailedHoleActive()) {
+      if (filter.length > 0 && TravelerHelper.isActiveHairyTailedHole()) {
          filter = [...filter, 'coin', 'stone'];
       }
 
@@ -387,11 +385,8 @@ class CreatureConforts
       } catch (e) {
          console.error(log, args, 'Exception thrown', e.stack);
       }
-      try {
-         return this.inherited(arguments);
-      } catch {
-         debugger;
-      }
+
+      return this.inherited(arguments);
    }
 
    formatTextDice(player_id: number, rawText: string) {

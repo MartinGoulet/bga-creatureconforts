@@ -1,4 +1,9 @@
 .deck.discard {
+   &[data-empty="true"] {
+      .eye-icon {
+         display: none;
+      }
+   }
    .eye-icon {
       cursor: zoom-in;
       position: absolute;

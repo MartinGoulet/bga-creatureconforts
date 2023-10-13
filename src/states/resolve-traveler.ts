@@ -19,7 +19,7 @@ class ResolveTravelerState implements StateHandler {
       this.trade = trade;
 
       const getRequirementFrom = (): IconsType[] | IconsType[][] => {
-         if (TravelerHelper.isHairyTailedHoleActive()) {
+         if (TravelerHelper.isActiveHairyTailedHole()) {
             return trade.from.requirement.map((icon) => [icon, 'coin']);
          } else {
             return trade.from.requirement;
@@ -33,14 +33,19 @@ class ResolveTravelerState implements StateHandler {
             this.game.restoreGameState();
          });
       } else {
+         const requirement = getRequirementFrom();
+         const filter_available =
+            TravelerHelper.isActiveAmericanBeaver() || requirement === undefined
+               ? [...GOODS]
+               : (requirement as IconsType[]);
+         const available = this.game.getPlayerResources(filter_available);
+
          this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
             ...trade,
             from: {
                ...trade.from,
-               available: this.game.getPlayerResources(
-                  trade.from.requirement !== undefined ? (trade.from.requirement as IconsType[]) : [...GOODS],
-               ),
-               requirement: getRequirementFrom(),
+               available,
+               requirement,
             },
             to: {
                ...trade.to,

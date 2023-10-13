@@ -233,17 +233,22 @@ trait Actions {
     private function resolveWorkerNextStep(int $location_id) {
         $player_id = $this->getActivePlayerId();
 
-        if(TravelerHelper::isActiveCommonRaven()) {
+        if (TravelerHelper::isActiveCommonRaven()) {
             $raven_location_ids = Globals::getRavenLocationIds();
-            if(in_array($location_id, $raven_location_ids)) {
+            if (in_array($location_id, $raven_location_ids)) {
                 Players::addResources(Players::getPlayerId(), [COIN => 1]);
                 Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [COIN => 1]);
             }
         }
 
-        if(TravelerHelper::isActiveStripedSkunk() && in_array($location_id, [11, 12])) {
+        if (in_array($location_id, [11, 12]) && TravelerHelper::isActiveStripedSkunk()) {
             Game::get()->gamestate->nextState('striped_skunk');
             return;
+        }
+
+        if (in_array($location_id, [1, 2]) && TravelerHelper::isActiveAmericanBeaver()) {
+            Players::addResources(Players::getPlayerId(), [WOOD => 2]);
+            Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [WOOD => 2]);
         }
 
         $workers_not_home = array_filter(Worker::getWorkersFromPlayer($player_id), function ($worker) {
@@ -269,6 +274,13 @@ trait Actions {
 
         $cost = Conforts::getCost($card);
 
+        if (TravelerHelper::isActivePileatedWoodpecker() && array_key_exists(WOOD, $cost)) {
+            $cost[WOOD] -= 1;
+            if ($cost[WOOD] === 0) {
+                unset($cost[WOOD]);
+            }
+        }
+
         if (array_key_exists(ANY_RESOURCE, $cost)) {
             if (sizeof($resources) !== $cost[ANY_RESOURCE]) {
                 throw new BgaUserException("Not the right amount of resources");
@@ -289,18 +301,18 @@ trait Actions {
             $group = ResourcesHelper::groupByType(ResourcesHelper::convertNumberToResource($resources));
             $isOk = true;
             $sumStoneCoin = 0;
-            foreach($cost as $resource => $count) {
-                if(!in_array($resource, [STONE, COIN])) {
+            foreach ($cost as $resource => $count) {
+                if (!in_array($resource, [STONE, COIN])) {
                     $isOk = $isOk && (array_key_exists($resource, $group) && $group[$resource] == $count);
                 } else {
                     $sumStoneCoin += $count;
                 }
             }
-            if(!$isOk) {
+            if (!$isOk) {
                 throw new BgaUserException("Resources does not match 1");
             }
             $isOk = $isOk && (($group[STONE] ?? 0) + ($group[COIN] ?? 0) === $sumStoneCoin);
-            if(!$isOk) {
+            if (!$isOk) {
                 throw new BgaUserException("Resources does not match");
             }
             $cost = $group;
@@ -351,13 +363,32 @@ trait Actions {
 
     function confirmCommonRaven(int $location_id) {
         $raven_location_ids = Globals::getRavenLocationIds() ?? [];
-        if(in_array($location_id, $raven_location_ids)) {
+        if (in_array($location_id, $raven_location_ids)) {
             throw new BgaUserException("The location was already taken");
         }
         $raven_location_ids[] = $location_id;
         Globals::setRavenLocationIds($raven_location_ids);
         Notifications::newRavenLocationTaken($location_id);
         Game::get()->gamestate->nextState();
+    }
+
+    function confirmStripedSkunk(int $card_id) {
+        $discard = Conforts::getDiscard();
+        $card_ids = array_column($discard, 'id');
+        if (!in_array($card_id, $card_ids)) {
+            throw new BgaUserException("The card is not in the discard pile");
+        }
+
+        $card = Conforts::addToHand(['id' => $card_id], Players::getPlayerId());
+        Notifications::addConfortToHand(Players::getPlayerId(), $card);
+        Game::get()->gamestate->nextState("next");
+    }
+
+    function pass(bool $notification) {
+        if ($notification) {
+            Notifications::pass(Players::getPlayerId());
+        }
+        Game::get()->gamestate->nextState('pass');
     }
 
     function undo() {

@@ -87,6 +87,10 @@ class TravelerHelper {
         }
     }
 
+    static function isActivePileatedWoodpecker() {
+        return self::isTravelerActive(3);
+    }
+
     static function isActiveGrayWolf() {
         return self::isTravelerActive(4);
     }
@@ -101,6 +105,10 @@ class TravelerHelper {
 
     static function isActiveStripedSkunk() {
         return self::isTravelerActive(7);
+    }
+
+    static function isActiveAmericanBeaver() {
+        return self::isTravelerActive(8);
     }
 
     static function isActiveBlackBear() {

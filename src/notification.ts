@@ -52,7 +52,10 @@ class NotificationManager {
          deck.removeCard(deck.getTopCard());
       }
       deck.setCardNumber(count + 1, { id: card.id } as TravelerCard);
-      setTimeout(() => deck.flipCard(card), 500);
+      setTimeout(() => {
+         deck.flipCard(card);
+         TravelerHelper.setTravelerToTable();
+      }, 500);
    }
 
    private async notif_onFamilyDice(args: FamilyDiceArgs) {

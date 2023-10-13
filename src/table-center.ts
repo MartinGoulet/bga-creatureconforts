@@ -32,6 +32,7 @@ class TableCenter {
       this.setupGlade(game);
       this.setRiverDial(game.gamedatas.river_dial);
       this.setupReservedZones(game);
+      this.setupAmericanBeaverZones(game);
    }
 
    public addRavenToken(location_id: number) {
@@ -159,6 +160,17 @@ class TableCenter {
       );
 
       this.improvement_market.addCards(market);
+   }
+
+   setupAmericanBeaverZones(game: CreatureConforts) {
+      const icons =
+         ResourceHelper.getElement<GoodsType>('wood') + ResourceHelper.getElement<GoodsType>('wood');
+
+      const html = arrayRange(1, 2)
+         .map((value) => `<div class="cc-zone" data-zone-id="${value}">${icons}</div>`)
+         .join('');
+
+      document.getElementById('american-beaver-zones').innerHTML = html;
    }
 
    private setupReservedZones(game: CreatureConforts) {

@@ -27,13 +27,20 @@ class DiscardStock<T> extends Deck<T> {
    public removeCard(card: T, settings?: RemoveCardSettings): Promise<boolean> {
       const promise = super.removeCard(card, settings);
       this.linestock?.removeCard({ ...card });
+      if (this.linestock?.getCards().length == 0) {
+         this.eyeIcon.classList.toggle('closed', true);
+         this.setClassToTable();
+      }
       return promise;
    }
 
    private onEyeClick() {
       this.eyeIcon.classList.toggle('closed');
-      const opened = !this.eyeIcon.classList.contains('closed');
+      this.setClassToTable();
+   }
 
+   private setClassToTable() {
+      const opened = !this.eyeIcon.classList.contains('closed');
       const classCss = `${this.element.id}-opened`;
       document.getElementById('table').classList.toggle(classCss, opened);
    }

@@ -2761,13 +2761,20 @@ var DiscardStock = (function (_super) {
         return promise;
     };
     DiscardStock.prototype.removeCard = function (card, settings) {
-        var _a;
+        var _a, _b;
         var promise = _super.prototype.removeCard.call(this, card, settings);
         (_a = this.linestock) === null || _a === void 0 ? void 0 : _a.removeCard(__assign({}, card));
+        if (((_b = this.linestock) === null || _b === void 0 ? void 0 : _b.getCards().length) == 0) {
+            this.eyeIcon.classList.toggle('closed', true);
+            this.setClassToTable();
+        }
         return promise;
     };
     DiscardStock.prototype.onEyeClick = function () {
         this.eyeIcon.classList.toggle('closed');
+        this.setClassToTable();
+    };
+    DiscardStock.prototype.setClassToTable = function () {
         var opened = !this.eyeIcon.classList.contains('closed');
         var classCss = "".concat(this.element.id, "-opened");
         document.getElementById('table').classList.toggle(classCss, opened);
@@ -3308,7 +3315,7 @@ var ResourceRequirement = (function () {
         for (var _i = 0, _c = Object.keys(cost); _i < _c.length; _i++) {
             var type = _c[_i];
             if (type !== '*' && counters[type].getValue() < cost[type]) {
-                if (['stone', 'coin'].includes(type) && TravelerHelper.isHairyTailedHoleActive()) {
+                if (['stone', 'coin'].includes(type) && TravelerHelper.isActiveHairyTailedHole()) {
                     var sumResource = counters['stone'].getValue() + counters['coin'].getValue();
                     var sumCost = ((_a = cost === null || cost === void 0 ? void 0 : cost.stone) !== null && _a !== void 0 ? _a : 0) + ((_b = cost === null || cost === void 0 ? void 0 : cost.coin) !== null && _b !== void 0 ? _b : 0);
                     if (sumResource < sumCost) {
@@ -3335,8 +3342,19 @@ var ResourceRequirement = (function () {
 var TravelerHelper = (function () {
     function TravelerHelper() {
     }
-    TravelerHelper.isHairyTailedHoleActive = function () {
+    TravelerHelper.setTravelerToTable = function () {
+        var game = window.gameui;
+        var traveler = game.tableCenter.traveler_deck.getTopCard().type;
+        document.getElementById('table').dataset.traveler = traveler;
+    };
+    TravelerHelper.isActivePileatedWoodpecker = function () {
+        return this.isTravelerActive(3);
+    };
+    TravelerHelper.isActiveHairyTailedHole = function () {
         return this.isTravelerActive(5);
+    };
+    TravelerHelper.isActiveAmericanBeaver = function () {
+        return this.isTravelerActive(8);
     };
     TravelerHelper.isTravelerActive = function (type) {
         var game = window.gameui;
@@ -3361,8 +3379,9 @@ var StateManager = (function () {
             resolveWorkshop: new ResolveWorkshopState(game),
             playerTurnDiscard: new PlayerTurnDiscardState(game),
             upkeep: new UpkeepState(game),
-            grayWolf: new GrayWolfState(game),
-            commonRaven: new CommonRavenState(game),
+            grayWolf: new TravelerGrayWolfState(game),
+            commonRaven: new TravelerCommonRavenState(game),
+            stripedSkunk: new TravelerStripedSkunkStates(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -3883,7 +3902,7 @@ var PlayerTurnCraftState = (function () {
                     resource_count: 2,
                 });
             }
-            else if (TravelerHelper.isHairyTailedHoleActive()) {
+            else if (TravelerHelper.isActiveHairyTailedHole()) {
                 _this.game.enableButton('btn_reset', 'gray');
                 var requirement = [];
                 var resource_type = [];
@@ -3917,7 +3936,14 @@ var PlayerTurnCraftState = (function () {
                 console.warn('No cost for', card_type);
                 return false;
             }
-            return ResourceRequirement.isRequirementMet(_this.game, card_type.cost);
+            var cost = __assign({}, card_type.cost);
+            if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+                cost['wood'] -= 1;
+                if (cost['wood'] <= 0) {
+                    delete cost['wood'];
+                }
+            }
+            return ResourceRequirement.isRequirementMet(_this.game, cost);
         });
         this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
         hand.setSelectionMode('single');
@@ -3938,7 +3964,14 @@ var PlayerTurnCraftState = (function () {
             if (!card)
                 return;
             var card_type = _this.game.confortManager.getCardType(card);
-            if (!ResourceRequirement.isRequirementMet(_this.game, card_type.cost)) {
+            var cost = __assign({}, card_type.cost);
+            if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+                cost['wood'] -= 1;
+                if (cost['wood'] <= 0) {
+                    delete cost['wood'];
+                }
+            }
+            if (!ResourceRequirement.isRequirementMet(_this.game, cost)) {
                 _this.game.showMessage('Requirement not met', 'error');
             }
             var resources = [];
@@ -4109,7 +4142,7 @@ var ResolveTravelerState = (function () {
         var trade = this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
         this.trade = trade;
         var getRequirementFrom = function () {
-            if (TravelerHelper.isHairyTailedHoleActive()) {
+            if (TravelerHelper.isActiveHairyTailedHole()) {
                 return trade.from.requirement.map(function (icon) { return [icon, 'coin']; });
             }
             else {
@@ -4123,7 +4156,11 @@ var ResolveTravelerState = (function () {
             });
         }
         else {
-            this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), __assign(__assign({}, trade), { from: __assign(__assign({}, trade.from), { available: this.game.getPlayerResources(trade.from.requirement !== undefined ? trade.from.requirement : __spreadArray([], GOODS, true)), requirement: getRequirementFrom() }), to: __assign(__assign({}, trade.to), { available: trade.to.resources !== undefined ? undefined : __spreadArray([], GOODS, true) }) }));
+            var requirement = getRequirementFrom();
+            var filter_available = TravelerHelper.isActiveAmericanBeaver() || requirement === undefined
+                ? __spreadArray([], GOODS, true) : requirement;
+            var available = this.game.getPlayerResources(filter_available);
+            this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), __assign(__assign({}, trade), { from: __assign(__assign({}, trade.from), { available: available, requirement: requirement }), to: __assign(__assign({}, trade.to), { available: trade.to.resources !== undefined ? undefined : __spreadArray([], GOODS, true) }) }));
         }
     };
     ResolveTravelerState.prototype.onLeavingState = function () {
@@ -4182,7 +4219,6 @@ var ResolveTravelerDiscardState = (function () {
         var _this = this;
         var hand = this.game.getCurrentPlayerTable().hand;
         var handleSelectionChange = function (selection) {
-            debugger;
             _this.game.toggleButtonEnable('btn_confirm', selection.length == args.count, 'blue');
         };
         hand.setSelectionMode('multiple');
@@ -4260,8 +4296,14 @@ var ResolveWorkshopState = (function () {
         market.setSelectableCards(market.getCards().filter(function (card) {
             if (Number(card.location_arg) > die.face)
                 return false;
-            var type = _this.game.improvementManager.getCardType(card);
-            return ResourceRequirement.isRequirementMet(_this.game, type.cost);
+            var cost = __assign({}, _this.game.improvementManager.getCardType(card).cost);
+            if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+                cost['wood'] -= 1;
+                if (cost['wood'] <= 0) {
+                    delete cost['wood'];
+                }
+            }
+            return ResourceRequirement.isRequirementMet(_this.game, cost);
         }));
         market.onSelectionChange = function (selection) {
             _this.game.toggleButtonEnable('btn_confirm', selection.length == 1);
@@ -4300,11 +4342,11 @@ var UpkeepState = (function () {
     UpkeepState.prototype.onUpdateActionButtons = function (args) { };
     return UpkeepState;
 }());
-var GrayWolfState = (function () {
-    function GrayWolfState(game) {
+var TravelerGrayWolfState = (function () {
+    function TravelerGrayWolfState(game) {
         this.game = game;
     }
-    GrayWolfState.prototype.onEnteringState = function (args) {
+    TravelerGrayWolfState.prototype.onEnteringState = function (args) {
         var _this = this;
         var market = this.game.tableCenter.confort_market;
         market.setSelectionMode('single');
@@ -4313,12 +4355,12 @@ var GrayWolfState = (function () {
             _this.game.toggleButtonEnable('btn_confirm', selection.length == 1);
         };
     };
-    GrayWolfState.prototype.onLeavingState = function () {
+    TravelerGrayWolfState.prototype.onLeavingState = function () {
         var market = this.game.tableCenter.confort_market;
         market.setSelectionMode('none');
         market.onSelectionChange = null;
     };
-    GrayWolfState.prototype.onUpdateActionButtons = function (args) {
+    TravelerGrayWolfState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
             var market = _this.game.tableCenter.confort_market;
@@ -4330,13 +4372,13 @@ var GrayWolfState = (function () {
         };
         this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
     };
-    return GrayWolfState;
+    return TravelerGrayWolfState;
 }());
-var CommonRavenState = (function () {
-    function CommonRavenState(game) {
+var TravelerCommonRavenState = (function () {
+    function TravelerCommonRavenState(game) {
         this.game = game;
     }
-    CommonRavenState.prototype.onEnteringState = function (args) {
+    TravelerCommonRavenState.prototype.onEnteringState = function (args) {
         var _this = this;
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.OnLocationClick = function (slotId) {
@@ -4354,13 +4396,13 @@ var CommonRavenState = (function () {
         };
         worker_locations.setSelectableLocation(arrayRange(1, 12));
     };
-    CommonRavenState.prototype.onLeavingState = function () {
+    TravelerCommonRavenState.prototype.onLeavingState = function () {
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectableLocation();
         worker_locations.setSelectedLocation();
         worker_locations.OnLocationClick = undefined;
     };
-    CommonRavenState.prototype.onUpdateActionButtons = function (args) {
+    TravelerCommonRavenState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
             var worker_locations = _this.game.tableCenter.worker_locations;
@@ -4372,27 +4414,40 @@ var CommonRavenState = (function () {
         };
         this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
     };
-    return CommonRavenState;
+    return TravelerCommonRavenState;
 }());
-var StripedSkunkStates = (function () {
-    function StripedSkunkStates(game) {
+var TravelerStripedSkunkStates = (function () {
+    function TravelerStripedSkunkStates(game) {
         this.game = game;
     }
-    StripedSkunkStates.prototype.onEnteringState = function (args) { };
-    StripedSkunkStates.prototype.onLeavingState = function () { };
-    StripedSkunkStates.prototype.onUpdateActionButtons = function (args) {
+    TravelerStripedSkunkStates.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var discard = this.game.tableCenter.confort_discard_line;
+        var handleSelectionChanged = function (selection) {
+            _this.game.toggleButtonEnable('btn_confirm', selection.length === 1);
+        };
+        discard.setSelectionMode('single');
+        discard.onSelectionChange = handleSelectionChanged;
+    };
+    TravelerStripedSkunkStates.prototype.onLeavingState = function () {
+        var discard = this.game.tableCenter.confort_discard_line;
+        discard.setSelectionMode('none');
+        discard.onSelectionChange = undefined;
+    };
+    TravelerStripedSkunkStates.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
-            var market = _this.game.tableCenter.confort_market;
-            if (market.getSelection().length == 0)
+            var discard = _this.game.tableCenter.confort_discard_line;
+            if (discard.getSelection().length == 0)
                 return;
-            _this.game.takeAction('confirmGrayWolf', {
-                slot_id: market.getSelection()[0].location_arg,
+            _this.game.takeAction('confirmStripedSkunk', {
+                card_id: discard.getSelection()[0].id,
             });
         };
         this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonPass();
     };
-    return StripedSkunkStates;
+    return TravelerStripedSkunkStates;
 }());
 var ToolbarContainer = (function () {
     function ToolbarContainer(name) {
@@ -4446,6 +4501,7 @@ var CreatureConforts = (function () {
         this.dontPreloadImage('improvements.jpg');
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
+        TravelerHelper.setTravelerToTable();
         this.setupNotifications();
     };
     CreatureConforts.prototype.onEnteringState = function (stateName, args) {
@@ -4470,10 +4526,11 @@ var CreatureConforts = (function () {
         };
         this.addActionButtonGray('btnCancelAction', _('Cancel'), handleCancel);
     };
-    CreatureConforts.prototype.addActionButtonPass = function () {
+    CreatureConforts.prototype.addActionButtonPass = function (notification) {
         var _this = this;
+        if (notification === void 0) { notification = false; }
         var handlePass = function () {
-            _this.takeAction('pass');
+            _this.takeAction('pass', { notification: notification });
         };
         this.addActionButtonRed('btn_pass', _('Pass'), handlePass);
     };
@@ -4568,7 +4625,7 @@ var CreatureConforts = (function () {
                 initialValue: icon == 'card' ? hand.getCards().length : counters[icon].getValue(),
             };
         });
-        if (filter.length > 0 && TravelerHelper.isHairyTailedHoleActive()) {
+        if (filter.length > 0 && TravelerHelper.isActiveHairyTailedHole()) {
             filter = __spreadArray(__spreadArray([], filter, true), ['coin', 'stone'], false);
         }
         return filter.length == 0 ? resources : resources.filter(function (r) { return filter.indexOf(r.resource) >= 0; });
@@ -4643,12 +4700,7 @@ var CreatureConforts = (function () {
         catch (e) {
             console.error(log, args, 'Exception thrown', e.stack);
         }
-        try {
-            return this.inherited(arguments);
-        }
-        catch (_a) {
-            debugger;
-        }
+        return this.inherited(arguments);
     };
     CreatureConforts.prototype.formatTextDice = function (player_id, rawText) {
         if (!rawText)
@@ -4802,7 +4854,10 @@ var NotificationManager = (function () {
             deck.removeCard(deck.getTopCard());
         }
         deck.setCardNumber(count + 1, { id: card.id });
-        setTimeout(function () { return deck.flipCard(card); }, 500);
+        setTimeout(function () {
+            deck.flipCard(card);
+            TravelerHelper.setTravelerToTable();
+        }, 500);
     };
     NotificationManager.prototype.notif_onFamilyDice = function (args) {
         return __awaiter(this, void 0, void 0, function () {
@@ -5215,6 +5270,7 @@ var TableCenter = (function () {
         this.setupGlade(game);
         this.setRiverDial(game.gamedatas.river_dial);
         this.setupReservedZones(game);
+        this.setupAmericanBeaverZones(game);
     }
     TableCenter.prototype.addRavenToken = function (location_id) {
         var zone = document.querySelector("#reserved-zones [data-zone-id=\"".concat(location_id, "\"]"));
@@ -5295,6 +5351,13 @@ var TableCenter = (function () {
             counter: {},
         });
         this.improvement_market.addCards(market);
+    };
+    TableCenter.prototype.setupAmericanBeaverZones = function (game) {
+        var icons = ResourceHelper.getElement('wood') + ResourceHelper.getElement('wood');
+        var html = arrayRange(1, 2)
+            .map(function (value) { return "<div class=\"cc-zone\" data-zone-id=\"".concat(value, "\">").concat(icons, "</div>"); })
+            .join('');
+        document.getElementById('american-beaver-zones').innerHTML = html;
     };
     TableCenter.prototype.setupReservedZones = function (game) {
         var _this = this;

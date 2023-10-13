@@ -32,7 +32,7 @@ class PlayerTurnCraftState implements StateHandler {
                player_resources: this.game.getPlayerResources([...GOODS]),
                resource_count: 2,
             });
-         } else if (TravelerHelper.isHairyTailedHoleActive()) {
+         } else if (TravelerHelper.isActiveHairyTailedHole()) {
             this.game.enableButton('btn_reset', 'gray');
 
             const requirement: IconsType[][] = [];
@@ -69,7 +69,16 @@ class PlayerTurnCraftState implements StateHandler {
             console.warn('No cost for', card_type);
             return false;
          }
-         return ResourceRequirement.isRequirementMet(this.game, card_type.cost);
+
+         let cost = { ...card_type.cost };
+         if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+            cost['wood'] -= 1;
+            if (cost['wood'] <= 0) {
+               delete cost['wood'];
+            }
+         }
+
+         return ResourceRequirement.isRequirementMet(this.game, cost);
       });
 
       this.game.enableButton('btn_pass', selection.length > 0 ? 'red' : 'blue');
@@ -91,7 +100,15 @@ class PlayerTurnCraftState implements StateHandler {
          if (!card) return;
          const card_type = this.game.confortManager.getCardType(card);
 
-         if (!ResourceRequirement.isRequirementMet(this.game, card_type.cost)) {
+         let cost = { ...card_type.cost };
+         if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+            cost['wood'] -= 1;
+            if (cost['wood'] <= 0) {
+               delete cost['wood'];
+            }
+         }
+
+         if (!ResourceRequirement.isRequirementMet(this.game, cost)) {
             this.game.showMessage('Requirement not met', 'error');
          }
 

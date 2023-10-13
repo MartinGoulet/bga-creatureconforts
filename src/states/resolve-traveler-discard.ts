@@ -5,7 +5,6 @@ class ResolveTravelerDiscardState implements StateHandler {
       const { hand } = this.game.getCurrentPlayerTable();
 
       const handleSelectionChange = (selection: ConfortCard[]) => {
-         debugger;
          this.game.toggleButtonEnable('btn_confirm', selection.length == args.count, 'blue');
       };
 

@@ -145,6 +145,16 @@ class action_creatureconforts extends APP_GameAction {
       self::ajaxResponse();
    }
 
+   public function pass() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      // Then, call the appropriate method in your game logic
+      $notification = self::getArg("notification", AT_bool, true);
+      $this->game->checkAction('pass');
+      $this->game->pass($notification);
+      self::ajaxResponse();
+   }
+
    public function discardConfort() {
       self::setAjaxMode();
       // Retrieve arguments
@@ -174,6 +184,16 @@ class action_creatureconforts extends APP_GameAction {
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmCommonRaven');
       $this->game->confirmCommonRaven($location_id);
+      self::ajaxResponse();
+   }
+
+   public function confirmStripedSkunk() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $card_id = intval(self::getArg("card_id", AT_int));
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmStripedSkunk');
+      $this->game->confirmStripedSkunk($card_id);
       self::ajaxResponse();
    }
 

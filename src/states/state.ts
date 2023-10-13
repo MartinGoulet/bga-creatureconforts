@@ -18,8 +18,9 @@ class StateManager {
          playerTurnDiscard: new PlayerTurnDiscardState(game),
          upkeep: new UpkeepState(game),
 
-         grayWolf: new GrayWolfState(game),
-         commonRaven: new CommonRavenState(game),
+         grayWolf: new TravelerGrayWolfState(game),
+         commonRaven: new TravelerCommonRavenState(game),
+         stripedSkunk: new TravelerStripedSkunkStates(game),
       };
    }
 

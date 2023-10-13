@@ -24,8 +24,8 @@ class AmericanBeaver {
         }
         $player_id = Players::getPlayerId();
         Players::removeResource($player_id, $group);
-        Players::addResources($player_id, [COIN => $group[COIN]]);
-        Notifications::travelerExchangeResources($group, [COIN => $group[COIN]]);
+        Players::addResources($player_id, [COIN => $group[WOOD]]);
+        Notifications::travelerExchangeResources($group, [COIN => $group[WOOD]]);
     }
     static function resolve_second(array $resource, array $group) {
         if (sizeof($resource) > 6) {

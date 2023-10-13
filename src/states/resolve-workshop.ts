@@ -13,8 +13,15 @@ class ResolveWorkshopState implements StateHandler {
          market.getCards().filter((card) => {
             if (Number(card.location_arg) > die.face) return false;
 
-            const type = this.game.improvementManager.getCardType(card);
-            return ResourceRequirement.isRequirementMet(this.game, type.cost);
+            let cost = { ...this.game.improvementManager.getCardType(card).cost };
+            if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
+               cost['wood'] -= 1;
+               if (cost['wood'] <= 0) {
+                  delete cost['wood'];
+               }
+            }
+
+            return ResourceRequirement.isRequirementMet(this.game, cost);
          }),
       );
       market.onSelectionChange = (selection: ConfortCard[]) => {

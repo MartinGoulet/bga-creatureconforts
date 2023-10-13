@@ -330,8 +330,8 @@ $this->traveler_types = [
          2 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [YARN, YARN]], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [YARN]], "to" => ["resources" => [MUSHROOM, MUSHROOM]], "times" => 2],
          4 => ["from" => ["count" => 1, "requirement" => [YARN]], "to" => ["resources" => [MUSHROOM, MUSHROOM]], "times" => 2],
-         4 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
-         4 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
+         5 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
+         6 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["resources" => [GRAIN, GRAIN]], "times" => 2],
       ],
    ],
    4 => [

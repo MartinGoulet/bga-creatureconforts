@@ -116,9 +116,13 @@ $travelerStates = [
         "descriptionmyturn" => clienttranslate('${you} may claim one Comfort from the discard pile'),
         "description" => clienttranslate('${actplayer} may claim one Comfort from the discard pile'),
         "type" => "activeplayer",
-        "possibleactions" => ["confirmStripedSkunk"],
-        "transitions" => ["" => ST_PLAYER_TURN_RESOLVE]
+        "possibleactions" => ["confirmStripedSkunk", "pass"],
+        "transitions" => [
+            "next" => ST_PLAYER_TURN_RESOLVE,
+            "pass" => ST_PLAYER_TURN_RESOLVE,
+        ]
     ],
+
 ];
 
 $machinestates = $basicGameStates + $travelerStates + array(

@@ -35,12 +35,13 @@ class Notifications extends \APP_DbObject {
     }
 
     static function buildImprovement(int $player_id, array $card, array $cost, array $cottage) {
-        $message = clienttranslate('${player_name} build ${card_name} from the workshop');
+        $message = clienttranslate('${player_name} spend ${resources_to} to build ${card_name} from the workshop');
         self::notifyAll('onBuildImprovement', $message, [
             'player_id' => $player_id,
             'player_name' => self::getPlayerName($player_id),
             'card' => $card,
             'cost' => $cost,
+            'resources_to' => $cost,
             'cottage' => $cottage,
             'card_name' => Improvements::getName($card),
             "i18n" => ["card_name"],
@@ -276,6 +277,13 @@ class Notifications extends \APP_DbObject {
             'player_name' => self::getPlayerName($player_id),
             'dice' => $dice,
             'rolledDice' => implode(',', array_column($dice, 'face')),
+        ]);
+    }
+
+    static function pass($player_id) {
+        $message = clienttranslate('${player_name} passes');
+        self::message($message, [
+            'player_name' => self::getPlayerName($player_id),
         ]);
     }
 
