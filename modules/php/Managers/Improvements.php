@@ -3,6 +3,7 @@
 namespace CreatureConforts\Managers;
 
 use CreatureConforts\Core\Game;
+use CreatureConforts\Core\Notifications;
 
 const LADDER = 'slot';
 const GLADE = 'glade';
@@ -12,6 +13,19 @@ const GLADE = 'glade';
  * Cards manager : allows to easily access card
  */
 class Improvements extends \APP_DbObject {
+
+    static function anonymize($cards, bool $anonymize = true) {
+        if (!$anonymize) return $cards;
+
+        return array_map(function ($card) {
+            return ['id' => $card['id']];
+        }, $cards);
+    }
+
+    static function getDeck() {
+        $cards = self::deck()->getCardsInLocation('deck', null, 'location_arg');
+        return self::anonymize($cards);
+    }
 
     static function setupNewGame(array $players) {
         $is_solo = count($players) == 1;
@@ -31,10 +45,7 @@ class Improvements extends \APP_DbObject {
 
     static function getUIData() {
         $result = [
-            'discard' => [
-                'topCard' => self::deck()->getCardOnTop('discard'),
-                'count' => self::deck()->countCardInLocation('discard'),
-            ],
+            'discard' => array_values(self::deck()->getCardsInLocation('discard', null, 'location_arg')),
             'deckCount' => self::deck()->countCardInLocation('deck'),
             'market' => array_values(self::deck()->getCardsInLocation(LADDER, null, 'location_arg')),
             'glade' => array_values(self::getGlade()),
@@ -101,6 +112,16 @@ class Improvements extends \APP_DbObject {
         return array_values($cards);
     }
 
+    static function hasBicycle($player_id) {
+        $cards = self::deck()->getCardsOfTypeInLocation('4', null, 'board', $player_id);
+        return sizeof($cards) > 0;
+    }
+
+    static function hasToolShed($player_id) {
+        $cards = self::deck()->getCardsOfTypeInLocation('6', null, 'board', $player_id);
+        return sizeof($cards) > 0;
+    }
+
     static function refillLadder() {
         $deck = self::deck();
         for ($i = 1; $i < 6; $i++) {
@@ -114,12 +135,20 @@ class Improvements extends \APP_DbObject {
             }
         }
 
+        $shuffle = $deck->countCardInLocation('deck') == 0;
+        if($shuffle) {
+            $deck->moveAllCardsInLocation('discard', 'deck');
+            $deck->shuffle('deck');
+        }
+
         $slot = $deck->getCardsInLocation(LADDER, 6);
         if (sizeof($slot) == 1) {
             $next_card = array_shift($slot);
             $deck->moveCard($next_card['id'], LADDER, 5);
         }
         $deck->pickCardForLocation('deck', LADDER, 6);
+
+        return $shuffle;
     }
 
     private static function deck() {

@@ -42,7 +42,7 @@ class Conforts {
 
     static function draw($player_id, $count = 1) {
         // Each player starts with 3 cards in hand
-        if($count == 1) {
+        if ($count == 1) {
             return self::deck()->pickCard('deck', $player_id);
         } else {
             return self::deck()->pickCards($count, 'deck', $player_id);
@@ -144,7 +144,7 @@ class Conforts {
         }
 
         $slot = $deck->getCardsInLocation('slot', 4);
-        if(sizeof($slot) == 1) {
+        if (sizeof($slot) == 1) {
             $next_card = array_shift($slot);
             $deck->moveCard($next_card['id'], 'slot', 3);
         }

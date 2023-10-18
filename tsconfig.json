@@ -84,6 +84,9 @@
         "src/states/resolve-workshop.ts",
         "src/states/upkeep.ts",
 
+        "src/states/improvement-bicycle.ts",
+        "src/states/improvement-bicycle-destination.ts",
+
         "src/states/traveler-gray-wolf.ts",
         "src/states/traveler-common-raven.ts",
         "src/states/traveler-striped-skunk.ts",

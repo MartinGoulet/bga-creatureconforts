@@ -1,4 +1,6 @@
 class PlayerTurnResolveState implements StateHandler {
+   private glade_selection?: number;
+
    constructor(private game: CreatureConforts) {}
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;
@@ -13,6 +15,18 @@ class PlayerTurnResolveState implements StateHandler {
             worker_locations.setSelectedLocation([slotId]);
             this.game.enableButton('btn_resolve');
          }
+         document
+            .querySelectorAll('#dice-locations .slot-dice.selectable.selected')
+            .forEach((slot) => slot.classList.remove('selected'));
+      };
+
+      const handleGladeSlotClick = (slot_id: number, is_selected: boolean) => {
+         const hasDice = this.getDiceFromLocation(Number(slot_id)).length == 1;
+         if (hasDice) {
+            this.glade_selection = is_selected ? slot_id : undefined;
+            this.game.toggleButtonEnable('btn_resolve', is_selected);
+            worker_locations.setSelectedLocation([]);
+         }
       };
 
       const dices = dice_locations.getDice().map((die: Dice) => Number(die.location));
@@ -21,6 +35,16 @@ class PlayerTurnResolveState implements StateHandler {
          .filter((location) => dices.indexOf(location) >= 0);
       worker_locations.setSelectableLocation(locations);
       worker_locations.OnLocationClick = handleWorkerLocationClick;
+
+      document.querySelectorAll('#dice-locations .slot-dice').forEach((slot: HTMLElement) => {
+         slot.classList.toggle('selectable', true);
+         slot.addEventListener('click', (ev: Event) => {
+            ev.stopPropagation();
+            slot.classList.toggle('selected');
+            const slot_id = Number(slot.dataset.slotId);
+            handleGladeSlotClick(slot_id, slot.classList.contains('selected'));
+         });
+      });
    }
    onLeavingState(): void {
       const { worker_locations } = this.game.tableCenter;
@@ -69,5 +93,11 @@ class PlayerTurnResolveState implements StateHandler {
       }
 
       this.game.addActionButtonUndo();
+   }
+
+   private getDiceFromLocation(location_id: number): Dice[] {
+      return this.game.tableCenter.dice_locations
+         .getDice()
+         .filter((die: Dice) => die.location == location_id);
    }
 }

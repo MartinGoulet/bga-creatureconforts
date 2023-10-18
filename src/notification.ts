@@ -140,8 +140,17 @@ class NotificationManager {
       await market.addCard(owl_nest[3], { fromStock: deck });
    }
 
-   private async notif_onRefillLadder(args: { ladder: ConfortCard[]; discard?: ConfortCard }) {
-      const { ladder, discard } = args;
+   private async notif_onRefillLadder({
+      ladder,
+      discard,
+      shuffled,
+      cards,
+   }: {
+      ladder: ImprovementCard[];
+      discard?: ConfortCard;
+      shuffled: boolean;
+      cards: ImprovementCard[];
+   }) {
       if (discard) {
          await this.game.tableCenter.improvement_discard.addCard(discard);
       }
@@ -150,6 +159,13 @@ class NotificationManager {
 
       for (const card of ladder.slice(0, 5)) {
          await market.swapCards([{ ...card }]);
+      }
+
+      if (shuffled) {
+         let copy = [...cards, { id: ladder[5].id } as ImprovementCard];
+         await deck.addCards(copy);
+         await deck.shuffle(Math.min(copy.length, 8));
+         deck.setCardNumber(deck.getCardNumber(), this.game.tableCenter.hidden_improvement);
       }
       await market.addCard(ladder[5], { fromStock: deck });
    }

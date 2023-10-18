@@ -168,6 +168,11 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function newTurn($turn_number) {
+        $message = clienttranslate('Turn ${turn_number}');
+        self::message($message, ['turn_number' => $turn_number]);
+    }
+
     static function returnDice(int $player_id, array $dice) {
         self::notifyAll('onReturnDice', '', [
             'player_id' => $player_id,
@@ -207,10 +212,15 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
-    static function refillLadder(array $ladder, array $discard = null) {
-        self::notifyAll('onRefillLadder', '', [
+    static function refillLadder(array $ladder, $shuffled = false, $discard = null) {
+        $message = $shuffled 
+            ? clienttranslate('The improvement deck is reshuffled because it is empty"') 
+            : '';
+        self::notifyAll('onRefillLadder', $message, [
             'ladder' => $ladder,
             'discard' => $discard,
+            'shuffled' => $shuffled,
+            'cards' => $shuffled ? Improvements::getDeck() : [],
         ]);
     }
 

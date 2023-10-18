@@ -57,10 +57,7 @@ interface CottageUIData {
 }
 
 interface ImprovementUIData {
-   discard: {
-      topCard?: ConfortCard;
-      count: number;
-   };
+   discard: ImprovementCard[];
    deckCount: number;
    market: ImprovementCard[];
    glade: ImprovementCard[];

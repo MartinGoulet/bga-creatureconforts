@@ -8,10 +8,16 @@ class ResolveWorkshopState implements StateHandler {
 
       const die = dice_locations.getDice().find((die: Dice) => die.location == 10);
 
+      const hasToolShed =
+         this.game
+            .getCurrentPlayerTable()
+            .improvements.getCards()
+            .find((f) => f.type === '6') !== undefined;
+
       market.setSelectionMode('single');
       market.setSelectableCards(
          market.getCards().filter((card) => {
-            if (Number(card.location_arg) > die.face) return false;
+            if (Number(card.location_arg) > die.face && !hasToolShed) return false;
 
             let cost = { ...this.game.improvementManager.getCardType(card).cost };
             if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {

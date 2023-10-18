@@ -59,6 +59,11 @@ class PlacementState implements StateHandler {
    }
 
    private moveWorker(slotId: SlotId) {
+      if (this.locations.includes(Number(slotId))) {
+         this.game.showMessage(_('You already have a worker on that location'), 'error');
+         return;
+      }
+
       const worker = this.game.getCurrentPlayerTable().workers.getCards()[0];
       const copy = { ...worker, location: 'board', location_arg: slotId.toString() };
 
@@ -82,8 +87,12 @@ class PlacementState implements StateHandler {
    private showSelection() {
       const locations = this.game.tableCenter.worker_locations;
       if (this.locations.length < 4) {
-         const selectable = arrayRange(1, 12).filter((num) => this.locations.indexOf(num) < 0);
-         locations.setSelectableLocation(selectable);
+         if (TravelerHelper.isActivePineMarten()) {
+            locations.setSelectableLocation(arrayRange(3, 12));
+         } else {
+            const selectable = arrayRange(1, 12).filter((num) => this.locations.indexOf(num) < 0);
+            locations.setSelectableLocation(selectable);
+         }
       } else {
          locations.setSelectableLocation([]);
       }

@@ -125,7 +125,21 @@ $travelerStates = [
 
 ];
 
-$machinestates = $basicGameStates + $travelerStates + array(
+$improvementStates = [
+    ST_IMPROVEMENT_BICYCLE => [
+        "name" => "bicycle",
+        "descriptionmyturn" => clienttranslate('${you} may move one of your workers to a different location'),
+        "description" => clienttranslate('${actplayer} may move one of his workers to a different location'),
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmBicycle", "pass"],
+        "transitions" => [
+            "next" => ST_PLAYER_TURN_DICE,
+            "pass" => ST_PLAYER_TURN_DICE,
+        ]
+    ],
+];
+
+$machinestates = $basicGameStates + $travelerStates + $improvementStates + array(
 
     ST_START_HAND => [
         "name" => "startHand",
@@ -194,7 +208,10 @@ $machinestates = $basicGameStates + $travelerStates + array(
         "name" => "playerTurnStart",
         "type" => "game",
         "action" => "stPlayerTurnStart",
-        "transitions" => ["" => ST_PLAYER_TURN_DICE]
+        "transitions" => [
+            "next" => ST_PLAYER_TURN_DICE,
+            "bicycle" => ST_IMPROVEMENT_BICYCLE,
+        ]
     ],
 
     ST_PLAYER_TURN_DICE => [

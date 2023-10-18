@@ -18,6 +18,9 @@ class StateManager {
          playerTurnDiscard: new PlayerTurnDiscardState(game),
          upkeep: new UpkeepState(game),
 
+         bicycle: new ImprovementBicycleState(game),
+         resolveBicycleDestination: new ImprovementBicycleDestinationState(game),
+
          grayWolf: new TravelerGrayWolfState(game),
          commonRaven: new TravelerCommonRavenState(game),
          stripedSkunk: new TravelerStripedSkunkStates(game),

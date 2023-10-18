@@ -16,6 +16,7 @@
                 <div id="hill-dice"></div>
                 <div id="reserved-zones"></div>
                 <div id="american-beaver-zones"></div>
+                <div id="black-bear-zones"></div>
 
                 <div id="decks">
                     <div>

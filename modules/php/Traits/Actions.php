@@ -52,8 +52,9 @@ trait Actions {
 
     function confirmPlacement(array $locations) {
         // Basic location
-        $available_locations = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-        // TODO add location from cards
+        $available_locations = TravelerHelper::isActivePineMarten()
+            ? [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+            : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
         foreach ($locations as $location) {
             if (!in_array($location, $available_locations)) {
@@ -382,6 +383,37 @@ trait Actions {
         $card = Conforts::addToHand(['id' => $card_id], Players::getPlayerId());
         Notifications::addConfortToHand(Players::getPlayerId(), $card);
         Game::get()->gamestate->nextState("next");
+    }
+
+    function confirmBicycle(int $worker_id, int $location) {
+        $workers = Worker::getWorkersFromPlayer(Players::getPlayerId());
+        $worker = array_filter($workers, function ($w) use ($worker_id) {
+            return $w['id'] == $worker_id;
+        });
+
+        $worker = array_shift($worker);
+
+        if ($worker == null) {
+            throw new BgaUserException("This is not your worker");
+        }
+
+        if (in_array($location, [1, 2]) && TravelerHelper::isActivePineMarten()) {
+            throw new BgaUserException("You cannot go there with Pine Marten in play");
+        }
+
+        $worker_locations = array_values(array_column($workers, 'location_arg'));
+        if (in_array($location, $worker_locations)) {
+            throw new BgaUserException("Worker already in that location");
+        }
+
+        if($location <= 0 || $location > 12) {
+            throw new BgaUserException("Location must be between 1 and 12 => " . $location);
+        }
+
+        Worker::moveToLocation($worker['id'], $location);
+        Notifications::revealPlacement(Worker::getUIData());
+
+        Game::get()->gamestate->nextState('next');
     }
 
     function pass(bool $notification) {

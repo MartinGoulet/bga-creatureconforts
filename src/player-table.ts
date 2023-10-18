@@ -69,7 +69,7 @@ class PlayerTable {
          game.confortManager,
          document.getElementById(`player-table-${this.player_id}-confort`),
          {
-            gap: '5px',
+            gap: '10px',
          },
       );
       this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
@@ -115,7 +115,7 @@ class PlayerTable {
          game.improvementManager,
          document.getElementById(`player-table-${this.player_id}-improvement`),
          {
-            gap: '5px',
+            gap: '15px',
          },
       );
 

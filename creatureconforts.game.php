@@ -226,7 +226,34 @@ class CreatureConforts extends Table {
         In this space, you can put any utility methods useful for your game logic
     */
 
-
+    /**
+     * Returns an array of user preference colors to game colors.
+     * Game colors must be among those which are passed to reattributeColorsBasedOnPreferences()
+     * Each game color can be an array of suitable colors, or a single color:
+     * [
+     *    // The first available color chosen:
+     *    'ff0000' => ['990000', 'aa1122'],
+     *    // This color is chosen, if available
+     *    '0000ff' => '000099',
+     * ]
+     * If no color can be matched from this array, then the default implementation is used.
+     */
+    function getSpecificColorPairings(): array {
+        return array(
+            "ff0000" /* Red */         => "b7313e",
+            "008000" /* Green */       => "13586b",
+            "0000ff" /* Blue */        => null,
+            "ffa500" /* Yellow */      => "dcac28",
+            "000000" /* Black */       => null,
+            "ffffff" /* White */       => null,
+            "e94190" /* Pink */        => null,
+            "982fff" /* Purple */      => "650e41",
+            "72c3b1" /* Cyan */        => null,
+            "f07f16" /* Orange */      => null,
+            "bdd002" /* Khaki green */ => null,
+            "7b7b7b" /* Gray */        => "7e797b",
+        );
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions

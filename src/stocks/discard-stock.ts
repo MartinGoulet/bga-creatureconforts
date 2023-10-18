@@ -10,12 +10,14 @@ class DiscardStock<T> extends Deck<T> {
          autoRemovePreviousCards: false,
       });
 
-      this.eyeIcon = document.createElement('div');
-      this.eyeIcon.classList.add('eye-icon', 'closed');
-      this.eyeIcon.onclick = () => this.onEyeClick();
+      if (linestock) {
+         this.eyeIcon = document.createElement('div');
+         this.eyeIcon.classList.add('eye-icon', 'closed');
+         this.eyeIcon.onclick = () => this.onEyeClick();
+         element.appendChild(this.eyeIcon);
+      }
 
       element.classList.add('discard');
-      element.appendChild(this.eyeIcon);
    }
 
    public addCard(card: T, animation?: CardAnimation<T>, settings?: AddCardToDeckSettings): Promise<boolean> {

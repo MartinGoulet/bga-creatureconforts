@@ -1,3 +1,4 @@
+@charset "UTF-8";
 #bga-zoom-wrapper {
   position: relative;
 }
@@ -761,22 +762,22 @@ body > .bga-dice_die {
   gap: 3px;
 }
 #table-center-wrapper [data-zone-id="1"] {
-  top: 175px;
+  top: 165px;
   left: 55px;
   width: 130px;
 }
 #table-center-wrapper [data-zone-id="2"] {
-  top: 175px;
+  top: 165px;
   left: 211px;
   width: 130px;
 }
 #table-center-wrapper [data-zone-id="3"] {
-  top: 175px;
+  top: 165px;
   left: 397px;
   width: 130px;
 }
 #table-center-wrapper [data-zone-id="4"] {
-  top: 175px;
+  top: 165px;
   left: 553px;
   width: 130px;
 }
@@ -819,14 +820,16 @@ body > .bga-dice_die {
   left: 530px;
   justify-content: flex-start;
 }
-#table-center-wrapper #american-beaver-zones {
+#table-center-wrapper #american-beaver-zones,
+#table-center-wrapper #black-bear-zones {
   display: none;
 }
 #table-center-wrapper .bga-dice_die.bga-dice_die6.colored-die {
   zoom: 0.8;
 }
 
-[data-traveler="8"] #table-center-wrapper #american-beaver-zones {
+[data-traveler="8"] #table-center-wrapper #american-beaver-zones,
+[data-traveler="12"] #table-center-wrapper #black-bear-zones {
   display: block;
 }
 
@@ -842,6 +845,26 @@ body > .bga-dice_die {
 }
 .gamestate_placement #worker-locations .slot .card.worker {
   zoom: unset !important;
+}
+
+.gamestate_placement [data-traveler="11"] #table-center-wrapper #worker-locations [data-slot-id="1"]:after,
+.gamestate_placement [data-traveler="11"] #table-center-wrapper #worker-locations [data-slot-id="2"]:after,
+.gamestate_resolveBicycleDestination [data-traveler="11"] #table-center-wrapper #worker-locations [data-slot-id="1"]:after,
+.gamestate_resolveBicycleDestination [data-traveler="11"] #table-center-wrapper #worker-locations [data-slot-id="2"]:after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: "❌"; /* use the hex value here... */
+  font-size: 40px;
+  color: #ff0000;
+  line-height: 60px;
+  text-align: center;
+}
+
+.gamestate_resolveBicycleDestination .remainder {
+  box-shadow: 0 0 4px 5px white;
 }
 
 #discard-conforts-wrapper {
@@ -878,6 +901,7 @@ body > .bga-dice_die {
   display: flex;
   gap: 5px;
   flex-wrap: wrap;
+  margin-top: 10px;
 }
 .icons.counters .wrapper {
   display: flex;
@@ -942,7 +966,7 @@ body > .bga-dice_die {
 }
 .player-table .cols {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   gap: 10px;
   padding: 15px 15px 0 15px;
 }
@@ -1007,6 +1031,10 @@ body > .bga-dice_die {
 }
 .player-table.player-color-purple .player-table-board {
   background-image: url("img/board_purple.jpg");
+}
+
+.gamestate_bicycle .player-table .card.improvement .front[data-type="4"] {
+  box-shadow: 0 0 5px 6px orange;
 }
 
 .log .resource-icon {
@@ -1766,6 +1794,10 @@ body > .bga-dice_die {
   animation: pulseSelectable 1s infinite alternate;
   pointer-events: initial !important;
   user-select: initial !important;
+}
+.slot-dice.selectable.selected {
+  animation: none;
+  box-shadow: 0 0 5px 7px #00ffff;
 }
 
 .gamestate_placement #hill-dice .bga-dice_die[data-color=white] {

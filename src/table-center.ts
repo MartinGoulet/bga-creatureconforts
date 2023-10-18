@@ -10,7 +10,7 @@ class TableCenter {
 
    public improvement_market: SlotStock<ImprovementCard>;
    public improvement_deck: Deck<ImprovementCard>;
-   public improvement_discard: Deck<ImprovementCard>;
+   public improvement_discard: DiscardStock<ImprovementCard>;
 
    public traveler_deck: Deck<TravelerCard>;
    public valley: SlotStock<ImprovementCard>;
@@ -32,7 +32,8 @@ class TableCenter {
       this.setupGlade(game);
       this.setRiverDial(game.gamedatas.river_dial);
       this.setupReservedZones(game);
-      this.setupAmericanBeaverZones(game);
+      this.setupAmericanBeaverZones();
+      this.setupBlackBearZones();
    }
 
    public addRavenToken(location_id: number) {
@@ -143,26 +144,22 @@ class TableCenter {
          game.improvementManager,
          document.getElementById(`deck-improvements`),
          {
-            cardNumber: deckCount,
-            topCard: this.hidden_confort,
+            cardNumber: Number(deckCount),
+            topCard: this.hidden_improvement,
             counter: {},
          },
       );
 
-      this.improvement_discard = new Deck<ImprovementCard>(
+      this.improvement_discard = new DiscardStock<ImprovementCard>(
          game.improvementManager,
          document.getElementById(`discard-improvements`),
-         {
-            cardNumber: discard.count,
-            topCard: discard.topCard,
-            counter: {},
-         },
       );
 
+      this.improvement_discard.addCards(discard);
       this.improvement_market.addCards(market);
    }
 
-   setupAmericanBeaverZones(game: CreatureConforts) {
+   setupAmericanBeaverZones() {
       const icons =
          ResourceHelper.getElement<GoodsType>('wood') + ResourceHelper.getElement<GoodsType>('wood');
 
@@ -171,6 +168,16 @@ class TableCenter {
          .join('');
 
       document.getElementById('american-beaver-zones').innerHTML = html;
+   }
+
+   setupBlackBearZones() {
+      const icon = ResourceHelper.getElement<GoodsType>('fruit');
+
+      const html = arrayRange(1, 4)
+         .map((value) => `<div class="cc-zone" data-zone-id="${value}">${icon}</div>`)
+         .join('');
+
+      document.getElementById('black-bear-zones').innerHTML = html;
    }
 
    private setupReservedZones(game: CreatureConforts) {

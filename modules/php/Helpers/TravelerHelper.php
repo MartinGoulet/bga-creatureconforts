@@ -111,6 +111,10 @@ class TravelerHelper {
         return self::isTravelerActive(8);
     }
 
+    static function isActivePineMarten() {
+        return self::isTravelerActive(11);
+    }
+
     static function isActiveBlackBear() {
         return self::isTravelerActive(12);
     }

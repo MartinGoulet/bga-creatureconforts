@@ -309,22 +309,22 @@
    }
 
    [data-zone-id='1'] {
-      top: 175px;
+      top: 165px;
       left: 55px;
       width: 130px;
    }
    [data-zone-id='2'] {
-      top: 175px;
+      top: 165px;
       left: 211px;
       width: 130px;
    }
    [data-zone-id='3'] {
-      top: 175px;
+      top: 165px;
       left: 397px;
       width: 130px;
    }
    [data-zone-id='4'] {
-      top: 175px;
+      top: 165px;
       left: 553px;
       width: 130px;
    }
@@ -371,7 +371,8 @@
       justify-content: flex-start;
    }
 
-   #american-beaver-zones {
+   #american-beaver-zones,
+   #black-bear-zones {
       display: none;
    }
 
@@ -380,7 +381,8 @@
    }
 }
 
-[data-traveler="8"] #table-center-wrapper #american-beaver-zones {
+[data-traveler='8'] #table-center-wrapper #american-beaver-zones,
+[data-traveler='12'] #table-center-wrapper #black-bear-zones {
    display: block;
 }
 
@@ -403,6 +405,33 @@
             zoom: unset !important;
          }
       }
+   }
+}
+
+.gamestate_placement,
+.gamestate_resolveBicycleDestination {
+   [data-traveler='11'] #table-center-wrapper #worker-locations {
+      [data-slot-id='1'],
+      [data-slot-id='2'] {
+         &:after {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            content: '\274c'; /* use the hex value here... */
+            font-size: 40px;
+            color: #ff0000;
+            line-height: 60px;
+            text-align: center;
+         }
+      }
+   }
+}
+
+.gamestate_resolveBicycleDestination {
+   .remainder {
+      box-shadow: 0 0 4px 5px white;
    }
 }
 

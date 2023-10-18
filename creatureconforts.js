@@ -2747,11 +2747,13 @@ var DiscardStock = (function (_super) {
             autoRemovePreviousCards: false,
         }) || this;
         _this.linestock = linestock;
-        _this.eyeIcon = document.createElement('div');
-        _this.eyeIcon.classList.add('eye-icon', 'closed');
-        _this.eyeIcon.onclick = function () { return _this.onEyeClick(); };
+        if (linestock) {
+            _this.eyeIcon = document.createElement('div');
+            _this.eyeIcon.classList.add('eye-icon', 'closed');
+            _this.eyeIcon.onclick = function () { return _this.onEyeClick(); };
+            element.appendChild(_this.eyeIcon);
+        }
         element.classList.add('discard');
-        element.appendChild(_this.eyeIcon);
         return _this;
     }
     DiscardStock.prototype.addCard = function (card, animation, settings) {
@@ -3356,6 +3358,9 @@ var TravelerHelper = (function () {
     TravelerHelper.isActiveAmericanBeaver = function () {
         return this.isTravelerActive(8);
     };
+    TravelerHelper.isActivePineMarten = function () {
+        return this.isTravelerActive(11);
+    };
     TravelerHelper.isTravelerActive = function (type) {
         var game = window.gameui;
         return Number(game.tableCenter.traveler_deck.getTopCard().type) === type;
@@ -3379,6 +3384,8 @@ var StateManager = (function () {
             resolveWorkshop: new ResolveWorkshopState(game),
             playerTurnDiscard: new PlayerTurnDiscardState(game),
             upkeep: new UpkeepState(game),
+            bicycle: new ImprovementBicycleState(game),
+            resolveBicycleDestination: new ImprovementBicycleDestinationState(game),
             grayWolf: new TravelerGrayWolfState(game),
             commonRaven: new TravelerCommonRavenState(game),
             stripedSkunk: new TravelerStripedSkunkStates(game),
@@ -3558,6 +3565,10 @@ var PlacementState = (function () {
         }
     };
     PlacementState.prototype.moveWorker = function (slotId) {
+        if (this.locations.includes(Number(slotId))) {
+            this.game.showMessage(_('You already have a worker on that location'), 'error');
+            return;
+        }
         var worker = this.game.getCurrentPlayerTable().workers.getCards()[0];
         var copy = __assign(__assign({}, worker), { location: 'board', location_arg: slotId.toString() });
         this.original_workers.push(__assign({}, worker));
@@ -3577,8 +3588,13 @@ var PlacementState = (function () {
         var _this = this;
         var locations = this.game.tableCenter.worker_locations;
         if (this.locations.length < 4) {
-            var selectable = arrayRange(1, 12).filter(function (num) { return _this.locations.indexOf(num) < 0; });
-            locations.setSelectableLocation(selectable);
+            if (TravelerHelper.isActivePineMarten()) {
+                locations.setSelectableLocation(arrayRange(3, 12));
+            }
+            else {
+                var selectable = arrayRange(1, 12).filter(function (num) { return _this.locations.indexOf(num) < 0; });
+                locations.setSelectableLocation(selectable);
+            }
         }
         else {
             locations.setSelectableLocation([]);
@@ -3810,6 +3826,17 @@ var PlayerTurnResolveState = (function () {
                 worker_locations.setSelectedLocation([slotId]);
                 _this.game.enableButton('btn_resolve');
             }
+            document
+                .querySelectorAll('#dice-locations .slot-dice.selectable.selected')
+                .forEach(function (slot) { return slot.classList.remove('selected'); });
+        };
+        var handleGladeSlotClick = function (slot_id, is_selected) {
+            var hasDice = _this.getDiceFromLocation(Number(slot_id)).length == 1;
+            if (hasDice) {
+                _this.glade_selection = is_selected ? slot_id : undefined;
+                _this.game.toggleButtonEnable('btn_resolve', is_selected);
+                worker_locations.setSelectedLocation([]);
+            }
         };
         var dices = dice_locations.getDice().map(function (die) { return Number(die.location); });
         var locations = this.game.tableCenter
@@ -3817,6 +3844,15 @@ var PlayerTurnResolveState = (function () {
             .filter(function (location) { return dices.indexOf(location) >= 0; });
         worker_locations.setSelectableLocation(locations);
         worker_locations.OnLocationClick = handleWorkerLocationClick;
+        document.querySelectorAll('#dice-locations .slot-dice').forEach(function (slot) {
+            slot.classList.toggle('selectable', true);
+            slot.addEventListener('click', function (ev) {
+                ev.stopPropagation();
+                slot.classList.toggle('selected');
+                var slot_id = Number(slot.dataset.slotId);
+                handleGladeSlotClick(slot_id, slot.classList.contains('selected'));
+            });
+        });
     };
     PlayerTurnResolveState.prototype.onLeavingState = function () {
         var worker_locations = this.game.tableCenter.worker_locations;
@@ -3867,6 +3903,11 @@ var PlayerTurnResolveState = (function () {
             this.game.addActionButton('btn_end', _('End'), handleEnd);
         }
         this.game.addActionButtonUndo();
+    };
+    PlayerTurnResolveState.prototype.getDiceFromLocation = function (location_id) {
+        return this.game.tableCenter.dice_locations
+            .getDice()
+            .filter(function (die) { return die.location == location_id; });
     };
     return PlayerTurnResolveState;
 }());
@@ -4292,9 +4333,13 @@ var ResolveWorkshopState = (function () {
         worker_locations.setSelectableLocation([10]);
         worker_locations.setSelectedLocation([10]);
         var die = dice_locations.getDice().find(function (die) { return die.location == 10; });
+        var hasToolShed = this.game
+            .getCurrentPlayerTable()
+            .improvements.getCards()
+            .find(function (f) { return f.type === '6'; }) !== undefined;
         market.setSelectionMode('single');
         market.setSelectableCards(market.getCards().filter(function (card) {
-            if (Number(card.location_arg) > die.face)
+            if (Number(card.location_arg) > die.face && !hasToolShed)
                 return false;
             var cost = __assign({}, _this.game.improvementManager.getCardType(card).cost);
             if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {
@@ -4341,6 +4386,122 @@ var UpkeepState = (function () {
     UpkeepState.prototype.onLeavingState = function () { };
     UpkeepState.prototype.onUpdateActionButtons = function (args) { };
     return UpkeepState;
+}());
+var ImprovementBicycleState = (function () {
+    function ImprovementBicycleState(game) {
+        this.game = game;
+    }
+    ImprovementBicycleState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var worker_locations = this.game.tableCenter.worker_locations;
+        this.available = worker_locations.getCards().map(function (worker) { return worker.location_arg; });
+        worker_locations.setSelectableLocation(this.available);
+        worker_locations.OnLocationClick = function (slotId) {
+            if (worker_locations.isSelectedLocation(slotId)) {
+                _this.reset();
+            }
+            else {
+                worker_locations.setSelectedLocation([slotId]);
+                worker_locations.setSelectableLocation([slotId]);
+                _this.game.enableButton('btn_confirm', 'blue');
+                _this.game.enableButton('btn_reset', 'gray');
+            }
+        };
+    };
+    ImprovementBicycleState.prototype.onLeavingState = function () {
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectedLocation();
+        worker_locations.setSelectableLocation();
+        worker_locations.OnLocationClick = undefined;
+    };
+    ImprovementBicycleState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var selectedSlotId = _this.game.tableCenter.worker_locations.getSelectedLocation();
+            if (selectedSlotId.length !== 1)
+                return;
+            var worker_id = Number(_this.game.tableCenter.worker_locations
+                .getCards()
+                .find(function (worker) { return worker.location_arg == selectedSlotId[0]; }).id);
+            _this.game.setClientState('resolveBicycleDestination', {
+                descriptionmyturn: _('${you} must select a destination for your worker'),
+                args: {
+                    worker_id: worker_id,
+                    location: Number(selectedSlotId[0]),
+                },
+            });
+        };
+        this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonPass(true);
+        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(); });
+    };
+    ImprovementBicycleState.prototype.reset = function () {
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectedLocation();
+        worker_locations.setSelectableLocation(this.available);
+        this.game.disableButton('btn_confirm');
+        this.game.disableButton('btn_reset');
+    };
+    return ImprovementBicycleState;
+}());
+var ImprovementBicycleDestinationState = (function () {
+    function ImprovementBicycleDestinationState(game) {
+        this.game = game;
+    }
+    ImprovementBicycleDestinationState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        document
+            .querySelector("#worker-locations [data-slot-id=\"".concat(args.location, "\"]"))
+            .classList.add('remainder');
+        var worker_locations = this.game.tableCenter.worker_locations;
+        var unavailable = worker_locations.getCards().map(function (worker) { return worker.location_arg; });
+        var min = TravelerHelper.isActivePineMarten() ? 3 : 1;
+        this.available = arrayRange(min, 12).filter(function (loc) { return !unavailable.includes(loc.toString()); });
+        worker_locations.setSelectableLocation(this.available);
+        worker_locations.OnLocationClick = function (slotId) {
+            if (worker_locations.isSelectedLocation(slotId)) {
+                _this.reset();
+            }
+            else {
+                worker_locations.setSelectedLocation([slotId]);
+                worker_locations.setSelectableLocation([slotId]);
+                _this.game.enableButton('btn_confirm', 'blue');
+                _this.game.enableButton('btn_reset', 'gray');
+            }
+        };
+    };
+    ImprovementBicycleDestinationState.prototype.onLeavingState = function () {
+        document.querySelector('.remainder').classList.remove('remainder');
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectedLocation();
+        worker_locations.setSelectableLocation();
+        worker_locations.OnLocationClick = undefined;
+    };
+    ImprovementBicycleDestinationState.prototype.onUpdateActionButtons = function (_a) {
+        var _this = this;
+        var worker_id = _a.worker_id;
+        var handleConfirm = function () {
+            var locations = _this.game.tableCenter.worker_locations.getSelectedLocation();
+            if (locations.length !== 1)
+                return;
+            _this.game.takeAction('confirmBicycle', { worker_id: worker_id, location: Number(locations[0]) });
+        };
+        this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(); });
+        this.game.addActionButtonClientCancel();
+    };
+    ImprovementBicycleDestinationState.prototype.reset = function () {
+        var worker_locations = this.game.tableCenter.worker_locations;
+        worker_locations.setSelectedLocation();
+        worker_locations.setSelectableLocation(this.available);
+        this.game.disableButton('btn_confirm');
+        this.game.disableButton('btn_reset');
+    };
+    return ImprovementBicycleDestinationState;
 }());
 var TravelerGrayWolfState = (function () {
     function TravelerGrayWolfState(game) {
@@ -4975,36 +5136,47 @@ var NotificationManager = (function () {
             });
         });
     };
-    NotificationManager.prototype.notif_onRefillLadder = function (args) {
+    NotificationManager.prototype.notif_onRefillLadder = function (_a) {
+        var ladder = _a.ladder, discard = _a.discard, shuffled = _a.shuffled, cards = _a.cards;
         return __awaiter(this, void 0, void 0, function () {
-            var ladder, discard, _a, deck, market, _i, _b, card;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var _b, deck, market, _i, _c, card, copy;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
-                        ladder = args.ladder, discard = args.discard;
                         if (!discard) return [3, 2];
                         return [4, this.game.tableCenter.improvement_discard.addCard(discard)];
                     case 1:
-                        _c.sent();
-                        _c.label = 2;
+                        _d.sent();
+                        _d.label = 2;
                     case 2:
-                        _a = this.game.tableCenter, deck = _a.improvement_deck, market = _a.improvement_market;
+                        _b = this.game.tableCenter, deck = _b.improvement_deck, market = _b.improvement_market;
                         market.setSelectionMode('none');
-                        _i = 0, _b = ladder.slice(0, 5);
-                        _c.label = 3;
+                        _i = 0, _c = ladder.slice(0, 5);
+                        _d.label = 3;
                     case 3:
-                        if (!(_i < _b.length)) return [3, 6];
-                        card = _b[_i];
+                        if (!(_i < _c.length)) return [3, 6];
+                        card = _c[_i];
                         return [4, market.swapCards([__assign({}, card)])];
                     case 4:
-                        _c.sent();
-                        _c.label = 5;
+                        _d.sent();
+                        _d.label = 5;
                     case 5:
                         _i++;
                         return [3, 3];
-                    case 6: return [4, market.addCard(ladder[5], { fromStock: deck })];
+                    case 6:
+                        if (!shuffled) return [3, 9];
+                        copy = __spreadArray(__spreadArray([], cards, true), [{ id: ladder[5].id }], false);
+                        return [4, deck.addCards(copy)];
                     case 7:
-                        _c.sent();
+                        _d.sent();
+                        return [4, deck.shuffle(Math.min(copy.length, 8))];
+                    case 8:
+                        _d.sent();
+                        deck.setCardNumber(deck.getCardNumber(), this.game.tableCenter.hidden_improvement);
+                        _d.label = 9;
+                    case 9: return [4, market.addCard(ladder[5], { fromStock: deck })];
+                    case 10:
+                        _d.sent();
                         return [2];
                 }
             });
@@ -5220,7 +5392,7 @@ var PlayerTable = (function () {
     };
     PlayerTable.prototype.setupConfort = function (game, player) {
         this.conforts = new LineStock(game.confortManager, document.getElementById("player-table-".concat(this.player_id, "-confort")), {
-            gap: '5px',
+            gap: '10px',
         });
         this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
     };
@@ -5243,7 +5415,7 @@ var PlayerTable = (function () {
     };
     PlayerTable.prototype.setupImprovement = function (game) {
         this.improvements = new LineStock(game.improvementManager, document.getElementById("player-table-".concat(this.player_id, "-improvement")), {
-            gap: '5px',
+            gap: '15px',
         });
         this.improvements.addCards(game.gamedatas.improvements.players[this.player_id]);
     };
@@ -5270,7 +5442,8 @@ var TableCenter = (function () {
         this.setupGlade(game);
         this.setRiverDial(game.gamedatas.river_dial);
         this.setupReservedZones(game);
-        this.setupAmericanBeaverZones(game);
+        this.setupAmericanBeaverZones();
+        this.setupBlackBearZones();
     }
     TableCenter.prototype.addRavenToken = function (location_id) {
         var zone = document.querySelector("#reserved-zones [data-zone-id=\"".concat(location_id, "\"]"));
@@ -5341,23 +5514,27 @@ var TableCenter = (function () {
             gap: '7px',
         });
         this.improvement_deck = new Deck(game.improvementManager, document.getElementById("deck-improvements"), {
-            cardNumber: deckCount,
-            topCard: this.hidden_confort,
+            cardNumber: Number(deckCount),
+            topCard: this.hidden_improvement,
             counter: {},
         });
-        this.improvement_discard = new Deck(game.improvementManager, document.getElementById("discard-improvements"), {
-            cardNumber: discard.count,
-            topCard: discard.topCard,
-            counter: {},
-        });
+        this.improvement_discard = new DiscardStock(game.improvementManager, document.getElementById("discard-improvements"));
+        this.improvement_discard.addCards(discard);
         this.improvement_market.addCards(market);
     };
-    TableCenter.prototype.setupAmericanBeaverZones = function (game) {
+    TableCenter.prototype.setupAmericanBeaverZones = function () {
         var icons = ResourceHelper.getElement('wood') + ResourceHelper.getElement('wood');
         var html = arrayRange(1, 2)
             .map(function (value) { return "<div class=\"cc-zone\" data-zone-id=\"".concat(value, "\">").concat(icons, "</div>"); })
             .join('');
         document.getElementById('american-beaver-zones').innerHTML = html;
+    };
+    TableCenter.prototype.setupBlackBearZones = function () {
+        var icon = ResourceHelper.getElement('fruit');
+        var html = arrayRange(1, 4)
+            .map(function (value) { return "<div class=\"cc-zone\" data-zone-id=\"".concat(value, "\">").concat(icon, "</div>"); })
+            .join('');
+        document.getElementById('black-bear-zones').innerHTML = html;
     };
     TableCenter.prototype.setupReservedZones = function (game) {
         var _this = this;

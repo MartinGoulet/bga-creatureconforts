@@ -20,7 +20,7 @@
 
    .cols {
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
       gap: 10px;
       padding: 15px 15px 0 15px;
 
@@ -87,6 +87,16 @@
    @each $playerColor in $playerColorNames {
       &.player-color-#{$playerColor} .player-table-board {
          background-image: url('img/board_#{$playerColor}.jpg');
+      }
+   }
+}
+
+.gamestate_bicycle {
+   .player-table {
+      .card.improvement {
+         .front[data-type="4"] {
+            box-shadow: 0 0 5px 6px orange;
+         }
       }
    }
 }

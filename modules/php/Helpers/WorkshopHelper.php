@@ -12,7 +12,7 @@ class WorkshopHelper {
 
     static function resolve(int $die_value, int $position) {
 
-        if ($position > $die_value) {
+        if (!Improvements::hasToolShed(Players::getPlayerId()) && $position > $die_value) {
             throw new BgaUserException("You cannot take a position higher than " . $die_value);
         }
 
@@ -54,7 +54,7 @@ class WorkshopHelper {
                 break;
         }
 
-        Improvements::refillLadder();
-        Notifications::refillLadder(Improvements::getLadder());
+        $shuffled = Improvements::refillLadder();
+        Notifications::refillLadder(Improvements::getLadder(), $shuffled);
     }
 }

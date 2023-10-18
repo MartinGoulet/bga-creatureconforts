@@ -2,7 +2,6 @@
 
 namespace CreatureConforts\Traits;
 
-use BgaUserException;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
@@ -29,8 +28,11 @@ trait States {
 
     function stNewTraveler() {
         Game::get()->incStat(1, STAT_TURN_NUMBER);
+        $turn_number = Game::get()->getStat(STAT_TURN_NUMBER);
 
-        $isFirstTurn = Game::get()->getStat(STAT_TURN_NUMBER) == 1;
+        Notifications::newTurn($turn_number);
+
+        $isFirstTurn = $turn_number == 1;
         if (!$isFirstTurn) {
             Travelers::discardTopCard();
         }
@@ -91,7 +93,9 @@ trait States {
         $dice = Dice::getDiceFromPlayer($player_id);
         Notifications::moveDiceToHill($dice);
         Game::undoSavepoint();
-        Game::get()->gamestate->nextState();
+
+        $next_state = Improvements::hasBicycle(Players::getPlayerId()) ? "bicycle" : "next";
+        Game::get()->gamestate->nextState($next_state);
     }
 
     function stPlayerReturnUnresolvedWorker() {
@@ -181,8 +185,8 @@ trait States {
         // then slide the five remaining Improvements down a slot and deal a new
         // Improvement from the deck face up into the top slot.
         $discard = Improvements::discardBottomLadder();
-        Improvements::refillLadder();
-        Notifications::refillLadder(Improvements::getLadder(), $discard);
+        $shuffled = Improvements::refillLadder();
+        Notifications::refillLadder(Improvements::getLadder(), $shuffled, $discard);
 
         // 3. Discard the Traveler from the Inn.
         Travelers::discardTopCard();
