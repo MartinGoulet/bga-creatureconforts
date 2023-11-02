@@ -14,6 +14,7 @@ class NotificationManager {
          ['onGetResourcesFromLocation', 1200],
          ['onCraftConfort', 1000],
          ['onReturnDice', 1200],
+         ['onReturnFamilyDie', undefined],
          ['onNewSeason', 1000],
          ['onRiverDialRotate', 500],
          ['onRefillOwlNest', undefined],
@@ -95,7 +96,10 @@ class NotificationManager {
       resources,
       player_id,
    }: GetResourcesFromLocationArgs) {
-      const fromElement = document.querySelectorAll(`#worker-locations *[data-slot-id="${location_id}"]`)[0];
+      const fromElement =
+         location_id < 20
+            ? document.querySelector(`#worker-locations *[data-slot-id="${location_id}"]`)
+            : document.querySelector(`#dice-locations   *[data-slot-id="${location_id}"]`);
       this.animationMoveResource(player_id, resources, fromElement);
    }
 
@@ -115,6 +119,10 @@ class NotificationManager {
       const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
       this.game.tableCenter.hill.addDice(white_dice);
       this.game.getPlayerTable(player_id).dice.addDice(player_dice);
+   }
+
+   private notif_onReturnFamilyDie({ player_id, die }: { player_id: number; die: Dice }) {
+      return this.game.getPlayerTable(player_id).dice.addDie(die);
    }
 
    private notif_onNewSeason(args: { info: ValleyUIData }) {

@@ -634,12 +634,15 @@ body > .bga-dice_die {
   align-items: center;
   gap: 5px;
 }
-#table-center-wrapper #board #dice-locations .slot .lesson-wrapper {
+#table-center-wrapper #board #dice-locations .slot .tokens-wrapper {
   margin-top: 5px;
   display: inline-flex;
 }
-#table-center-wrapper #board #dice-locations .slot .lesson-wrapper .resource-icon:not(:first-child) {
+#table-center-wrapper #board #dice-locations .slot .tokens-wrapper .resource-icon:not(:first-child) {
   margin-left: -16px;
+}
+#table-center-wrapper #board #dice-locations .slot.is-invalid {
+  outline: 5px dashed red;
 }
 #table-center-wrapper #board #dice-locations [data-slot-id="1"] {
   top: 54px;
@@ -1005,10 +1008,12 @@ body > .bga-dice_die {
   top: 167px;
   left: 6px;
 }
-.player-table .player-table-improvement, .player-table .player-table-confort {
+.player-table .player-table-improvement,
+.player-table .player-table-confort {
   max-width: 515px;
 }
-.player-table .player-table-improvement:empty, .player-table .player-table-confort:empty {
+.player-table .player-table-improvement:empty,
+.player-table .player-table-confort:empty {
   display: none;
 }
 .player-table .player-table-confort .card {
@@ -1031,6 +1036,10 @@ body > .bga-dice_die {
 }
 .player-table.player-color-purple .player-table-board {
   background-image: url("img/board_purple.jpg");
+}
+.player-table .card.improvement .card-sides .front {
+  box-shadow: none;
+  filter: none;
 }
 
 .gamestate_bicycle .player-table .card.improvement .front[data-type="4"] {
@@ -1151,6 +1160,7 @@ body > .bga-dice_die {
 .card.confort .card-sides .front {
   border-radius: 5px;
   background-size: 660px 924px;
+  outline: 1px solid #000;
 }
 .card.confort .card-sides .front.background_1 {
   background-image: url("img/confort_front_1.jpg");
@@ -1755,6 +1765,36 @@ body > .bga-dice_die {
   transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
 }
 
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='%23fdc627' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23231f21' /%3E%3C/svg%3E ") !important;
+  box-shadow: inset 2px 2px 3px #C68212, inset -2px -2px 3px #C68312;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='white' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23231f21' /%3E%3C/svg%3E ") !important;
+  box-shadow: inset 0px 0px 4px #231f21;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face, .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face {
+  background-size: 600% 100%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="1"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="1"] {
+  background-position: 0% 0%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="2"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="2"] {
+  background-position: -100% 0%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="3"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="3"] {
+  background-position: -200% 0%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="4"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="4"] {
+  background-position: -300% 0%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="5"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="5"] {
+  background-position: -400% 0%;
+}
+.bga-dice_die.bga-dice_die6.colored-die[data-color=yellow] .bga-dice_die-face[data-face="6"], .bga-dice_die.bga-dice_die6.colored-die[data-color=white] .bga-dice_die-face[data-face="6"] {
+  background-position: -500% 0%;
+}
+
 .dice-icon-log {
   width: 25px;
   height: 25px;
@@ -1915,6 +1955,15 @@ body > .bga-dice_die {
   background-repeat: no-repeat;
   background-position: 4px 4px;
   width: 25px;
+}
+.resource-icon[data-type=umbrella] {
+  background-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cg transform="rotate(45 12 12)"%3E%3Cpath fill="currentColor" d="M12.75 1.5a.75.75 0 0 0-1.5 0v1.03a9.5 9.5 0 0 0-8.749 9.319a.667.667 0 0 0 .558.668a54.39 54.39 0 0 0 8.191.735V19a.75.75 0 0 1-1.5 0v-.5a.75.75 0 0 0-1.5 0v.5a2.25 2.25 0 0 0 4.5 0v-5.748a54.39 54.39 0 0 0 8.192-.735a.667.667 0 0 0 .557-.668c-.077-4.926-3.902-8.941-8.749-9.32V1.5Z"%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+  background-size: 26px 26px;
+  background-color: white;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background-position: 2px 2px;
 }
 
 .resource-container .resource-counter-line-stock {
@@ -2083,7 +2132,7 @@ body > .bga-dice_die {
 .bgabutton .resource-icon {
   display: inline-block;
   vertical-align: middle;
-  zoom: 0.6;
+  zoom: 0.8;
 }
 
 .bga-cards_selected-card .front {
@@ -2182,4 +2231,8 @@ body > .bga-dice_die {
 #pagemaintitletext .resource-icon {
   display: inline-block;
   vertical-align: middle;
+}
+
+.cc-toolbar {
+  padding: 5px 0;
 }

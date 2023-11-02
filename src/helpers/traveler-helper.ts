@@ -23,6 +23,7 @@ class TravelerHelper {
 
    private static isTravelerActive(type: number): boolean {
       const game = (window as any).gameui as CreatureConforts;
+      if (Number(game.gamedatas.gamestate.id) > 90) return false;
       return Number(game.tableCenter.traveler_deck.getTopCard().type) === type;
    }
 }

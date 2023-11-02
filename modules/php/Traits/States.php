@@ -151,7 +151,21 @@ trait States {
         }
     }
 
-    function stUnkeep() {
+    function stPreUpkeep() {
+        $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
+        $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
+        
+        $turn_number = intval(Game::get()->getStat(STAT_TURN_NUMBER));
+        $last_turn_number = $isShortGame ? 6 : 8;
+
+        if($turn_number === $last_turn_number) {
+            Game::get()->gamestate->nextState('end');
+        } else {
+            Game::get()->gamestate->nextState('upkeep');
+        }
+    }
+
+    function stUpkeep() {
 
         Globals::setRavenLocationIds([]);
 

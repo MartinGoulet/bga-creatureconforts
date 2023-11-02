@@ -47,6 +47,10 @@ class TableCenter {
       });
    }
 
+   public getDiceFromLocation(location_id: number): Dice[] {
+      return this.dice_locations.getDice().filter((die: Dice) => die.location == location_id);
+   }
+
    public getWorkerLocations(): number[] {
       const player_id = this.game.getPlayerId().toString();
       return this.game.tableCenter.worker_locations

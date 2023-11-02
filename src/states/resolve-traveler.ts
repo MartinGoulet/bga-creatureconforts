@@ -2,8 +2,6 @@ class ResolveTravelerState implements StateHandler {
    private resource_manager?: ResourceManagerPayFor<IconsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('traveler');
 
-   private trade: ResourceManagerPayForSettings<IconsType>;
-
    constructor(private game: CreatureConforts) {}
 
    onEnteringState(args: any): void {
@@ -16,7 +14,6 @@ class ResolveTravelerState implements StateHandler {
       const traveler_type = Number(this.game.tableCenter.traveler_deck.getTopCard().type);
       const trade: ResourceManagerPayForSettings<IconsType> =
          this.game.gamedatas.travelers.types[traveler_type].trade[die.face];
-      this.trade = trade;
 
       const getRequirementFrom = (): IconsType[] | IconsType[][] => {
          if (TravelerHelper.isActiveHairyTailedHole()) {

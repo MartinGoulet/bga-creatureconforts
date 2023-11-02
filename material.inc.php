@@ -27,6 +27,7 @@ $this->confort_types = [
       'name' => clienttranslate("Board Game"),
       'score' => 7,
       'cost' => [ANY_RESOURCE => 2, COIN => 1, STORY => 1],
+      'class' => "BoardGame",
    ],
    2 => [
       'name' => clienttranslate("Snowshoes"),
@@ -39,12 +40,14 @@ $this->confort_types = [
       'type' => FOOD,
       'score' => 4,
       'cost' => [FRUIT => 4],
+      'class' => "Preserves",
    ],
    4 => [
       'name' => clienttranslate("Ice Skates"),
       'type' => OUTDOOR,
       'score' => 6,
       'cost' => [COIN => 2, YARN => 1],
+      'class' => "IceSkates",
    ],
    5 => [
       'name' => clienttranslate("Muffler"),
@@ -56,21 +59,25 @@ $this->confort_types = [
       'name' => clienttranslate("Rocking Chair"),
       'score' => 5,
       'cost' => [WOOD => 3, YARN => 1],
+      'class' => "RockingChair",
    ],
    7 => [
       'name' => clienttranslate("Piggy Bank"),
       'score' => 3,
       'cost' => [STONE => 1, COIN => 2],
+      'class' => "PiggyBank",
    ],
    8 => [
       'name' => clienttranslate("Bookshelf"),
       'score' => 6,
       'cost' => [WOOD => 2, STORY => 2],
+      'class' => "Bookshelf",
    ],
    9 => [
       'name' => clienttranslate("Pot of Tea"),
       'score' => 4,
       'cost' => [FRUIT => 2, COIN => 1],
+      'class' => "PotOfTea",
    ],
    10 => [
       'name' => clienttranslate("Candles"),
@@ -88,6 +95,8 @@ $this->confort_types = [
       'name' => clienttranslate("Pantry"),
       'score' => 5,
       'cost' => [WOOD => 1, GRAIN => 1, MUSHROOM => 1, FRUIT => 1],
+      'class' => "Pantry",
+      "storable" => [GRAIN, MUSHROOM, FRUIT],
    ],
    13 => [
       'name' => clienttranslate("Pie"),
@@ -100,11 +109,13 @@ $this->confort_types = [
       'type' => FOOD,
       'score' => 5,
       'cost' => [MUSHROOM => 4],
+      'class' => "Stew",
    ],
    15 => [
       'name' => clienttranslate("Flute"),
       'score' => 4,
       'cost' => [WOOD => 1, COIN => 1],
+      'class' => "Flute",
    ],
    16 => [
       'name' => clienttranslate("Soup"),
@@ -116,6 +127,8 @@ $this->confort_types = [
       'name' => clienttranslate("Fairy Garden"),
       'score' => 4,
       'cost' => [MUSHROOM => 2, COIN => 2],
+      'class' => "FairyGarden",
+      "storable" => [WOOD, STONE, GRAIN, MUSHROOM, YARN, FRUIT],
    ],
    18 => [
       'name' => clienttranslate("Toys"),
@@ -127,6 +140,7 @@ $this->confort_types = [
       'type' => OUTDOOR,
       'score' => 5,
       'cost' => [WOOD => 2, YARN => 1],
+      'class' => "Toboggan",
    ],
    20 => [
       'name' => clienttranslate("Mandolin"),
@@ -144,18 +158,23 @@ $this->confort_types = [
       'type' => FOOD,
       'score' => 4,
       'cost' => [GRAIN => 5],
+      'class' => "Bread",
    ],
    23 => [
       'name' => clienttranslate("Hearth"),
       'type' => LIGHTING,
       'score' => 6,
       'cost' => [WOOD => 2, STONE => 3],
+      'class' => "Hearth",
+      "storable" => [WOOD],
    ],
    24 => [
       'name' => clienttranslate("Lamp"),
       'type' => LIGHTING,
       'score' => 4,
       'cost' => [STONE => 1, YARN => 1, COIN => 1],
+      'class' => "Lamp",
+      "storable" => [STORY],
    ],
    // --- gen php end --- 
 ];

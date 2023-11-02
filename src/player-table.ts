@@ -21,16 +21,11 @@ class PlayerTable {
       this.setupWorker(game, player);
       this.setupConfort(game, player);
       this.setupImprovement(game);
-      // if (this.player_id == this.game.getPlayerId()) this.setupResources();
    }
 
-   // public displayResource(resources: { [type: string]: number }[]) {
-   //    document.getElementById(`player-table-${this.player_id}-resources`).classList.add('show');
-   // }
-
-   // public hideResource() {
-   //    document.getElementById(`player-table-${this.player_id}-resources`).classList.remove('show');
-   // }
+   public hasUmbrella(): boolean {
+      return this.improvements.getCards().filter((card) => card.type === '9').length > 0;
+   }
 
    private setupBoard(game: CreatureConforts, player: CreatureConfortsPlayerData) {
       const dataset: string = [`data-color="${player.color}"`].join(' ');
@@ -69,7 +64,7 @@ class PlayerTable {
          game.confortManager,
          document.getElementById(`player-table-${this.player_id}-confort`),
          {
-            gap: '10px',
+            gap: '7px',
          },
       );
       this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
@@ -115,7 +110,7 @@ class PlayerTable {
          game.improvementManager,
          document.getElementById(`player-table-${this.player_id}-improvement`),
          {
-            gap: '15px',
+            gap: '7px',
          },
       );
 

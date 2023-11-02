@@ -111,6 +111,7 @@ interface ConfortType {
    type?: 'outdoor' | 'food' | 'clothing' | 'lighting';
    score: number;
    cost: { [type: string]: number };
+   storable?: IconsType[];
 }
 
 interface ValleyType {

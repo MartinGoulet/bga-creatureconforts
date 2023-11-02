@@ -2,8 +2,6 @@
 
 namespace CreatureConforts\Core;
 
-use BgaUserException;
-
 /*
  * Game: a wrapper over table object to allow more generic modules
  */

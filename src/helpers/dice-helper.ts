@@ -25,6 +25,8 @@ class DiceHelper {
          requirement = this.getValleyRequirement(info);
       } else if (location_id >= 5 && location_id <= 7) {
          requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
+      } else {
+         return true;
       }
       return requirement.isRequirementMet(dice.map((d) => Number(d.face)).sort((a, b) => a - b));
    }

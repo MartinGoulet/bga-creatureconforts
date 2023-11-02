@@ -18,7 +18,6 @@ const OPTION_SHORT_GAME_DISABLED = 1;
  * States
  */
 const ST_BGA_GAME_SETUP = 1;
-const ST_PRE_END_OF_GAME = 98;
 const ST_END_GAME = 99;
 
 const ST_START_HAND = 2;
@@ -54,6 +53,9 @@ const ST_STRIPED_SKUNK = 74;
 const ST_IMPROVEMENT_BICYCLE = 80;
 
 const ST_START_TURN = 90;
+
+const ST_PRE_END_OF_GAME = 95;
+const ST_PRE_END_OF_GAME_SCORING = 96;
 
 /**
  * Goods tokens

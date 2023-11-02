@@ -29,12 +29,16 @@ class ResourceTrader<TResource> {
          resources: from.resources,
          restriction: from.restriction,
       });
-      this.element.append(this.createArrow());
-      this.to = new ResourcePlaceholderLineStock(this.element, to.count ?? to.resources!.length, {
-         restriction: to.restriction,
-      });
-      if (to.resources) {
-         to.resources.forEach((r) => this.to.add(r));
+
+      if (to.count || to.resources || to.resources) {
+         this.element.append(this.createArrow());
+
+         this.to = new ResourcePlaceholderLineStock(this.element, to.count ?? to.resources!.length, {
+            restriction: to.restriction,
+         });
+         if (to.resources) {
+            to.resources.forEach((r) => this.to.add(r));
+         }
       }
    }
 

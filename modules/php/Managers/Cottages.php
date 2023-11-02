@@ -34,6 +34,17 @@ class Cottages {
         return self::deck()->pickCardForLocation("brd_$player_id", "improvement", $card_id);
     }
 
+    static function countPlayerCottageRemaining($player_id) {
+        return sizeof(self::deck()->getCardsOnTop(4, "brd_$player_id"));
+    }
+
+    static function getOwner($improvement) {
+        $cottages = self::deck()->getCardsInLocation("improvement", $improvement['id']);
+        $cottage = array_shift($cottages);
+        $player_id = intval($cottage['type_arg']);
+        return $player_id;
+    }
+
     static function setupNewGame($players, $options) {
         $players = Game::get()->loadPlayersBasicInfos();
         foreach ($players as $player_id => $player) {

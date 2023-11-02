@@ -173,13 +173,17 @@
             align-items: center;
             gap: 5px;
 
-            .lesson-wrapper {
+            .tokens-wrapper {
                margin-top: 5px;
                display: inline-flex;
 
                .resource-icon:not(:first-child) {
                   margin-left: -16px;
                }
+            }
+
+            &.is-invalid {
+               outline: 5px dashed red;
             }
          }
 

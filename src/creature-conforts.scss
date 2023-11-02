@@ -102,7 +102,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    .resource-icon {
       display: inline-block;
       vertical-align: middle;
-      zoom: 0.6;
+      zoom: 0.8;
    }
 }
 
@@ -224,4 +224,8 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       display: inline-block;
       vertical-align: middle;
    }
+}
+
+.cc-toolbar {
+   padding: 5px 0 
 }

@@ -21,6 +21,7 @@ interface CreatureConforts
    fadeOutAndDestroy(id: string, duration?: number, delay?: number): void;
    showMessage(msg: string, type: 'info' | 'error' | 'only_to_log'): void;
    updatePlayerOrdering(): void;
+   removeActionButtons: () => void;
    addTooltip(
       nodeId: string,
       helpStringTranslated: string,
@@ -262,6 +263,10 @@ class CreatureConforts
 
    public getPlayerTable(playerId: number): PlayerTable {
       return this.playersTables.find((playerTable) => playerTable.player_id === playerId);
+   }
+
+   public getCurrentPlayerPanel() {
+      return this.getPlayerPanel(this.getPlayerId());
    }
 
    public getCurrentPlayerTable() {

@@ -54,6 +54,8 @@
         "src/resource-manager/resource-placeholder.ts",
         "src/resource-manager/resource-trader.ts",
 
+        "src/dice-modifier/dice-modifier.ts",
+
         "src/stocks/discard-stock.ts",
         "src/stocks/hand-stock.ts",
         "src/stocks/location-stock.ts",
@@ -67,6 +69,7 @@
         "src/managers/workers.ts",
 
         "src/helpers/dice-helper.ts",
+        "src/helpers/improvement-helper.ts",
         "src/helpers/resource-requirement.ts",
         "src/helpers/traveler-helper.ts",
 
@@ -74,6 +77,7 @@
         "src/states/start-hand.ts",
         "src/states/placement.ts",
         "src/states/player-turn-dice.ts",
+        "src/states/player-turn-dice-modifier.ts",
         "src/states/player-turn-resolve.ts",
         "src/states/player-turn-craft.ts",
         "src/states/player-turn-discard.ts",
@@ -83,6 +87,7 @@
         "src/states/resolve-owl-nest.ts",
         "src/states/resolve-workshop.ts",
         "src/states/upkeep.ts",
+        "src/states/pre-end-game.ts",
 
         "src/states/improvement-bicycle.ts",
         "src/states/improvement-bicycle-destination.ts",

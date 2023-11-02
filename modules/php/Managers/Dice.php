@@ -50,6 +50,11 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
+    static function get($dice_id) {
+        $dice = self::getDice([$dice_id]);
+        return array_shift($dice);
+    }
+
     static function getDice(array $dice_ids) {
         $dice_ids = implode(',', $dice_ids);
         $sql = "SELECT dice_id id, dice_color type, dice_value face, dice_owner_id owner_id, dice_location location FROM dice WHERE dice_id in ($dice_ids)";
@@ -77,6 +82,10 @@ class Dice extends \APP_DbObject {
 
     static function moveWhiteDiceToHill() {
         self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id is null");
+    }
+
+    static function moveFamilyDieToBoard(int $player_id, int $die_id) {
+        self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id AND dice_id = $die_id");
     }
 
     static function movePlayerDiceToBoard($player_id) {

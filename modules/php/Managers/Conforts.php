@@ -107,6 +107,10 @@ class Conforts {
         return array_values(array_merge($cards, $selection));
     }
 
+    static function getCardType($card) {
+        return Game::get()->confort_types[$card['type']];
+    }
+
     static function getName($card) {
         $card_type = Game::get()->confort_types[$card['type']];
         return $card_type['name'];

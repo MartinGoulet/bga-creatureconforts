@@ -135,7 +135,7 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
-    static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson) {
+    static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson, $nbr_umbrella) {
         $message = clienttranslate('${player_name} uses ${resources_to} to change ${die_from} for ${die_to}');
         $new_dice = $die;
         $new_dice['face'] = $new_value;
@@ -146,7 +146,10 @@ class Notifications extends \APP_DbObject {
             'die_to' => $new_value,
             'die_color' => $die['type'],
             'nbr_lesson' => $nbr_lesson,
-            'resources_to' => [LESSON_LEARNED => 1],
+            'resources_to' => [
+                LESSON_LEARNED => $nbr_lesson,
+                'umbrella' => $nbr_umbrella
+            ],
         ]);
     }
 
@@ -177,6 +180,13 @@ class Notifications extends \APP_DbObject {
         self::notifyAll('onReturnDice', '', [
             'player_id' => $player_id,
             'dice' => $dice,
+        ]);
+    }
+
+    static function returnFamilyDie(int $player_id, array $die) {
+        self::notifyAll('onReturnFamilyDie', '', [
+            'player_id' => $player_id,
+            'die' => $die,
         ]);
     }
 

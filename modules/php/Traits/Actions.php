@@ -7,12 +7,14 @@ use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
 use CreatureConforts\Helpers\DiceHelper;
+use CreatureConforts\Helpers\ImprovementHelper;
 use CreatureConforts\Helpers\MarketHelper;
 use CreatureConforts\Helpers\ResourcesHelper;
 use CreatureConforts\Helpers\TravelerHelper;
 use CreatureConforts\Helpers\WorkshopHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
+use CreatureConforts\Managers\Improvements;
 use CreatureConforts\Managers\Players;
 use CreatureConforts\Managers\Travelers;
 use CreatureConforts\Managers\Valleys;
@@ -73,14 +75,33 @@ trait Actions {
         Globals::setWorkerPlacement($current_player_id, []);
     }
 
-    function confirmPlayerDice(array $dice_ids, array $location_ids, array $modifiers) {
+    function confirmPlayerDice(array $dice_ids, array $location_ids, array $lesson, array $umbrella) {
 
-        $sum_modifier = array_sum(array_values($modifiers));
-        if ($sum_modifier > 0) {
-            if (!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier])) {
+        $count_umbrella = 0;
+        $sum_lesson = 0;
+
+        $infos = [];
+        for ($i = 0; $i < sizeof($dice_ids); $i++) {
+            $info = [
+                'die'      => intval($dice_ids[$i]),
+                'location' => intval($location_ids[$i]),
+                'lesson'   => intval($lesson[$i]),
+                'umbrella' => intval($umbrella[$i]),
+            ];
+            $count_umbrella += in_array($info['umbrella'], [1, 2]) ? 1 : 0;
+            $sum_lesson += $info['lesson'];
+            $infos[$info['die']] = $info;
+        }
+
+        if ($sum_lesson > 0) {
+            if (!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_lesson])) {
                 throw new BgaUserException("Not enough lesson learned");
             }
-            Players::removeResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_modifier]);
+            Players::removeResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_lesson]);
+        }
+
+        if ($count_umbrella > 0 && !Improvements::hasUmbrella(Players::getPlayerId())) {
+            throw new BgaUserException("You dont have the Umbrella");
         }
 
         $dice = Dice::getDice($dice_ids);
@@ -89,27 +110,24 @@ trait Actions {
         // Group dice by location
 
         $error = [];
-        for ($i = 0; $i < sizeof($dice_ids); $i++) {
-            $location_id = intval($location_ids[$i]);
-            $modifier = intval($modifiers[$i]);
-            $die_id = intval($dice_ids[$i]);
-            $die = array_values(array_filter($dice, function ($die) use ($die_id) {
-                return $die['id'] == $die_id;
-            }))[0];
-            $dice_value = intval($die['face']);
-
+        foreach ($dice as $die) {
+            $die_id = intval($die['id']);
+            $info = $infos[$die_id];
+            $value = intval($die['face']) + $info['lesson'] + $info['umbrella'];
+            $location_id = $info['location'];
             if (!array_key_exists($location_id, $dice_by_locations)) {
                 $dice_by_locations[$location_id] = [];
                 $dice_value_by_location[$location_id] = [];
             }
-            $dice_by_locations[$location_id][] = $die_id;
-            $dice_value_by_location[$location_id][] = $dice_value + $modifier;
 
-            if ($modifier != 0) {
-                Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $dice_value + $modifier, $modifier);
+            $dice_by_locations[$location_id][] = $die_id;
+            $dice_value_by_location[$location_id][] = $value;
+
+            if ($info['lesson'] != 0) {
+                Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $value, $info['lesson'], $info['umbrella']);
             }
 
-            if (!in_array($location_id, [1, 2, 3, 4, 5, 6, 7, 9, 10, 12]) && $modifier !== 0) {
+            if (!in_array($location_id, [1, 2, 3, 4, 5, 6, 7, 9, 10, 12]) && $value !== intval($die['face'])) {
                 $error[] = $location_id;
             }
         }
@@ -138,18 +156,23 @@ trait Actions {
     function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids) {
         $player_id = $this->getActivePlayerId();
 
+        $dice = Dice::getDiceInLocation($location_id); 
+        
+        if (sizeof($dice) == 0) {
+            throw new BgaUserException("No dice here");
+        }
+
+        if ($location_id >= 20) {
+            ImprovementHelper::resolve($location_id);
+            return;
+        }
+
         $worker = Worker::returnToPlayerBoard($player_id, $location_id);
         if ($worker == null) {
             throw new BgaUserException("No worker in this location, please refresh your page");
         }
 
         Notifications::returnToPlayerBoard($worker);
-
-        $dice = Dice::getDiceInLocation($location_id);
-
-        if (sizeof($dice) == 0) {
-            throw new BgaUserException("No dice here");
-        }
 
         if ($location_id >= 1 && $location_id <= 4) {
             $valley = Valleys::getValleyLocationInfo($location_id);
@@ -257,8 +280,9 @@ trait Actions {
         });
 
         // TODO Glade
-        $next_step = count($workers_not_home) > 0 ? "next" : "end";
-        Game::get()->gamestate->nextState($next_step);
+        // $next_step = count($workers_not_home) > 0 ? "next" : "end";
+        // Game::get()->gamestate->nextState($next_step);
+        Game::get()->gamestate->nextState("next");
     }
 
     function confirmResolveWorker() {
@@ -406,7 +430,7 @@ trait Actions {
             throw new BgaUserException("Worker already in that location");
         }
 
-        if($location <= 0 || $location > 12) {
+        if ($location <= 0 || $location > 12) {
             throw new BgaUserException("Location must be between 1 and 12 => " . $location);
         }
 

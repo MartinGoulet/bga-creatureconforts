@@ -1,42 +1,42 @@
 class PlayerTurnResolveState implements StateHandler {
-   private glade_selection?: number;
+   private glade_selection?: number = undefined;
 
    constructor(private game: CreatureConforts) {}
+
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;
 
       const { worker_locations, dice_locations } = this.game.tableCenter;
 
       const handleWorkerLocationClick = (slotId: SlotId) => {
-         if (worker_locations.isSelectedLocation(slotId)) {
-            worker_locations.setSelectedLocation([]);
-            this.game.disableButton('btn_resolve');
-         } else {
-            worker_locations.setSelectedLocation([slotId]);
-            this.game.enableButton('btn_resolve');
-         }
-         document
-            .querySelectorAll('#dice-locations .slot-dice.selectable.selected')
-            .forEach((slot) => slot.classList.remove('selected'));
+         const isSelected = worker_locations.isSelectedLocation(slotId);
+         this.clearSelectedDiceLocations();
+         worker_locations.setSelectedLocation(isSelected ? [] : [slotId]);
+         this.game.toggleButtonEnable('btn_resolve', !isSelected);
       };
 
-      const handleGladeSlotClick = (slot_id: number, is_selected: boolean) => {
-         const hasDice = this.getDiceFromLocation(Number(slot_id)).length == 1;
-         if (hasDice) {
-            this.glade_selection = is_selected ? slot_id : undefined;
-            this.game.toggleButtonEnable('btn_resolve', is_selected);
+      const handleGladeSlotClick = (slotId: number, isSelected: boolean) => {
+         if (hasSingleDice(slotId)) {
+            this.glade_selection = isSelected ? slotId : undefined;
+            this.game.toggleButtonEnable('btn_resolve', isSelected);
             worker_locations.setSelectedLocation([]);
          }
+      };
+
+      const hasSingleDice = (slotId: number) => {
+         const diceCount = this.game.tableCenter.getDiceFromLocation(slotId).length;
+         return diceCount === 1;
       };
 
       const dices = dice_locations.getDice().map((die: Dice) => Number(die.location));
       const locations = this.game.tableCenter
          .getWorkerLocations()
-         .filter((location) => dices.indexOf(location) >= 0);
+         .filter((location) => dices.includes(location));
       worker_locations.setSelectableLocation(locations);
       worker_locations.OnLocationClick = handleWorkerLocationClick;
 
-      document.querySelectorAll('#dice-locations .slot-dice').forEach((slot: HTMLElement) => {
+      const slotDices = document.querySelectorAll('#dice-locations .slot-dice:not(:empty)');
+      slotDices.forEach((slot: HTMLElement) => {
          slot.classList.toggle('selectable', true);
          slot.addEventListener('click', (ev: Event) => {
             ev.stopPropagation();
@@ -46,38 +46,53 @@ class PlayerTurnResolveState implements StateHandler {
          });
       });
    }
+
    onLeavingState(): void {
       const { worker_locations } = this.game.tableCenter;
       worker_locations.setSelectableLocation([]);
       worker_locations.setSelectedLocation([]);
       worker_locations.OnLocationClick = null;
+      this.clearSelectedDiceLocations();
+      this.glade_selection = undefined;
+      document
+         .querySelectorAll('#dice-locations .slot-dice.selectable')
+         .forEach((div) => div.classList.remove('selectable'));
    }
+
    onUpdateActionButtons(args: any): void {
       const handleResolve = () => {
-         if (this.game.tableCenter.worker_locations.getSelectedLocation().length == 0) {
-            this.game.showMessage(_('You must select a location with one of your worker'), 'error');
+         if (this.glade_selection) {
+            this.game.takeAction('resolveWorker', { location_id: this.glade_selection });
             return;
          }
 
-         const location_id: number = Number(this.game.tableCenter.worker_locations.getSelectedLocation()[0]);
-         if (location_id == 8) {
+         const selectedLocations = this.game.tableCenter.worker_locations.getSelectedLocation();
+
+         if (selectedLocations.length === 0) {
+            this.game.showMessage(_('You must select a location with one of your workers'), 'error');
+            return;
+         }
+
+         const locationId: number = Number(selectedLocations[0]);
+
+         if (locationId == 8) {
             this.game.setClientState('resolveMarket', {
                descriptionmyturn: _('You must resolve the effect of the market'),
             });
-         } else if (location_id == 9) {
+         } else if (locationId == 9) {
             this.game.setClientState('resolveTraveler', {
                descriptionmyturn: _('You must resolve the effect of the traveler'),
             });
-         } else if (location_id == 10) {
+         } else if (locationId == 10) {
             this.game.setClientState('resolveWorkshop', {
                descriptionmyturn: _(`You must select one card in the Workshop`),
             });
-         } else if (location_id == 11) {
+         } else if (locationId == 11) {
             this.game.setClientState('resolveOwnNest', {
                descriptionmyturn: _(`You must select one card in the Owl's Nest`),
             });
          } else {
-            this.game.takeAction('resolveWorker', { location_id });
+            this.game.takeAction('resolveWorker', { location_id: locationId });
          }
       };
 
@@ -95,9 +110,10 @@ class PlayerTurnResolveState implements StateHandler {
       this.game.addActionButtonUndo();
    }
 
-   private getDiceFromLocation(location_id: number): Dice[] {
-      return this.game.tableCenter.dice_locations
-         .getDice()
-         .filter((die: Dice) => die.location == location_id);
+   clearSelectedDiceLocations() {
+      const selectedDiceLocations = document.querySelectorAll(
+         '#dice-locations .slot-dice.selectable.selected',
+      );
+      selectedDiceLocations.forEach((slot) => slot.classList.remove('selected'));
    }
 }

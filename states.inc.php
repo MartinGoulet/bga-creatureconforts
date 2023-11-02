@@ -139,7 +139,30 @@ $improvementStates = [
     ],
 ];
 
-$machinestates = $basicGameStates + $travelerStates + $improvementStates + array(
+$endGameStates = [
+    ST_PRE_END_OF_GAME => [
+        "name" => "preEndOfGame",
+        "descriptionmyturn" => clienttranslate('${you} may store resources on your comfort\'s cards for bonus scoring'),
+        "description" => clienttranslate('Waiting for others to store resources on their comfort\'s cards for bonus scoring'),
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        "possibleactions" => ["confirmStoreResource", "cancelStoreResource"],
+        "transitions" => [
+            "" =>  ST_PRE_END_OF_GAME_SCORING
+        ],
+    ],
+
+    ST_PRE_END_OF_GAME_SCORING => [
+        "name" => "endGameScore",
+        "type" => "game",
+        "action" => "stEndGameScore",
+        "transitions" => [
+            "" => ST_END_GAME,
+        ]
+    ],
+];
+
+$machinestates = $basicGameStates + $travelerStates + $improvementStates + $endGameStates + array(
 
     ST_START_HAND => [
         "name" => "startHand",
@@ -295,17 +318,19 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + array
 
     ST_PRE_UPKEEP => [
         "name" => "preUpkeep",
-        "description" => "Step 6 : Unkeep",
         "type" => "game",
-        "action" => "stUnkeep",
-        "transitions" => ["" => ST_NEW_TRAVELER]
+        "action" => "stPreUpkeep",
+        "transitions" => [
+            "unkeep" => ST_UPKEEP,
+            "end" => ST_PRE_END_OF_GAME,
+        ]
     ],
 
     ST_UPKEEP => [
         "name" => "upkeep",
-        "description" => "Step 6 : Unkeep",
+        "description" => "Step 6 : Upkeep",
         "type" => "game",
-        "action" => "stUnkeep",
+        "action" => "stUpkeep",
         "transitions" => ["" => ST_NEW_TRAVELER]
     ],
 

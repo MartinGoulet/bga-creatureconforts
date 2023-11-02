@@ -22,6 +22,10 @@ class Improvements extends \APP_DbObject {
         }, $cards);
     }
 
+    static function getCardInLocation() {
+        
+    }
+
     static function getDeck() {
         $cards = self::deck()->getCardsInLocation('deck', null, 'location_arg');
         return self::anonymize($cards);
@@ -119,6 +123,11 @@ class Improvements extends \APP_DbObject {
 
     static function hasToolShed($player_id) {
         $cards = self::deck()->getCardsOfTypeInLocation('6', null, 'board', $player_id);
+        return sizeof($cards) > 0;
+    }
+
+    static function hasUmbrella($player_id) {
+        $cards = self::deck()->getCardsOfTypeInLocation('9', null, 'board', $player_id);
         return sizeof($cards) > 0;
     }
 

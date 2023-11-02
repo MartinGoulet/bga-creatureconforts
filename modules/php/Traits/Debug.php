@@ -2,8 +2,10 @@
 
 namespace CreatureConforts\Traits;
 
+use BgaUserException;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Notifications;
+use CreatureConforts\Core\Score;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Cottages;
 use CreatureConforts\Managers\Dice;
@@ -46,5 +48,9 @@ trait Debug {
     function addColumn() {
         self::DbQuery('ALTER TABLE `player` ADD `almanac` smallint UNSIGNED NOT NULL DEFAULT 0');
         self::DbQuery('ALTER TABLE `player` ADD `wheelbarrow` smallint UNSIGNED NOT NULL DEFAULT 0');
+    }
+
+    function score() {
+        var_dump(Score::getScore($this->getCurrentPlayerId()));
     }
 }

@@ -10,6 +10,7 @@ class StateManager {
          playerTurnDice: new PlayerTurnDiceState(game),
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
+         resolvePlayerTurnDiceManipulation: new PlayerTurnDiceManipulationState(game),
          resolveTraveler: new ResolveTravelerState(game),
          resolveTravelerDiscard: new ResolveTravelerDiscardState(game),
          resolveMarket: new ResolveMarketState(game),
@@ -17,6 +18,7 @@ class StateManager {
          resolveWorkshop: new ResolveWorkshopState(game),
          playerTurnDiscard: new PlayerTurnDiscardState(game),
          upkeep: new UpkeepState(game),
+         preEndOfGame: new PreEndGame(game),
 
          bicycle: new ImprovementBicycleState(game),
          resolveBicycleDestination: new ImprovementBicycleDestinationState(game),

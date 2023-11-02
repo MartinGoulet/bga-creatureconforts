@@ -107,6 +107,11 @@ class Players extends \APP_DbObject {
         }
     }
 
+    static function getResources(int $player_id) {
+        $sql = "SELECT wood, stone, fruit, mushroom, yarn, grain, lesson, story, coin FROM player WHERE player_id = $player_id";
+        return self::getObjectFromDB($sql);
+    }
+
     static function hasEnoughResource(int $player_id, array $cost) {
         $card = 0;
         $values = ["player_id = $player_id"];

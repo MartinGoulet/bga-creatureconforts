@@ -64,4 +64,13 @@
       background-position: 4px 4px;
       width: 25px;
    }
+   &[data-type='umbrella'] {
+      background-image: url('data:image/svg+xml,%3Csvg xmlns="http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg" width="24" height="24" viewBox="0 0 24 24"%3E%3Cg transform="rotate(45 12 12)"%3E%3Cpath fill="currentColor" d="M12.75 1.5a.75.75 0 0 0-1.5 0v1.03a9.5 9.5 0 0 0-8.749 9.319a.667.667 0 0 0 .558.668a54.39 54.39 0 0 0 8.191.735V19a.75.75 0 0 1-1.5 0v-.5a.75.75 0 0 0-1.5 0v.5a2.25 2.25 0 0 0 4.5 0v-5.748a54.39 54.39 0 0 0 8.192-.735a.667.667 0 0 0 .557-.668c-.077-4.926-3.902-8.941-8.749-9.32V1.5Z"%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E');
+      background-size: 26px 26px;
+      background-color: white;
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      background-position: 2px 2px;
+   }
 }

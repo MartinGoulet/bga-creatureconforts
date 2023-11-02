@@ -40,6 +40,14 @@ class Globals extends \APP_DbObject {
         self::set("locations_" . $player_id, $locations_id);
     }
 
+    public static function getComfortResource(int $card_id) {
+        return self::get("comforts_" . $card_id, true) ?? [];
+    }
+
+    public static function setComfortResource(int $card_id, array $resources) {
+        self::set("comforts_" . $card_id, $resources);
+    }
+
     /*************************
      **** GENERIC METHODS ****
      *************************/
