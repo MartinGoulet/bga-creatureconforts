@@ -169,6 +169,16 @@ class action_creatureconforts extends APP_GameAction {
       self::ajaxResponse();
    }
 
+   public function confirmStoreResource() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      // $card_ids = self::getArg("card_ids", AT_numberlist, true);
+      // $card_ids = self::getArrayArgs($card_ids);
+      // Then, call the appropriate method in your game logic
+      $this->game->gamestate->checkPossibleAction('confirmStoreResource');
+      $this->game->confirmStoreResource();
+      self::ajaxResponse();
+   }
 
    public function confirmGrayWolf() {
       self::setAjaxMode();

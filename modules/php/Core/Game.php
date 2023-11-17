@@ -22,4 +22,10 @@ class Game extends \APP_DbObject {
         $stateNum = intval(self::get()->getGameStateValue(VAR_SAVEPOINT_TRANSITION));
         self::get()->gamestate->jumpToState($stateNum);
     }
+
+    public static function isShortGame() {
+        $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
+        $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
+        return $isShortGame;
+    }
 }

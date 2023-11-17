@@ -32,6 +32,12 @@ class StateManager {
    onEnteringState(stateName: string, args: any): void {
       debug('Entering state: ' + stateName);
 
+      if (args.phase) {
+         this.game.gameOptions.setPhase(args.phase);
+      } else {
+         this.game.gameOptions.setPhase('99');
+      }
+
       if (this.states[stateName] !== undefined) {
          this.states[stateName].onEnteringState(args.args);
          if (stateName.startsWith('resolve')) {

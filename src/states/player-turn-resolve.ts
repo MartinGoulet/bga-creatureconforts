@@ -3,7 +3,7 @@ class PlayerTurnResolveState implements StateHandler {
 
    constructor(private game: CreatureConforts) {}
 
-   onEnteringState(args: any): void {
+   onEnteringState({ locations }: PlayerTurnResolveArgs): void {
       if (!this.game.isCurrentPlayerActive()) return;
 
       const { worker_locations, dice_locations } = this.game.tableCenter;
@@ -28,11 +28,7 @@ class PlayerTurnResolveState implements StateHandler {
          return diceCount === 1;
       };
 
-      const dices = dice_locations.getDice().map((die: Dice) => Number(die.location));
-      const locations = this.game.tableCenter
-         .getWorkerLocations()
-         .filter((location) => dices.includes(location));
-      worker_locations.setSelectableLocation(locations);
+      worker_locations.setSelectableLocation(locations.filter((f) => f < 20));
       worker_locations.OnLocationClick = handleWorkerLocationClick;
 
       const slotDices = document.querySelectorAll('#dice-locations .slot-dice:not(:empty)');
@@ -59,7 +55,7 @@ class PlayerTurnResolveState implements StateHandler {
          .forEach((div) => div.classList.remove('selectable'));
    }
 
-   onUpdateActionButtons(args: any): void {
+   onUpdateActionButtons({ locations }: PlayerTurnResolveArgs): void {
       const handleResolve = () => {
          if (this.glade_selection) {
             this.game.takeAction('resolveWorker', { location_id: this.glade_selection });
@@ -100,7 +96,8 @@ class PlayerTurnResolveState implements StateHandler {
          this.game.takeAction('confirmResolveWorker');
       };
 
-      if (this.game.tableCenter.getWorkerLocations().length > 0) {
+      debugger;
+      if (locations.length > 0) {
          this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
          this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
       } else {
@@ -116,4 +113,8 @@ class PlayerTurnResolveState implements StateHandler {
       );
       selectedDiceLocations.forEach((slot) => slot.classList.remove('selected'));
    }
+}
+
+interface PlayerTurnResolveArgs {
+   locations: number[];
 }

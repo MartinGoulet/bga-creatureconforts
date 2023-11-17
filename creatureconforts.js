@@ -3261,6 +3261,7 @@ var DiceHelper = (function () {
             requirement = this.getValleyRequirement(info);
         }
         else if (location_id >= 5 && location_id <= 7) {
+            debugger;
             requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
         }
         else {
@@ -3392,17 +3393,16 @@ var DialRequirement = (function () {
     }
     DialRequirement.prototype.isRequirementMet = function (values) {
         var dieValue = values[0];
+        var nextValues = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 1, 7: 2, 8: 3, 9: 4, 10: 5, 11: 6, 12: 1 };
         switch (this.location_id) {
             case 5:
                 return dieValue == this.dial;
-            case 6: {
-                var baseValue = (this.dial + 1) % 6;
-                return dieValue == baseValue || dieValue == baseValue + 1;
-            }
-            case 7: {
-                var baseValue = (this.dial + 3) % 6;
-                return dieValue == baseValue || dieValue == baseValue + 1 || dieValue == baseValue + 2;
-            }
+            case 6:
+                return dieValue == nextValues[this.dial] || dieValue == nextValues[this.dial + 1];
+            case 7:
+                return (dieValue == nextValues[this.dial + 2] ||
+                    dieValue == nextValues[this.dial + 3] ||
+                    dieValue == nextValues[this.dial + 4]);
             default:
                 return false;
         }
@@ -3503,6 +3503,12 @@ var StateManager = (function () {
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
         debug('Entering state: ' + stateName);
+        if (args.phase) {
+            this.game.gameOptions.setPhase(args.phase);
+        }
+        else {
+            this.game.gameOptions.setPhase('99');
+        }
         if (this.states[stateName] !== undefined) {
             this.states[stateName].onEnteringState(args.args);
             if (stateName.startsWith('resolve')) {
@@ -3732,6 +3738,10 @@ var PlayerTurnDiceState = (function () {
                 _this.addSelectedDieToSlot(slot_id);
             }
         };
+        var handleDiceLocationClick = function (die) {
+            dice_locations.unselectDie(die, true);
+            hill.addDie(die);
+        };
         var handleHillClick = function (selection) {
             worker_locations.setSelectableLocation([]);
             document.querySelectorAll('#dice-locations .slot-dice').forEach(function (slot) {
@@ -3765,6 +3775,7 @@ var PlayerTurnDiceState = (function () {
         hill.setSelectionMode('single');
         hill.onSelectionChange = handleHillClick;
         worker_locations.OnLocationClick = handleWorkerLocationClick;
+        dice_locations.onDieClick = handleDiceLocationClick;
         document.querySelectorAll('#dice-locations .slot-dice').forEach(function (slot) {
             slot.addEventListener('click', function (ev) {
                 ev.stopPropagation();
@@ -4058,11 +4069,12 @@ var PlayerTurnResolveState = (function () {
         this.game = game;
         this.glade_selection = undefined;
     }
-    PlayerTurnResolveState.prototype.onEnteringState = function (args) {
+    PlayerTurnResolveState.prototype.onEnteringState = function (_a) {
         var _this = this;
+        var locations = _a.locations;
         if (!this.game.isCurrentPlayerActive())
             return;
-        var _a = this.game.tableCenter, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        var _b = this.game.tableCenter, worker_locations = _b.worker_locations, dice_locations = _b.dice_locations;
         var handleWorkerLocationClick = function (slotId) {
             var isSelected = worker_locations.isSelectedLocation(slotId);
             _this.clearSelectedDiceLocations();
@@ -4080,11 +4092,7 @@ var PlayerTurnResolveState = (function () {
             var diceCount = _this.game.tableCenter.getDiceFromLocation(slotId).length;
             return diceCount === 1;
         };
-        var dices = dice_locations.getDice().map(function (die) { return Number(die.location); });
-        var locations = this.game.tableCenter
-            .getWorkerLocations()
-            .filter(function (location) { return dices.includes(location); });
-        worker_locations.setSelectableLocation(locations);
+        worker_locations.setSelectableLocation(locations.filter(function (f) { return f < 20; }));
         worker_locations.OnLocationClick = handleWorkerLocationClick;
         var slotDices = document.querySelectorAll('#dice-locations .slot-dice:not(:empty)');
         slotDices.forEach(function (slot) {
@@ -4108,8 +4116,9 @@ var PlayerTurnResolveState = (function () {
             .querySelectorAll('#dice-locations .slot-dice.selectable')
             .forEach(function (div) { return div.classList.remove('selectable'); });
     };
-    PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
+    PlayerTurnResolveState.prototype.onUpdateActionButtons = function (_a) {
         var _this = this;
+        var locations = _a.locations;
         var handleResolve = function () {
             if (_this.glade_selection) {
                 _this.game.takeAction('resolveWorker', { location_id: _this.glade_selection });
@@ -4148,7 +4157,8 @@ var PlayerTurnResolveState = (function () {
         var handleEnd = function () {
             _this.game.takeAction('confirmResolveWorker');
         };
-        if (this.game.tableCenter.getWorkerLocations().length > 0) {
+        debugger;
+        if (locations.length > 0) {
             this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
             this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
         }
@@ -4361,13 +4371,13 @@ var ResolveMarketState = (function () {
                 from: {
                     available: _this.game.getPlayerResources(['coin']),
                     count: 1,
-                    requirement: ['coin'],
+                    requirement: TravelerHelper.isActiveHairyTailedHole() ? ['stone', 'coin'] : ['coin'],
                 },
                 to: {
                     count: 1,
                     available: __spreadArray([], GOODS, true),
                 },
-                times: 1,
+                times: 99,
             });
             handleChoice();
         };
@@ -4380,9 +4390,9 @@ var ResolveMarketState = (function () {
                 },
                 to: {
                     count: 1,
-                    resources: __spreadArray([], GOODS, true),
+                    available: __spreadArray([], GOODS, true),
                 },
-                times: 1,
+                times: 99,
             });
             handleChoice();
         };
@@ -4395,7 +4405,7 @@ var ResolveMarketState = (function () {
                 to: {
                     resources: ['coin'],
                 },
-                times: 1,
+                times: 99,
             });
             handleChoice();
         };
@@ -4711,8 +4721,9 @@ var PreEndGame = (function () {
     };
     PreEndGame.prototype.onLeavingState = function () { };
     PreEndGame.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
         var handleConfirm = function () {
-            alert('test');
+            _this.game.takeAction('confirmStoreResource', {});
         };
         this.game.addActionButton('btn_ress', _('Confirm stored resources'), handleConfirm);
     };
@@ -4985,6 +4996,7 @@ var CreatureConforts = (function () {
         this.workerManager = new WorkerManager(this);
         this.notifManager = new NotificationManager(this);
         this.stateManager = new StateManager(this);
+        this.gameOptions = new GameOptions(this);
         this.tableCenter = new TableCenter(this);
         this.modal = new Modal(this);
         ['red', 'yellow', 'green', 'gray', 'purple'].forEach(function (color) {
@@ -5220,6 +5232,55 @@ var CreatureConforts = (function () {
     };
     return CreatureConforts;
 }());
+var GameOptions = (function () {
+    function GameOptions(game) {
+        this.game = game;
+        this.setupGameInfo(game.gamedatas);
+        this.setupGamePhase();
+        this.game.updatePlayerOrdering();
+    }
+    GameOptions.prototype.setPhase = function (phase) {
+        document.getElementById('wg-phases').dataset.phase = phase.toString();
+        document.getElementById('table').dataset.phase = phase.toString();
+    };
+    GameOptions.prototype.setTurnNumber = function (value) {
+        this.turn_number.toValue(value);
+    };
+    GameOptions.prototype.setupGameInfo = function (_a) {
+        var turn_number = _a.turn_number, nbr_turns = _a.nbr_turns;
+        var display = document.getElementById('game-infos');
+        if (display) {
+            display.parentElement.removeChild(display);
+        }
+        var html = "\n         <div class=\"player-board\" id=\"game-infos\">\n            <div class=\"title\">".concat(_('Game informations'), "</div>\n            <div class=\"player-board-inner\">\n               <div id=\"game-infos-turn-number\">").concat(_('Turn : '), " <span id=\"game-infos-turn-number-counter\"></span> / ").concat(nbr_turns, "</div>\n            </div>\n         </div>");
+        document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
+        this.turn_number = new ebg.counter();
+        this.turn_number.create('game-infos-turn-number-counter');
+        this.turn_number.setValue(turn_number);
+    };
+    GameOptions.prototype.setupGamePhase = function () {
+        var display = document.getElementById('game-phases');
+        if (display) {
+            display.parentElement.removeChild(display);
+        }
+        var _a = {
+            phase1: _('New traveler'),
+            phase2: _('Family dice'),
+            phase3: _('Placement'),
+            phase4: _('Village dice'),
+            phase5: _('Player Turn'),
+            phase6: _('Upkeep'),
+        }, phase1 = _a.phase1, phase2 = _a.phase2, phase3 = _a.phase3, phase4 = _a.phase4, phase5 = _a.phase5, phase6 = _a.phase6;
+        var _b = {
+            phase5b: _('Assign dice'),
+            phase5c: _('Resolve locations'),
+            phase5e: _('Craft Comforts'),
+        }, phase5b = _b.phase5b, phase5c = _b.phase5c, phase5e = _b.phase5e;
+        var html = "\n         <div class=\"player-board\" id=\"game-phases\">\n            <div class=\"title\">".concat(_('Turn order'), "</div>\n            <div class=\"player-board-inner\">\n               <ul id=\"wg-phases\" data-phase=\"1\">\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">1. ").concat(phase1, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">2. ").concat(phase2, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">3. ").concat(phase3, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">4. ").concat(phase4, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">5. ").concat(phase5, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5b, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5c, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5e, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">6. ").concat(phase6, "</div></li>\n               </ul>\n            </div>\n         </div>");
+        document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
+    };
+    return GameOptions;
+}());
 var Modal = (function () {
     function Modal(game) {
         var _this = this;
@@ -5326,6 +5387,7 @@ var NotificationManager = (function () {
             ['onNewRavenLocationTaken', 100],
             ['onAddAlmanac', 100],
             ['onAddWheelbarrow', 100],
+            ['onNewTurn', 100],
         ];
         this.setupNotifications(notifs);
         ['message', 'onDrawConfort'].forEach(function (eventName) {
@@ -5626,6 +5688,10 @@ var NotificationManager = (function () {
         var player_id = _a.player_id;
         this.game.getPlayerPanel(player_id).addWheelbarrow();
     };
+    NotificationManager.prototype.notif_onNewTurn = function (_a) {
+        var turn_number = _a.turn_number;
+        this.game.gameOptions.setTurnNumber(turn_number);
+    };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
         var _this = this;
         var index = 0;
@@ -5804,10 +5870,17 @@ var TableCenter = (function () {
     };
     TableCenter.prototype.getWorkerLocations = function () {
         var player_id = this.game.getPlayerId().toString();
-        return this.game.tableCenter.worker_locations
+        var locations = this.game.tableCenter.worker_locations
             .getCards()
             .filter(function (meeple) { return meeple.type_arg == player_id; })
             .map(function (meeple) { return Number(meeple.location_arg); });
+        if (TravelerHelper.isActivePineMarten()) {
+            if (!locations.includes(1))
+                locations.push(1);
+            if (!locations.includes(2))
+                locations.push(2);
+        }
+        return locations;
     };
     TableCenter.prototype.setRiverDial = function (value) {
         document.getElementById('river-dial').dataset.position = value.toString();

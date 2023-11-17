@@ -7,8 +7,6 @@ use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
 use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
-use PSpell\Config;
 
 trait Args {
 
@@ -53,6 +51,23 @@ trait Args {
         }
 
         return $args;
+    }
+
+    function argPlayerTurnResolve() {
+        $player_id = Players::getPlayerId();
+        $player_dice = Dice::getDiceFromPlayer($player_id);
+        $white_dice = Dice::getWhiteDice();
+        $dice = array_merge($player_dice, $white_dice);
+        $locations = array_unique(array_map(function ($die) {
+            return intval($die['location']);
+        }, $dice));
+        $locations = array_filter($locations, function ($location) {
+            return $location > 0;
+        });
+
+        return [
+            'locations' => array_values($locations),
+        ];
     }
 
     function argPlayerTurnDiscard() {

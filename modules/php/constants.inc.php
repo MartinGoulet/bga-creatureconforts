@@ -120,3 +120,4 @@ const RULE_STRAIGHT = "STRAIGHT";
 const VAR_FIRST_PLAYER = 'first_player';
 const VAR_RIVER_DIAL = 'river_dial';
 const VAR_SAVEPOINT_TRANSITION = 'savepoint_transition';
+const VAR_MARKET_USED = 'market_used';

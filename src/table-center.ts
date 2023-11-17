@@ -53,10 +53,15 @@ class TableCenter {
 
    public getWorkerLocations(): number[] {
       const player_id = this.game.getPlayerId().toString();
-      return this.game.tableCenter.worker_locations
+      const locations = this.game.tableCenter.worker_locations
          .getCards()
          .filter((meeple) => meeple.type_arg == player_id)
          .map((meeple) => Number(meeple.location_arg));
+      if (TravelerHelper.isActivePineMarten()) {
+         if (!locations.includes(1)) locations.push(1);
+         if (!locations.includes(2)) locations.push(2);
+      }
+      return locations;
    }
 
    public setRiverDial(value: number) {

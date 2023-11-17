@@ -80,16 +80,26 @@ class Dice extends \APP_DbObject {
         self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id = $player_id OR dice_owner_id is null");
     }
 
-    static function moveWhiteDiceToHill() {
-        self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id is null");
+    static function moveWhiteDiceToHill($dice = null) {
+        if($dice == null) {
+            self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_owner_id is null");
+        } else {
+            $dice_id = implode(",", array_column($dice, 'id'));
+            self::DbQuery("UPDATE dice SET dice_location = 0 WHERE dice_id in ($dice_id)");
+        }
     }
 
     static function moveFamilyDieToBoard(int $player_id, int $die_id) {
         self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id AND dice_id = $die_id");
     }
 
-    static function movePlayerDiceToBoard($player_id) {
-        self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id");
+    static function movePlayerDiceToBoard($player_id, $dice = null) {
+        if($dice == null) {
+            self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id");
+        } else {
+            $dice_id = implode(",", array_column($dice, 'id'));
+            self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id AND dice_id in ($dice_id)");
+        }
     }
 
     static function throwPlayerDice() {

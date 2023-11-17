@@ -99,6 +99,7 @@
         "src/toolbar-container.ts",
         "src/creature-conforts.d.ts",
         "src/creature-conforts.ts",
+        "src/game-options.ts",
         "src/modal.ts",
         "src/notification.ts",
         "src/player-panel.ts",

@@ -988,6 +988,7 @@ body > .bga-dice_die {
 .player-table .player-table-board {
   margin: 0 auto 20px;
   background-size: 400px 220px;
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5);
   width: 400px;
   height: 220px;
   border-radius: 10px;
@@ -1143,6 +1144,64 @@ body > .bga-dice_die {
   outline: 1px solid #000;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+}
+
+#game-phases, #game-infos {
+  background-color: rgba(34, 34, 34, 0.6666666667);
+  color: #fff;
+}
+#game-phases .title, #game-infos .title {
+  margin: 0 -3px;
+  text-align: center;
+  font-size: 24px;
+  line-height: 36px;
+  border-bottom: 2px solid white;
+}
+#game-phases .player-board-inner, #game-infos .player-board-inner {
+  position: relative;
+  margin: 5px -3px 0 -3px;
+}
+
+#game-infos .player-board-inner {
+  padding: 3px 15px;
+}
+
+#wg-phases-wrapper {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  gap: 2px;
+}
+
+#wg-phases > li {
+  padding: 5px 15px;
+  transition: ease-in-out all 0.2s;
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 2px solid transparent;
+  transition: background-color 1s ease-in-out;
+}
+#wg-phases > li.sub {
+  padding: 3px 15px 3px 29px;
+}
+#wg-phases[data-phase="1"] li:nth-child(1), #wg-phases[data-phase="2"] li:nth-child(2), #wg-phases[data-phase="3"] li:nth-child(3), #wg-phases[data-phase="4"] li:nth-child(4), #wg-phases[data-phase="5"] li:nth-child(5), #wg-phases[data-phase="5b"] li:nth-child(5), #wg-phases[data-phase="5c"] li:nth-child(5), #wg-phases[data-phase="5e"] li:nth-child(5), #wg-phases[data-phase="6"] li:nth-child(9) {
+  background-color: #35a589;
+  border-radius: 0;
+  font-style: italic;
+}
+#wg-phases[data-phase="5b"] li:nth-child(6), #wg-phases[data-phase="5c"] li:nth-child(7), #wg-phases[data-phase="5e"] li:nth-child(8) {
+  background-color: #ff9f31;
+  border-radius: 0;
+  font-style: italic;
+}
+#wg-phases .wg-icon {
+  background-size: 20px 20px;
+  height: 20px;
+  width: 20px;
+  display: none;
 }
 
 .card.confort {

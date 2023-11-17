@@ -32,6 +32,9 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
    first_player_id: number;
    river_dial: number;
    raven_location: number[];
+
+   turn_number: number;
+   nbr_turns: number;
 }
 
 type TopCardCount<T> = {

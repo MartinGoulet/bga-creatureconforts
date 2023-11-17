@@ -74,6 +74,7 @@ $basicGameStates = [
 
 $travelerStates = [
     ST_GRAY_WOLF => [
+        "phase" => "5",
         "name" => "grayWolf",
         "descriptionmyturn" => clienttranslate('${you} must choose a face-up Comfort form the Owl\'s Nest'),
         "description" => clienttranslate('Waiting for others to choose a face-up Comfort form the Owl\'s Nest'),
@@ -93,6 +94,7 @@ $travelerStates = [
     ],
 
     ST_COMMON_RAVEN => [
+        "phase" => "5",
         "name" => "commonRaven",
         "descriptionmyturn" => clienttranslate('${you} must place a ::coin:: in a location'),
         "description" => clienttranslate('${actplayer} must place a ::coin:: in a location'),
@@ -112,6 +114,7 @@ $travelerStates = [
     ],
 
     ST_STRIPED_SKUNK => [
+        "phase" => "5",
         "name" => "stripedSkunk",
         "descriptionmyturn" => clienttranslate('${you} may claim one Comfort from the discard pile'),
         "description" => clienttranslate('${actplayer} may claim one Comfort from the discard pile'),
@@ -127,6 +130,7 @@ $travelerStates = [
 
 $improvementStates = [
     ST_IMPROVEMENT_BICYCLE => [
+        "phase" => "5",
         "name" => "bicycle",
         "descriptionmyturn" => clienttranslate('${you} may move one of your workers to a different location'),
         "description" => clienttranslate('${actplayer} may move one of his workers to a different location'),
@@ -183,6 +187,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_NEW_TRAVELER => [
+        "phase" => 1,
         "name" => "newTraveler",
         "description" => "Step 1 : New Traveler",
         "type" => "game",
@@ -195,6 +200,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_FAMILY_DICE => [
+        "phase" => 2,
         "name" => "familyDice",
         "description" => "Step 2 : Family Dice",
         "type" => "game",
@@ -203,6 +209,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLACEMENT => [
+        "phase" => 3,
         "name" => "placement",
         "descriptionmyturn" => clienttranslate('${you} must place your workers'),
         "description" => clienttranslate('Waiting for others to place their workers'),
@@ -214,6 +221,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLACEMENT_END => [
+        "phase" => 3,
         "name" => "placementEnd",
         "type" => "game",
         "action" => "stPlacementEnd",
@@ -221,6 +229,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_VILLAGE_DICE => [
+        "phase" => 4,
         "name" => "villageDice",
         "type" => "game",
         "action" => "stVillageDice",
@@ -228,6 +237,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_START => [
+        "phase" => "5a",
         "name" => "playerTurnStart",
         "type" => "game",
         "action" => "stPlayerTurnStart",
@@ -238,6 +248,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_DICE => [
+        "phase" => "5b",
         "name" => "playerTurnDice",
         "descriptionmyturn" => clienttranslate('${you} must place your dices where your have workers'),
         "description" => clienttranslate('${actplayer} must place their dices'),
@@ -249,9 +260,11 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_RESOLVE => [
+        "phase" => "5c",
         "name" => "playerTurnResolve",
         "descriptionmyturn" => clienttranslate('${you} must resolve your workers'),
         "description" => clienttranslate('${actplayer} must resolve their workers'),
+        "args" => "argPlayerTurnResolve",
         "type" => "activeplayer",
         "possibleactions" => array("resolveWorker", "confirmResolveWorker", "undo"),
         "transitions" => [
@@ -263,6 +276,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_RETURN_UNRESOLVED_WORKER => [
+        "phase" => "5d",
         "name" => "playerReturnUnresolvedWorker",
         "type" => "game",
         "action" => "stPlayerReturnUnresolvedWorker",
@@ -272,6 +286,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_CRAFT_CONFORT => [
+        "phase" => "5e",
         "name" => "playerTurnCraftConfort",
         "descriptionmyturn" => clienttranslate('${you} may craft any number of Conforts from your hand'),
         "description" => clienttranslate('${actplayer} may craft any number of Conforts'),
@@ -285,6 +300,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_END => [
+        "phase" => "5f",
         "name" => "playerTurnEnd",
         "type" => "game",
         "action" => "stPlayerTurnEnd",
@@ -295,6 +311,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_DISCARD => [
+        "phase" => "5f",
         "name" => "playerTurnDiscard",
         "descriptionmyturn" => clienttranslate('${you} must discard card until you have 3 Confort cards in your hand'),
         "description" => clienttranslate('${actplayer} must discard Confort cards'),
@@ -307,6 +324,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PLAYER_TURN_NEXT => [
+        "phase" => "5f",
         "name" => "playerTurnNext",
         "type" => "game",
         "action" => "stPlayerTurnNext",
@@ -317,16 +335,18 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ],
 
     ST_PRE_UPKEEP => [
+        "phase" => 6,
         "name" => "preUpkeep",
         "type" => "game",
         "action" => "stPreUpkeep",
         "transitions" => [
-            "unkeep" => ST_UPKEEP,
+            "upkeep" => ST_UPKEEP,
             "end" => ST_PRE_END_OF_GAME,
         ]
     ],
 
     ST_UPKEEP => [
+        "phase" => 6,
         "name" => "upkeep",
         "description" => "Step 6 : Upkeep",
         "type" => "game",

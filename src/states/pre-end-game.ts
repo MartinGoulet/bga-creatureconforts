@@ -87,7 +87,7 @@ class PreEndGame implements StateHandler {
    onLeavingState(): void {}
    onUpdateActionButtons(args: any): void {
       const handleConfirm = () => {
-         alert('test');
+         this.game.takeAction('confirmStoreResource', {});
       };
 
       this.game.addActionButton('btn_ress', _('Confirm stored resources'), handleConfirm);

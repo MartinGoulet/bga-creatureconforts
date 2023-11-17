@@ -37,13 +37,13 @@ class ResolveMarketState implements StateHandler {
             from: {
                available: this.game.getPlayerResources(['coin']),
                count: 1,
-               requirement: ['coin'],
+               requirement: TravelerHelper.isActiveHairyTailedHole() ? ['stone', 'coin'] : ['coin'],
             },
             to: {
                count: 1,
                available: [...GOODS],
             },
-            times: 1,
+            times: 99,
          });
          handleChoice();
       };
@@ -56,9 +56,9 @@ class ResolveMarketState implements StateHandler {
             },
             to: {
                count: 1,
-               resources: [...GOODS],
+               available: [...GOODS],
             },
-            times: 1,
+            times: 99,
          });
          handleChoice();
       };
@@ -71,7 +71,7 @@ class ResolveMarketState implements StateHandler {
             to: {
                resources: ['coin'],
             },
-            times: 1,
+            times: 99,
          });
          handleChoice();
       };

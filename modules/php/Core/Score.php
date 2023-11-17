@@ -2,6 +2,7 @@
 
 namespace CreatureConforts\Core;
 
+use CreatureConforts;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Cottages;
 use CreatureConforts\Managers\Improvements;
@@ -41,14 +42,17 @@ class Score extends \APP_DbObject {
         foreach ($comforts as $comfort) {
             $card_info = Conforts::getCardType($comfort);
             if (array_key_exists('class', $card_info)) {
-                $instance = new $card_info['class']();
+                $className = "CreatureConforts\\Cards\\Comforts\\" . $card_info['class'];
+                $instance = new $className();
                 $score += $instance->getScore($player_id, intval($comfort['id']));
             }
             // Recipe Book / Pattern Book Improvements
-            if ($card_info['type'] == FOOD || $card_info['type'] == CLOTHING) {
-                $resources = Globals::getComfortResource($comfort['id']);
-                if (array_key_exists(STORY, $resources)) {
-                    $score += 4;
+            if (array_key_exists('type', $card_info)) {
+                if ($card_info['type'] == FOOD || $card_info['type'] == CLOTHING) {
+                    $resources = Globals::getComfortResource($comfort['id']);
+                    if (array_key_exists(STORY, $resources)) {
+                        $score += 4;
+                    }
                 }
             }
         }

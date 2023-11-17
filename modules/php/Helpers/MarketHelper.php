@@ -19,26 +19,29 @@ class MarketHelper {
             throw new BgaUserException("You dont have those resources");
         }
 
-        if (sizeof($resources) == 1 && in_array(COIN, $resources) && sizeof($resources2) == 1) {
-            // Option 1 : Coin => Good
-            if (!sizeof($resources2) == 1) {
-                throw new BgaUserException("You must select only 1 resource");
+        // Option 1 : Coin => Good
+        if (sizeof($resources) == sizeof($resources2)) {
+            $limitedTo = TravelerHelper::isActiveHairyTailedHole() ? [STONE, COIN] : [COIN];
+            if (!ResourcesHelper::isGroupLimitedTo($group, $limitedTo)) {
+                throw new BgaUserException("Wrong type of resources");
             }
             self::doTransaction($player_id, $group, $group2);
             return;
         }
 
-        if (sizeof($resources) == 2 && sizeof($resources2) == 1) {
-            // Option 2 : 2 identical goods => 1 good
-            if (sizeof($group) != 1) {
-                throw new BgaUserException("Goods must be identical");
+        // Option 2 : 2 identical goods => 1 good
+        if (sizeof($resources) == sizeof($resources2) * 2) {
+            foreach ($group as $resource => $value) {
+                if ($value % 2 !== 0) {
+                    throw new BgaUserException("Must have even number of resources");
+                }
             }
             self::doTransaction($player_id, $group, $group2);
             return;
         }
 
-        if (sizeof($resources) == 3 && sizeof($resources2) == 1 && in_array(COIN, $resources2)) {
-            // Option 3 : 3 goods => 1 coin
+        // Option 3 : 3 goods => 1 coin
+        if (sizeof($resources) == sizeof($resources2) * 3) {
             self::doTransaction($player_id, $group, $group2);
             return;
         }

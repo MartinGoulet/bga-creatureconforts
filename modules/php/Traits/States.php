@@ -5,6 +5,7 @@ namespace CreatureConforts\Traits;
 use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Core\Notifications;
+use CreatureConforts\Core\Score;
 use CreatureConforts\Helpers\TravelerHelper;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Dice;
@@ -94,6 +95,7 @@ trait States {
         Notifications::moveDiceToHill($dice);
         Game::undoSavepoint();
 
+        Globals::setMarketUsed(false);
         $next_state = Improvements::hasBicycle(Players::getPlayerId()) ? "bicycle" : "next";
         Game::get()->gamestate->nextState($next_state);
     }
@@ -106,8 +108,12 @@ trait States {
             if($location_id > 0) {
                 Worker::returnToPlayerBoard($player_id, $location_id);
                 Notifications::returnToPlayerBoard($worker);
-                Players::addResources($player_id, [LESSON_LEARNED => 1]);
-                Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
+                if($location_id == 8 && Globals::getMarketUsed()) {
+                    // do nothing
+                } else {
+                    Players::addResources($player_id, [LESSON_LEARNED => 1]);
+                    Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
+                }
             }
         }
         Game::get()->gamestate->nextState();
@@ -214,5 +220,13 @@ trait States {
 
         // Start the new month with Step 1: New Traveler.
         Game::get()->gamestate->nextState();
+    }
+
+    function stEndGameScore() {
+        $players = Game::get()->loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $score = Score::getScore(intval($player_id));
+            
+        }
     }
 }

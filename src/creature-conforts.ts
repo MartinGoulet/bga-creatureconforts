@@ -57,6 +57,7 @@ class CreatureConforts
    public playersTables: PlayerTable[];
    public zoomManager: ZoomManager;
 
+   public gameOptions: GameOptions;
    public modal: Modal;
 
    constructor() {}
@@ -91,6 +92,7 @@ class CreatureConforts
       this.notifManager = new NotificationManager(this);
       this.stateManager = new StateManager(this);
 
+      this.gameOptions = new GameOptions(this);
       this.tableCenter = new TableCenter(this);
       this.modal = new Modal(this);
 

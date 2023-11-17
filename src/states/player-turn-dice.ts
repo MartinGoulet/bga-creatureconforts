@@ -22,6 +22,11 @@ class PlayerTurnDiceState implements StateHandler {
          }
       };
 
+      const handleDiceLocationClick = (die: Dice) => {
+         dice_locations.unselectDie(die, true);
+         hill.addDie(die);
+      };
+
       const handleHillClick = (selection: Dice[]) => {
          // Clean selection
          worker_locations.setSelectableLocation([]);
@@ -64,6 +69,7 @@ class PlayerTurnDiceState implements StateHandler {
       hill.setSelectionMode('single');
       hill.onSelectionChange = handleHillClick;
       worker_locations.OnLocationClick = handleWorkerLocationClick;
+      dice_locations.onDieClick = handleDiceLocationClick;
 
       document.querySelectorAll('#dice-locations .slot-dice').forEach((slot: HTMLElement) => {
          slot.addEventListener('click', (ev: Event) => {

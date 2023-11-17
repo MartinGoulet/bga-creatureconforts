@@ -173,7 +173,7 @@ class Notifications extends \APP_DbObject {
 
     static function newTurn($turn_number) {
         $message = clienttranslate('Turn ${turn_number}');
-        self::message($message, ['turn_number' => $turn_number]);
+        self::notifyAll('onNewTurn', $message, ['turn_number' => $turn_number]);
     }
 
     static function returnDice(int $player_id, array $dice) {

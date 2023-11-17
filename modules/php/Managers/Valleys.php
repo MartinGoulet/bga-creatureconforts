@@ -24,8 +24,7 @@ class Valleys {
         self::deck()->createCards($forest, FOREST . "temp");
         self::deck()->createCards($meadow, MEADOW . "temp");
 
-        $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
-        $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
+        $isShortGame = Game::isShortGame();
 
         foreach ([FOREST, MEADOW] as $region) {
             foreach ([FALL, SUMMER, SPRING] as $season) {

@@ -17,6 +17,7 @@
  *
  */
 
+use CreatureConforts\Core\Game;
 use CreatureConforts\Core\Globals;
 use CreatureConforts\Managers\Conforts;
 use CreatureConforts\Managers\Cottages;
@@ -60,7 +61,7 @@ class CreatureConforts extends Table {
     public $travelers;
     /** @var Deck */
     public $valleys;
-    /** @var Worker */
+    /** @var Deck */
     public $workers;
 
     /** @var array */
@@ -91,6 +92,7 @@ class CreatureConforts extends Table {
             VAR_FIRST_PLAYER => 10,
             VAR_RIVER_DIAL => 11,
             VAR_SAVEPOINT_TRANSITION => 12,
+            VAR_MARKET_USED => 13,
 
             OPTION_SHORT_GAME => OPTION_SHORT_GAME_ID,
             //    "my_first_global_variable" => 10,
@@ -148,6 +150,7 @@ class CreatureConforts extends Table {
         Dice::setupNewGame($players, $options);
         Worker::setupNewGame();
         self::setGameStateInitialValue(VAR_RIVER_DIAL, bga_rand(1, 6));
+        self::setGameStateInitialValue(VAR_MARKET_USED, 0);
         $this->activeNextPlayer();
 
         // Init game statistics
@@ -197,6 +200,7 @@ class CreatureConforts extends Table {
         $result['raven_location'] = Globals::getRavenLocationIds();
 
         $result['turn_number'] = self::getStat(STAT_TURN_NUMBER);
+        $result['nbr_turns'] = Game::isShortGame() ? 6 : 8;
 
         return $result;
     }

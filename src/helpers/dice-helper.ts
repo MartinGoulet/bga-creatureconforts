@@ -24,6 +24,7 @@ class DiceHelper {
          // Get requirement
          requirement = this.getValleyRequirement(info);
       } else if (location_id >= 5 && location_id <= 7) {
+         debugger;
          requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
       } else {
          return true;
@@ -135,17 +136,20 @@ class DialRequirement implements DiceRequirement {
    constructor(private dial: number, private location_id: number) {}
    isRequirementMet(values: number[]): boolean {
       const dieValue = values[0];
+
+      const nextValues = { 1: 2, 2: 3, 3: 4, 4: 5, 5: 6, 6: 1, 7: 2, 8: 3, 9: 4, 10: 5, 11: 6, 12: 1 };
+
       switch (this.location_id) {
          case 5:
             return dieValue == this.dial;
-         case 6: {
-            const baseValue = (this.dial + 1) % 6;
-            return dieValue == baseValue || dieValue == baseValue + 1;
-         }
-         case 7: {
-            const baseValue = (this.dial + 3) % 6;
-            return dieValue == baseValue || dieValue == baseValue + 1 || dieValue == baseValue + 2;
-         }
+         case 6:
+            return dieValue == nextValues[this.dial] || dieValue == nextValues[this.dial + 1];
+         case 7:
+            return (
+               dieValue == nextValues[this.dial + 2] ||
+               dieValue == nextValues[this.dial + 3] ||
+               dieValue == nextValues[this.dial + 4]
+            );
          default:
             return false;
       }

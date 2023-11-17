@@ -30,6 +30,7 @@ class NotificationManager {
          ['onNewRavenLocationTaken', 100],
          ['onAddAlmanac', 100],
          ['onAddWheelbarrow', 100],
+         ['onNewTurn', 100],
       ];
 
       this.setupNotifications(notifs);
@@ -248,6 +249,10 @@ class NotificationManager {
 
    private notif_onAddWheelbarrow({ player_id }: { player_id: number }) {
       this.game.getPlayerPanel(player_id).addWheelbarrow();
+   }
+
+   private notif_onNewTurn({ turn_number }: { turn_number: number }) {
+      this.game.gameOptions.setTurnNumber(turn_number);
    }
 
    private animationMoveResource(

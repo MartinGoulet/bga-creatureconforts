@@ -156,8 +156,8 @@ trait Actions {
     function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids) {
         $player_id = $this->getActivePlayerId();
 
-        $dice = Dice::getDiceInLocation($location_id); 
-        
+        $dice = Dice::getDiceInLocation($location_id);
+
         if (sizeof($dice) == 0) {
             throw new BgaUserException("No dice here");
         }
@@ -167,12 +167,31 @@ trait Actions {
             return;
         }
 
-        $worker = Worker::returnToPlayerBoard($player_id, $location_id);
-        if ($worker == null) {
-            throw new BgaUserException("No worker in this location, please refresh your page");
+        // Market will return at the end of the phase (multiple use)
+        if ($location_id != 8) {
+            $worker = Worker::returnToPlayerBoard($player_id, $location_id);
+            if ($worker !== null) {
+                Notifications::returnToPlayerBoard($worker);
+                // throw new BgaUserException("No worker in this location, please refresh your page");
+            }
+            // return dice
+            $white_dice = array_filter($dice, function ($die) {
+                return $die['type'] == "white";
+            });
+            if (sizeof($white_dice) > 0) {
+                Dice::moveWhiteDiceToHill($dice);
+                Notifications::moveDiceToHill($dice);
+            }
+            $player_dice = array_filter($dice, function ($die) {
+                return $die['type'] !== "white";
+            });
+            if (sizeof($player_dice) > 0) {
+                Dice::movePlayerDiceToBoard($player_id, $player_dice);
+                Notifications::returnDice($player_id, $player_dice);
+            }
+        } else {
+            Globals::setMarketUsed(true);
         }
-
-        Notifications::returnToPlayerBoard($worker);
 
         if ($location_id >= 1 && $location_id <= 4) {
             $valley = Valleys::getValleyLocationInfo($location_id);
@@ -372,6 +391,13 @@ trait Actions {
         }
         Notifications::discardConfort($cards);
         Game::get()->gamestate->nextState();
+    }
+
+    function confirmStoreResource() {
+        $current_player_id = $this->getCurrentPlayerId();
+
+        // Desactivate the current player
+        $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
     }
 
     function confirmGrayWolf(int $slot_id) {
