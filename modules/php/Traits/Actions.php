@@ -175,20 +175,19 @@ trait Actions {
                 // throw new BgaUserException("No worker in this location, please refresh your page");
             }
             // return dice
-            $white_dice = array_filter($dice, function ($die) {
+            $white_dice = array_values(array_filter($dice, function ($die) {
                 return $die['type'] == "white";
-            });
+            }));
             if (sizeof($white_dice) > 0) {
-                Dice::moveWhiteDiceToHill($dice);
-                Notifications::moveDiceToHill($dice);
+                Dice::moveWhiteDiceToHill($white_dice);
             }
             $player_dice = array_filter($dice, function ($die) {
                 return $die['type'] !== "white";
             });
             if (sizeof($player_dice) > 0) {
                 Dice::movePlayerDiceToBoard($player_id, $player_dice);
-                Notifications::returnDice($player_id, $player_dice);
             }
+            Notifications::returnDice($player_id, $dice);
         } else {
             Globals::setMarketUsed(true);
         }
@@ -464,6 +463,22 @@ trait Actions {
         Notifications::revealPlacement(Worker::getUIData());
 
         Game::get()->gamestate->nextState('next');
+    }
+
+    function confirmWildTurkey(int $die_id, int $die_value) {
+        $current_player_id = $this->getCurrentPlayerId();
+        Globals::setWildTurkeyDice($current_player_id, [
+            'die_id' => $die_id,
+            'die_value' => $die_value,
+        ]);
+        // Desactivate the current player
+        $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
+    }
+
+    function cancelWildTurkey() {
+        $current_player_id = $this->getCurrentPlayerId();
+        Globals::setWildTurkeyDice($current_player_id, []);
+        $this->gamestate->setPlayersMultiactive([$current_player_id], '');
     }
 
     function pass(bool $notification) {

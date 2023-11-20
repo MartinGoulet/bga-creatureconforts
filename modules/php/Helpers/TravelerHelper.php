@@ -111,12 +111,20 @@ class TravelerHelper {
         return self::isTravelerActive(8);
     }
 
+    static function isActiveCommonLoon() {
+        return self::isTravelerActive(9);
+    }
+
     static function isActivePineMarten() {
         return self::isTravelerActive(11);
     }
 
     static function isActiveBlackBear() {
         return self::isTravelerActive(12);
+    }
+
+    static function isActiveWildTurkey() {
+        return self::isTravelerActive(15);
     }
 
     private static function isTravelerActive(int $type) {

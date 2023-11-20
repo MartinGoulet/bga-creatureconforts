@@ -4,21 +4,32 @@ class PlacementState implements StateHandler {
    private locations: number[] = [];
    private original_workers: Meeple[] = [];
 
-   constructor(private game: CreatureConforts) {}
+   private allowed_workers: Meeple[];
+   private locations_unavailable: number[];
+
+   constructor(
+      private game: CreatureConforts,
+      private confirmAction = 'confirmPlacement',
+      private cancelAction = 'cancelPlacement',
+   ) {}
 
    onEnteringState(args: PlacementStateArgs): void {
-      this.original_workers = [];
-      this.locations = args._private?.locations?.map((loc) => Number(loc)) ?? [];
+      debug(args);
+      this.allowed_workers = args._private.workers;
+      this.locations_unavailable = args._private.locations_unavailable;
 
-      if (this.locations.length > 0) {
-         this.locations.forEach((slotId) => this.moveWorker(slotId));
+      this.original_workers = [];
+      const locations = args._private?.locations?.map((loc) => Number(loc)) ?? [];
+
+      if (locations.length > 0) {
+         locations.forEach((slotId) => this.moveWorker(slotId, args._private.workers));
       }
 
       this.showSelection();
       if (!this.game.isCurrentPlayerActive) return;
 
       this.game.tableCenter.worker_locations.OnLocationClick = (slotId: SlotId) => {
-         this.moveWorker(slotId);
+         this.moveWorker(slotId, args._private.workers);
       };
    }
 
@@ -35,15 +46,15 @@ class PlacementState implements StateHandler {
       };
 
       const handleConfirmPlacement = () => {
-         if (this.locations.length !== 4) {
+         if (this.locations.length !== this.allowed_workers.length) {
             this.game.showMessage('You must place all your workers', 'error');
             return;
          }
-         this.game.takeAction('confirmPlacement', { locations: this.locations.join(';') });
+         this.game.takeAction(this.confirmAction, { locations: this.locations.join(';') });
       };
 
       const handleRestartPlacement = () => {
-         this.game.takeAction('cancelPlacement', {}, null, () => {
+         this.game.takeAction(this.cancelAction, {}, null, () => {
             this.resetState();
          });
       };
@@ -58,13 +69,13 @@ class PlacementState implements StateHandler {
       }
    }
 
-   private moveWorker(slotId: SlotId) {
+   private moveWorker(slotId: SlotId, workers: Meeple[]) {
       if (this.locations.includes(Number(slotId))) {
          this.game.showMessage(_('You already have a worker on that location'), 'error');
          return;
       }
 
-      const worker = this.game.getCurrentPlayerTable().workers.getCards()[0];
+      const worker = workers.filter((w) => !this.original_workers.find((x) => x.id === w.id))[0];
       const copy = { ...worker, location: 'board', location_arg: slotId.toString() };
 
       this.original_workers.push({ ...worker });
@@ -73,11 +84,14 @@ class PlacementState implements StateHandler {
       this.locations.push(Number(slotId));
       this.showSelection();
 
-      this.game.toggleButtonEnable('btn_confirm', this.locations.length == 4);
+      this.game.toggleButtonEnable('btn_confirm', this.locations.length == this.allowed_workers.length);
    }
 
    private resetState() {
-      this.game.getCurrentPlayerTable().workers.addCards(this.original_workers);
+      if (this.original_workers.length > 0) {
+         const player_id = Number(this.original_workers[0].type_arg);
+         this.game.getPlayerTable(player_id).workers.addCards(this.original_workers);
+      }
       this.locations = [];
       this.original_workers = [];
       this.showSelection();
@@ -86,11 +100,13 @@ class PlacementState implements StateHandler {
 
    private showSelection() {
       const locations = this.game.tableCenter.worker_locations;
-      if (this.locations.length < 4) {
+      if (this.locations.length < this.allowed_workers.length) {
          if (TravelerHelper.isActivePineMarten()) {
             locations.setSelectableLocation(arrayRange(3, 12));
          } else {
-            const selectable = arrayRange(1, 12).filter((num) => this.locations.indexOf(num) < 0);
+            const selectable = arrayRange(1, 12).filter(
+               (num) => this.locations.indexOf(num) < 0 && this.locations_unavailable.indexOf(num) < 0,
+            );
             locations.setSelectableLocation(selectable);
          }
       } else {
@@ -103,5 +119,7 @@ class PlacementState implements StateHandler {
 interface PlacementStateArgs {
    _private?: {
       locations: string[];
+      locations_unavailable: number[];
+      workers: Meeple[];
    };
 }

@@ -88,8 +88,7 @@ class ResourceTrader<TResource> {
 
    isTradePending(): boolean {
       return (
-         (!this.isFullFrom() && this.getFrom().length > 0) ||
-         (!this.isFullTo() && this.settings.to.resources === undefined)
+         (!this.isFullFrom() && this.getFrom().length > 0) || (!this.isFullTo() && this.getTo().length > 0)
       );
    }
 

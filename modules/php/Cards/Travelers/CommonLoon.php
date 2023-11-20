@@ -28,7 +28,7 @@ class CommonLoon {
         }
         $unique_resource = array_unique($resource);
         $unique_resource2 = array_unique($resource2);
-        if (sizeof($resource) == sizeof($unique_resource)) {
+        if (sizeof($resource) !== sizeof($unique_resource)) {
             throw new BgaUserException('All goods must be different');
         }
         if (sizeof($resource2) == sizeof($unique_resource2)) {

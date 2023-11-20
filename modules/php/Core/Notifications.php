@@ -124,6 +124,12 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function finalScoring($scores) {
+        self::notifyAll('onFinalScoring', '', [
+            "scores" => $scores,
+        ]);
+    }
+
     static function getResourcesFromLocation(int $player_id, int $location_id, array $resources) {
         $message = clienttranslate('${player_name} get ${resources_to} from a location');
         self::notifyAll('onGetResourcesFromLocation', $message, [
@@ -153,6 +159,24 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function modifyDieWithWildTurkey(int $player_id, array $die, int $new_value) {
+        $message = clienttranslate('${player_name} uses ${card_name} to change ${die_from} for ${die_to}');
+        $new_dice = $die;
+        $new_dice['face'] = $new_value;
+        self::notifyAll('onModifyDieWithWildTurkey', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'die_from' => intval($die['face']),
+            'die_to' => $new_value,
+            'die_color' => $die['type'],
+            'die_val_id' => intval($die['id']),
+            'die_val_to' => intval($new_value),
+            'card_name' => _("Wild turkey"),
+            "i18n" => ["card_name"],
+            'preserve' => ['die_from', 'die_to', 'die_color']
+        ]);
+    }
+
     static function newRavenLocationTaken(int $location_id) {
         self::notifyAll('onNewRavenLocationTaken', '', [
             'location_id' => $location_id,
@@ -179,7 +203,7 @@ class Notifications extends \APP_DbObject {
     static function returnDice(int $player_id, array $dice) {
         self::notifyAll('onReturnDice', '', [
             'player_id' => $player_id,
-            'dice' => $dice,
+            'dice' => array_values($dice),
         ]);
     }
 

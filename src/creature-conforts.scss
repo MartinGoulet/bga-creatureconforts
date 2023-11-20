@@ -18,6 +18,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import '../node_modules/bga-cards/bga-cards';
 @import '../node_modules/bga-dice/bga-dice';
 @import 'table-center';
+@import 'table-score';
 @import 'player-panel';
 @import 'player-table';
 @import 'log';
@@ -228,5 +229,24 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 }
 
 .cc-toolbar {
-   padding: 5px 0 
+   padding: 5px 0;
+}
+
+#resource_manager_wild-turkey {
+   display: flex;
+   justify-content: center;
+   gap: 10px;
+   --size: 40px;
+   .bga-dice_die-face {
+      width: 40px;
+      height: 40px;
+      border-radius: 12%;
+   }
+
+   .selected {
+      box-shadow: 0 0 3px 3px #00ffff;
+   }
+   .disabled {
+      opacity: 0.2;
+   }
 }

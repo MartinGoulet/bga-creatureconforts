@@ -120,4 +120,8 @@ class Dice extends \APP_DbObject {
             self::DbQuery("UPDATE dice SET dice_value = $value WHERE dice_id = $die_id;");
         }
     }
+
+    static function updateDieValue($die_id, $value) {
+        self::DbQuery("UPDATE dice SET dice_value = $value WHERE dice_id = $die_id;");
+    }
 }

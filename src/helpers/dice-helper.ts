@@ -24,7 +24,6 @@ class DiceHelper {
          // Get requirement
          requirement = this.getValleyRequirement(info);
       } else if (location_id >= 5 && location_id <= 7) {
-         debugger;
          requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
       } else {
          return true;

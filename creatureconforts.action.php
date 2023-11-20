@@ -210,6 +210,24 @@ class action_creatureconforts extends APP_GameAction {
       self::ajaxResponse();
    }
 
+   public function confirmWildTurkey() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $die_id = self::getArg("die_id", AT_int, true);
+      $die_value = self::getArg("die_value", AT_int, true);
+      // Then, call the appropriate method in your game logic
+      $this->game->gamestate->checkPossibleAction('confirmWildTurkey');
+      $this->game->confirmWildTurkey($die_id, $die_value);
+      self::ajaxResponse();
+   }
+
+   public function cancelWildTurkey() {
+      self::setAjaxMode();
+      $this->game->gamestate->checkPossibleAction('cancelWildTurkey');
+      $this->game->cancelWildTurkey();
+      self::ajaxResponse();
+   }
+
    public function confirmBicycle() {
       self::setAjaxMode();
       // Retrieve arguments

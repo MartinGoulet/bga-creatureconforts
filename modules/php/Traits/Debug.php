@@ -53,4 +53,8 @@ trait Debug {
     function score() {
         var_dump(Score::getScore($this->getCurrentPlayerId()));
     }
+
+    function next() {
+        Game::get()->gamestate->jumpToState(ST_FAMILY_DICE);
+    }
 }

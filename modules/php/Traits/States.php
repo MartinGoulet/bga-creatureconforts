@@ -44,9 +44,9 @@ trait States {
             Globals::setWorkerPlacement(intval($player_id), []);
         }
 
-        if(TravelerHelper::isActiveGrayWolf()) {
+        if (TravelerHelper::isActiveGrayWolf()) {
             Game::get()->gamestate->nextState("gray_wolf");
-        } else if(TravelerHelper::isActiveCommonRaven()) {
+        } else if (TravelerHelper::isActiveCommonRaven()) {
             Game::get()->gamestate->nextState("common_raven");
         } else {
             Game::get()->gamestate->nextState("family");
@@ -61,15 +61,28 @@ trait States {
             Notifications::familyDice(intval($player_id), Dice::getDiceFromPlayer(intval($player_id)));
         }
 
-        Game::get()->gamestate->nextState();
+        if (TravelerHelper::isActiveCommonLoon()) {
+            Game::get()->gamestate->nextState('common_loon');
+        } else if (TravelerHelper::isActiveWildTurkey()) {
+            Game::get()->gamestate->nextState('wild_turkey');
+        } else {
+            Game::get()->gamestate->nextState('end');
+        }
     }
 
     function stPlacementEnd() {
         $players = Game::get()->loadPlayersBasicInfos();
+        $prevTable = Game::get()->getPrevPlayerTable();
 
         foreach ($players as $player_id => $player) {
             $locations = Globals::getWorkerPlacement($player_id);
-            $workers = array_values(Worker::getWorkersFromPlayer($player_id));
+            $pId = $player_id;
+            if (Game::get()->gamestate->state_id() == ST_COMMON_LOON_END) {
+                $pId = $prevTable[$pId];
+            }
+            $workers = array_values(Worker::getWorkersFromPlayer($pId));
+            $workers = array_filter($workers, fn ($w) => $w['location'] == "player");
+
             foreach ($locations as $location) {
                 $worker = array_shift($workers);
                 Worker::moveToLocation($worker['id'], $location);
@@ -102,13 +115,13 @@ trait States {
 
     function stPlayerReturnUnresolvedWorker() {
         $player_id = Players::getPlayerId();
-        $workers = Worker::getWorkersFromPlayer($player_id );
+        $workers = Worker::getWorkersFromPlayer($player_id);
         foreach ($workers as $worker) {
             $location_id = intval($worker['location_arg']);
-            if($location_id > 0) {
+            if ($location_id > 0) {
                 Worker::returnToPlayerBoard($player_id, $location_id);
                 Notifications::returnToPlayerBoard($worker);
-                if($location_id == 8 && Globals::getMarketUsed()) {
+                if ($location_id == 8 && Globals::getMarketUsed()) {
                     // do nothing
                 } else {
                     Players::addResources($player_id, [LESSON_LEARNED => 1]);
@@ -160,11 +173,11 @@ trait States {
     function stPreUpkeep() {
         $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
         $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
-        
+
         $turn_number = intval(Game::get()->getStat(STAT_TURN_NUMBER));
         $last_turn_number = $isShortGame ? 6 : 8;
 
-        if($turn_number === $last_turn_number) {
+        if ($turn_number === $last_turn_number) {
             Game::get()->gamestate->nextState('end');
         } else {
             Game::get()->gamestate->nextState('upkeep');
@@ -224,9 +237,30 @@ trait States {
 
     function stEndGameScore() {
         $players = Game::get()->loadPlayersBasicInfos();
+        $scores = [];
         foreach ($players as $player_id => $player) {
             $score = Score::getScore(intval($player_id));
-            
+            $sum = array_sum($score);
+            Players::setPlayerScore($player_id, $sum);
+            $score['total'] = $sum;
+            $scores[$player_id] = $score;
         }
+        Notifications::finalScoring($scores);
+        Game::get()->gamestate->nextState();
+    }
+
+    function stWildTurkeyEnd() {
+        $players = Game::get()->loadPlayersBasicInfos();
+
+        foreach($players as $player_id => $player) {
+            $dice_info = Globals::getWildTurkeyDice($player_id);
+            if($dice_info['die_id'] > 0) {
+                $die = Dice::get($dice_info['die_id']);
+                Dice::updateDieValue($dice_info['die_id'], $dice_info['die_value']);
+                Notifications::modifyDieWithWildTurkey($player_id, $die , $dice_info['die_value']);
+            }
+        }
+
+        Game::get()->gamestate->nextState();
     }
 }

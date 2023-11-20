@@ -53,6 +53,7 @@ class CreatureConforts
    public animationManager: AnimationManager;
 
    public tableCenter: TableCenter;
+   public tableScore: TableScore;
    public playersPanels: PlayerPanel[];
    public playersTables: PlayerTable[];
    public zoomManager: ZoomManager;
@@ -94,6 +95,7 @@ class CreatureConforts
 
       this.gameOptions = new GameOptions(this);
       this.tableCenter = new TableCenter(this);
+      this.tableScore = new TableScore(this);
       this.modal = new Modal(this);
 
       ['red', 'yellow', 'green', 'gray', 'purple'].forEach((color) => {

@@ -248,6 +248,22 @@ var BgaCumulatedAnimation = (function (_super) {
     }
     return BgaCumulatedAnimation;
 }(BgaAnimation));
+function pauseAnimation(animationManager, animation) {
+    var promise = new Promise(function (success) {
+        var _a;
+        var settings = animation.settings;
+        var duration = (_a = settings === null || settings === void 0 ? void 0 : settings.duration) !== null && _a !== void 0 ? _a : 500;
+        setTimeout(function () { return success(); }, duration);
+    });
+    return promise;
+}
+var BgaPauseAnimation = (function (_super) {
+    __extends(BgaPauseAnimation, _super);
+    function BgaPauseAnimation(settings) {
+        return _super.call(this, pauseAnimation, settings) || this;
+    }
+    return BgaPauseAnimation;
+}(BgaAnimation));
 function slideAnimation(animationManager, animation) {
     var promise = new Promise(function (success) {
         var _a, _b, _c, _d;
@@ -2723,8 +2739,7 @@ var ResourceTrader = (function () {
         return this.isFullFrom() && this.isFullTo();
     };
     ResourceTrader.prototype.isTradePending = function () {
-        return ((!this.isFullFrom() && this.getFrom().length > 0) ||
-            (!this.isFullTo() && this.settings.to.resources === undefined));
+        return ((!this.isFullFrom() && this.getFrom().length > 0) || (!this.isFullTo() && this.getTo().length > 0));
     };
     ResourceTrader.prototype.createElement = function () {
         var element = document.createElement('div');
@@ -2896,11 +2911,8 @@ var Hand = (function (_super) {
     }
     Hand.prototype.addCard = function (card, animation, settings) {
         var _this = this;
-        var copy = __assign({ type: null, type_arg: null }, card);
-        if (!this.current_player) {
-            copy.type = null;
-            copy.type_arg = null;
-        }
+        var id = card.id;
+        var copy = this.current_player ? __assign({}, card) : { id: id };
         return new Promise(function (resolve) {
             _super.prototype.addCard.call(_this, copy, animation, settings)
                 .then(function () { return _this.hand_counter.toValue(_this.getCards().length); })
@@ -3261,7 +3273,6 @@ var DiceHelper = (function () {
             requirement = this.getValleyRequirement(info);
         }
         else if (location_id >= 5 && location_id <= 7) {
-            debugger;
             requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
         }
         else {
@@ -3499,6 +3510,9 @@ var StateManager = (function () {
             grayWolf: new TravelerGrayWolfState(game),
             commonRaven: new TravelerCommonRavenState(game),
             stripedSkunk: new TravelerStripedSkunkStates(game),
+            commonLoon: new PlacementState(game),
+            wildTurkey: new TravelerWildTurkeyStates(game),
+            wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -3530,6 +3544,9 @@ var StateManager = (function () {
         debug('Leaving state: ' + stateName);
         if (this.states[stateName] !== undefined) {
             if (this.game.isCurrentPlayerActive()) {
+                this.states[stateName].onLeavingState();
+            }
+            else if ('isMultipleActivePlayer' in this.states[stateName]) {
                 this.states[stateName].onLeavingState();
             }
         }
@@ -3626,8 +3643,12 @@ var StartHandState = (function () {
     return StartHandState;
 }());
 var PlacementState = (function () {
-    function PlacementState(game) {
+    function PlacementState(game, confirmAction, cancelAction) {
+        if (confirmAction === void 0) { confirmAction = 'confirmPlacement'; }
+        if (cancelAction === void 0) { cancelAction = 'cancelPlacement'; }
         this.game = game;
+        this.confirmAction = confirmAction;
+        this.cancelAction = cancelAction;
         this.isMultipleActivePlayer = true;
         this.locations = [];
         this.original_workers = [];
@@ -3635,16 +3656,19 @@ var PlacementState = (function () {
     PlacementState.prototype.onEnteringState = function (args) {
         var _this = this;
         var _a, _b, _c;
+        debug(args);
+        this.allowed_workers = args._private.workers;
+        this.locations_unavailable = args._private.locations_unavailable;
         this.original_workers = [];
-        this.locations = (_c = (_b = (_a = args._private) === null || _a === void 0 ? void 0 : _a.locations) === null || _b === void 0 ? void 0 : _b.map(function (loc) { return Number(loc); })) !== null && _c !== void 0 ? _c : [];
-        if (this.locations.length > 0) {
-            this.locations.forEach(function (slotId) { return _this.moveWorker(slotId); });
+        var locations = (_c = (_b = (_a = args._private) === null || _a === void 0 ? void 0 : _a.locations) === null || _b === void 0 ? void 0 : _b.map(function (loc) { return Number(loc); })) !== null && _c !== void 0 ? _c : [];
+        if (locations.length > 0) {
+            locations.forEach(function (slotId) { return _this.moveWorker(slotId, args._private.workers); });
         }
         this.showSelection();
         if (!this.game.isCurrentPlayerActive)
             return;
         this.game.tableCenter.worker_locations.OnLocationClick = function (slotId) {
-            _this.moveWorker(slotId);
+            _this.moveWorker(slotId, args._private.workers);
         };
     };
     PlacementState.prototype.onLeavingState = function () {
@@ -3659,14 +3683,14 @@ var PlacementState = (function () {
             _this.resetState();
         };
         var handleConfirmPlacement = function () {
-            if (_this.locations.length !== 4) {
+            if (_this.locations.length !== _this.allowed_workers.length) {
                 _this.game.showMessage('You must place all your workers', 'error');
                 return;
             }
-            _this.game.takeAction('confirmPlacement', { locations: _this.locations.join(';') });
+            _this.game.takeAction(_this.confirmAction, { locations: _this.locations.join(';') });
         };
         var handleRestartPlacement = function () {
-            _this.game.takeAction('cancelPlacement', {}, null, function () {
+            _this.game.takeAction(_this.cancelAction, {}, null, function () {
                 _this.resetState();
             });
         };
@@ -3680,21 +3704,25 @@ var PlacementState = (function () {
             }
         }
     };
-    PlacementState.prototype.moveWorker = function (slotId) {
+    PlacementState.prototype.moveWorker = function (slotId, workers) {
+        var _this = this;
         if (this.locations.includes(Number(slotId))) {
             this.game.showMessage(_('You already have a worker on that location'), 'error');
             return;
         }
-        var worker = this.game.getCurrentPlayerTable().workers.getCards()[0];
+        var worker = workers.filter(function (w) { return !_this.original_workers.find(function (x) { return x.id === w.id; }); })[0];
         var copy = __assign(__assign({}, worker), { location: 'board', location_arg: slotId.toString() });
         this.original_workers.push(__assign({}, worker));
         this.game.tableCenter.worker_locations.addCard(copy);
         this.locations.push(Number(slotId));
         this.showSelection();
-        this.game.toggleButtonEnable('btn_confirm', this.locations.length == 4);
+        this.game.toggleButtonEnable('btn_confirm', this.locations.length == this.allowed_workers.length);
     };
     PlacementState.prototype.resetState = function () {
-        this.game.getCurrentPlayerTable().workers.addCards(this.original_workers);
+        if (this.original_workers.length > 0) {
+            var player_id = Number(this.original_workers[0].type_arg);
+            this.game.getPlayerTable(player_id).workers.addCards(this.original_workers);
+        }
         this.locations = [];
         this.original_workers = [];
         this.showSelection();
@@ -3703,12 +3731,12 @@ var PlacementState = (function () {
     PlacementState.prototype.showSelection = function () {
         var _this = this;
         var locations = this.game.tableCenter.worker_locations;
-        if (this.locations.length < 4) {
+        if (this.locations.length < this.allowed_workers.length) {
             if (TravelerHelper.isActivePineMarten()) {
                 locations.setSelectableLocation(arrayRange(3, 12));
             }
             else {
-                var selectable = arrayRange(1, 12).filter(function (num) { return _this.locations.indexOf(num) < 0; });
+                var selectable = arrayRange(1, 12).filter(function (num) { return _this.locations.indexOf(num) < 0 && _this.locations_unavailable.indexOf(num) < 0; });
                 locations.setSelectableLocation(selectable);
             }
         }
@@ -3785,10 +3813,11 @@ var PlayerTurnDiceState = (function () {
         });
     };
     PlayerTurnDiceState.prototype.onLeavingState = function () {
-        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations;
+        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         hill.setSelectionMode('none');
         hill.onSelectionChange = null;
         worker_locations.OnLocationClick = null;
+        dice_locations.onDieClick = null;
     };
     PlayerTurnDiceState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -3841,14 +3870,14 @@ var PlayerTurnDiceManipulationState = (function () {
         };
     };
     PlayerTurnDiceManipulationState.prototype.onLeavingState = function () {
-        document.querySelectorAll("#dice-locations .slot.is-invalid").forEach(function (slot) {
-            slot.classList.remove('is-invalid');
-        });
         this.toolbar.removeContainer();
         this.resetDiceManipulation();
         var dice_locations = this.game.tableCenter.dice_locations;
         dice_locations.setSelectionMode('none');
         dice_locations.onSelectionChange = undefined;
+        document.querySelectorAll("#dice-locations .is-invalid").forEach(function (slot) {
+            slot.classList.remove('is-invalid');
+        });
     };
     PlayerTurnDiceManipulationState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -3906,7 +3935,7 @@ var PlayerTurnDiceManipulationState = (function () {
                 _this.game.showMessage(_('You cannot use this option yet'), 'error');
                 return;
             }
-            if (_this.getLessonLearnedRemaining() == 0 && info.lesson >= 0) {
+            if (_this.getLessonLearnedRemaining() == 0 && info.lesson <= 0) {
                 _this.game.showMessage(_("You don't have any lesson learned remaining"), 'error');
                 return;
             }
@@ -4157,7 +4186,6 @@ var PlayerTurnResolveState = (function () {
         var handleEnd = function () {
             _this.game.takeAction('confirmResolveWorker');
         };
-        debugger;
         if (locations.length > 0) {
             this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
             this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
@@ -4952,6 +4980,128 @@ var TravelerStripedSkunkStates = (function () {
     };
     return TravelerStripedSkunkStates;
 }());
+var TravelerWildTurkeyStates = (function () {
+    function TravelerWildTurkeyStates(game) {
+        this.game = game;
+        this.isMultipleActivePlayer = true;
+        this.toolbar = new ToolbarContainer('wild-turkey');
+    }
+    TravelerWildTurkeyStates.prototype.onEnteringState = function (args) {
+        var _this = this;
+        var _a = this.game.getCurrentPlayerTable(), dice = _a.dice, player_color = _a.player_color;
+        this.addDiceSelector(player_color);
+        var handleDiceSelection = function (selection) {
+            _this.toolbar
+                .getContainer()
+                .querySelectorAll('.colored-die')
+                .forEach(function (div) { return div.classList.remove('disabled', 'selected'); });
+            if (selection.length == 1) {
+                document.getElementById("die-wt-".concat(selection[0].face)).classList.add('disabled');
+            }
+            else {
+                _this.toolbar
+                    .getContainer()
+                    .querySelectorAll('.colored-die')
+                    .forEach(function (div) { return div.classList.add('disabled'); });
+            }
+            _this.game.disableButton('btn_confirm');
+        };
+        if (this.game.isCurrentPlayerActive()) {
+            dice.setSelectionMode('single');
+            dice.onSelectionChange = handleDiceSelection;
+        }
+        else if (args._private.die_id > 0) {
+            dice.setSelectionMode('none');
+            dice.onSelectionChange = undefined;
+            var die_1 = this.game
+                .getCurrentPlayerTable()
+                .dice.getDice()
+                .filter(function (die) { return die.id == args._private.die_id; })[0];
+            var divDie = this.game.diceManager.getDieElement(die_1);
+            divDie.classList.add('bga-dice_selected-die');
+            this.toolbar
+                .getContainer()
+                .querySelectorAll('.disabled')
+                .forEach(function (div) {
+                div.classList.toggle('disabled', div.dataset.face === die_1.face.toString());
+                div.classList.toggle('selected', div.dataset.face === args._private.die_value.toString());
+            });
+        }
+    };
+    TravelerWildTurkeyStates.prototype.addDiceSelector = function (player_color) {
+        var _this = this;
+        var handleChoiceClick = function (div) {
+            if (!_this.game.isCurrentPlayerActive())
+                return;
+            if (div.classList.contains('disabled'))
+                return;
+            if (!div.classList.contains('selected')) {
+                _this.toolbar
+                    .getContainer()
+                    .querySelectorAll('.selected')
+                    .forEach(function (div) { return div.classList.remove('selected'); });
+            }
+            div.classList.toggle('selected');
+            _this.game.toggleButtonEnable('btn_confirm', div.classList.contains('selected'), 'blue');
+        };
+        var root = this.toolbar.addContainer();
+        arrayRange(1, 6).forEach(function (value) {
+            root.insertAdjacentHTML('beforeend', "<div id=\"die-wt-".concat(value, "\" data-face=\"").concat(value, "\" class=\"disabled bga-dice_die bga-dice_die6 colored-die\" data-color=\"").concat(player_color, "\">\n               <div class=\"bga-dice_die-face\" data-face=\"").concat(value, "\"></div>\n            </div>"));
+            var div = document.getElementById("die-wt-".concat(value));
+            div.onclick = function () { return handleChoiceClick(div); };
+        });
+    };
+    TravelerWildTurkeyStates.prototype.onLeavingState = function () { };
+    TravelerWildTurkeyStates.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var die_value = Number(_this.toolbar.getContainer().querySelector('.selected').dataset.face);
+            var die_id = _this.game.getCurrentPlayerTable().dice.getSelection()[0].id;
+            _this.game.takeAction('confirmWildTurkey', { die_id: die_id, die_value: die_value }, function () {
+                var dice = _this.game.getCurrentPlayerTable().dice;
+                dice.setSelectionMode('none');
+                dice.onSelectionChange = undefined;
+                _this.onEnteringState({ _private: { die_id: die_id, die_value: die_value } });
+            });
+        };
+        var handlePass = function () {
+            _this.game.takeAction('confirmWildTurkey', { die_id: 0, die_value: 0 }, function () {
+                var dice = _this.game.getCurrentPlayerTable().dice;
+                dice.setSelectionMode('none');
+                dice.onSelectionChange = undefined;
+                _this.onEnteringState({ _private: { die_id: 0, die_value: 0 } });
+            });
+        };
+        var handleCancel = function () {
+            _this.game.takeAction('cancelWildTurkey', {}, function () {
+                _this.game.restoreGameState();
+            });
+        };
+        if (this.game.isCurrentPlayerActive()) {
+            this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
+            this.game.addActionButtonRed('btn_pass', _('Pass'), handlePass);
+        }
+        else {
+            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+        }
+    };
+    return TravelerWildTurkeyStates;
+}());
+var TravelerWildTurkeyEndStates = (function () {
+    function TravelerWildTurkeyEndStates(game) {
+        this.game = game;
+        this.toolbar = new ToolbarContainer('wild-turkey');
+    }
+    TravelerWildTurkeyEndStates.prototype.onEnteringState = function (args) {
+        var dice = this.game.getCurrentPlayerTable().dice;
+        dice.setSelectionMode('none');
+        dice.onSelectionChange = undefined;
+        this.toolbar.removeContainer();
+    };
+    TravelerWildTurkeyEndStates.prototype.onLeavingState = function () { };
+    TravelerWildTurkeyEndStates.prototype.onUpdateActionButtons = function (args) { };
+    return TravelerWildTurkeyEndStates;
+}());
 var ToolbarContainer = (function () {
     function ToolbarContainer(name) {
         this.name = name;
@@ -4998,6 +5148,7 @@ var CreatureConforts = (function () {
         this.stateManager = new StateManager(this);
         this.gameOptions = new GameOptions(this);
         this.tableCenter = new TableCenter(this);
+        this.tableScore = new TableScore(this);
         this.modal = new Modal(this);
         ['red', 'yellow', 'green', 'gray', 'purple'].forEach(function (color) {
             _this.dontPreloadImage("board_".concat(color, ".jpg"));
@@ -5384,10 +5535,12 @@ var NotificationManager = (function () {
             ['onAddConfortToHand', undefined],
             ['onBuildImprovement', undefined],
             ['onModifyDieWithLessonLearned', 100],
+            ['onModifyDieWithWildTurkey', 375],
             ['onNewRavenLocationTaken', 100],
             ['onAddAlmanac', 100],
             ['onAddWheelbarrow', 100],
             ['onNewTurn', 100],
+            ['onFinalScoring', 3000],
         ];
         this.setupNotifications(notifs);
         ['message', 'onDrawConfort'].forEach(function (eventName) {
@@ -5488,6 +5641,7 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_onReturnDice = function (_a) {
         var player_id = _a.player_id, dice = _a.dice;
+        debugger;
         var white_dice = dice.filter(function (die) { return die.type == 'white'; });
         var player_dice = dice.filter(function (die) { return Number(die.owner_id) == player_id; });
         this.game.tableCenter.hill.addDice(white_dice);
@@ -5676,6 +5830,15 @@ var NotificationManager = (function () {
         var player_id = _a.player_id, nbr_lesson = _a.nbr_lesson;
         this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
     };
+    NotificationManager.prototype.notif_onModifyDieWithWildTurkey = function (_a) {
+        var player_id = _a.player_id, die_val_id = _a.die_val_id, die_val_to = _a.die_val_to;
+        var die = this.game
+            .getPlayerTable(player_id)
+            .dice.getDice()
+            .find(function (d) { return d.id == die_val_id; });
+        die.face = die_val_to;
+        this.game.getPlayerTable(player_id).dice.rollDie(die, { effect: 'turn', duration: 375 });
+    };
     NotificationManager.prototype.notif_onNewRavenLocationTaken = function (_a) {
         var location_id = _a.location_id;
         this.game.tableCenter.addRavenToken(location_id);
@@ -5691,6 +5854,14 @@ var NotificationManager = (function () {
     NotificationManager.prototype.notif_onNewTurn = function (_a) {
         var turn_number = _a.turn_number;
         this.game.gameOptions.setTurnNumber(turn_number);
+    };
+    NotificationManager.prototype.notif_onFinalScoring = function (_a) {
+        var _this = this;
+        var scores = _a.scores;
+        this.game.tableScore.displayScores(scores);
+        Object.keys(scores).forEach(function (player_id) {
+            _this.game.scoreCtrl[player_id].toValue(scores[player_id]['total']);
+        });
     };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
         var _this = this;
@@ -5989,6 +6160,50 @@ var TableCenter = (function () {
         this.worker_locations.addCards(game.gamedatas.workers.board);
     };
     return TableCenter;
+}());
+var TableScore = (function () {
+    function TableScore(game) {
+        this.game = game;
+        if (game.gamedatas.gamestate.name !== 'gameEnd')
+            return;
+        this.displayScores(game.gamedatas.scores);
+    }
+    TableScore.prototype.displayScores = function (scores) {
+        var player_ids = this.game.gamedatas.playerorder.map(function (id) { return Number(id); });
+        var html = "<table class=\"players-scores\">\n            <thead>\n               ".concat(this.getHeaderNames(player_ids, this.game.gamedatas), "\n            </thead>\n            <tbody>\n               ").concat(this.getRow('comforts', _('Comforts'), player_ids, scores), "\n               ").concat(this.getRow('comforts_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('improvements', _('Improvements'), player_ids, scores), "\n               ").concat(this.getRow('improvements_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('cottages', _('Cottages'), player_ids, scores), "\n               ").concat(this.getRow('resources', _('Resources'), player_ids, scores), "\n               ").concat(this.getTotals(player_ids, scores), "\n            </tbody>\n         </table>");
+        document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
+    };
+    TableScore.prototype.getHeaderNames = function (player_ids, _a) {
+        var players = _a.players;
+        var colums = player_ids.map(function (id) {
+            var _a = players[id], color = _a.color, name = _a.name;
+            return "<th style=\"color: #".concat(color, "\">").concat(name, "</th>");
+        });
+        return "<tr id=\"score-headers\">\n         <th></th>\n         ".concat(colums.join(''), "\n      </tr>");
+    };
+    TableScore.prototype.getTotals = function (player_ids, scores) {
+        var colums = player_ids.map(function (pId) {
+            var player_scores = scores[pId];
+            var total = Object.keys(player_scores)
+                .filter(function (key) { return key !== 'total'; })
+                .reduce(function (prev, curr) {
+                return prev + Number(player_scores[curr]);
+            }, 0);
+            return "<td>\n            <div id=\"score-".concat(pId, "-total\">").concat(total, "</div>\n            <i class=\"fa fa-star\"></id>\n         </td>");
+        });
+        return "<tr id=\"scores-row-total\">\n         <td class=\"row-header\">".concat(_('Total'), "</td>\n         ").concat(colums, "\n      </tr>");
+    };
+    TableScore.prototype.getRow = function (row, title, player_ids, scores) {
+        var columns = player_ids.map(function (pId) {
+            var score = scores[pId][row];
+            return "<td>\n            <div id=\"score-".concat(pId, "-").concat(row, "\">").concat(score, "</div>\n            <i class=\"fa fa-star\"></id>\n         </td>");
+        });
+        return this.getScoreRow(row, title, columns);
+    };
+    TableScore.prototype.getScoreRow = function (id, title, columns) {
+        return "<tr id=\"scores-row-".concat(id, "\">\n         <td class=\"row-header\">").concat(title, "</td>\n         ").concat(columns.join(''), "\n      </tr>");
+    };
+    return TableScore;
 }());
 var colors = {
     dcac28: 'yellow',

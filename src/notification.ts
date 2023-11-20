@@ -27,10 +27,12 @@ class NotificationManager {
          ['onAddConfortToHand', undefined],
          ['onBuildImprovement', undefined],
          ['onModifyDieWithLessonLearned', 100],
+         ['onModifyDieWithWildTurkey', 375],
          ['onNewRavenLocationTaken', 100],
          ['onAddAlmanac', 100],
          ['onAddWheelbarrow', 100],
          ['onNewTurn', 100],
+         ['onFinalScoring', 3000],
       ];
 
       this.setupNotifications(notifs);
@@ -116,6 +118,7 @@ class NotificationManager {
    }
 
    private notif_onReturnDice({ player_id, dice }: { player_id: number; dice: Dice[] }) {
+      debugger;
       const white_dice = dice.filter((die) => die.type == 'white');
       const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
       this.game.tableCenter.hill.addDice(white_dice);
@@ -239,6 +242,16 @@ class NotificationManager {
       this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
    }
 
+   private notif_onModifyDieWithWildTurkey({ player_id, die_val_id, die_val_to }: ModifyDieWithWildTurkey) {
+      const die = this.game
+         .getPlayerTable(player_id)
+         .dice.getDice()
+         .find((d) => d.id == die_val_id);
+
+      die.face = die_val_to;
+      this.game.getPlayerTable(player_id).dice.rollDie(die, { effect: 'turn', duration: 375 });
+   }
+
    private notif_onNewRavenLocationTaken({ location_id }: { location_id: number }) {
       this.game.tableCenter.addRavenToken(location_id);
    }
@@ -253,6 +266,13 @@ class NotificationManager {
 
    private notif_onNewTurn({ turn_number }: { turn_number: number }) {
       this.game.gameOptions.setTurnNumber(turn_number);
+   }
+
+   private notif_onFinalScoring({ scores }: { scores: Record<number, any> }) {
+      this.game.tableScore.displayScores(scores);
+      Object.keys(scores).forEach((player_id) => {
+         this.game.scoreCtrl[player_id].toValue(scores[player_id]['total']);
+      });
    }
 
    private animationMoveResource(
@@ -359,4 +379,10 @@ interface BuildImprovementArgs {
 interface ModifyDieWithLessonLearnedArgs {
    player_id: number;
    nbr_lesson: number;
+}
+
+interface ModifyDieWithWildTurkey {
+   player_id: number;
+   die_val_id: number;
+   die_val_to: number;
 }

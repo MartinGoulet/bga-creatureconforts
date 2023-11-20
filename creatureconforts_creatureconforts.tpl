@@ -2,6 +2,7 @@
 
 <div id="table">
     <div id="tables-and-center">
+        <div id="table-score"></div>
         <div id="current-player-table"></div>
         <div id="table-center-wrapper">
             <div id="table-improvements"></div>

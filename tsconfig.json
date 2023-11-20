@@ -20,6 +20,7 @@
         "node_modules/bga-animations/src/animations.ts",
         "node_modules/bga-animations/src/animations/attach-with-animation.ts",
         "node_modules/bga-animations/src/animations/cumulated-animations.ts",
+        "node_modules/bga-animations/src/animations/pause-animation.ts",
         "node_modules/bga-animations/src/animations/slide-animation.ts",
         "node_modules/bga-animations/src/animations/slide-to-animation.ts",
         "node_modules/bga-animations/src/animations-utils.ts",
@@ -95,6 +96,7 @@
         "src/states/traveler-gray-wolf.ts",
         "src/states/traveler-common-raven.ts",
         "src/states/traveler-striped-skunk.ts",
+        "src/states/traveler-wild-turkey.ts",
         
         "src/toolbar-container.ts",
         "src/creature-conforts.d.ts",
@@ -105,6 +107,7 @@
         "src/player-panel.ts",
         "src/player-table.ts",
         "src/table-center.ts",
+        "src/table-score.ts",
         "src/utils.ts",
 
         "src/define.ts"

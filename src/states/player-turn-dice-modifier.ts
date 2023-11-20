@@ -21,14 +21,14 @@ class PlayerTurnDiceManipulationState implements StateHandler {
    }
 
    onLeavingState(): void {
-      document.querySelectorAll(`#dice-locations .slot.is-invalid`).forEach((slot) => {
-         slot.classList.remove('is-invalid');
-      });
       this.toolbar.removeContainer();
       this.resetDiceManipulation();
       const { dice_locations } = this.game.tableCenter;
       dice_locations.setSelectionMode('none');
       dice_locations.onSelectionChange = undefined;
+      document.querySelectorAll(`#dice-locations .is-invalid`).forEach((slot) => {
+         slot.classList.remove('is-invalid');
+      });
    }
 
    onUpdateActionButtons(args: PlayerTurnDiceManipulationArgs): void {
@@ -98,7 +98,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
             return;
          }
 
-         if (this.getLessonLearnedRemaining() == 0 && info.lesson >= 0) {
+         if (this.getLessonLearnedRemaining() == 0 && info.lesson <= 0) {
             this.game.showMessage(_("You don't have any lesson learned remaining"), 'error');
             return;
          }

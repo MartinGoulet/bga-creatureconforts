@@ -1,0 +1,79 @@
+#table-score {
+   flex-basis: 100%;
+   display: flex;
+   justify-content: center;
+
+   .players-scores {
+      background-color: white;
+
+      .row-header {
+         padding: 4px 12px 3px;
+         text-align: left;
+         vertical-align: top;
+      }
+      #scores-row-total {
+        border-top: 2px solid #000;
+        font-weight: 700;
+        background-color: white;
+        
+        .row-header {
+            background: #515151;
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+        }
+      }
+
+      .fa.fa-star {
+        color: #2222229e;
+        font-size: .8em;
+        margin-left: 1px;
+        vertical-align: middle;
+      }
+
+      #scores-row-comforts_bonus .row-header,
+      #scores-row-improvements_bonus .row-header {
+        padding-left: 30px;
+      }
+   }
+
+   table {
+        border-bottom: 2px solid #000;
+
+      thead tr {
+         border-bottom: 2px solid #000;
+         border-top: 2px solid #000;
+
+         th {
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            height: 30px;
+            min-width: 80px;
+            font-weight: 700;
+            padding: 2px 15px;
+            text-align: center;
+            vertical-align: middle;
+         }
+      }
+      tbody tr {
+         td {
+            word-wrap: anywhere;
+            border-left: 2px solid #000;
+            border-right: 2px solid #000;
+            min-width: 100px;
+            text-align: center;
+            vertical-align: middle;
+
+            div {
+                display: inline-block;
+                min-width: 20px;
+                text-align: right;
+            }
+         }
+         &:nth-child(odd) {
+            background-color: #ccc;
+         }
+      }
+   }
+}

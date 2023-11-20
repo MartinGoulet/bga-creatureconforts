@@ -26,6 +26,9 @@ class StateManager {
          grayWolf: new TravelerGrayWolfState(game),
          commonRaven: new TravelerCommonRavenState(game),
          stripedSkunk: new TravelerStripedSkunkStates(game),
+         commonLoon: new PlacementState(game),
+         wildTurkey: new TravelerWildTurkeyStates(game),
+         wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
       };
    }
 
@@ -59,6 +62,8 @@ class StateManager {
 
       if (this.states[stateName] !== undefined) {
          if (this.game.isCurrentPlayerActive()) {
+            this.states[stateName].onLeavingState();
+         } else if ('isMultipleActivePlayer' in this.states[stateName]) {
             this.states[stateName].onLeavingState();
          }
       }

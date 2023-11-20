@@ -96,7 +96,6 @@ class PlayerTurnResolveState implements StateHandler {
          this.game.takeAction('confirmResolveWorker');
       };
 
-      debugger;
       if (locations.length > 0) {
          this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
          this.game.addActionButtonRed('btn_end', _('End'), handleEnd);

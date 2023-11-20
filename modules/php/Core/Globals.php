@@ -40,6 +40,14 @@ class Globals extends \APP_DbObject {
         Game::get()->setGameStateValue(VAR_RIVER_DIAL, $value);
     }
 
+    public static function getWildTurkeyDice(int $player_id) {
+        return self::get("wild_turkey_" . $player_id, true) ?? [];
+    }
+
+    public static function setWildTurkeyDice(int $player_id, array $dice_info) {
+        self::set("wild_turkey_" . $player_id, $dice_info);
+    }
+
     public static function getWorkerPlacement(int $player_id) {
         return self::get("locations_" . $player_id);
     }

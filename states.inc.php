@@ -126,6 +126,46 @@ $travelerStates = [
         ]
     ],
 
+    ST_COMMON_LOON => [
+        "phase" => "3",
+        "name" => "commonLoon",
+        "descriptionmyturn" => clienttranslate('${you} must place one ${otherplayer}\'s worker on a location'),
+        "description" => clienttranslate('Waiting for others to place a worker'),
+        "args" => "argCommonLoon",
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        "possibleactions" => ["confirmPlacement", "cancelPlacement"],
+        "transitions" => ["" => ST_COMMON_LOON_END]
+    ],
+
+    ST_COMMON_LOON_END => [
+        "phase" => 3,
+        "name" => "commonLoonEnd",
+        "type" => "game",
+        "action" => "stPlacementEnd",
+        "transitions" => ["" => ST_PLACEMENT]
+    ],
+
+    ST_WILD_TURKEY => [
+        "phase" => "3",
+        "name" => "wildTurkey",
+        "descriptionmyturn" => clienttranslate('${you} may change one of your own Family dice to any result'),
+        "description" => clienttranslate('Waiting for others to change on of their Family dice'),
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        'args' => 'argWildTurkey',
+        "possibleactions" => ["confirmWildTurkey", "cancelWildTurkey"],
+        "transitions" => ["" => ST_WILD_TURKEY_END]
+    ],
+
+    ST_WILD_TURKEY_END => [
+        "phase" => 3,
+        "name" => "wildTurkeyEnd",
+        "type" => "game",
+        "action" => "stWildTurkeyEnd",
+        "transitions" => ["" => ST_PLACEMENT]
+    ],
+
 ];
 
 $improvementStates = [
@@ -205,7 +245,11 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
         "description" => "Step 2 : Family Dice",
         "type" => "game",
         "action" => "stFamilyDice",
-        "transitions" => ["" => ST_PLACEMENT]
+        "transitions" => [
+            "end" => ST_PLACEMENT,
+            "common_loon" => ST_COMMON_LOON,
+            "wild_turkey" => ST_WILD_TURKEY,
+        ]
     ],
 
     ST_PLACEMENT => [

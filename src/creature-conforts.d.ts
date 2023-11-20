@@ -35,6 +35,8 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
 
    turn_number: number;
    nbr_turns: number;
+
+   scores: Record<number, any>;
 }
 
 type TopCardCount<T> = {

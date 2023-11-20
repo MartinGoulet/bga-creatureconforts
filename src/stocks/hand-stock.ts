@@ -14,11 +14,9 @@ class Hand<T> extends HandStock<T> {
    }
 
    public addCard(card: T, animation?: CardAnimation<T>, settings?: AddCardSettings): Promise<boolean> {
-      const copy = { type: null, type_arg: null, ...card }; // { ...card, isHidden: !this.current_player };
-      if (!this.current_player) {
-         copy.type = null;
-         copy.type_arg = null;
-      }
+      const { id } = card as Card;
+      const copy: T = this.current_player ? { ...card } : ({ id } as T);
+
       return new Promise<boolean>((resolve) => {
          super
             .addCard(copy, animation, settings)
