@@ -29,27 +29,36 @@ class TravelerWildTurkeyStates implements StateHandler {
       if (this.game.isCurrentPlayerActive()) {
          dice.setSelectionMode('single');
          dice.onSelectionChange = handleDiceSelection;
-      } else if (args._private.die_id > 0) {
-         dice.setSelectionMode('none');
-         dice.onSelectionChange = undefined;
-
-         const die = this.game
-            .getCurrentPlayerTable()
-            .dice.getDice()
-            .filter((die) => die.id == args._private.die_id)[0];
-         const divDie = this.game.diceManager.getDieElement(die);
-         divDie.classList.add('bga-dice_selected-die');
-
-         this.toolbar
-            .getContainer()
-            .querySelectorAll('.disabled')
-            .forEach((div: HTMLDivElement) => {
-               div.classList.toggle('disabled', div.dataset.face === die.face.toString());
-               div.classList.toggle('selected', div.dataset.face === args._private.die_value.toString());
-            });
+      } else {
+         this.displayDiceSelection(args._private);
       }
    }
+   private displayDiceSelection({ die_id, die_value }: { die_id: number; die_value: number }) {
+      const { dice } = this.game.getCurrentPlayerTable();
+      dice.setSelectionMode('none');
+      dice.onSelectionChange = undefined;
+
+      if (die_id === 0) return;
+      if (!this.toolbar.getContainer()) return;
+
+      const die = this.game
+         .getCurrentPlayerTable()
+         .dice.getDice()
+         .filter((die) => die.id == die_id)[0];
+      const divDie = this.game.diceManager.getDieElement(die);
+      divDie.classList.add('bga-dice_selected-die');
+
+      this.toolbar
+         .getContainer()
+         .querySelectorAll('.disabled')
+         .forEach((div: HTMLDivElement) => {
+            div.classList.toggle('disabled', div.dataset.face === die.face.toString());
+            div.classList.toggle('selected', div.dataset.face === die_value.toString());
+         });
+   }
+
    private addDiceSelector(player_color: string) {
+      debugger;
       const handleChoiceClick = (div: HTMLDivElement) => {
          if (!this.game.isCurrentPlayerActive()) return;
          if (div.classList.contains('disabled')) return;
@@ -85,19 +94,13 @@ class TravelerWildTurkeyStates implements StateHandler {
          );
          const die_id = this.game.getCurrentPlayerTable().dice.getSelection()[0].id;
          this.game.takeAction('confirmWildTurkey', { die_id, die_value }, () => {
-            const { dice } = this.game.getCurrentPlayerTable();
-            dice.setSelectionMode('none');
-            dice.onSelectionChange = undefined;
-            this.onEnteringState({ _private: { die_id, die_value } });
+            this.displayDiceSelection({ die_id, die_value });
          });
       };
 
       const handlePass = () => {
          this.game.takeAction('confirmWildTurkey', { die_id: 0, die_value: 0 }, () => {
-            const { dice } = this.game.getCurrentPlayerTable();
-            dice.setSelectionMode('none');
-            dice.onSelectionChange = undefined;
-            this.onEnteringState({ _private: { die_id: 0, die_value: 0 } });
+            this.displayDiceSelection({ die_id: 0, die_value: 0 });
          });
       };
 
@@ -117,13 +120,18 @@ class TravelerWildTurkeyStates implements StateHandler {
 }
 
 class TravelerWildTurkeyEndStates implements StateHandler {
+   public isMultipleActivePlayer: boolean = true;
    private toolbar: ToolbarContainer = new ToolbarContainer('wild-turkey');
    constructor(private game: CreatureConforts) {}
    onEnteringState(args: any): void {
+      debugger;
       const { dice } = this.game.getCurrentPlayerTable();
       dice.setSelectionMode('none');
       dice.onSelectionChange = undefined;
       this.toolbar.removeContainer();
+      document
+         .querySelectorAll('.bga-dice_selected-die')
+         .forEach((div: HTMLDivElement) => div.classList.remove('bga-dice_selected-die'));
    }
    onLeavingState(): void {}
    onUpdateActionButtons(args: any): void {}

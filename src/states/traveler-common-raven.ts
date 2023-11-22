@@ -1,7 +1,7 @@
 class TravelerCommonRavenState implements StateHandler {
    constructor(private game: CreatureConforts) {}
 
-   onEnteringState(args: any): void {
+   onEnteringState({ locations_unavailable: location_ids }: TravelerCommonRavenArgs): void {
       const { worker_locations } = this.game.tableCenter;
 
       worker_locations.OnLocationClick = (slotId: SlotId) => {
@@ -17,7 +17,7 @@ class TravelerCommonRavenState implements StateHandler {
          }
       };
 
-      worker_locations.setSelectableLocation(arrayRange(1, 12));
+      worker_locations.setSelectableLocation(arrayRange(1, 12).filter((l) => !location_ids.includes(l)));
    }
 
    onLeavingState(): void {
@@ -39,4 +39,8 @@ class TravelerCommonRavenState implements StateHandler {
 
       this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
    }
+}
+
+interface TravelerCommonRavenArgs {
+   locations_unavailable: number[];
 }

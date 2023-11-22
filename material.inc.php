@@ -128,7 +128,7 @@ $this->confort_types = [
       'score' => 4,
       'cost' => [MUSHROOM => 2, COIN => 2],
       'class' => "FairyGarden",
-      "storable" => [WOOD, STONE, GRAIN, MUSHROOM, YARN, FRUIT],
+      "storable" => [WOOD, STONE, FRUIT, MUSHROOM, YARN, GRAIN],
    ],
    18 => [
       'name' => clienttranslate("Toys"),
@@ -400,9 +400,9 @@ $this->traveler_types = [
          1 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
          2 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [CARD, LESSON_LEARNED]], "times" => 1],
-         4 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
-         5 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
-         6 => ["from" => ["count" => 2, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
+         4 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
+         5 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
+         6 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [COIN]], "times" => 3],
       ],
    ],
    7 => [
@@ -766,7 +766,7 @@ $this->valley_types = [
             "resources" => [STORY => 2]
          ],
          4 => [
-            "count" => 3,
+            "count" => 2,
             "rule" => RULE_TOTAL_7,
             "resources" => [GRAIN => 2, FRUIT => 2],
          ],

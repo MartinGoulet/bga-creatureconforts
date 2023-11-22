@@ -254,7 +254,7 @@ class CreatureConforts extends Table {
         return array(
             "ff0000" /* Red */         => "b7313e",
             "008000" /* Green */       => "13586b",
-            "0000ff" /* Blue */        => null,
+            "0000ff" /* Blue */        => "13586b",
             "ffa500" /* Yellow */      => "dcac28",
             "000000" /* Black */       => null,
             "ffffff" /* White */       => null,

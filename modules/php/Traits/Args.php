@@ -102,6 +102,12 @@ trait Args {
         ];
     }
 
+    function argCommonRaven() {
+        return [
+            "locations_unavailable" => Globals::getRavenLocationIds(),
+        ];
+    }
+
     function argWildTurkey() {
         $players = Game::get()->loadPlayersBasicInfos();
         $args = ["_private" => []];

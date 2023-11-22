@@ -156,6 +156,7 @@ class Notifications extends \APP_DbObject {
                 LESSON_LEARNED => $nbr_lesson,
                 'umbrella' => $nbr_umbrella
             ],
+            // TODO check resources_to
         ]);
     }
 

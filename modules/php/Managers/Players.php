@@ -147,4 +147,9 @@ class Players extends \APP_DbObject {
     public static function setPlayerScore(int $player_id, int $score) {
         self::DbQuery("UPDATE player SET player_score = $score WHERE player_id = $player_id");
     }
+
+    public static function countAlmanac(int $player_id) {
+        $sql = "SELECT almanac FROM player WHERE player_id = $player_id";
+        return intval(self::getUniqueValueFromDB($sql));
+    }
 }

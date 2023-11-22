@@ -71,7 +71,7 @@ class ResourceTrader<TResource> {
    }
 
    getTo(): TResource[] {
-      return this.to.get();
+      return this.to !== undefined ? this.to.get() : [];
    }
 
    isFullFrom(): boolean {
@@ -79,7 +79,7 @@ class ResourceTrader<TResource> {
    }
 
    isFullTo(): boolean {
-      return this.to.isFull();
+      return this.to === undefined || this.to.isFull();
    }
 
    isComplete(): boolean {

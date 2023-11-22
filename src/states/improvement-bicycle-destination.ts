@@ -7,7 +7,7 @@ class ImprovementBicycleDestinationState implements StateHandler {
       if (!this.game.isCurrentPlayerActive()) return;
 
       document
-         .querySelector(`#worker-locations [data-slot-id="${args.location}"]`)
+         .querySelector(`#worker-locations [data-slot-id="${args.location_from}"]`)
          .classList.add('remainder');
 
       const { worker_locations } = this.game.tableCenter;
@@ -37,12 +37,12 @@ class ImprovementBicycleDestinationState implements StateHandler {
       worker_locations.OnLocationClick = undefined;
    }
 
-   onUpdateActionButtons({ worker_id }: ImprovementBicycleDestinationArgs): void {
+   onUpdateActionButtons({ location_from }: ImprovementBicycleDestinationArgs): void {
       const handleConfirm = () => {
          const locations = this.game.tableCenter.worker_locations.getSelectedLocation();
          if (locations.length !== 1) return;
 
-         this.game.takeAction('confirmBicycle', { worker_id, location: Number(locations[0]) });
+         this.game.takeAction('confirmBicycle', { location_from, location_to: Number(locations[0]) });
       };
       this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
       this.game.addActionButtonDisabled('btn_reset', _('Reset'), () => this.reset());
@@ -59,6 +59,5 @@ class ImprovementBicycleDestinationState implements StateHandler {
 }
 
 interface ImprovementBicycleDestinationArgs {
-   worker_id: number;
-   location: number;
+   location_from: number;
 }

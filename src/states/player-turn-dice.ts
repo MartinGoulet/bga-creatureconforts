@@ -102,7 +102,9 @@ class PlayerTurnDiceState implements StateHandler {
          const args: PlayerTurnDiceManipulationArgs = {
             dice: [...dice.sort((a, b) => a.id - b.id)],
             original: this.original_dice,
-            lessons: Number(this.game.getCurrentPlayerPanel().counters['lesson'].getValue()),
+            lessons:
+               Number(this.game.getCurrentPlayerPanel().counters['lesson'].getValue()) +
+               this.game.getCurrentPlayerPanel().countAlmanac(),
             umbrella: this.game.getCurrentPlayerTable().hasUmbrella(),
          };
 

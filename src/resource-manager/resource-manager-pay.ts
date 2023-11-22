@@ -46,6 +46,9 @@ class ResourceManagerPay<TResource> implements IResourceManager<TResource> {
       this.resource_player.reset();
       this.resource_paid.reset();
    }
+   hasTradePending(): boolean {
+      return !this.resource_paid.isFull();
+   }
 
    private createSpacer(): HTMLElement {
       const divSpacer = document.createElement('div');

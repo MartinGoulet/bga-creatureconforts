@@ -33,17 +33,10 @@ class ImprovementBicycleState implements StateHandler {
          const selectedSlotId = this.game.tableCenter.worker_locations.getSelectedLocation();
          if (selectedSlotId.length !== 1) return;
 
-         const worker_id = Number(
-            this.game.tableCenter.worker_locations
-               .getCards()
-               .find((worker) => worker.location_arg == selectedSlotId[0]).id,
-         );
-
          this.game.setClientState('resolveBicycleDestination', {
             descriptionmyturn: _('${you} must select a destination for your worker'),
             args: {
-               worker_id,
-               location: Number(selectedSlotId[0]),
+               location_from: Number(selectedSlotId[0]),
             },
          });
       };

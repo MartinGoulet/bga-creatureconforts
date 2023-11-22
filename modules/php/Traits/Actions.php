@@ -93,6 +93,11 @@ trait Actions {
             $infos[$info['die']] = $info;
         }
 
+        $count_almanac = Players::countAlmanac(Players::getPlayerId());
+        if($count_almanac > 0) {
+            $sum_lesson = $sum_lesson >= $count_almanac ? $sum_lesson - $count_almanac : 0;
+        }
+
         if ($sum_lesson > 0) {
             if (!Players::hasEnoughResource(Players::getPlayerId(), [LESSON_LEARNED => $sum_lesson])) {
                 throw new BgaUserException("Not enough lesson learned");
@@ -434,10 +439,10 @@ trait Actions {
         Game::get()->gamestate->nextState("next");
     }
 
-    function confirmBicycle(int $worker_id, int $location) {
+    function confirmBicycle(int $location_id_from, int $location_id_to) {
         $workers = Worker::getWorkersFromPlayer(Players::getPlayerId());
-        $worker = array_filter($workers, function ($w) use ($worker_id) {
-            return $w['id'] == $worker_id;
+        $worker = array_filter($workers, function ($w) use ($location_id_from) {
+            return $w['location_arg'] == $location_id_from;
         });
 
         $worker = array_shift($worker);
@@ -446,20 +451,20 @@ trait Actions {
             throw new BgaUserException("This is not your worker");
         }
 
-        if (in_array($location, [1, 2]) && TravelerHelper::isActivePineMarten()) {
+        if (in_array($location_id_to, [1, 2]) && TravelerHelper::isActivePineMarten()) {
             throw new BgaUserException("You cannot go there with Pine Marten in play");
         }
 
         $worker_locations = array_values(array_column($workers, 'location_arg'));
-        if (in_array($location, $worker_locations)) {
+        if (in_array($location_id_to, $worker_locations)) {
             throw new BgaUserException("Worker already in that location");
         }
 
-        if ($location <= 0 || $location > 12) {
-            throw new BgaUserException("Location must be between 1 and 12 => " . $location);
+        if ($location_id_to <= 0 || $location_id_to > 12) {
+            throw new BgaUserException("Location must be between 1 and 12 => " . $location_id_to);
         }
 
-        Worker::moveToLocation($worker['id'], $location);
+        Worker::moveToLocation($worker['id'], $location_id_to);
         Notifications::revealPlacement(Worker::getUIData());
 
         Game::get()->gamestate->nextState('next');

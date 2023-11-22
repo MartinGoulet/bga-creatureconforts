@@ -80,7 +80,8 @@ class TravelerHelper {
                 BlueJay::resolve($die['face'], $group);
                 break;
             case 15:
-                WildTurkey::resolve($die['face'], $resources, $group);
+                $group2 = ResourcesHelper::groupByType($resources_get);
+                WildTurkey::resolve($die['face'], $resources, $group, $resources_get, $group2);
                 break;
             default:
                 throw new BgaUserException("Traveler not found");

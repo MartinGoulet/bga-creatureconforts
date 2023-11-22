@@ -6,6 +6,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
    private toolbar: ToolbarContainer = new ToolbarContainer('dice-manipulation');
    private totalUmbrella: number;
    private totalLesson: number;
+   private totalAlmanac: number;
 
    constructor(private game: CreatureConforts) {}
 
@@ -33,7 +34,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
 
    onUpdateActionButtons(args: PlayerTurnDiceManipulationArgs): void {
       this.totalLesson = args.lessons;
-      this.totalUmbrella = args.original ? 1 : 0;
+      this.totalUmbrella = args.umbrella ? 1 : 0;
 
       const handleReset = () => {
          this.game.tableCenter.dice_locations.unselectAll();

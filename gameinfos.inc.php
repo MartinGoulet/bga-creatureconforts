@@ -102,10 +102,10 @@ $gameinfos = array(
     // Colors attributed to players
     // 'player_colors' => array( "ff0000", "008000", "0000ff", "ffa500", "773300" ),
     'player_colors' => [
-        "dcac28", // Yellow
-        "13586b", // Green
-        "7e797b", // Gray
         "b7313e", // Red
+        "13586b", // Green
+        "dcac28", // Yellow
+        "7e797b", // Gray
         "650e41", // Purple
     ],
 

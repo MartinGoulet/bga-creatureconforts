@@ -74,7 +74,7 @@ $basicGameStates = [
 
 $travelerStates = [
     ST_GRAY_WOLF => [
-        "phase" => "5",
+        "phase" => "1",
         "name" => "grayWolf",
         "descriptionmyturn" => clienttranslate('${you} must choose a face-up Comfort form the Owl\'s Nest'),
         "description" => clienttranslate('Waiting for others to choose a face-up Comfort form the Owl\'s Nest'),
@@ -84,6 +84,7 @@ $travelerStates = [
     ],
 
     ST_GRAY_WOLF_NEXT_PLAYER => [
+        "phase" => "1",
         "name" => "grayWolfNextPlayer",
         "type" => "game",
         "action" => "stPlayerTurnNextTraveler",
@@ -94,16 +95,18 @@ $travelerStates = [
     ],
 
     ST_COMMON_RAVEN => [
-        "phase" => "5",
+        "phase" => "1",
         "name" => "commonRaven",
         "descriptionmyturn" => clienttranslate('${you} must place a ::coin:: in a location'),
         "description" => clienttranslate('${actplayer} must place a ::coin:: in a location'),
+        "args" => "argCommonRaven",
         "type" => "activeplayer",
         "possibleactions" => ["confirmCommonRaven"],
         "transitions" => ["" => ST_COMMON_RAVEN_NEXT_PLAYER]
     ],
 
     ST_COMMON_RAVEN_NEXT_PLAYER => [
+        "phase" => "1",
         "name" => "commonRavenNextPlayer",
         "type" => "game",
         "action" => "stPlayerTurnNextTraveler",
@@ -172,8 +175,8 @@ $improvementStates = [
     ST_IMPROVEMENT_BICYCLE => [
         "phase" => "5",
         "name" => "bicycle",
-        "descriptionmyturn" => clienttranslate('${you} may move one of your workers to a different location'),
-        "description" => clienttranslate('${actplayer} may move one of his workers to a different location'),
+        "descriptionmyturn" => clienttranslate('Bicycle : ${you} may move one of your workers to a different location'),
+        "description" => clienttranslate('Bycicle : ${actplayer} may move one of his workers to a different location'),
         "type" => "activeplayer",
         "possibleactions" => ["confirmBicycle", "pass"],
         "transitions" => [

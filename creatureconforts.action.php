@@ -231,11 +231,11 @@ class action_creatureconforts extends APP_GameAction {
    public function confirmBicycle() {
       self::setAjaxMode();
       // Retrieve arguments
-      $worker_id = intval(self::getArg("worker_id", AT_int));
-      $location = intval(self::getArg("location", AT_int));
+      $location_from = intval(self::getArg("location_from", AT_int));
+      $location_to = intval(self::getArg("location_to", AT_int));
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmBicycle');
-      $this->game->confirmBicycle($worker_id, $location);
+      $this->game->confirmBicycle($location_from, $location_to);
       self::ajaxResponse();
    }
 

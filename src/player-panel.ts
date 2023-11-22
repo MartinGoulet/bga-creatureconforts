@@ -1,6 +1,7 @@
 class PlayerPanel {
    public player_id: number;
    public counters: { [icon: string]: ebg.counter } = {};
+   private almanac: number = 0;
 
    constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
       this.player_id = Number(player.id);
@@ -53,10 +54,15 @@ class PlayerPanel {
    addAlmanac() {
       const container = document.querySelectorAll(`#player-panel-${this.player_id}-icons .row`)[0];
       container.insertAdjacentHTML('beforeend', '<div class="almanac"></div>');
+      this.almanac += 1;
    }
 
    addWheelbarrow() {
       const container = document.querySelectorAll(`#player-panel-${this.player_id}-icons .row`)[0];
       container.insertAdjacentHTML('beforeend', '<div class="wheelbarrow"></div>');
+   }
+
+   public countAlmanac() {
+      return this.almanac;
    }
 }
