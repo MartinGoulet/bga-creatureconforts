@@ -4,3 +4,5 @@
 .eslintrc
 img
 node_modules
+misc/**/*.png
+misc/**/*.jpg
