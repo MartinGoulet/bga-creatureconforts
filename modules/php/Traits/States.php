@@ -48,6 +48,8 @@ trait States {
             Game::get()->gamestate->nextState("gray_wolf");
         } else if (TravelerHelper::isActiveCommonRaven()) {
             Game::get()->gamestate->nextState("common_raven");
+        } else if (TravelerHelper::isActiveCanadaLynx()) {
+            Game::get()->gamestate->nextState("canada_lynx");
         } else {
             Game::get()->gamestate->nextState("family");
         }

@@ -55,7 +55,7 @@ class PlayerTurnResolveState implements StateHandler {
          .forEach((div) => div.classList.remove('selectable'));
    }
 
-   onUpdateActionButtons({ locations }: PlayerTurnResolveArgs): void {
+   onUpdateActionButtons({ locations, wheelbarrow }: PlayerTurnResolveArgs): void {
       const handleResolve = () => {
          if (this.glade_selection) {
             this.game.takeAction('resolveWorker', { location_id: this.glade_selection });
@@ -87,6 +87,10 @@ class PlayerTurnResolveState implements StateHandler {
             this.game.setClientState('resolveOwnNest', {
                descriptionmyturn: _(`You must select one card in the Owl's Nest`),
             });
+         } else if (wheelbarrow === locationId) {
+            this.game.setClientState('resolveWheelbarrow', {
+               descriptionmyturn: _(`You must select one card in the Owl's Nest`),
+            });
          } else {
             this.game.takeAction('resolveWorker', { location_id: locationId });
          }
@@ -116,4 +120,5 @@ class PlayerTurnResolveState implements StateHandler {
 
 interface PlayerTurnResolveArgs {
    locations: number[];
+   wheelbarrow: number;
 }

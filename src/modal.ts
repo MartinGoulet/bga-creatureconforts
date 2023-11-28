@@ -50,9 +50,10 @@ class Modal {
    displayConfort(card: ConfortCard) {
       const front = this.addDivCard('confort');
       front.dataset.type = card.type;
-      front.dataset.pos = card.type_arg;
-      front.classList.toggle('background_1', Number(card.type) <= 12);
-      front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
+      // front.dataset.pos = card.type_arg;
+      front.dataset.img = this.game.confortManager.getCardType(card).img.toString();
+      // front.classList.toggle('background_1', Number(card.type) <= 12);
+      // front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
       this.adjustPosition();
    }
 

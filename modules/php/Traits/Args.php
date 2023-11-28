@@ -54,6 +54,8 @@ trait Args {
                 "locations" => $locations,
                 'locations_unavailable' => array_values(array_map(fn ($w) => intval($w['location_arg']), $workers_board)),
                 "workers" => array_values($workers_player),
+                "wheelbarrow" => Globals::getWheelbarrow($player_id),
+                "wheelbarrow_count" => Players::countWheelbarrow($player_id),
             ];
         }
 
@@ -74,12 +76,23 @@ trait Args {
 
         return [
             'locations' => array_values($locations),
+            'wheelbarrow' => Globals::getWheelbarrow($player_id),
         ];
     }
 
     function argPlayerTurnDiscard() {
         return [
             'nbr' => sizeof(Conforts::getHand(Players::getPlayerId())) - 3,
+        ];
+    }
+
+    function argCanadaLynx() {
+        $current_player_id = $this->getActivePlayerId();
+        $left_player_id = Game::get()->getPrevPlayerTable()[$current_player_id];
+
+        return [
+            'otherplayer' => Game::get()->getPlayerNameById($left_player_id),
+            'otherplayer_id' => $left_player_id,
         ];
     }
 

@@ -52,7 +52,9 @@ trait Actions {
         Conforts::cancelStartHand($current_player_id);
     }
 
-    function confirmPlacement(array $locations) {
+    function confirmPlacement(array $locations, int $wheelbarrow) {
+        $current_player_id = $this->getCurrentPlayerId();
+
         // Basic location
         $available_locations = TravelerHelper::isActivePineMarten()
             ? [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -64,7 +66,17 @@ trait Actions {
             }
         }
 
-        $current_player_id = $this->getCurrentPlayerId();
+        if ($wheelbarrow > 0) {
+            
+            if (!Players::hasWheelbarrow($current_player_id)) {
+                throw new BgaUserException("You dont have any wheelbarrow");
+            }
+            if ($wheelbarrow < 1 || $wheelbarrow > 7) {
+                throw new BgaUserException("Location must be between 1 and 7");
+            }
+            Globals::setWheelbarrow($current_player_id, $wheelbarrow);
+        }
+
         Globals::setWorkerPlacement($current_player_id, $locations);
         $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
     }
@@ -73,6 +85,7 @@ trait Actions {
         $current_player_id = $this->getCurrentPlayerId();
         $this->gamestate->setPlayersMultiactive([$current_player_id], '');
         Globals::setWorkerPlacement($current_player_id, []);
+        Globals::setWheelbarrow($current_player_id, 0);
     }
 
     function confirmPlayerDice(array $dice_ids, array $location_ids, array $lesson, array $umbrella) {
@@ -94,8 +107,12 @@ trait Actions {
         }
 
         $count_almanac = Players::countAlmanac(Players::getPlayerId());
-        if($count_almanac > 0) {
+        if ($count_almanac > 0) {
             $sum_lesson = $sum_lesson >= $count_almanac ? $sum_lesson - $count_almanac : 0;
+        }
+
+        if(TravelerHelper::isActiveLeopardFrog()) {
+            $sum_lesson -= 2;
         }
 
         if ($sum_lesson > 0) {
@@ -205,18 +222,20 @@ trait Actions {
                 Players::addResources($player_id, [FRUIT => 1]);
                 Notifications::abilityBlackBear($player_id, $location_id, [FRUIT => 1]);
             }
+            $this->resolveWheelbarrow($location_id, $resources);
             $this->resolveWorkerNextStep($location_id);
             return;
         }
 
         if ($location_id >= 5 && $location_id <= 7) {
-            $resources = [
+            $resources_conv = [
                 5 => [COIN => 1, STONE => 1],
                 6 => [STONE => 2],
                 7 => [STONE => 1],
             ];
-            Players::addResources($player_id, $resources[$location_id]);
-            Notifications::getResourcesFromLocation($player_id, $location_id, $resources[$location_id]);
+            Players::addResources($player_id, $resources_conv[$location_id]);
+            Notifications::getResourcesFromLocation($player_id, $location_id, $resources_conv[$location_id]);
+            $this->resolveWheelbarrow($location_id, $resources);
             $this->resolveWorkerNextStep($location_id);
             return;
         }
@@ -275,6 +294,18 @@ trait Actions {
         }
 
         throw new BgaUserException("Not implemented yet");
+    }
+
+    private function resolveWheelbarrow(int $location_id, $resources) {
+        $wheelbarrow = Globals::getWheelbarrow($location_id);
+        if($wheelbarrow == $location_id) {
+            if(sizeof($resources) !== 1) {
+                throw new BgaUserException("You have to choose a resource for wheelbarrow");
+            }
+            Globals::setWheelbarrow(Players::getPlayerId(), 0);
+            Players::addResources(Players::getPlayerId(), $resources);
+            Notifications::getResourceFromWheelbarrow($location_id, $resources);
+        }
     }
 
     private function resolveWorkerNextStep(int $location_id) {
@@ -413,6 +444,18 @@ trait Actions {
         Notifications::addConfortToHand(Players::getPlayerId(), $card);
         Conforts::refillOwlNest();
         Notifications::refillOwlNest(Conforts::getOwlNest());
+        Game::get()->gamestate->nextState();
+    }
+
+    function confirmCanadaLynx(array $resources) {
+        $resources = ResourcesHelper::convertNumberToResource($resources);
+        $group = ResourcesHelper::groupByType($resources);
+        if (sizeof($group) !== 2 || sizeof($resources) !== 2) {
+            throw new BgaUserException("Error with the number of resources");
+        }
+        $left_player_id = intval($this->argCanadaLynx()['otherplayer_id']);
+        Players::addResources($left_player_id, $group);
+        Notifications::travelerReceivedResources($group, $left_player_id);
         Game::get()->gamestate->nextState();
     }
 

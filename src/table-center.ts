@@ -34,6 +34,21 @@ class TableCenter {
       this.setupReservedZones(game);
       this.setupAmericanBeaverZones();
       this.setupBlackBearZones();
+      this.setupLeopardFrogZones();
+
+      game.gamedatas.wheelbarrows.forEach((location_id) => this.addWheelbarrow(location_id));
+   }
+
+   public addWheelbarrow(location_id: number) {
+      const html = `<div class="wheelbarrow"></div>`;
+      const zone = document.querySelector(`#reserved-zones [data-zone-id="${location_id}"]`);
+      zone.insertAdjacentHTML('beforeend', html);
+   }
+
+   public clearWheelbarrow() {
+      document
+         .querySelectorAll(`#reserved-zones .wheelbarrow`)
+         .forEach((div: HTMLDivElement) => div.parentElement.removeChild(div));
    }
 
    public addRavenToken(location_id: number) {
@@ -187,6 +202,14 @@ class TableCenter {
          .join('');
 
       document.getElementById('black-bear-zones').innerHTML = html;
+   }
+
+   setupLeopardFrogZones() {
+      const icon = ResourceHelper.getElement<IconsType>('lesson');
+
+      document.getElementById(
+         'leopard-frog-zones',
+      ).innerHTML = `<div class="cc-zone" data-zone-id="9">${icon}${icon}</div>`;
    }
 
    private setupReservedZones(game: CreatureConforts) {

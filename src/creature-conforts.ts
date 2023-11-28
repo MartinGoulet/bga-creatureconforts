@@ -306,6 +306,10 @@ class CreatureConforts
       debug('clearSelection');
    }
 
+   public setTooltip(id: string, html: string) {
+      this.addTooltipHtml(id, html, this.TOOLTIP_DELAY);
+   }
+
    public takeAction(
       action: string,
       data?: any,
@@ -378,13 +382,13 @@ class CreatureConforts
             if (args.die_from !== undefined) {
                const value = args.die_from;
                const color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
-               args.die_from = `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`;
+               args.die_from = this.getDiceLog(value, color);
             }
 
             if (args.die_to !== undefined) {
                const value = args.die_to;
                const color = args.die_color == 'white' ? 'white' : getColorName(args.die_color);
-               args.die_to = `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`;
+               args.die_to = this.getDiceLog(value, color);
             }
 
             if (args.token !== undefined) {
@@ -398,6 +402,10 @@ class CreatureConforts
       return this.inherited(arguments);
    }
 
+   private getDiceLog(value: string, color: string): string {
+      return `<div class="dice-icon-log bga-dice_die colored-die" data-color="${color}"><div class="bga-dice_die-face" data-face="${value}"><span>${value}</span></div></div>`;
+   }
+
    formatTextDice(player_id: number, rawText: string) {
       if (!rawText) return '';
 
@@ -407,9 +415,7 @@ class CreatureConforts
       const color = dice.length == 2 ? this.getPlayerTable(player_id).player_color : 'white';
 
       dice.forEach((value: string) => {
-         values.push(
-            `<div class="dice-icon-log bga-dice_die colored-die bga-dice_die-face" data-face="${value}" data-color="${color}"><span>${value}<span></div>`,
-         );
+         values.push(this.getDiceLog(value, color));
       });
 
       return values.join('');
@@ -425,5 +431,17 @@ class CreatureConforts
       });
 
       return values.join('');
+   }
+
+   formatTextIcons(rawText: string) {
+      if (!rawText) {
+         return '';
+      }
+      const generic_icons = /::(\w+)::/gi;
+      const generic_digit_icons = /::(\w+)-(\S+)::/gi;
+
+      return rawText
+         .replaceAll(generic_icons, '<div class="resource-icon" data-type="$1"></div>')
+         .replaceAll(generic_digit_icons, '<div class="i-$1"><span>$2</span></div>');
    }
 }

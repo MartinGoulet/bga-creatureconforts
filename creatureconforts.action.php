@@ -59,10 +59,11 @@ class action_creatureconforts extends APP_GameAction {
       self::setAjaxMode();
       // Retrieve arguments
       $locations = self::getArg("locations", AT_numberlist, true);
+      $wheelbarrow = self::getArg("wheelbarrow", AT_int, true);
       $locations_id = self::getArrayArgs($locations);
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmPlacement');
-      $this->game->confirmPlacement($locations_id);
+      $this->game->confirmPlacement($locations_id, $wheelbarrow);
       self::ajaxResponse();
    }
 
@@ -187,6 +188,17 @@ class action_creatureconforts extends APP_GameAction {
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmGrayWolf');
       $this->game->confirmGrayWolf($slot_id);
+      self::ajaxResponse();
+   }
+
+   public function confirmCanadaLynx() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $resources = self::getArg("resources", AT_numberlist, true);
+      $resources = self::getArrayArgs($resources);
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmCanadaLynx');
+      $this->game->confirmCanadaLynx($resources);
       self::ajaxResponse();
    }
 

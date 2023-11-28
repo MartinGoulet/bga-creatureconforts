@@ -152,4 +152,14 @@ class Players extends \APP_DbObject {
         $sql = "SELECT almanac FROM player WHERE player_id = $player_id";
         return intval(self::getUniqueValueFromDB($sql));
     }
+
+    public static function hasWheelbarrow(int $player_id) {
+        $sql = "SELECT wheelbarrow FROM player WHERE player_id = $player_id";
+        return intval(self::getUniqueValueFromDB($sql)) === 1;
+    }
+
+    public static function countWheelbarrow(int $player_id) {
+        $sql = "SELECT wheelbarrow FROM player WHERE player_id = $player_id";
+        return intval(self::getUniqueValueFromDB($sql));
+    }
 }

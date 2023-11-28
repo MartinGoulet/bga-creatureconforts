@@ -1,70 +1,47 @@
-.bga-dice_die-face {
-   background-size: 300% 200%;
-}
-
-.bga-dice_die .bga-dice_die-face[data-face='1'] {
-   background-position: 0% -92%;
-}
-.bga-dice_die .bga-dice_die-face[data-face='2'] {
-   background-position: 0% 0%;
-}
-.bga-dice_die .bga-dice_die-face[data-face='3'] {
-   background-position: -100% -100%;
-}
-.bga-dice_die .bga-dice_die-face[data-face='4'] {
-   background-position: -100% 0%;
-}
-.bga-dice_die .bga-dice_die-face[data-face='5'] {
-   background-position: -200% 0%;
-}
-.bga-dice_die .bga-dice_die-face[data-face='6'] {
-   background-position: -200% -100%;
-}
-
-@each $playerColor in $playerColorNames {
-   .colored-die[data-color='#{$playerColor}'] .bga-dice_die-face,
-   .colored-die[data-color='#{$playerColor}'].bga-dice_die-face {
-      background-image: url('img/dice_#{$playerColor}.jpg');
-   }
-}
-
-.colored-die[data-color='white'] .bga-dice_die-face,
-.colored-die[data-color='white'].bga-dice_die-face {
-   background-image: url('img/dice_white.jpg');
-}
-
-.bga-dice_die6 .bga-dice_die-faces[data-visible-face='1'] {
-   transform: rotate3d(1, 1, 1, 0deg) rotate(90deg);
-}
-
-.bga-dice_die6 .bga-dice_die-faces .bga-dice_die-face[data-face='1'] {
-   transform: rotate3d(1, 1, 1, 0deg) translateZ(var(--half-size)) rotate(90deg);
-}
-
-.bga-dice_die.bga-dice_die6.colored-die {
+.bga-dice_die.colored-die {
    &[data-color='yellow'] {
       .bga-dice_die-face {
-         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='%23fdc627' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23231f21' /%3E%3C/svg%3E ") !important;
-         box-shadow: inset 2px 2px 3px #c68212, inset -2px -2px 3px #c68312;
+         background-image: url('img/yellow/dice.svg');
+         // box-shadow: inset 2px 2px 3px #c68212, inset -2px -2px 3px #c68312;
       }
    }
    &[data-color='white'] {
       .bga-dice_die-face {
-         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='white' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23231f21' /%3E%3C/svg%3E ") !important;
-         box-shadow: inset 0px 0px 4px #231f21;
+         background-image: url('img/white/dice.svg');
+         // box-shadow: inset 0px 0px 4px #231f21;
       }
    }
    &[data-color='green'] {
       .bga-dice_die-face {
-         // background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='%234c8691' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23231f21' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23231f21' /%3E%3C/svg%3E ") !important;
-         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 100'%3E%3Crect width='600' height='100' fill='%234c8691' /%3E%3Ccircle cx='50' cy='50' r='10' fill='%23ffffff' /%3E%3Ccircle cx='125' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='175' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='225' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='250' cy='50' r='10' fill='%23ffffff' /%3E%3Ccircle cx='275' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='325' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='325' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='375' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='375' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='425' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='425' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='450' cy='50' r='10' fill='%23ffffff' /%3E%3Ccircle cx='475' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='475' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='530' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='530' cy='50' r='10' fill='%23ffffff' /%3E%3Ccircle cx='530' cy='75' r='10' fill='%23ffffff' /%3E%3Ccircle cx='570' cy='25' r='10' fill='%23ffffff' /%3E%3Ccircle cx='570' cy='50' r='10' fill='%23ffffff' /%3E%3Ccircle cx='570' cy='75' r='10' fill='%23ffffff' /%3E%3C/svg%3E ") !important;
-         box-shadow: inset 2px 2px 3px #06485a, inset -2px -2px 3px #06485a;
+         background-image: url('img/green/dice.svg');
+         // box-shadow: inset 2px 2px 3px #06485a, inset -2px -2px 3px #06485a;
+      }
+   }
+   &[data-color='gray'] {
+      .bga-dice_die-face {
+         background-image: url('img/gray/dice.svg');
+         // box-shadow: inset 2px 2px 3px #06485a, inset -2px -2px 3px #06485a;
+      }
+   }
+   &[data-color='purple'] {
+      .bga-dice_die-face {
+         background-image: url('img/purple/dice.svg');
+         // box-shadow: inset 2px 2px 3px #06485a, inset -2px -2px 3px #06485a;
+      }
+   }
+   &[data-color='red'] {
+      .bga-dice_die-face {
+         background-image: url('img/red/dice.svg');
+         // box-shadow: inset 2px 2px 3px #06485a, inset -2px -2px 3px #06485a;
       }
    }
 
    &[data-color='yellow'],
    &[data-color='white'],
-   &[data-color='green'] {
+   &[data-color='green'],
+   &[data-color='gray'],
+   &[data-color='purple'],
+   &[data-color='red'] {
       .bga-dice_die-face {
          background-size: 600% 100%;
 
@@ -90,49 +67,6 @@
    }
 }
 
-// // .bga-dice_die-face {
-// //    background-size: 600% 800%;
-// //    background-image: url('img/agk_spritesheet_dice1.png');
-// // }
-
-// // .bga-dice_die .bga-dice_die-face[data-face='1'] {
-// //    background-position-x: -0%;
-// // }
-// // .bga-dice_die .bga-dice_die-face[data-face='2'] {
-// //    background-position-x: -100%;
-// // }
-// // .bga-dice_die .bga-dice_die-face[data-face='3'] {
-// //    background-position-x: -200%;
-// // }
-// // .bga-dice_die .bga-dice_die-face[data-face='4'] {
-// //    background-position-x: -300%;
-// // }
-// // .bga-dice_die .bga-dice_die-face[data-face='5'] {
-// //    background-position-x: -400%;
-// // }
-// // .bga-dice_die .bga-dice_die-face[data-face='6'] {
-// //    background-position-x: -500%;
-// // }
-
-// // .colored-die[data-color='yellow'] .bga-dice_die-face {
-// //    background-position-y: -300%;
-// // }
-// // .colored-die[data-color='green'] .bga-dice_die-face {
-// //    background-position-y: -500%;
-// // }
-// // .colored-die[data-color='gray'] .bga-dice_die-face {
-// //    background-position-y: -0%;
-// // }
-// // .colored-die[data-color='red'] .bga-dice_die-face {
-// //    background-position-y: -100%;
-// // }
-// // .colored-die[data-color='purple'] .bga-dice_die-face {
-// //    background-position-y: -600%;
-// // }
-// // .colored-die[data-color='white'] .bga-dice_die-face {
-// //    background-position-y: -700%;
-// // }
-
 .dice-icon-log {
    width: 25px;
    height: 25px;
@@ -140,74 +74,20 @@
    margin: 0 5px;
    vertical-align: middle;
    border-radius: 5px;
-   border: 1px solid black;
+   outline: 1px solid black;
 
-   > span {
+   span {
       display: none;
    }
 
-   &[data-face='1'] {
-      background-position: 0% -100%;
-      transform: rotate(90deg);
+   .bga-dice_die-face {
+      width: 25px;
+      height: 25px;
    }
-   &[data-face='2'] {
-      background-position: 0% 0%;
-   }
-   &[data-face='3'] {
-      background-position: -100% -100%;
-   }
-   &[data-face='4'] {
-      background-position: -100% 0%;
-   }
-   &[data-face='5'] {
-      background-position: -200% 0%;
-   }
-   &[data-face='6'] {
-      background-position: -200% -100%;
-   }
-
-   // &.colored-die[data-color='yellow'] {
-   //    background-position-y: -300%;
-   // }
-   // &.colored-die[data-color='green'] {
-   //    background-position-y: -500%;
-   // }
-   // &.colored-die[data-color='gray'] {
-   //    background-position-y: -0%;
-   // }
-   // &.colored-die[data-color='red'] {
-   //    background-position-y: -100%;
-   // }
-   // &.colored-die[data-color='purple'] {
-   //    background-position-y: -600%;
-   // }
-   // &.colored-die[data-color='white'] {
-   //    background-position-y: -700%;
-   // }
-
-   // &.bga-dice_die-face[data-face='1'] {
-   //    background-position-x: -0%;
-   // }
-   // &.bga-dice_die-face[data-face='2'] {
-   //    background-position-x: -100%;
-   // }
-   // &.bga-dice_die-face[data-face='3'] {
-   //    background-position-x: -200%;
-   // }
-   // &.bga-dice_die-face[data-face='4'] {
-   //    background-position-x: -300%;
-   // }
-   // &.bga-dice_die-face[data-face='5'] {
-   //    background-position-x: -400%;
-   // }
-   // &.bga-dice_die-face[data-face='6'] {
-   //    background-position-x: -500%;
-   // }
 }
 
 .slot-dice {
    border-radius: 5px;
-   // transform: translate(-54px, -3px);
 
    &.selectable {
       animation: pulseSelectable 1s infinite alternate;

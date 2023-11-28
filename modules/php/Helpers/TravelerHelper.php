@@ -88,6 +88,14 @@ class TravelerHelper {
         }
     }
 
+    static function isActiveCanadaLynx() {
+        return self::isTravelerActive(1);
+    }
+
+    static function isActiveLeopardFrog() {
+        return self::isTravelerActive(2);
+    }
+
     static function isActivePileatedWoodpecker() {
         return self::isTravelerActive(3);
     }

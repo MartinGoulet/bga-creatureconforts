@@ -32,6 +32,14 @@ class Globals extends \APP_DbObject {
         self::set("raven_locations_ids", $locations_ids);
     }
 
+    public static function getWheelbarrow(int $player_id) {
+        return self::get("wheelbarrow__" . $player_id, false) ?? 0;
+    }
+
+    public static function setWheelbarrow(int $player_id, int $location_id) {
+        self::set("wheelbarrow__" . $player_id, $location_id);
+    }
+
     public static function getRiverDialValue() {
         return intval(Game::get()->getGameStateValue(VAR_RIVER_DIAL));
     }

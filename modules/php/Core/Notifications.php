@@ -141,6 +141,17 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
+    static function getResourceFromWheelbarrow(int $location_id, array $resources) {
+        $message = clienttranslate('${player_name} get ${resources_to} from wheelbarrow');
+        self::notifyAll('onGetResourcesFromLocation', $message, [
+            'player_id' => Players::getPlayerId(),
+            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'location_id' => $location_id,
+            'resources' => $resources,
+            'resources_to' => $resources,
+        ]);
+    }
+
     static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson, $nbr_umbrella) {
         $message = clienttranslate('${player_name} uses ${resources_to} to change ${die_from} for ${die_to}');
         $new_dice = $die;
@@ -156,6 +167,7 @@ class Notifications extends \APP_DbObject {
                 LESSON_LEARNED => $nbr_lesson,
                 'umbrella' => $nbr_umbrella
             ],
+            'preserve' => ['die_from', 'die_to', 'die_color'],
             // TODO check resources_to
         ]);
     }
@@ -303,11 +315,14 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
-    static function travelerReceivedResources($resources_to) {
+    static function travelerReceivedResources($resources_to, $player_id = null) {
+        if($player_id == null) {
+            $player_id = Players::getPlayerId();
+        }
         $message = clienttranslate('${player_name} receives ${resources_to} from the traveler');
         self::notifyAll('onTravelerExchangeResources', $message, [
-            'player_id' => Players::getPlayerId(),
-            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
             'resources_to' => $resources_to,
             'from' => [],
             'to' => $resources_to,

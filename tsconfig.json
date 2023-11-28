@@ -73,6 +73,7 @@
         "src/helpers/improvement-helper.ts",
         "src/helpers/resource-requirement.ts",
         "src/helpers/traveler-helper.ts",
+        "src/helpers/valley-helper.ts",
 
         "src/states/state.ts",
         "src/states/start-hand.ts",
@@ -86,6 +87,7 @@
         "src/states/resolve-traveler.ts", 
         "src/states/resolve-traveler-discard.ts", 
         "src/states/resolve-owl-nest.ts",
+        "src/states/resolve-wheelbarrow.ts",
         "src/states/resolve-workshop.ts",
         "src/states/upkeep.ts",
         "src/states/pre-end-game.ts",
@@ -94,6 +96,7 @@
         "src/states/improvement-bicycle-destination.ts",
 
         "src/states/traveler-gray-wolf.ts",
+        "src/states/traveler-canada-lynx.ts",
         "src/states/traveler-common-raven.ts",
         "src/states/traveler-striped-skunk.ts",
         "src/states/traveler-wild-turkey.ts",

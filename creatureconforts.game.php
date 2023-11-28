@@ -193,6 +193,14 @@ class CreatureConforts extends Table {
         $result['valleys'] = Valleys::getUIData();
         $result['workers'] = Worker::getUIData();
 
+        $result['wheelbarrows'] = [];
+        foreach (self::loadPlayersBasicInfos() as $player_id => $player) {
+            $wheelbarrow = Globals::getWheelbarrow($player_id);
+            if ($wheelbarrow > 0) {
+                $result['wheelbarrows'][] = $wheelbarrow;
+            }
+        }
+
         $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
         // $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
         $result['debug_valley'] = array_values(self::getCollectionFromDB("SELECT * FROM valley WHERE card_location != 'box' ORDER BY card_location, card_location_arg desc"));
@@ -203,9 +211,9 @@ class CreatureConforts extends Table {
         $result['turn_number'] = self::getStat(STAT_TURN_NUMBER);
         $result['nbr_turns'] = Game::isShortGame() ? 6 : 8;
 
-        if($this->gamestate->state_id() == 99) {
+        if ($this->gamestate->state_id() == 99) {
             $result['scores'] = [];
-            foreach(self::loadPlayersBasicInfos() as $player_id => $player) {
+            foreach (self::loadPlayersBasicInfos() as $player_id => $player) {
                 $result['scores'][$player_id] = Score::getScore(intval($player_id));
             }
         }

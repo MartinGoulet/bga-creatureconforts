@@ -35,6 +35,7 @@ interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerD
 
    turn_number: number;
    nbr_turns: number;
+   wheelbarrows: number[];
 
    scores: Record<number, any>;
 }
@@ -113,9 +114,11 @@ interface ImprovementType {
 
 interface ConfortType {
    name: string;
+   gametext: string;
    type?: 'outdoor' | 'food' | 'clothing' | 'lighting';
    score: number;
-   cost: { [type: string]: number };
+   img: number;
+   cost: Record<string, number>;
    storable?: IconsType[];
 }
 

@@ -5,6 +5,10 @@ class TravelerHelper {
       document.getElementById('table').dataset.traveler = traveler;
    }
 
+   static isActiveLeopardFrog(): boolean {
+      return this.isTravelerActive(2);
+   }
+
    static isActivePileatedWoodpecker(): boolean {
       return this.isTravelerActive(3);
    }

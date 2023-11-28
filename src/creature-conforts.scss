@@ -250,3 +250,21 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       opacity: 0.2;
    }
 }
+
+.i-heart {
+   background-image: url("img/heart.png");
+   background-size: 25px 20px;
+   background-repeat: no-repeat;
+   width: 25px;
+   height: 20px;
+   display: inline-flex;
+   justify-content: center;
+   align-items: center;
+
+   span {
+      display: block;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+   }
+}

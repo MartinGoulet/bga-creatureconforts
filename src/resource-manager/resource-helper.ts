@@ -11,4 +11,14 @@ class ResourceHelper {
    static convertToInt(icons: IconsType[]): number[] {
       return icons.map((type) => ICONS.indexOf(type) + 1);
    }
+
+   static convertCostToArray(cost: Record<string, number>): string[] {
+      const value: string[] = [];
+      Object.keys(cost).forEach((type) => {
+         for (let index = 0; index < cost[type]; index++) {
+            value.push(type);
+         }
+      });
+      return value;
+   }
 }

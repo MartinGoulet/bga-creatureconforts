@@ -18,6 +18,7 @@
                 <div id="reserved-zones"></div>
                 <div id="american-beaver-zones"></div>
                 <div id="black-bear-zones"></div>
+                <div id="leopard-frog-zones"></div>
 
                 <div id="decks">
                     <div>

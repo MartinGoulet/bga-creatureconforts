@@ -6,7 +6,7 @@ class StateManager {
    constructor(private game: CreatureConforts) {
       this.states = {
          startHand: new StartHandState(game),
-         placement: new PlacementState(game),
+         placement: new PlacementState(game, true),
          playerTurnDice: new PlayerTurnDiceState(game),
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
@@ -15,6 +15,7 @@ class StateManager {
          resolveTravelerDiscard: new ResolveTravelerDiscardState(game),
          resolveMarket: new ResolveMarketState(game),
          resolveOwnNest: new ResolveOwlNestState(game),
+         resolveWheelbarrow: new ResolveWheelbarrowState(game),
          resolveWorkshop: new ResolveWorkshopState(game),
          playerTurnDiscard: new PlayerTurnDiscardState(game),
          upkeep: new UpkeepState(game),
@@ -24,9 +25,10 @@ class StateManager {
          resolveBicycleDestination: new ImprovementBicycleDestinationState(game),
 
          grayWolf: new TravelerGrayWolfState(game),
+         canadaLynx: new TravelerCanadaLynxState(game),
          commonRaven: new TravelerCommonRavenState(game),
          stripedSkunk: new TravelerStripedSkunkStates(game),
-         commonLoon: new PlacementState(game),
+         commonLoon: new PlacementState(game, false),
          wildTurkey: new TravelerWildTurkeyStates(game),
          wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
       };

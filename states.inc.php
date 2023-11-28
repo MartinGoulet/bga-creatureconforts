@@ -78,6 +78,7 @@ $travelerStates = [
         "name" => "grayWolf",
         "descriptionmyturn" => clienttranslate('${you} must choose a face-up Comfort form the Owl\'s Nest'),
         "description" => clienttranslate('Waiting for others to choose a face-up Comfort form the Owl\'s Nest'),
+        "type" => "argPlayer",
         "type" => "activeplayer",
         "possibleactions" => ["confirmGrayWolf"],
         "transitions" => ["" => ST_GRAY_WOLF_NEXT_PLAYER]
@@ -90,6 +91,28 @@ $travelerStates = [
         "action" => "stPlayerTurnNextTraveler",
         "transitions" => [
             "next" => ST_GRAY_WOLF,
+            "end" => ST_FAMILY_DICE,
+        ]
+    ],
+
+    ST_CANADA_LYNX => [
+        "phase" => "1",
+        "name" => "canadaLynx",
+        "descriptionmyturn" => clienttranslate('${you} must pick 2 differents goods from the supply to give to ${otherplayer}'),
+        "description" => clienttranslate('Waiting for ${actplayer} to pick 2 differents goods from the supply to give to ${otherplayer}'),
+        "args" => "argCanadaLynx",
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmCanadaLynx"],
+        "transitions" => ["" => ST_CANADA_LYNX_NEXT_PLAYER]
+    ],
+
+    ST_CANADA_LYNX_NEXT_PLAYER => [
+        "phase" => "1",
+        "name" => "canadaLynxNextPlayer",
+        "type" => "game",
+        "action" => "stPlayerTurnNextTraveler",
+        "transitions" => [
+            "next" => ST_CANADA_LYNX,
             "end" => ST_FAMILY_DICE,
         ]
     ],
@@ -239,6 +262,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
             "family" => ST_FAMILY_DICE,
             "gray_wolf" => ST_GRAY_WOLF,
             "common_raven" => ST_COMMON_RAVEN,
+            "canada_lynx" => ST_CANADA_LYNX,
         ]
     ],
 

@@ -1,25 +1,25 @@
-id|name|type|score|cost
-1|Board Game||7|[ANY_RESOURCE => 2, COIN => 1, STORY => 1]
-2|Snowshoes|OUTDOOR|6|[WOOD => 1, YARN => 2]
-3|Preserves|FOOD|4|[FRUIT => 4]
-4|Ice Skates|OUTDOOR|6|[COIN => 2, YARN => 1]
-5|Muffler|CLOTHING|5|[WOOD => 1, YARN => 1, FRUIT => 1]
-6|Rocking Chair||5|[WOOD => 3, YARN => 1]
-7|Piggy Bank||3|[STONE => 1, COIN => 2]
-8|Bookshelf||6|[WOOD => 2, STORY => 2]
-9|Pot of Tea||4|[FRUIT => 2, COIN => 1]
-10|Candles|LIGHTING|5|[STONE => 1, YARN => 1, COIN => 1]
-11|Socks|CLOTHING|4|[YARN => 2, FRUIT => 1]
-12|Pantry||5|[WOOD => 1, GRAIN => 1, MUSHROOM => 1, FRUIT => 1]
-13|Pie|FOOD|4|[GRAIN => 2, FRUIT => 2]
-14|Stew|FOOD|5|[MUSHROOM => 4]
-15|Flute||4|[WOOD => 1, COIN => 1]
-16|Soup|FOOD|5|[GRAIN => 2, MUSHROOM => 2]
-17|Fairy Garden||4|[MUSHROOM => 2, COIN => 2]
-18|Toys||6|[WOOD => 1, STONE => 1, STORY => 1]
-19|Toboggan|OUTDOOR|5|[WOOD => 2, STONE => 3]
-20|Mandolin||6|[WOOD => 2, COIN => 2]
-21|Quilt|CLOTHING|7|[YARN => 1, COIN => 1, STORY => 1]
-22|Bread|FOOD|4|[GRAIN => 5]
-23|Hearth|LIGHTING|6|[WOOD => 2, STONE => 3]
-24|Lamp|LIGHTING|4|[STONE => 1, YARN => 1, COIN => 1]
+id|name|gametext|type|score|cost|class|img|storable
+1|Board Game|+ ::heart-1:: for each other BOARD GAME and TOYS Comfort you have||7|[ANY_RESOURCE => 2, COIN => 1, STORY => 1]|BoardGame|1|
+2|Snowshoes||OUTDOOR|6|[WOOD => 1, YARN => 2]||2|
+3|Preserves|+ ::heart-2:: if you also have a PANTRY|FOOD|4|[FRUIT => 4]|Preserves|5|
+4|Ice Skates|+ ::heart-2:: if you also have SOCKS|OUTDOOR|6|[COIN => 2, YARN => 1]|IceSkates|6|
+5|Muffler||CLOTHING|5|[WOOD => 1, YARN => 1, FRUIT => 1]||9|
+6|Rocking Chair|+ ::heart-2:: if you also have a QUILT||5|[WOOD => 3, YARN => 1]|RockingChair|10|
+7|Piggy Bank|+ ::heart-2:: for each ::coin:: stored here||3|[STONE => 1, COIN => 2]|PiggyBank|13|
+8|Bookshelf|+ ::heart-3:: for each ::story:: stored here||6|[WOOD => 2, STORY => 2]|Bookshelf|14|
+9|Pot of Tea|+ ::heart-2:: if you also have ROCKING CHAIR||4|[FRUIT => 2, COIN => 1]|PotOfTea|17|
+10|Candles||LIGHTING|5|[STONE => 1, YARN => 1, COIN => 1]||18|
+11|Socks||CLOTHING|4|[YARN => 2, FRUIT => 1]||21|
+12|Pantry|+ ::heart-2:: for each set of ::grain:: ::mushroom:: ::fruit:: stored here||5|[WOOD => 1, GRAIN => 1, MUSHROOM => 1, FRUIT => 1]|Pantry|22|[GRAIN, MUSHROOM, FRUIT]
+13|Pie||FOOD|4|[GRAIN => 2, FRUIT => 2]||3|
+14|Stew|+ ::heart-2:: if you also have BREAD|FOOD|5|[MUSHROOM => 4]|Stew|4|
+15|Flute|+ ::heart-2:: if you also have a MANDOLIN||4|[WOOD => 1, COIN => 1]|Flute|7|
+16|Soup||FOOD|5|[GRAIN => 2, MUSHROOM => 2]||8|
+17|Fairy Garden|+ ::heart-2:: for each set of ::wood:: ::stone:: ::grain:: ::mushroom:: ::yarn:: ::fruit:: stored here||4|[MUSHROOM => 2, COIN => 2]|FairyGarden|11|[WOOD, STONE, FRUIT, MUSHROOM, YARN, GRAIN]
+18|Toys|||6|[WOOD => 1, STONE => 1, STORY => 1]||12|
+19|Toboggan|+ ::heart-2:: if you also have a MUFFLER|OUTDOOR|5|[WOOD => 2, YARN => 1]|Toboggan|15|
+20|Mandolin|||6|[WOOD => 2, COIN => 2]||16|
+21|Quilt||CLOTHING|7|[YARN => 1, COIN => 1, STORY => 1]||19|
+22|Bread|+ ::heart-2:: if you also have SOUP|FOOD|4|[GRAIN => 5]|Bread|20|
+23|Hearth|+ ::heart-2:: for each set of ::wood:: ::wood:: stored here|LIGHTING|6|[WOOD => 2, STONE => 3]|Hearth|23|[WOOD]
+24|Lamp|+ ::heart-7:: for each set of ::story:: ::story:: stored here|LIGHTING|4|[STONE => 1, YARN => 1, COIN => 1]|Lamp|24|[STORY]

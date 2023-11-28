@@ -85,7 +85,7 @@
             }
 
             .card.worker {
-               zoom: 0.75;
+               // zoom: 0.75;
                &:nth-child(3),
                &:nth-child(4),
                &:nth-child(5) {
@@ -309,7 +309,12 @@
       position: absolute;
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 3px;
+
+      .wheelbarrow {
+         zoom: 0.6;
+      }
    }
 
    [data-zone-id='1'] {
@@ -354,8 +359,10 @@
       left: 456px;
    }
    [data-zone-id='9'] {
-      top: 540px;
-      left: 354px;
+      // top: 540px;
+      // left: 354px;
+      top: 428px;
+      left: 167px;
       justify-content: flex-start;
    }
 
@@ -376,7 +383,8 @@
    }
 
    #american-beaver-zones,
-   #black-bear-zones {
+   #black-bear-zones,
+   #leopard-from-zones {
       display: none;
    }
 
@@ -385,6 +393,7 @@
    }
 }
 
+[data-traveler='2'] #table-center-wrapper #leopard-from-zones,
 [data-traveler='8'] #table-center-wrapper #american-beaver-zones,
 [data-traveler='12'] #table-center-wrapper #black-bear-zones {
    display: block;

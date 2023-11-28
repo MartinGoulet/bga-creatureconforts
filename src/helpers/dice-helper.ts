@@ -9,7 +9,7 @@ class DiceHelper {
       if (location_id > 4) {
          return 1;
       }
-      return this.getValleyLocationInfo(location_id).count;
+      return ValleyHelper.getValleyLocationInfo(location_id).count;
    }
 
    isRequirementMet(location_id: number, dice: Dice[]): boolean {
@@ -18,7 +18,7 @@ class DiceHelper {
       let requirement: DiceRequirement = null;
 
       if (location_id >= 1 && location_id <= 4) {
-         const info = this.getValleyLocationInfo(location_id);
+         const info = ValleyHelper.getValleyLocationInfo(location_id);
          // If number of dice is required, we reject if not all dice are present
          if (info.count > 0 && info.count !== dice.length) return false;
          // Get requirement
@@ -29,12 +29,6 @@ class DiceHelper {
          return true;
       }
       return requirement.isRequirementMet(dice.map((d) => Number(d.face)).sort((a, b) => a - b));
-   }
-
-   private getValleyLocationInfo(location_id: number): ValleyLocationInfo {
-      const location = location_id <= 2 ? 'forest' : 'meadow';
-      const card = this.game.tableCenter.valley.getCards().filter((card) => card.location == location)[0];
-      return this.game.gamedatas.valley_types[Number(card.type_arg)].position[location_id];
    }
 
    private getValleyRequirement({ count, values, rule }: ValleyLocationInfo): DiceRequirement {

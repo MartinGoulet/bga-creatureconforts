@@ -6,17 +6,15 @@ class PlacementState implements StateHandler {
 
    private allowed_workers: Meeple[];
    private locations_unavailable: number[];
+   private wheelbarrow: number;
 
-   constructor(
-      private game: CreatureConforts,
-      private confirmAction = 'confirmPlacement',
-      private cancelAction = 'cancelPlacement',
-   ) {}
+   constructor(private game: CreatureConforts, private is_placement_phase: boolean) {}
 
    onEnteringState(args: PlacementStateArgs): void {
       debug(args);
       this.allowed_workers = args._private.workers;
       this.locations_unavailable = args._private.locations_unavailable;
+      this.wheelbarrow = args._private.wheelbarrow;
 
       this.original_workers = [];
       const locations = args._private?.locations?.map((loc) => Number(loc)) ?? [];
@@ -26,10 +24,30 @@ class PlacementState implements StateHandler {
       }
 
       this.showSelection();
+      debugger;
+      if (args._private.wheelbarrow > 0) {
+         this.game.tableCenter.addWheelbarrow(args._private.wheelbarrow);
+      }
       if (!this.game.isCurrentPlayerActive) return;
 
       this.game.tableCenter.worker_locations.OnLocationClick = (slotId: SlotId) => {
-         this.moveWorker(slotId, args._private.workers);
+         debugger;
+         const isValleyOrRiver = Number(slotId) >= 1 && Number(slotId) <= 7;
+         const askWheelbarrow =
+            isValleyOrRiver && this.wheelbarrow === 0 && args._private.wheelbarrow_count > 0;
+         if (askWheelbarrow) {
+            const handleYes = () => {
+               this.wheelbarrow = Number(slotId);
+               this.game.tableCenter.addWheelbarrow(Number(slotId));
+               this.moveWorker(slotId, args._private.workers);
+            };
+            const handleNo = () => {
+               this.moveWorker(slotId, args._private.workers);
+            };
+            this.game.confirmationDialog(_('Do you want to add a wheelbarrow'), handleYes, handleNo);
+         } else {
+            this.moveWorker(slotId, args._private.workers);
+         }
       };
    }
 
@@ -50,11 +68,14 @@ class PlacementState implements StateHandler {
             this.game.showMessage('You must place all your workers', 'error');
             return;
          }
-         this.game.takeAction(this.confirmAction, { locations: this.locations.join(';') });
+         this.game.takeAction('confirmPlacement', {
+            locations: this.locations.join(';'),
+            wheelbarrow: this.wheelbarrow,
+         });
       };
 
       const handleRestartPlacement = () => {
-         this.game.takeAction(this.cancelAction, {}, null, () => {
+         this.game.takeAction('cancelPlacement', {}, null, () => {
             this.resetState();
          });
       };
@@ -94,6 +115,8 @@ class PlacementState implements StateHandler {
       }
       this.locations = [];
       this.original_workers = [];
+      this.wheelbarrow = 0;
+      this.game.tableCenter.clearWheelbarrow();
       this.showSelection();
       this.game.disableButton('btn_confirm');
    }
@@ -121,5 +144,7 @@ interface PlacementStateArgs {
       locations: string[];
       locations_unavailable: number[];
       workers: Meeple[];
+      wheelbarrow: number;
+      wheelbarrow_count: number;
    };
 }

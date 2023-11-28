@@ -50,7 +50,7 @@
 
       .player-table-dice {
          position: absolute;
-         left: 300px;
+         left: 304px;
          top: 8px;
       }
 
@@ -88,7 +88,7 @@
 
    @each $playerColor in $playerColorNames {
       &.player-color-#{$playerColor} .player-table-board {
-         background-image: url('img/board_#{$playerColor}.jpg');
+         background-image: url('img/#{$playerColor}/board.jpg');
       }
    }
 

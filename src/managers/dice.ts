@@ -36,7 +36,7 @@ class MyDiceManager extends DiceManager {
 class PlayerDiceStock extends LineDiceStock {
    constructor(protected manager: DiceManager, protected element: HTMLElement) {
       super(manager, element, {
-         gap: '10px',
+         gap: '8px',
          sort: sortFunction('id'),
       });
    }
