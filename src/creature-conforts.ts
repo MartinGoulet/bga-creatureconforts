@@ -128,6 +128,15 @@ class CreatureConforts
       TravelerHelper.setTravelerToTable();
 
       this.setupNotifications();
+
+      const cards = Object.keys(gamedatas.confort_types)
+         .map((key) => gamedatas.confort_types[key])
+         .sort((a: ConfortType, b: ConfortType) => a.img.toString().localeCompare(b.img.toString()))
+         .map((card) => {
+            return { img: card.img, name: card.name };
+         });
+
+      debug(cards);
    }
 
    ///////////////////////////////////////////////////
@@ -433,15 +442,27 @@ class CreatureConforts
       return values.join('');
    }
 
-   formatTextIcons(rawText: string) {
+   formatTextIcons(rawText: string, groupResources = false) {
       if (!rawText) {
          return '';
       }
       const generic_icons = /::(\w+)::/gi;
       const generic_digit_icons = /::(\w+)-(\S+)::/gi;
 
-      return rawText
+      let value = rawText
          .replaceAll(generic_icons, '<div class="resource-icon" data-type="$1"></div>')
          .replaceAll(generic_digit_icons, '<div class="i-$1"><span>$2</span></div>');
+
+      if (groupResources) {
+         const firstDiv = value.indexOf('<div class="resource-icon"');
+         const lastDiv = value.lastIndexOf('<div class="resource-icon"');
+         if (firstDiv !== lastDiv) {
+            value = value.substring(0, firstDiv) + `<div class="resource-group">` + value.substring(firstDiv);
+            const lastEndDiv = value.lastIndexOf('</div>');
+            value = value.substring(0, lastEndDiv) + `</div>` + value.substring(lastEndDiv);
+         }
+      }
+
+      return value;
    }
 }

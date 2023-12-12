@@ -3007,7 +3007,18 @@ var ConfortManager = (function (_super) {
                 if (!card_info)
                     return;
                 div.dataset.type = card.type;
-                div.dataset.img = card_info.img.toString();
+                if (Array.isArray(card_info.img)) {
+                    div.dataset.img = card_info.img[Number(card.type_arg) - 1].toString();
+                }
+                else {
+                    div.dataset.img = card_info.img.toString();
+                }
+                if (div.getElementsByClassName('title').length !== 0)
+                    return;
+                div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
+                if (card_info.gametext) {
+                    div.insertAdjacentHTML('beforeend', "<div class=\"gametext-wrapper\"><div class=\"gametext\">".concat(_this.game.formatTextIcons(_(card_info.gametext), true), "</div></div>"));
+                }
                 game.setTooltip(div.id, _this.getTooltip(card));
                 _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
                     return _this.game.modal.displayConfort(card);
@@ -5445,6 +5456,13 @@ var CreatureConforts = (function () {
         this.createPlayerTables(gamedatas);
         TravelerHelper.setTravelerToTable();
         this.setupNotifications();
+        var cards = Object.keys(gamedatas.confort_types)
+            .map(function (key) { return gamedatas.confort_types[key]; })
+            .sort(function (a, b) { return a.img.toString().localeCompare(b.img.toString()); })
+            .map(function (card) {
+            return { img: card.img, name: card.name };
+        });
+        debug(cards);
     };
     CreatureConforts.prototype.onEnteringState = function (stateName, args) {
         this.stateManager.onEnteringState(stateName, args);
@@ -5674,15 +5692,26 @@ var CreatureConforts = (function () {
         });
         return values.join('');
     };
-    CreatureConforts.prototype.formatTextIcons = function (rawText) {
+    CreatureConforts.prototype.formatTextIcons = function (rawText, groupResources) {
+        if (groupResources === void 0) { groupResources = false; }
         if (!rawText) {
             return '';
         }
         var generic_icons = /::(\w+)::/gi;
         var generic_digit_icons = /::(\w+)-(\S+)::/gi;
-        return rawText
+        var value = rawText
             .replaceAll(generic_icons, '<div class="resource-icon" data-type="$1"></div>')
             .replaceAll(generic_digit_icons, '<div class="i-$1"><span>$2</span></div>');
+        if (groupResources) {
+            var firstDiv = value.indexOf('<div class="resource-icon"');
+            var lastDiv = value.lastIndexOf('<div class="resource-icon"');
+            if (firstDiv !== lastDiv) {
+                value = value.substring(0, firstDiv) + "<div class=\"resource-group\">" + value.substring(firstDiv);
+                var lastEndDiv = value.lastIndexOf('</div>');
+                value = value.substring(0, lastEndDiv) + "</div>" + value.substring(lastEndDiv);
+            }
+        }
+        return value;
     };
     return CreatureConforts;
 }());

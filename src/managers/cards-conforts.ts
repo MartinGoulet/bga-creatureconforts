@@ -10,7 +10,25 @@ class ConfortManager extends CardManager<ConfortCard> {
             const card_info: ConfortType = this.getCardType(card);
             if (!card_info) return;
             div.dataset.type = card.type;
-            div.dataset.img = card_info.img.toString();
+
+            if (Array.isArray(card_info.img)) {
+               div.dataset.img = card_info.img[Number(card.type_arg) - 1].toString();
+            } else {
+               div.dataset.img = card_info.img.toString();
+            }
+
+            if (div.getElementsByClassName('title').length !== 0) return;
+
+            div.insertAdjacentHTML('beforeend', `<div class="title">${_(card_info.name)}</div>`);
+            if (card_info.gametext) {
+               div.insertAdjacentHTML(
+                  'beforeend',
+                  `<div class="gametext-wrapper"><div class="gametext">${this.game.formatTextIcons(
+                     _(card_info.gametext),
+                     true,
+                  )}</div></div>`,
+               );
+            }
 
             game.setTooltip(div.id, this.getTooltip(card));
 

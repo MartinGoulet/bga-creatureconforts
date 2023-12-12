@@ -14,6 +14,16 @@ $purple: '650e41';
 
 $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 
+@font-face {
+   font-family: "Bosk";
+   src: url("img/Bosk.otf") format("opentype");
+}
+
+@font-face {
+   font-family: "PanPizza";
+   src: url("img/panpizza.ttf") format("truetype");
+}
+
 @import '../node_modules/bga-zoom/bga-zoom';
 @import '../node_modules/bga-cards/bga-cards';
 @import '../node_modules/bga-dice/bga-dice';
@@ -40,6 +50,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import './resource-manager/resource-trader';
 
 @import './stocks/discard-stock';
+
 
 #game_play_area {
    #bga-zoom-wrapper {

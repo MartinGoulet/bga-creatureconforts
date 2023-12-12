@@ -1,31 +1,35 @@
 .card.confort {
+   --card-width: 110px;
+   --card-height: 154px;
    display: inline-block;
    position: relative;
-   width: 110px;
-   height: 154px;
+   width: var(--card-width);
+   height: var(--card-height);
    border-radius: 5px;
 
    .card-sides {
       .back {
-         background-image: url('img/comforts/back.jpg');
-         background-size: 110px 154px;
+         background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+         background-image: url('img/comforts/cards.jpg');
+         background-position: -600% -200%;
          border-radius: 5px;
       }
+
       .front {
          border-radius: 5px;
-         background-size: 440px 924px;
          outline: 1px solid #000;
-         background-image: url('img/comforts/front.jpg');
+         background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+         background-image: url('img/comforts/cards.jpg');
 
-         @for $row from 0 through 6 {
-            @for $col from 0 through 3 {
-               &[data-img='#{(($row * 4) + $col + 1)}'] {
+         @for $row from 0 through 3 {
+            @for $col from 0 through 6 {
+               &[data-img='#{(($row * 7) + $col + 1)}'] {
                   background-position: ($col * -100%) ($row * -100%);
                }
             }
          }
 
-         & > * {
+         &>* {
             pointer-events: none;
             user-select: none;
          }
@@ -34,6 +38,65 @@
 
    .help-marker {
       top: 17px;
+   }
+
+   .title {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      right: 0;
+      font-size: 11px;
+      padding-left: 27px;
+      color: white;
+      font-family: Bosk;
+   }
+
+   .gametext-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 33px;
+      font-family: 'Bosk';
+      font-size: 11px;
+      color: white;
+      padding: 0 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+   }
+
+   .gametext {
+      text-align: center;
+
+      .i-heart {
+         width: 16px;
+         height: 12px;
+         background-size: 16px 12px;
+
+         span {
+            font-size: 9px;
+         }
+      }
+
+      .resource-group {
+         display: inline-block;
+         margin: 0 2px;
+      }
+
+      .resource-icon {
+         display: inline-flex;
+         align-items: center;
+         zoom: 0.5;
+
+         &::after {
+            content: "\00a0";
+         }
+
+         &[data-type="coin"] {
+            height: 10px;
+         }
+      }
    }
 }
 
@@ -47,6 +110,7 @@
          }
       }
    }
+
    .bga-cards_selectable-card:not(.bga-cards_selected-card) {
       .card-sides {
          .front {
@@ -78,6 +142,7 @@
                zoom: 1.1;
             }
          }
+
          .name {
             text-align: center;
             justify-content: center;
@@ -114,6 +179,7 @@
             &::after {
                content: "\00a0";
             }
+
             &[data-type="coin"] {
                height: 26px;
             }

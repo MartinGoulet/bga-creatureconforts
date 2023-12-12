@@ -117,7 +117,7 @@ interface ConfortType {
    gametext: string;
    type?: 'outdoor' | 'food' | 'clothing' | 'lighting';
    score: number;
-   img: number;
+   img: number | number[];
    cost: Record<string, number>;
    storable?: IconsType[];
 }

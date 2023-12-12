@@ -1,4 +1,12 @@
 @charset "UTF-8";
+@font-face {
+  font-family: "Bosk";
+  src: url("img/Bosk.otf") format("opentype");
+}
+@font-face {
+  font-family: "PanPizza";
+  src: url("img/panpizza.ttf") format("truetype");
+}
 #bga-zoom-wrapper {
   position: relative;
 }
@@ -1268,22 +1276,25 @@ body > .bga-dice_die {
 }
 
 .card.confort {
+  --card-width: 110px;
+  --card-height: 154px;
   display: inline-block;
   position: relative;
-  width: 110px;
-  height: 154px;
+  width: var(--card-width);
+  height: var(--card-height);
   border-radius: 5px;
 }
 .card.confort .card-sides .back {
-  background-image: url("img/comforts/back.jpg");
-  background-size: 110px 154px;
+  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+  background-image: url("img/comforts/cards.jpg");
+  background-position: -600% -200%;
   border-radius: 5px;
 }
 .card.confort .card-sides .front {
   border-radius: 5px;
-  background-size: 440px 924px;
   outline: 1px solid #000;
-  background-image: url("img/comforts/front.jpg");
+  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+  background-image: url("img/comforts/cards.jpg");
 }
 .card.confort .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
@@ -1298,76 +1309,76 @@ body > .bga-dice_die {
   background-position: -300% 0%;
 }
 .card.confort .card-sides .front[data-img="5"] {
-  background-position: 0% -100%;
+  background-position: -400% 0%;
 }
 .card.confort .card-sides .front[data-img="6"] {
-  background-position: -100% -100%;
+  background-position: -500% 0%;
 }
 .card.confort .card-sides .front[data-img="7"] {
-  background-position: -200% -100%;
+  background-position: -600% 0%;
 }
 .card.confort .card-sides .front[data-img="8"] {
-  background-position: -300% -100%;
+  background-position: 0% -100%;
 }
 .card.confort .card-sides .front[data-img="9"] {
-  background-position: 0% -200%;
+  background-position: -100% -100%;
 }
 .card.confort .card-sides .front[data-img="10"] {
-  background-position: -100% -200%;
+  background-position: -200% -100%;
 }
 .card.confort .card-sides .front[data-img="11"] {
-  background-position: -200% -200%;
+  background-position: -300% -100%;
 }
 .card.confort .card-sides .front[data-img="12"] {
-  background-position: -300% -200%;
+  background-position: -400% -100%;
 }
 .card.confort .card-sides .front[data-img="13"] {
-  background-position: 0% -300%;
+  background-position: -500% -100%;
 }
 .card.confort .card-sides .front[data-img="14"] {
-  background-position: -100% -300%;
+  background-position: -600% -100%;
 }
 .card.confort .card-sides .front[data-img="15"] {
-  background-position: -200% -300%;
+  background-position: 0% -200%;
 }
 .card.confort .card-sides .front[data-img="16"] {
-  background-position: -300% -300%;
+  background-position: -100% -200%;
 }
 .card.confort .card-sides .front[data-img="17"] {
-  background-position: 0% -400%;
+  background-position: -200% -200%;
 }
 .card.confort .card-sides .front[data-img="18"] {
-  background-position: -100% -400%;
+  background-position: -300% -200%;
 }
 .card.confort .card-sides .front[data-img="19"] {
-  background-position: -200% -400%;
+  background-position: -400% -200%;
 }
 .card.confort .card-sides .front[data-img="20"] {
-  background-position: -300% -400%;
+  background-position: -500% -200%;
 }
 .card.confort .card-sides .front[data-img="21"] {
-  background-position: 0% -500%;
+  background-position: -600% -200%;
 }
 .card.confort .card-sides .front[data-img="22"] {
-  background-position: -100% -500%;
+  background-position: 0% -300%;
 }
 .card.confort .card-sides .front[data-img="23"] {
-  background-position: -200% -500%;
+  background-position: -100% -300%;
 }
 .card.confort .card-sides .front[data-img="24"] {
-  background-position: -300% -500%;
+  background-position: -200% -300%;
 }
 .card.confort .card-sides .front[data-img="25"] {
-  background-position: 0% -600%;
+  background-position: -300% -300%;
 }
 .card.confort .card-sides .front[data-img="26"] {
-  background-position: -100% -600%;
+  background-position: -400% -300%;
 }
 .card.confort .card-sides .front[data-img="27"] {
-  background-position: -200% -600%;
+  background-position: -500% -300%;
 }
 .card.confort .card-sides .front[data-img="28"] {
-  background-position: -300% -600%;
+  background-position: -600% -300%;
 }
 .card.confort .card-sides .front > * {
   pointer-events: none;
@@ -1375,6 +1386,56 @@ body > .bga-dice_die {
 }
 .card.confort .help-marker {
   top: 17px;
+}
+.card.confort .title {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+  font-size: 11px;
+  padding-left: 27px;
+  color: white;
+  font-family: Bosk;
+}
+.card.confort .gametext-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 33px;
+  font-family: "Bosk";
+  font-size: 11px;
+  color: white;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card.confort .gametext {
+  text-align: center;
+}
+.card.confort .gametext .i-heart {
+  width: 16px;
+  height: 12px;
+  background-size: 16px 12px;
+}
+.card.confort .gametext .i-heart span {
+  font-size: 9px;
+}
+.card.confort .gametext .resource-group {
+  display: inline-block;
+  margin: 0 2px;
+}
+.card.confort .gametext .resource-icon {
+  display: inline-flex;
+  align-items: center;
+  zoom: 0.5;
+}
+.card.confort .gametext .resource-icon::after {
+  content: " ";
+}
+.card.confort .gametext .resource-icon[data-type=coin] {
+  height: 10px;
 }
 
 .white-border .card.confort .card-sides .front {
