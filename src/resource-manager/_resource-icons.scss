@@ -3,7 +3,7 @@
    background-image: url('img/resources.png');
    background-size: auto 35px;
 
-   &[data-type='*'] {
+   &[data-type='*'], &[data-type='any'] {
       background-image: url('img/any_resources.png');
       background-size: cover;
       width: 25px;

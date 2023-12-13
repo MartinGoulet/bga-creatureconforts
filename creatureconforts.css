@@ -834,14 +834,14 @@ body > .bga-dice_die {
 }
 #table-center-wrapper #american-beaver-zones,
 #table-center-wrapper #black-bear-zones,
-#table-center-wrapper #leopard-from-zones {
+#table-center-wrapper #leopard-frog-zones {
   display: none;
 }
 #table-center-wrapper .bga-dice_die.bga-dice_die6.colored-die {
   zoom: 0.8;
 }
 
-[data-traveler="2"] #table-center-wrapper #leopard-from-zones,
+[data-traveler="2"] #table-center-wrapper #leopard-frog-zones,
 [data-traveler="8"] #table-center-wrapper #american-beaver-zones,
 [data-traveler="12"] #table-center-wrapper #black-bear-zones {
   display: block;
@@ -1055,13 +1055,6 @@ body > .bga-dice_die {
   flex-direction: column;
   row-gap: 20px;
 }
-.player-table .title {
-  color: var(--color);
-  padding: 3px 10px;
-  margin: 0;
-  top: -15px;
-  left: 20px;
-}
 .player-table .player-table-board {
   margin: 0 auto 20px;
   background-size: 400px 220px;
@@ -1135,6 +1128,9 @@ body > .bga-dice_die {
 .modal_open #modal-display {
   display: flex;
 }
+.modal_open .help-marker {
+  display: none;
+}
 
 #modal-display {
   display: none;
@@ -1159,37 +1155,22 @@ body > .bga-dice_die {
   margin-top: -450px;
   position: absolute;
 }
+#modal-display .card .front {
+  box-shadow: unset;
+  filter: unset;
+}
 
 .desktop_version.modal_open #modal-display-card .card.improvement {
-  width: 500px;
-  height: 500px;
-}
-.desktop_version.modal_open #modal-display-card .card.improvement .front {
-  background-size: 1500px 3000px;
+  zoom: 4;
 }
 .desktop_version.modal_open #modal-display-card .card.traveler {
-  width: 750px;
-  height: 500px;
-}
-.desktop_version.modal_open #modal-display-card .card.traveler .front {
-  background-size: 3750px 1500px;
+  zoom: 3;
 }
 .desktop_version.modal_open #modal-display-card .card.valley {
-  width: 750px;
-  height: 378px;
-}
-.desktop_version.modal_open #modal-display-card .card.valley .front {
-  background-size: 3000px 756px;
+  zoom: 3;
 }
 .desktop_version.modal_open #modal-display-card .card.confort {
-  width: 375px;
-  height: 500px;
-}
-.desktop_version.modal_open #modal-display-card .card.confort .front {
-  background-size: 1500px 3000px;
-  outline: 1px solid #000;
-  box-shadow: 0 0 5px 6px #fff;
-  filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+  zoom: 4;
 }
 
 .mobile_version.modal_open #modal-display-card .card.improvement {
@@ -1402,9 +1383,9 @@ body > .bga-dice_die {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 33px;
+  min-height: 33px;
   font-family: "Bosk";
-  font-size: 11px;
+  font-size: 9px;
   color: white;
   padding: 0 5px;
   display: flex;
@@ -1429,13 +1410,13 @@ body > .bga-dice_die {
 .card.confort .gametext .resource-icon {
   display: inline-flex;
   align-items: center;
-  zoom: 0.5;
+  zoom: 0.4;
 }
 .card.confort .gametext .resource-icon::after {
   content: " ";
 }
 .card.confort .gametext .resource-icon[data-type=coin] {
-  height: 10px;
+  height: 35px;
 }
 
 .white-border .card.confort .card-sides .front {
@@ -1540,73 +1521,84 @@ body > .bga-dice_die {
   width: 125px;
   height: 125px;
   border-radius: 5px;
+  --card-width: 125px;
+  --card-height: 125px;
+}
+.card.improvement .card-sides .image {
+  background-image: url("img/improvements/cards.jpg");
+  background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
+}
+.card.improvement .card-sides .image[data-img="1"] {
+  background-position: 0% 0%;
+}
+.card.improvement .card-sides .image[data-img="2"] {
+  background-position: -100% 0%;
+}
+.card.improvement .card-sides .image[data-img="3"] {
+  background-position: -200% 0%;
+}
+.card.improvement .card-sides .image[data-img="4"] {
+  background-position: -300% 0%;
+}
+.card.improvement .card-sides .image[data-img="5"] {
+  background-position: -400% 0%;
+}
+.card.improvement .card-sides .image[data-img="6"] {
+  background-position: 0% -100%;
+}
+.card.improvement .card-sides .image[data-img="7"] {
+  background-position: -100% -100%;
+}
+.card.improvement .card-sides .image[data-img="8"] {
+  background-position: -200% -100%;
+}
+.card.improvement .card-sides .image[data-img="9"] {
+  background-position: -300% -100%;
+}
+.card.improvement .card-sides .image[data-img="10"] {
+  background-position: -400% -100%;
+}
+.card.improvement .card-sides .image[data-img="11"] {
+  background-position: 0% -200%;
+}
+.card.improvement .card-sides .image[data-img="12"] {
+  background-position: -100% -200%;
+}
+.card.improvement .card-sides .image[data-img="13"] {
+  background-position: -200% -200%;
+}
+.card.improvement .card-sides .image[data-img="14"] {
+  background-position: -300% -200%;
+}
+.card.improvement .card-sides .image[data-img="15"] {
+  background-position: -400% -200%;
+}
+.card.improvement .card-sides .image[data-img="16"] {
+  background-position: 0% -300%;
+}
+.card.improvement .card-sides .image[data-img="17"] {
+  background-position: -100% -300%;
+}
+.card.improvement .card-sides .image[data-img="18"] {
+  background-position: -200% -300%;
+}
+.card.improvement .card-sides .image[data-img="19"] {
+  background-position: -300% -300%;
+}
+.card.improvement .card-sides .image[data-img="20"] {
+  background-position: -400% -300%;
 }
 .card.improvement .card-sides .back {
-  background-image: url("img/improvement_back.jpg");
-  background-size: 125px 125px;
+  background-image: url("img/improvements/cards.jpg");
+  background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
+  background-position: -200% -300%;
   border-radius: 5px;
 }
 .card.improvement .card-sides .front {
-  background-image: url("img/improvement_v2.jpg");
-  background-size: 375px 750px;
   outline: 1px solid #000;
   border-radius: 5px;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
-}
-.card.improvement .card-sides .front[data-type="1"] {
-  background-position: 0% 0%;
-}
-.card.improvement .card-sides .front[data-type="2"] {
-  background-position: -100% 0%;
-}
-.card.improvement .card-sides .front[data-type="3"] {
-  background-position: -200% 0%;
-}
-.card.improvement .card-sides .front[data-type="4"] {
-  background-position: 0% -100%;
-}
-.card.improvement .card-sides .front[data-type="5"] {
-  background-position: -100% -100%;
-}
-.card.improvement .card-sides .front[data-type="6"] {
-  background-position: -200% -100%;
-}
-.card.improvement .card-sides .front[data-type="7"] {
-  background-position: 0% -200%;
-}
-.card.improvement .card-sides .front[data-type="8"] {
-  background-position: -100% -200%;
-}
-.card.improvement .card-sides .front[data-type="9"] {
-  background-position: -200% -200%;
-}
-.card.improvement .card-sides .front[data-type="10"] {
-  background-position: 0% -300%;
-}
-.card.improvement .card-sides .front[data-type="11"] {
-  background-position: -100% -300%;
-}
-.card.improvement .card-sides .front[data-type="12"] {
-  background-position: -200% -300%;
-}
-.card.improvement .card-sides .front[data-type="13"] {
-  background-position: 0% -400%;
-}
-.card.improvement .card-sides .front[data-type="14"] {
-  background-position: -100% -400%;
-}
-.card.improvement .card-sides .front[data-type="15"] {
-  background-position: -200% -400%;
-}
-.card.improvement .card-sides .front[data-type="16"] {
-  background-position: 0% -500%;
-}
-.card.improvement .card-sides .front[data-type="17"] {
-  background-position: -100% -500%;
-}
-.card.improvement .card-sides .front[data-type="18"] {
-  background-position: -200% -500%;
 }
 .card.improvement .card-sides .front > * {
   pointer-events: none;
@@ -1633,72 +1625,141 @@ body > .bga-dice_die {
   box-shadow: 0 0 5px 6px orange;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
+.card.improvement .title {
+  position: absolute;
+  top: 9px;
+  left: 0;
+  right: 0;
+  font-size: 10px;
+  padding-left: 27px;
+  color: palegoldenrod;
+  font-family: Bosk;
+}
+.card.improvement .gametext-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  min-height: 33px;
+  font-family: "Bosk";
+  font-size: 8px;
+  color: palegoldenrod;
+  padding: 0 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card.improvement [data-type="8"] .gametext-wrapper,
+.card.improvement [data-type="14"] .gametext-wrapper,
+.card.improvement [data-type="16"] .gametext-wrapper {
+  min-height: 28px;
+}
+.card.improvement [data-type="11"] .gametext-wrapper {
+  min-height: 41px;
+}
+.card.improvement .gametext {
+  text-align: center;
+}
+.card.improvement .gametext .keyword {
+  color: white;
+}
+.card.improvement .gametext .type .label {
+  color: white;
+}
+.card.improvement .gametext .i-heart {
+  width: 16px;
+  height: 12px;
+  background-size: 16px 12px;
+}
+.card.improvement .gametext .i-heart span {
+  font-size: 9px;
+}
+.card.improvement .gametext .resource-group {
+  display: inline-block;
+  margin: 0 2px;
+}
+.card.improvement .gametext .resource-icon {
+  display: inline-flex;
+  align-items: center;
+  zoom: 0.4;
+}
+.card.improvement .gametext .resource-icon::after {
+  content: " ";
+}
+.card.improvement .gametext .resource-icon[data-type=coin] {
+  height: 35px;
+}
 
 .card.traveler {
   display: inline-block;
   position: relative;
-  width: 212px;
-  height: 142px;
+  width: var(--card-width);
+  height: var(--card-height);
   border-radius: 5px;
+  --card-width: 212px;
+  --card-height: 142px;
 }
-.card.traveler .card-sides .back, .card.traveler .card-sides .front {
+.card.traveler .card-sides .back,
+.card.traveler .card-sides .front {
   outline: 1px solid #000;
   border-radius: 5px;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
-.card.traveler .card-sides .back {
-  background-image: url("img/travelers-back.jpg");
-  background-size: 212px 142px;
+.card.traveler .card-sides .image {
+  background-image: url("img/travelers/cards.jpg");
+  background-size: calc(var(--card-width) * 4) calc(var(--card-height) * 4);
 }
-.card.traveler .card-sides .front {
-  background-image: url("img/travelers.jpg");
-  background-size: 1060px 426px;
-}
-.card.traveler .card-sides .front[data-type="1"] {
+.card.traveler .card-sides .image[data-img="1"] {
   background-position: 0% 0%;
 }
-.card.traveler .card-sides .front[data-type="2"] {
+.card.traveler .card-sides .image[data-img="2"] {
   background-position: -100% 0%;
 }
-.card.traveler .card-sides .front[data-type="3"] {
+.card.traveler .card-sides .image[data-img="3"] {
   background-position: -200% 0%;
 }
-.card.traveler .card-sides .front[data-type="4"] {
+.card.traveler .card-sides .image[data-img="4"] {
   background-position: -300% 0%;
 }
-.card.traveler .card-sides .front[data-type="5"] {
-  background-position: -400% 0%;
-}
-.card.traveler .card-sides .front[data-type="6"] {
+.card.traveler .card-sides .image[data-img="5"] {
   background-position: 0% -100%;
 }
-.card.traveler .card-sides .front[data-type="7"] {
+.card.traveler .card-sides .image[data-img="6"] {
   background-position: -100% -100%;
 }
-.card.traveler .card-sides .front[data-type="8"] {
+.card.traveler .card-sides .image[data-img="7"] {
   background-position: -200% -100%;
 }
-.card.traveler .card-sides .front[data-type="9"] {
+.card.traveler .card-sides .image[data-img="8"] {
   background-position: -300% -100%;
 }
-.card.traveler .card-sides .front[data-type="10"] {
-  background-position: -400% -100%;
-}
-.card.traveler .card-sides .front[data-type="11"] {
+.card.traveler .card-sides .image[data-img="9"] {
   background-position: 0% -200%;
 }
-.card.traveler .card-sides .front[data-type="12"] {
+.card.traveler .card-sides .image[data-img="10"] {
   background-position: -100% -200%;
 }
-.card.traveler .card-sides .front[data-type="13"] {
+.card.traveler .card-sides .image[data-img="11"] {
   background-position: -200% -200%;
 }
-.card.traveler .card-sides .front[data-type="14"] {
+.card.traveler .card-sides .image[data-img="12"] {
   background-position: -300% -200%;
 }
-.card.traveler .card-sides .front[data-type="15"] {
-  background-position: -400% -200%;
+.card.traveler .card-sides .image[data-img="13"] {
+  background-position: 0% -300%;
+}
+.card.traveler .card-sides .image[data-img="14"] {
+  background-position: -100% -300%;
+}
+.card.traveler .card-sides .image[data-img="15"] {
+  background-position: -200% -300%;
+}
+.card.traveler .card-sides .image[data-img="16"] {
+  background-position: -300% -300%;
+}
+.card.traveler .card-sides .back {
+  background-position: -100% -200%;
 }
 .card.traveler .card-sides .front > * {
   pointer-events: none;
@@ -1708,6 +1769,92 @@ body > .bga-dice_die {
   top: 15px;
   right: unset;
   left: 3px;
+}
+.card.traveler .title {
+  font-family: "PanPizza";
+  color: white;
+  position: absolute;
+  font-size: 10px;
+  top: 6px;
+  left: 5px;
+}
+.card.traveler .gametext-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  font-family: "Bosk";
+  font-size: 7px;
+  color: white;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 9px;
+}
+.card.traveler .gametext {
+  text-align: justify;
+}
+.card.traveler .gametext .i-heart {
+  width: 16px;
+  height: 12px;
+  background-size: 16px 12px;
+}
+.card.traveler .gametext .i-heart span {
+  font-size: 9px;
+}
+.card.traveler .gametext .resource-group {
+  display: inline-flex;
+  margin: 0 2px;
+}
+.card.traveler .gametext .resource-icon {
+  display: inline-flex;
+  align-items: flex-end;
+  zoom: 0.3;
+}
+.card.traveler .gametext .resource-icon::after {
+  content: " ";
+}
+.card.traveler .gametext .resource-icon[data-type=coin] {
+  height: 25px;
+  transform: translateY(-2px);
+  zoom: 0.5;
+}
+.card.traveler .gametext .resource-icon[data-type=lesson] {
+  transform: translateY(-6px);
+}
+.card.traveler .gametext .resource-icon[data-type=stone] {
+  transform: translateY(2px);
+  zoom: 0.4;
+}
+.card.traveler .gametext .resource-icon[data-type=wood] {
+  transform: translateY(-3px);
+  zoom: 0.4;
+  height: 28px;
+}
+.card.traveler .gametext .resource-icon[data-type=story] {
+  transform: translateY(-3px);
+  height: 26px;
+  zoom: 0.4;
+}
+.card.traveler .gametext .resource-icon[data-type=fruit] {
+  transform: translateY(-2px);
+  zoom: 0.4;
+  height: 30px;
+}
+.card.traveler .gametext .resource-icon[data-type=any] {
+  transform: translateY(-4px);
+  zoom: 0.45;
+}
+.card.traveler .gametext .resource-icon[data-type=different] {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle fill='black' cx='12' cy='12' r='11' /%3E%3Cpath fill='white' d='M18 9.998H6a1 1 0 1 1 0-2h12a1 1 0 0 1 0 2zm0 6H6a1 1 0 0 1 0-2h12a1 1 0 0 1 0 2z'/%3E%3Cpath fill='white' d='M14.999 5H15c.507.219.742.806.525 1.314l-5.212 12.162A.999.999 0 0 1 9 19a1.002 1.002 0 0 1-.525-1.314l5.212-12.162A.999.999 0 0 1 15 5z'/%3E%3C/svg%3E");
+  zoom: unset;
+  width: 8px;
+  height: 8px;
+  background-size: 8px 8px;
+  margin: 0px -4px 0;
+  z-index: 10;
 }
 
 .card.valley {
@@ -1945,7 +2092,7 @@ body > .bga-dice_die {
   background-image: url("img/resources.png");
   background-size: auto 35px;
 }
-.resource-icon[data-type="*"] {
+.resource-icon[data-type="*"], .resource-icon[data-type=any] {
   background-image: url("img/any_resources.png");
   background-size: cover;
   width: 25px;

@@ -207,7 +207,7 @@ $this->confort_types = [
    ],
    24 => [
       'name' => clienttranslate("Lamp"),
-      'gametext' => clienttranslate("+ ::heart-7:: for each set of ::story:: ::story:: stored here"),
+      'gametext' => clienttranslate("+ ::heart-7:: if you store exactly ::story:: ::story:: here"),
       'type' => LIGHTING,
       'score' => 4,
       'cost' => [STONE => 1, YARN => 1, COIN => 1],
@@ -222,6 +222,8 @@ $this->improvement_types = [
    // --- gen php begin improvements ---
    1 => [
       'name' => clienttranslate("Barrel Sauna"),
+      'img' => 17,
+      'gametext' => clienttranslate("Gain ::heart-2:: for every ::type-outdoor:: Comfort owned by all ::keyword-{other}:: players"),
       'score' => 2,
       'cost' => [WOOD => 1, STONE => 1],
       'glade' => false,
@@ -230,6 +232,8 @@ $this->improvement_types = [
    ],
    2 => [
       'name' => clienttranslate("Writing Desk"),
+      'img' => 12,
+      'gametext' => clienttranslate("Gain ::heart-2:: for every ::type-lighting:: Comfort owned by all ::keyword-{other}:: players"),
       'score' => 2,
       'cost' => [WOOD => 1, STONE => 1],
       'glade' => false,
@@ -237,6 +241,8 @@ $this->improvement_types = [
    ],
    3 => [
       'name' => clienttranslate("Spinning Wheel"),
+      'img' => 4,
+      'gametext' => clienttranslate("Gain ::heart-2:: for every ::type-clothing:: Comfort owned by all ::keyword-{other}:: players"),
       'score' => 2,
       'cost' => [WOOD => 1, YARN => 1],
       'glade' => false,
@@ -244,6 +250,8 @@ $this->improvement_types = [
    ],
    4 => [
       'name' => clienttranslate("Bicycle"),
+      'img' => 14,
+      'gametext' => clienttranslate("At the start of your turn, you may move one of your workers to a different location"),
       'score' => 2,
       'cost' => [WOOD => 2, STONE => 1],
       'glade' => false,
@@ -251,6 +259,8 @@ $this->improvement_types = [
    ],
    5 => [
       'name' => clienttranslate("Pattern Book"),
+      'img' => 16,
+      'gametext' => clienttranslate("You may store one ::story:: on each of your ::type-clothing:: Comforts. The ::story:: add ::heart-4:: to the Comfort's score"),
       'score' => 3,
       'cost' => [YARN => 1, FRUIT => 1, STORY => 1],
       'glade' => false,
@@ -258,6 +268,8 @@ $this->improvement_types = [
    ],
    6 => [
       'name' => clienttranslate("Tool Shed"),
+      'img' => 6,
+      'gametext' => clienttranslate("When resolving a worker in the Workshop, treat your placed die's value as if it were 6"),
       'score' => 2,
       'cost' => [WOOD => 2],
       'glade' => false,
@@ -265,6 +277,8 @@ $this->improvement_types = [
    ],
    7 => [
       'name' => clienttranslate("Guest Cottage"),
+      'img' => 5,
+      'gametext' => clienttranslate("Owner may ::keyword-{not}:: place here. When another player collects, they ::keyword-{must}:: give a gift of ::any:: to the owner"),
       'score' => 4,
       'cost' => [WOOD => 1, STONE => 2, GRAIN => 1],
       'glade' => true,
@@ -273,6 +287,8 @@ $this->improvement_types = [
    ],
    8 => [
       'name' => clienttranslate("Orchard"),
+      'img' => 2,
+      'gametext' => clienttranslate("Owner gains ::fruit:: when ::keyword-{another}:: player collects"),
       'score' => 2,
       'cost' => [WOOD => 2, STONE => 1],
       'glade' => true,
@@ -281,6 +297,8 @@ $this->improvement_types = [
    ],
    9 => [
       'name' => clienttranslate("Umbrella"),
+      'img' => 7,
+      'gametext' => clienttranslate("Once each turn, you may add 1 or 2 to ::keyword-{one}:: of your Family dice"),
       'score' => 3,
       'cost' => [COIN => 2],
       'glade' => false,
@@ -288,6 +306,8 @@ $this->improvement_types = [
    ],
    10 => [
       'name' => clienttranslate("Almanac"),
+      'img' => 1,
+      'gametext' => clienttranslate("Gain on ::keyword-{Almanac token}::. Treat it as a permanent Lesson Learned, which you may use once per month"),
       'score' => 3,
       'cost' => [WOOD => 1, STONE => 1, COIN => 2],
       'glade' => false,
@@ -295,6 +315,8 @@ $this->improvement_types = [
    ],
    11 => [
       'name' => clienttranslate("Wheelbarrow"),
+      'img' => 9,
+      'gametext' => clienttranslate("Gain one ::keyword-{Wheelbarrow token}::. Each month you may place it with a worker in the Valley or River. That worker collects one extra ::any:: of a type being collected"),
       'score' => 2,
       'cost' => [WOOD => 2, COIN => 1],
       'glade' => false,
@@ -302,6 +324,8 @@ $this->improvement_types = [
    ],
    12 => [
       'name' => clienttranslate("Recipe Book"),
+      'img' => 13,
+      'gametext' => clienttranslate("You may store one ::story:: of each of your ::type-food:: Comforts. The ::story:: add ::heart-4:: to the Comfort's score"),
       'score' => 3,
       'cost' => [GRAIN => 1, MUSHROOM => 1, STORY => 1],
       'glade' => false,
@@ -309,6 +333,8 @@ $this->improvement_types = [
    ],
    13 => [
       'name' => clienttranslate("Weathervane"),
+      'img' => 8,
+      'gametext' => clienttranslate("Once each turn you mai raise or lower ::keyword-{one}:: Village die by 1. The die keeps its new value for the rest of the month"),
       'score' => 3,
       'cost' => [STONE => 2, COIN => 1],
       'glade' => false,
@@ -316,6 +342,8 @@ $this->improvement_types = [
    ],
    14 => [
       'name' => clienttranslate("Wildwood"),
+      'img' => 11,
+      'gametext' => clienttranslate("Owner gains ::mushroom:: when ::keyword-{another}:: player collects"),
       'score' => 2,
       'cost' => [WOOD => 2, STONE => 1],
       'glade' => true,
@@ -324,6 +352,8 @@ $this->improvement_types = [
    ],
    15 => [
       'name' => clienttranslate("Scale"),
+      'img' => 3,
+      'gametext' => clienttranslate("When visiting the Market, you may make ::keyword-{one}:: trade of ::any:: for ::any::. Then the usual rates apply"),
       'score' => 1,
       'cost' => [WOOD => 1, STONE => 2],
       'glade' => false,
@@ -331,6 +361,8 @@ $this->improvement_types = [
    ],
    16 => [
       'name' => clienttranslate("Field"),
+      'img' => 19,
+      'gametext' => clienttranslate("Owner gains ::grain:: when ::keyword-{another}:: player collects"),
       'score' => 2,
       'cost' => [WOOD => 1, STONE => 2],
       'glade' => true,
@@ -339,6 +371,8 @@ $this->improvement_types = [
    ],
    17 => [
       'name' => clienttranslate("Herb Garden"),
+      'img' => 10,
+      'gametext' => clienttranslate("Gain ::heart-1:: for every ::food:: Comfort owned by all ::keyword-{other}:: players"),
       'score' => 1,
       'cost' => [WOOD => 2],
       'glade' => false,
@@ -350,8 +384,10 @@ $this->improvement_types = [
 $this->traveler_types = [
    1 => [
       'name' => clienttranslate("Canada Lynx"),
+      'gametext' => clienttranslate("In turn order each player must pick ::any:: ::different:: ::any:: from the supply to give the player on their left"),
       'timing' => "IMMEDIATELY",
-      "trade" => [
+      'img' => 16,
+      'trade' => [
          1 => [
             "from" => ["count" => 2, "restriction" => "different"], "to" => ["resources" => [COIN]], "times" => 4
          ],
@@ -370,8 +406,10 @@ $this->traveler_types = [
    ],
    2 => [
       'name' => clienttranslate("Leopard Frog"),
+      'gametext' => clienttranslate("Place ::lesson:: ::lesson:: tokens from the supply here. Each player may use them on their turn. "),
       'timing' => "IMMEDIATELY",
-      "trade" => [
+      'img' => 3,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [MUSHROOM]], "to" => ["count" => 1], "times" => 3],
@@ -382,8 +420,10 @@ $this->traveler_types = [
    ],
    3 => [
       'name' => clienttranslate("Pileated Woodpecker"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("All Improvements and Comforts cost one less ::wood:: than displayed on their cards"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 12,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [YARN, YARN]], "times" => 2],
          2 => ["from" => ["count" => 1, "requirement" => [GRAIN]], "to" => ["resources" => [YARN, YARN]], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [YARN]], "to" => ["resources" => [MUSHROOM, MUSHROOM]], "times" => 2],
@@ -394,8 +434,10 @@ $this->traveler_types = [
    ],
    4 => [
       'name' => clienttranslate("Gray Wolf"),
+      'gametext' => clienttranslate("In turn order, each player may claim a face-up Comfort from the Owl's Nest, then refill the Owl's Nest"),
       'timing' => "IMMEDIATELY",
-      "trade" => [
+      'img' => 14,
+      'trade' => [
          1 => [
             "from" => ["count" => 1, "requirement" => [COIN]],
             "to" => ["resources" => [LESSON_LEARNED, LESSON_LEARNED]],
@@ -414,7 +456,8 @@ $this->traveler_types = [
    ],
    5 => [
       'name' => clienttranslate("Hairy-tailed Hole"),
-      'timing' => "ALL_MONTH_LONG",
+      'gametext' => clienttranslate("::stone:: and ::coin:: may be used as each other for any purpose"),
+      'timing' => "ALL MONTH LONG",
       'reward' => [
          1 => ["from" => [STONE], 'to' => [ANY_RESOURCE], 'times' => 1],
          2 => ["from" => [STONE], 'to' => [ANY_RESOURCE], 'times' => 1],
@@ -423,7 +466,8 @@ $this->traveler_types = [
          5 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
          6 => ["from" => [STONE, STONE], 'to' => [STORY], 'times' => 3],
       ],
-      "trade" => [
+      'img' => 2,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [STONE]], "to" => ["count" => 1], "times" => 3],
@@ -434,8 +478,10 @@ $this->traveler_types = [
    ],
    6 => [
       'name' => clienttranslate("Common Raven"),
+      'gametext' => clienttranslate("In turn order, each player places ::coin:: from the supply in a different location. This month, those locations provide ::coin:: in addition to what they show"),
       'timing' => "IMMEDIATELY",
-      "trade" => [
+      'img' => 9,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
          2 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [CARD, LESSON_LEARNED]], "times" => 1],
@@ -446,8 +492,10 @@ $this->traveler_types = [
    ],
    7 => [
       'name' => clienttranslate("Striped Skunk"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("After visiting the Owl's Nest, you may search through the discard pile and claim one Comfort of your choice"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 15,
+      'trade' => [
          1 => ["from" => ["count" => 0], "to" => ["resources" => [STORY]], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [CARD]], "to" => ["count" => 2], "times" => 2],
@@ -458,8 +506,10 @@ $this->traveler_types = [
    ],
    8 => [
       'name' => clienttranslate("American Beaver"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("Both Forest locations provide ::wood:: ::wood:: in addition to what they show"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 11,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resources" => [COIN]], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resources" => [COIN]], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [WOOD]], "to" => ["resources" => [COIN]], "times" => 3],
@@ -470,8 +520,10 @@ $this->traveler_types = [
    ],
    9 => [
       'name' => clienttranslate("Common Loon"),
+      'gametext' => clienttranslate("All players pass one worker to the player on their left. During Placement, you must place the neighbor's worker before placing the rest of you own"),
       'timing' => "IMMEDIATELY",
-      "trade" => [
+      'img' => 4,
+      'trade' => [
          1 => ["from" => ["count" => 0], "to" => ["resources" => [LESSON_LEARNED, LESSON_LEARNED]], "times" => 1],
          2 => ["from" => ["count" => 0], "to" => ["resources" => [LESSON_LEARNED, LESSON_LEARNED]], "times" => 1],
          3 => ["from" => ["count" => 1, "restriction" => "all_different"], "to" => ["count" => 1, "restriction" => "all_same"], "times" => 3],
@@ -482,8 +534,10 @@ $this->traveler_types = [
    ],
    10 => [
       'name' => clienttranslate("Snapping Turtle"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("Every unresolved worker earns two more ::lesson:: tokens than usual"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 8,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
          3 => ["from" => ["count" => 1, "requirement" => [STORY]], "to" => ["count" => 3], "times" => 1],
@@ -495,8 +549,10 @@ $this->traveler_types = [
    ],
    11 => [
       'name' => clienttranslate("Pine Marten"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("Worker may may not be sent to Forest locations. On your turn you may assign dice to resolve Forest locations as if you had sent a worker there"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 7,
+      'trade' => [
          1 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 5],
          2 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 5],
          3 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 1],
@@ -507,8 +563,10 @@ $this->traveler_types = [
    ],
    12 => [
       'name' => clienttranslate("Black Bear"),
-      'timing' => "ALL_MONTH_LONG",
-      "trade" => [
+      'gametext' => clienttranslate("All four Valley locations provide ::fruit:: in addition to what they show"),
+      'timing' => "ALL MONTH LONG",
+      'img' => 13,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 1],
          2 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 2],
          3 => ["from" => ["count" => 1, "requirement" => [FRUIT]], "to" => ["count" => 1], "times" => 3],
@@ -519,8 +577,10 @@ $this->traveler_types = [
    ],
    13 => [
       'name' => clienttranslate("Moose"),
-      'timing' => "END_OF_MONTH",
-      "trade" => [
+      'gametext' => clienttranslate("In turn uorder, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player"),
+      'timing' => "END OF MONTH",
+      'img' => 1,
+      'trade' => [
          1 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["count" => 2, "restriction" => "different"], "times" => 2],
          2 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["count" => 2, "restriction" => "different"], "times" => 2],
          3 => ["from" => ["count" => 0], "to" => ["resources" => [STORY]], "times" => 1],
@@ -531,8 +591,10 @@ $this->traveler_types = [
    ],
    14 => [
       'name' => clienttranslate("Blue Jay"),
-      'timing' => "END_OF_MONTH",
-      "trade" => [
+      'gametext' => clienttranslate("Each player may resolve one Valley location of their choice using the Villae dice only, as if they'd sent a worker there"),
+      'timing' => "END OF MONTH",
+      'img' => 5,
+      'trade' => [
          1 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
          2 => ["from" => ["count" => 0], "to" => ["resources" => [COIN, COIN]], "times" => 1],
          3 => ["from" => ["count" => 1, "requirement" => [COIN]], "to" => ["resources" => [STORY]], "times" => 2],
@@ -543,8 +605,10 @@ $this->traveler_types = [
    ],
    15 => [
       'name' => clienttranslate("Wild Turkey"),
-      'timing' => "AFTER_ROLLING_FAMILY_DICE",
-      "trade" => [
+      'gametext' => clienttranslate("Each player may change one of their own Family dice to any result they wish"),
+      'timing' => "AFTER ROLLING FAMILY DICE",
+      'img' => 6,
+      'trade' => [
          1 => ["from" => ["count" => 0], "to" => ["resources" => [CARD, STORY]], "times" => 1],
          2 => ["from" => ["count" => 0], "to" => ["resources" => [MUSHROOM, GRAIN, FRUIT]], "times" => 1],
          3 => ["from" => ["count" => 0], "to" => ["resources" => [MUSHROOM, GRAIN, FRUIT]], "times" => 1],

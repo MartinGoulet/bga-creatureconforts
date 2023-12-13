@@ -58,7 +58,6 @@ class TravelerWildTurkeyStates implements StateHandler {
    }
 
    private addDiceSelector(player_color: string) {
-      debugger;
       const handleChoiceClick = (div: HTMLDivElement) => {
          if (!this.game.isCurrentPlayerActive()) return;
          if (div.classList.contains('disabled')) return;
@@ -124,7 +123,6 @@ class TravelerWildTurkeyEndStates implements StateHandler {
    private toolbar: ToolbarContainer = new ToolbarContainer('wild-turkey');
    constructor(private game: CreatureConforts) {}
    onEnteringState(args: any): void {
-      debugger;
       const { dice } = this.game.getCurrentPlayerTable();
       dice.setSelectionMode('none');
       dice.onSelectionChange = undefined;

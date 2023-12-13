@@ -90,6 +90,9 @@ class PlayerTurnResolveState implements StateHandler {
          } else if (wheelbarrow === locationId) {
             this.game.setClientState('resolveWheelbarrow', {
                descriptionmyturn: _(`You must select one card in the Owl's Nest`),
+               args: {
+                  location_id: locationId,
+               },
             });
          } else {
             this.game.takeAction('resolveWorker', { location_id: locationId });

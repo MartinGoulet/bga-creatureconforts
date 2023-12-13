@@ -14,10 +14,11 @@ class ResolveWheelbarrowState implements StateHandler {
             return ['stone'];
          }
          const valley_info = ValleyHelper.getValleyLocationInfo(location_id);
-         return (valley_info.resources as GoodsType[]).filter((res) => GOODS.indexOf(res) > 0);
+         return Object.keys(valley_info.resources).filter((res) => GOODS.includes(res as any)) as GoodsType[];
       };
 
       const requirement = getRequirementFrom();
+      debugger;
       const available = this.game.getPlayerResources(requirement as IconsType[]);
 
       this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {

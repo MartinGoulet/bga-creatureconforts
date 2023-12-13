@@ -57,4 +57,9 @@ trait Debug {
     function next() {
         Game::get()->gamestate->jumpToState(ST_FAMILY_DICE);
     }
+
+    function removeWheel() {
+        $sql = "DELETE FROM global_variables WHERE name like 'wheelbarrow__%'";
+        self::DbQuery($sql);
+    }
 }

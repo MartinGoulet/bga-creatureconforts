@@ -56,9 +56,9 @@
       bottom: 0;
       left: 0;
       right: 0;
-      height: 33px;
-      font-family: 'Bosk';
-      font-size: 11px;
+      min-height: 33px;
+      font-family: "Bosk";
+      font-size: 9px;
       color: white;
       padding: 0 5px;
       display: flex;
@@ -87,14 +87,15 @@
       .resource-icon {
          display: inline-flex;
          align-items: center;
-         zoom: 0.5;
+         zoom: 0.4;
+         
 
          &::after {
-            content: "\00a0";
+            content: " ";
          }
 
-         &[data-type="coin"] {
-            height: 10px;
+         &[data-type=coin] {
+            height: 35px;
          }
       }
    }

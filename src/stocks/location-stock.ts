@@ -38,7 +38,9 @@ class LocationStock extends SlotStock<Meeple> {
       this.slots.forEach((slot) => {
          slot.classList.toggle('selectable', false);
       });
-      locations.forEach((sel) => this.slots[sel].classList.toggle('selectable', true));
+      if (locations.length > 0) {
+         locations.forEach((sel) => this.slots[sel].classList.toggle('selectable', true));
+      }
    }
 
    public setSelectedLocation(locations: SlotId[] = []): void {

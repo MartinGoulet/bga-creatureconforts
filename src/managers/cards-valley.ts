@@ -1,7 +1,7 @@
 class ValleyManager extends CardManager<ValleyCard> {
-   constructor(public game: CreatureConforts) {
+   constructor(public game: CreatureConforts, prefix = 'valley') {
       super(game, {
-         getId: (card) => `valley-${card.id}`,
+         getId: (card) => `${prefix}-${card.id}`,
          setupDiv: (card: Card, div: HTMLElement) => {
             div.classList.add('valley');
             div.dataset.cardId = '' + card.id;

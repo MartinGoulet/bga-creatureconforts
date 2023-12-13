@@ -1,34 +1,41 @@
 .card.traveler {
    display: inline-block;
    position: relative;
-   width: 212px;
-   height: 142px;
+   width: var(--card-width);
+   height: var(--card-height);
    border-radius: 5px;
+   --card-width: 212px;
+   --card-height: 142px;
 
    .card-sides {
-      .back, .front {
+
+      .back,
+      .front {
          outline: 1px solid #000;
          border-radius: 5px;
          box-shadow: 0 0 5px 6px #fff;
          filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
       }
-      .back {
-         background-image: url('img/travelers-back.jpg');
-         background-size: 212px 142px;
-      }
-      .front {
-         background-image: url('img/travelers.jpg');
-         background-size: 1060px 426px;
 
-         @for $row from 0 through 2 {
-            @for $col from 0 through 4 {
-               &[data-type='#{(($row * 5) + $col + 1)}'] {
+      .image {
+         background-image: url('img/travelers/cards.jpg');
+         background-size: calc(var(--card-width) * 4) calc(var(--card-height) * 4);
+
+         @for $row from 0 through 3 {
+            @for $col from 0 through 3 {
+               &[data-img='#{(($row * 4) + $col + 1)}'] {
                   background-position: ($col * -100%) ($row * -100%);
                }
             }
          }
+      }
 
-         & > * {
+      .back {
+         background-position: -100% -200%;
+      }
+
+      .front {
+         &>* {
             pointer-events: none;
             user-select: none;
          }
@@ -39,5 +46,107 @@
       top: 15px;
       right: unset;
       left: 3px;
+   }
+
+   .title {
+      font-family: 'PanPizza';
+      color: white;
+      position: absolute;
+      font-size: 10px;
+      top: 6px;
+      left: 5px;
+   }
+
+   .gametext-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 32px;
+      font-family: "Bosk";
+      font-size: 7px;
+      color: white;
+      padding: 0 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 9px;
+   }
+
+   .gametext {
+      text-align: justify;
+
+      .i-heart {
+         width: 16px;
+         height: 12px;
+         background-size: 16px 12px;
+
+         span {
+            font-size: 9px;
+         }
+      }
+
+      .resource-group {
+         display: inline-flex;
+         margin: 0 2px;
+      }
+
+      .resource-icon {
+         display: inline-flex;
+         align-items: flex-end;
+         zoom: 0.3;
+
+         &::after {
+            content: " ";
+         }
+
+         &[data-type=coin] {
+            height: 25px;
+            transform: translateY(-2px);
+            zoom: 0.5;
+         }
+
+         &[data-type=lesson] {
+            transform: translateY(-6px);
+         }
+
+         &[data-type=stone] {
+            transform: translateY(2px);
+            zoom: 0.4;
+         }
+
+         &[data-type=wood] {
+            transform: translateY(-3px);
+            zoom: 0.4;
+            height: 28px;
+         }
+
+         &[data-type=story] {
+            transform: translateY(-3px);
+            height: 26px;
+            zoom: 0.4;
+         }
+
+         &[data-type=fruit] {
+            transform: translateY(-2px);
+            zoom: 0.4;
+            height: 30px;
+         }
+
+         &[data-type=any] {
+            transform: translateY(-4px);
+            zoom: 0.45;
+         }
+
+         &[data-type=different] {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle fill='black' cx='12' cy='12' r='11' /%3E%3Cpath fill='white' d='M18 9.998H6a1 1 0 1 1 0-2h12a1 1 0 0 1 0 2zm0 6H6a1 1 0 0 1 0-2h12a1 1 0 0 1 0 2z'/%3E%3Cpath fill='white' d='M14.999 5H15c.507.219.742.806.525 1.314l-5.212 12.162A.999.999 0 0 1 9 19a1.002 1.002 0 0 1-.525-1.314l5.212-12.162A.999.999 0 0 1 15 5z'/%3E%3C/svg%3E");
+            zoom: unset;
+            width: 8px;
+            height: 8px;
+            background-size: 8px 8px;
+            margin: 0px -4px 0;
+            z-index: 10;
+         }
+      }
    }
 }

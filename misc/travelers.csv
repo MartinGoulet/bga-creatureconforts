@@ -1,16 +1,16 @@
-id|name|power|timing
-1|Canada Lynx||IMMEDIATELY
-2|Leopard Frog||IMMEDIATELY
-3|Pileated Woodpecker||ALL_MONTH_LONG
-4|Gray Wolf||IMMEDIATELY
-5|Hairy-tailed Hole||ALL_MONTH_LONG
-6|Common Raven||IMMEDIATELY
-7|Striped Skunk||ALL_MONTH_LONG
-8|American Beaver||ALL_MONTH_LONG
-9|Common Loon||IMMEDIATELY
-10|Snapping Turtle||ALL_MONTH_LONG
-11|Pine Marten||ALL_MONTH_LONG
-12|Black Bear||ALL_MONTH_LONG
-13|Moose||END_OF_MONTH
-14|Blue Jay||END_OF_MONTH
-15|Wild Turkey||AFTER_ROLLING_FAMILY_DICE
+id|name|gametext|timing
+1|Canada Lynx|In turn order each player must pick ::any:: ::different:: ::any:: from the supply to give the player on their left|IMMEDIATELY
+2|Leopard Frog|"Place ::lesson:: ::lesson:: tokens from the supply here. Each player may use them on their turn. "|IMMEDIATELY
+3|Pileated Woodpecker|All Improvements and Comforts cost one less ::wood:: than displayed on their cards|ALL_MONTH_LONG
+4|Gray Wolf|In turn order, each player may claim a face-up Comfort from the Owl's Nest, then refill the Owl's Nest|IMMEDIATELY
+5|Hairy-tailed Hole|::stone:: and ::coin:: may be used as each other for any purpose|ALL_MONTH_LONG
+6|Common Raven|In turn order, each player places ::coin:: from the supply in a different location. This month, those locations provide ::coin:: in addition to what they show|IMMEDIATELY
+7|Striped Skunk|After visiting the Owl's Nest, you may search through the discard pile and claim one Comfort of your choice|ALL_MONTH_LONG
+8|American Beaver|Both Forest locations provide ::wood:: ::wood:: in addition to what they show|ALL_MONTH_LONG
+9|Common Loon|All players pass one worker to the player on their left. During Placement, you must place the neighbor's worker before placing the rest of you own|IMMEDIATELY
+10|Snapping Turtle|Every unresolved worker earns two more ::lesson:: tokens than usual|ALL_MONTH_LONG
+11|Pine Marten|Worker may may not be sent to Forest locations. On your turn you may assign dice to resolve Forest locations as if you had sent a worker there|ALL_MONTH_LONG
+12|Black Bear|All four Valley locations provide ::fruit:: in addition to what they show|ALL_MONTH_LONG
+13|Moose|In turn uorder, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player|END_OF_MONTH
+14|Blue Jay|Each player may resolve one Valley location of their choice using the Villae dice only, as if they'd sent a worker there|END_OF_MONTH
+15|Wild Turkey|Each player may change one of their own Family dice to any result they wish|AFTER_ROLLING_FAMILY_DICE

@@ -24,14 +24,12 @@ class PlacementState implements StateHandler {
       }
 
       this.showSelection();
-      debugger;
       if (args._private.wheelbarrow > 0) {
          this.game.tableCenter.addWheelbarrow(args._private.wheelbarrow);
       }
       if (!this.game.isCurrentPlayerActive) return;
 
       this.game.tableCenter.worker_locations.OnLocationClick = (slotId: SlotId) => {
-         debugger;
          const isValleyOrRiver = Number(slotId) >= 1 && Number(slotId) <= 7;
          const askWheelbarrow =
             isValleyOrRiver && this.wheelbarrow === 0 && args._private.wheelbarrow_count > 0;

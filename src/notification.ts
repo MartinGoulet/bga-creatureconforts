@@ -118,7 +118,6 @@ class NotificationManager {
    }
 
    private notif_onReturnDice({ player_id, dice }: { player_id: number; dice: Dice[] }) {
-      debugger;
       const white_dice = dice.filter((die) => die.type == 'white');
       const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
       this.game.tableCenter.hill.addDice(white_dice);

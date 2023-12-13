@@ -1,5 +1,6 @@
 class Modal {
    public cards: LineStock<Card>;
+   private onClose: () => void;
 
    constructor(private game: CreatureConforts) {
       const display = document.getElementById('modal-display');
@@ -28,46 +29,43 @@ class Modal {
    }
 
    displayImprovement(card: ImprovementCard) {
-      const front = this.addDivCard('improvement');
-      front.dataset.type = card.type;
+      const el = document.getElementById('modal-display-card');
+      const stock = new LineStock<ImprovementCard>(new ImprovementManager(this.game, 'modal', true), el);
+      stock.addCard(card);
+      this.onClose = () => {
+         stock.removeCard(card);
+      };
       this.adjustPosition();
    }
 
    displayTraveler(card: TravelerCard) {
-      const front = this.addDivCard('traveler');
-      front.dataset.type = card.type;
+      const el = document.getElementById('modal-display-card');
+      const stock = new LineStock<TravelerCard>(new TravelerManager(this.game, 'modal'), el);
+      stock.addCard(card);
+      this.onClose = () => {
+         stock.removeCard(card);
+      };
       this.adjustPosition();
    }
 
    displayValley(card: ValleyCard) {
-      const front = this.addDivCard('valley');
-      front.parentElement.parentElement.classList.add(card.location);
-      front.dataset.type = card.type;
-      front.dataset.image_pos = '' + this.game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
+      const el = document.getElementById('modal-display-card');
+      const stock = new LineStock<ValleyCard>(new ValleyManager(this.game, 'modal'), el);
+      stock.addCard(card);
+      this.onClose = () => {
+         stock.removeCard(card);
+      };
       this.adjustPosition();
    }
 
    displayConfort(card: ConfortCard) {
-      const front = this.addDivCard('confort');
-      front.dataset.type = card.type;
-      // front.dataset.pos = card.type_arg;
-      front.dataset.img = this.game.confortManager.getCardType(card).img.toString();
-      // front.classList.toggle('background_1', Number(card.type) <= 12);
-      // front.classList.toggle('background_2', Number(card.type) > 12 && Number(card.type) <= 24);
+      const el = document.getElementById('modal-display-card');
+      const stock = new LineStock<ConfortCard>(new ConfortManager(this.game, 'modal'), el);
+      stock.addCard(card);
+      this.onClose = () => {
+         stock.removeCard(card);
+      };
       this.adjustPosition();
-   }
-
-   private addDivCard(type: 'improvement' | 'traveler' | 'confort' | 'valley') {
-      const html = `<div id="modal-card" class="card ${type}">
-         <div class="card-sides">
-            <div id="modal-card-front" class="card-side front"></div>
-         </div>
-      </div>`;
-
-      document.getElementById('modal-card')?.remove();
-      document.getElementById('modal-display-card').insertAdjacentHTML('beforeend', html);
-
-      return document.getElementById('modal-card-front');
    }
 
    private adjustPosition() {
@@ -91,5 +89,7 @@ class Modal {
       display.style.top = `${scrollY}px`;
 
       window.scroll(0, scrollY);
+
+      this.onClose();
    }
 }

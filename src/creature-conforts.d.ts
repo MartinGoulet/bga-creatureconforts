@@ -78,6 +78,8 @@ interface TravelerUIData {
 interface TravelerType {
    name: string;
    timing: string;
+   gametext: string;
+   img: number;
    // reward: TravelerReward[];
    trade: ResourceManagerPayForSettings<IconsType>;
 }
@@ -108,8 +110,9 @@ interface CottageCard extends Card {}
 interface ImprovementType {
    name: string;
    score: number;
+   img: number;
    cost: { [type: string]: number };
-   power: string;
+   gametext: string;
 }
 
 interface ConfortType {
@@ -139,7 +142,7 @@ interface ValleyLocationInfo {
    count: number;
    rule: string;
    values: number[];
-   resources: string[];
+   resources: Record<IconsType, number>;
 }
 
 interface Dice extends BgaDie {

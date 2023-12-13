@@ -2978,7 +2978,9 @@ var LocationStock = (function (_super) {
         this.slots.forEach(function (slot) {
             slot.classList.toggle('selectable', false);
         });
-        locations.forEach(function (sel) { return _this.slots[sel].classList.toggle('selectable', true); });
+        if (locations.length > 0) {
+            locations.forEach(function (sel) { return _this.slots[sel].classList.toggle('selectable', true); });
+        }
     };
     LocationStock.prototype.setSelectedLocation = function (locations) {
         var _this = this;
@@ -3053,16 +3055,29 @@ var ConfortManager = (function (_super) {
 }(CardManager));
 var ImprovementManager = (function (_super) {
     __extends(ImprovementManager, _super);
-    function ImprovementManager(game) {
+    function ImprovementManager(game, prefix, modal) {
+        if (prefix === void 0) { prefix = 'improvement'; }
+        if (modal === void 0) { modal = false; }
         var _this = _super.call(this, game, {
-            getId: function (card) { return "improvement-".concat(card.id); },
+            getId: function (card) { return "".concat(prefix, "-").concat(card.id); },
             setupDiv: function (card, div) {
                 div.classList.add('improvement');
                 div.dataset.cardId = '' + card.id;
             },
             setupFrontDiv: function (card, div) {
+                var card_info = _this.getCardType(card);
+                if (!card_info)
+                    return;
                 div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
+                div.dataset.img = card_info.img.toString();
+                div.classList.add('image');
+                if (div.getElementsByClassName('title').length !== 0)
+                    return;
+                div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
+                if (card_info.gametext) {
+                    var gametext = _this.formatText(_(card_info.gametext));
+                    div.insertAdjacentHTML('beforeend', "<div class=\"gametext-wrapper\"><div class=\"gametext\">".concat(gametext, "</div></div>"));
+                }
                 if (card.type_arg) {
                 }
                 if ('type' in card) {
@@ -3070,15 +3085,15 @@ var ImprovementManager = (function (_super) {
                         return _this.game.modal.displayImprovement(card);
                     });
                 }
-                if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage"))) {
+                if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage")) && !modal) {
                     div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
                     _this.cottages[card.id] = new LineStock(_this.game.cottageManager, document.getElementById("".concat(_this.getId(card), "-slot-cottage")));
+                    var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
+                    if (cottage) {
+                        _this.cottages[card.id].addCard(cottage);
+                    }
                 }
-                var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
-                if (cottage) {
-                    _this.cottages[card.id].addCard(cottage);
-                }
-                if (card.location == 'glade') {
+                if (card.location == 'glade' && !modal) {
                     var slot = document.querySelector("#dice-locations [data-slot-id=\"".concat(card.location_arg, "\"]"));
                     if (slot) {
                         slot.classList.add('slot-dice');
@@ -3100,20 +3115,48 @@ var ImprovementManager = (function (_super) {
     ImprovementManager.prototype.getCardType = function (card) {
         return this.game.gamedatas.improvement_types[card.type];
     };
+    ImprovementManager.prototype.formatText = function (rawText) {
+        if (!rawText) {
+            return '';
+        }
+        var keywords = /::keyword-{([a-zA-Z ]*)}::/gi;
+        var type_food = /::type-food::/gi;
+        var type_clothing = /::type-clothing::/gi;
+        var type_lighting = /::type-lighting::/gi;
+        var type_outdoor = /::type-outdoor::/gi;
+        var value = rawText
+            .replaceAll(keywords, "<span class=\"keyword\">$1</span>")
+            .replaceAll(type_food, "<span class=\"type food\"><span class=\"label\">".concat(_('Food'), "</span><span class=\"image\"></span></span>"))
+            .replaceAll(type_clothing, "<span class=\"type clothing\"><span class=\"label\">".concat(_('Clothing'), "</span><span class=\"image\"></span></span>"))
+            .replaceAll(type_lighting, "<span class=\"type lighting\"><span class=\"label\">".concat(_('Lighting'), "</span><span class=\"image\"></span></span>"))
+            .replaceAll(type_outdoor, "<span class=\"type outdoor\"><span class=\"label\">".concat(_('Outdoor'), "</span><span class=\"image\"></span></span>"));
+        return this.game.formatTextIcons(value);
+    };
     return ImprovementManager;
 }(CardManager));
 var TravelerManager = (function (_super) {
     __extends(TravelerManager, _super);
-    function TravelerManager(game) {
+    function TravelerManager(game, prefix) {
+        if (prefix === void 0) { prefix = 'traveler'; }
         var _this = _super.call(this, game, {
-            getId: function (card) { return "traveler-".concat(card.id); },
+            getId: function (card) { return "".concat(prefix, "-").concat(card.id); },
             setupDiv: function (card, div) {
                 div.classList.add('traveler');
                 div.dataset.cardId = '' + card.id;
             },
             setupFrontDiv: function (card, div) {
+                var card_info = _this.getCardType(card);
                 div.dataset.type = card.type;
-                div.dataset.pos = card.type_arg;
+                div.dataset.img = '' + card_info.img;
+                div.classList.add('image');
+                if (div.getElementsByClassName('title').length !== 0)
+                    return;
+                div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
+                if (card_info.gametext) {
+                    var gametext = _this.game.formatTextIcons(_(card_info.gametext), ['1', '2', '8'].includes(card.type));
+                    var fullgametext = "".concat(_(card_info.timing), " \u2022 ").concat(gametext);
+                    div.insertAdjacentHTML('beforeend', "<div class=\"gametext-wrapper\"><div class=\"gametext\">".concat(fullgametext, "</div></div>"));
+                }
                 if (card.type_arg) {
                 }
                 if ('type' in card) {
@@ -3129,13 +3172,17 @@ var TravelerManager = (function (_super) {
         _this.game = game;
         return _this;
     }
+    TravelerManager.prototype.getCardType = function (card) {
+        return this.game.gamedatas.travelers.types[card.type];
+    };
     return TravelerManager;
 }(CardManager));
 var ValleyManager = (function (_super) {
     __extends(ValleyManager, _super);
-    function ValleyManager(game) {
+    function ValleyManager(game, prefix) {
+        if (prefix === void 0) { prefix = 'valley'; }
         var _this = _super.call(this, game, {
-            getId: function (card) { return "valley-".concat(card.id); },
+            getId: function (card) { return "".concat(prefix, "-").concat(card.id); },
             setupDiv: function (card, div) {
                 div.classList.add('valley');
                 div.dataset.cardId = '' + card.id;
@@ -3709,14 +3756,12 @@ var PlacementState = (function () {
             locations.forEach(function (slotId) { return _this.moveWorker(slotId, args._private.workers); });
         }
         this.showSelection();
-        debugger;
         if (args._private.wheelbarrow > 0) {
             this.game.tableCenter.addWheelbarrow(args._private.wheelbarrow);
         }
         if (!this.game.isCurrentPlayerActive)
             return;
         this.game.tableCenter.worker_locations.OnLocationClick = function (slotId) {
-            debugger;
             var isValleyOrRiver = Number(slotId) >= 1 && Number(slotId) <= 7;
             var askWheelbarrow = isValleyOrRiver && _this.wheelbarrow === 0 && args._private.wheelbarrow_count > 0;
             if (askWheelbarrow) {
@@ -4255,6 +4300,9 @@ var PlayerTurnResolveState = (function () {
             else if (wheelbarrow === locationId) {
                 _this.game.setClientState('resolveWheelbarrow', {
                     descriptionmyturn: _("You must select one card in the Owl's Nest"),
+                    args: {
+                        location_id: locationId,
+                    },
                 });
             }
             else {
@@ -4705,9 +4753,10 @@ var ResolveWheelbarrowState = (function () {
                 return ['stone'];
             }
             var valley_info = ValleyHelper.getValleyLocationInfo(location_id);
-            return valley_info.resources.filter(function (res) { return GOODS.indexOf(res) > 0; });
+            return Object.keys(valley_info.resources).filter(function (res) { return GOODS.includes(res); });
         };
         var requirement = getRequirementFrom();
+        debugger;
         var available = this.game.getPlayerResources(requirement);
         this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
             from: { requirement: requirement, available: available, count: 1 },
@@ -5327,7 +5376,6 @@ var TravelerWildTurkeyStates = (function () {
     };
     TravelerWildTurkeyStates.prototype.addDiceSelector = function (player_color) {
         var _this = this;
-        debugger;
         var handleChoiceClick = function (div) {
             if (!_this.game.isCurrentPlayerActive())
                 return;
@@ -5386,7 +5434,6 @@ var TravelerWildTurkeyEndStates = (function () {
         this.toolbar = new ToolbarContainer('wild-turkey');
     }
     TravelerWildTurkeyEndStates.prototype.onEnteringState = function (args) {
-        debugger;
         var dice = this.game.getCurrentPlayerTable().dice;
         dice.setSelectionMode('none');
         dice.onSelectionChange = undefined;
@@ -5456,13 +5503,6 @@ var CreatureConforts = (function () {
         this.createPlayerTables(gamedatas);
         TravelerHelper.setTravelerToTable();
         this.setupNotifications();
-        var cards = Object.keys(gamedatas.confort_types)
-            .map(function (key) { return gamedatas.confort_types[key]; })
-            .sort(function (a, b) { return a.img.toString().localeCompare(b.img.toString()); })
-            .map(function (card) {
-            return { img: card.img, name: card.name };
-        });
-        debug(cards);
     };
     CreatureConforts.prototype.onEnteringState = function (stateName, args) {
         this.stateManager.onEnteringState(stateName, args);
@@ -5786,34 +5826,40 @@ var Modal = (function () {
         elBody.addEventListener('keydown', handleKeyboard);
     }
     Modal.prototype.displayImprovement = function (card) {
-        var front = this.addDivCard('improvement');
-        front.dataset.type = card.type;
+        var el = document.getElementById('modal-display-card');
+        var stock = new LineStock(new ImprovementManager(this.game, 'modal', true), el);
+        stock.addCard(card);
+        this.onClose = function () {
+            stock.removeCard(card);
+        };
         this.adjustPosition();
     };
     Modal.prototype.displayTraveler = function (card) {
-        var front = this.addDivCard('traveler');
-        front.dataset.type = card.type;
+        var el = document.getElementById('modal-display-card');
+        var stock = new LineStock(new TravelerManager(this.game, 'modal'), el);
+        stock.addCard(card);
+        this.onClose = function () {
+            stock.removeCard(card);
+        };
         this.adjustPosition();
     };
     Modal.prototype.displayValley = function (card) {
-        var front = this.addDivCard('valley');
-        front.parentElement.parentElement.classList.add(card.location);
-        front.dataset.type = card.type;
-        front.dataset.image_pos = '' + this.game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
+        var el = document.getElementById('modal-display-card');
+        var stock = new LineStock(new ValleyManager(this.game, 'modal'), el);
+        stock.addCard(card);
+        this.onClose = function () {
+            stock.removeCard(card);
+        };
         this.adjustPosition();
     };
     Modal.prototype.displayConfort = function (card) {
-        var front = this.addDivCard('confort');
-        front.dataset.type = card.type;
-        front.dataset.img = this.game.confortManager.getCardType(card).img.toString();
+        var el = document.getElementById('modal-display-card');
+        var stock = new LineStock(new ConfortManager(this.game, 'modal'), el);
+        stock.addCard(card);
+        this.onClose = function () {
+            stock.removeCard(card);
+        };
         this.adjustPosition();
-    };
-    Modal.prototype.addDivCard = function (type) {
-        var _a;
-        var html = "<div id=\"modal-card\" class=\"card ".concat(type, "\">\n         <div class=\"card-sides\">\n            <div id=\"modal-card-front\" class=\"card-side front\"></div>\n         </div>\n      </div>");
-        (_a = document.getElementById('modal-card')) === null || _a === void 0 ? void 0 : _a.remove();
-        document.getElementById('modal-display-card').insertAdjacentHTML('beforeend', html);
-        return document.getElementById('modal-card-front');
     };
     Modal.prototype.adjustPosition = function () {
         var scrollY = window.scrollY;
@@ -5831,6 +5877,7 @@ var Modal = (function () {
         var scrollY = Number(display.style.top.replace('px', ''));
         display.style.top = "".concat(scrollY, "px");
         window.scroll(0, scrollY);
+        this.onClose();
     };
     return Modal;
 }());
@@ -5971,7 +6018,6 @@ var NotificationManager = (function () {
     };
     NotificationManager.prototype.notif_onReturnDice = function (_a) {
         var player_id = _a.player_id, dice = _a.dice;
-        debugger;
         var white_dice = dice.filter(function (die) { return die.type == 'white'; });
         var player_dice = dice.filter(function (die) { return Number(die.owner_id) == player_id; });
         this.game.tableCenter.hill.addDice(white_dice);

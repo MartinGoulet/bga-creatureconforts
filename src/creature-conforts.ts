@@ -128,15 +128,6 @@ class CreatureConforts
       TravelerHelper.setTravelerToTable();
 
       this.setupNotifications();
-
-      const cards = Object.keys(gamedatas.confort_types)
-         .map((key) => gamedatas.confort_types[key])
-         .sort((a: ConfortType, b: ConfortType) => a.img.toString().localeCompare(b.img.toString()))
-         .map((card) => {
-            return { img: card.img, name: card.name };
-         });
-
-      debug(cards);
    }
 
    ///////////////////////////////////////////////////
