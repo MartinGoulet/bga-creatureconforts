@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * CreatureConforts implementation : © Martin Goulet <martin.goulet@live.ca>
+ * CreatureComforts implementation : © Martin Goulet <martin.goulet@live.ca>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -11,7 +11,7 @@
  * 
  * states.inc.php
  *
- * CreatureConforts game states description
+ * CreatureComforts game states description
  *
  */
 
@@ -170,6 +170,27 @@ $travelerStates = [
         "type" => "game",
         "action" => "stPlacementEnd",
         "transitions" => ["" => ST_PLACEMENT]
+    ],
+    ST_MOOSE => [
+        "phase" => "1",
+        "name" => "moose",
+        "descriptionmyturn" => clienttranslate('${you} may gain ::story:: if you give a ::any:: to ${otherplayer}'),
+        "description" => clienttranslate('Waiting for others to choose if they want to trade'),
+        "args" => "argMoose",
+        "type" => "activeplayer",
+        "possibleactions" => ["confirmMoose"],
+        "transitions" => ["" => ST_MOOSE_NEXT_PLAYER]
+    ],
+
+    ST_MOOSE_NEXT_PLAYER => [
+        "phase" => "1",
+        "name" => "mooseNextPlayer",
+        "type" => "game",
+        "action" => "stPlayerTurnNextTraveler",
+        "transitions" => [
+            "next" => ST_MOOSE,
+            "end" => ST_PRE_UPKEEP,
+        ]
     ],
 
     ST_WILD_TURKEY => [
@@ -359,8 +380,8 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ST_PLAYER_TURN_CRAFT_CONFORT => [
         "phase" => "5e",
         "name" => "playerTurnCraftConfort",
-        "descriptionmyturn" => clienttranslate('${you} may craft any number of Conforts from your hand'),
-        "description" => clienttranslate('${actplayer} may craft any number of Conforts'),
+        "descriptionmyturn" => clienttranslate('${you} may craft any number of Comforts from your hand'),
+        "description" => clienttranslate('${actplayer} may craft any number of Comforts'),
         "type" => "activeplayer",
         "possibleactions" => array("craftConfort", "passCraftConfort", "undo"),
         "transitions" => [
@@ -384,8 +405,8 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ST_PLAYER_TURN_DISCARD => [
         "phase" => "5f",
         "name" => "playerTurnDiscard",
-        "descriptionmyturn" => clienttranslate('${you} must discard card until you have 3 Confort cards in your hand'),
-        "description" => clienttranslate('${actplayer} must discard Confort cards'),
+        "descriptionmyturn" => clienttranslate('${you} must discard card until you have 3 Comfort cards in your hand'),
+        "description" => clienttranslate('${actplayer} must discard Comfort cards'),
         "args" => "argPlayerTurnDiscard",
         "type" => "activeplayer",
         "possibleactions" => array("discardConfort"),
@@ -411,6 +432,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
         "type" => "game",
         "action" => "stPreUpkeep",
         "transitions" => [
+            "moose" => ST_MOOSE,
             "upkeep" => ST_UPKEEP,
             "end" => ST_PRE_END_OF_GAME,
         ]

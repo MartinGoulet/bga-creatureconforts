@@ -1,15 +1,15 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Managers\Cottages;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Worker;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Managers\Cottages;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Worker;
 
 class ImprovementHelper {
 

@@ -7,7 +7,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
    private totalUmbrella: number;
    private totalLesson: number;
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: PlayerTurnDiceManipulationArgs): void {
       this.original = args.original;

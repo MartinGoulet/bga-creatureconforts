@@ -1,5 +1,5 @@
 class ResolveTravelerDiscardState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: ResolveTravelerDiscardArgs): void {
       const { hand } = this.game.getCurrentPlayerTable();

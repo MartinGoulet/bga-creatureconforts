@@ -1,13 +1,13 @@
 const isDebug =
    window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 const debug = isDebug ? console.log.bind(window.console) : function () {};
-// const LOCAL_STORAGE_ZOOM_KEY = 'creature-conforts-zoom';
+// const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 
-interface CreatureConforts
+interface CreatureComforts
    extends ebg.core.gamegui,
-      BgaGame<CreatureConfortsPlayerData, CreatureConfortsGamedatas> {
+      BgaGame<CreatureComfortsPlayerData, CreatureComfortsGamedatas> {
    dontPreloadImage(image_file_name: string): void;
    ensureSpecificGameImageLoading(image_file_names_array: string[]);
    displayScoring(
@@ -31,13 +31,13 @@ interface CreatureConforts
    addTooltipHtmlToClass(cssClass: string, html: string, delay?: number): void;
 }
 
-class CreatureConforts
-   implements ebg.core.gamegui, BgaGame<CreatureConfortsPlayerData, CreatureConfortsGamedatas>
+class CreatureComforts
+   implements ebg.core.gamegui, BgaGame<CreatureComfortsPlayerData, CreatureComfortsGamedatas>
 {
    private TOOLTIP_DELAY = document.body.classList.contains('touch-device') ? 1500 : undefined;
 
-   public confortManager: ConfortManager;
-   public confortManagerDiscard: ConfortManager;
+   public confortManager: ComfortManager;
+   public confortManagerDiscard: ComfortManager;
    public improvementManager: ImprovementManager;
    public travelerManager: TravelerManager;
    public valleyManager: ValleyManager;
@@ -46,7 +46,7 @@ class CreatureConforts
    public cottageManager: CottageManager;
    public workerManager: WorkerManager;
 
-   public readonly gamedatas: CreatureConfortsGamedatas;
+   public readonly gamedatas: CreatureComfortsGamedatas;
    public notifManager: NotificationManager;
    public stateManager: StateManager;
 
@@ -75,13 +75,13 @@ class CreatureConforts
         
         "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
     */
-   public setup(gamedatas: CreatureConfortsGamedatas) {
+   public setup(gamedatas: CreatureComfortsGamedatas) {
       debug(gamedatas);
 
       this.animationManager = new AnimationManager(this, { duration: 0 });
 
-      this.confortManager = new ConfortManager(this);
-      this.confortManagerDiscard = new ConfortManager(this, 'conforts-discard');
+      this.confortManager = new ComfortManager(this);
+      this.confortManagerDiscard = new ComfortManager(this, 'comforts-discard');
       this.improvementManager = new ImprovementManager(this);
       this.travelerManager = new TravelerManager(this);
       this.valleyManager = new ValleyManager(this);
@@ -214,7 +214,7 @@ class CreatureConforts
       }
    }
 
-   private createPlayerPanels(gamedatas: CreatureConfortsGamedatas) {
+   private createPlayerPanels(gamedatas: CreatureComfortsGamedatas) {
       this.playersPanels = [];
       gamedatas.playerorder.forEach((player_id) => {
          const player = gamedatas.players[Number(player_id)];
@@ -223,7 +223,7 @@ class CreatureConforts
       });
    }
 
-   private createPlayerTables(gamedatas: CreatureConfortsGamedatas) {
+   private createPlayerTables(gamedatas: CreatureComfortsGamedatas) {
       this.playersTables = [];
       gamedatas.playerorder.forEach((player_id) => {
          const player = gamedatas.players[Number(player_id)];
@@ -353,7 +353,15 @@ class CreatureConforts
    format_string_recursive(log: string, args: any) {
       try {
          if (log.indexOf('::coin::') >= 0) {
-            log = log.replace('::coin::', `<div class="resource-icon" data-type="coin"></div>`);
+            log = log.replaceAll('::coin::', `<div class="resource-icon" data-type="coin"></div>`);
+         }
+
+         if (log.indexOf('::story::') >= 0) {
+            log = log.replaceAll('::story::', `<div class="resource-icon" data-type="story"></div>`);
+         }
+
+         if (log.indexOf('::any::') >= 0) {
+            log = log.replaceAll('::any::', `<div class="resource-icon" data-type="*"></div>`);
          }
 
          if (log && args && !args.processed) {

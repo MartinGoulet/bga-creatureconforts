@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * CreatureConforts implementation : © Martin Goulet <martin.goulet@live.ca>
+ * CreatureComforts implementation : © Martin Goulet <martin.goulet@live.ca>
  *
  * This code has been produced on the BGA studio platform for use on https://boardgamearena.com.
  * See http://en.doc.boardgamearena.com/Studio for more information.
@@ -11,7 +11,7 @@
  * 
  * creatureconforts.action.php
  *
- * CreatureConforts main action entry point
+ * CreatureComforts main action entry point
  *
  *
  * In this file, you are describing all the methods that can be called from your
@@ -101,12 +101,13 @@ class action_creatureconforts extends APP_GameAction {
       $resources = self::getArg("resources", AT_numberlist, false, '');
       $resources2 = self::getArg("resources2", AT_numberlist, false, '');
       $card_ids = self::getArg("card_ids", AT_numberlist, false, '');
+      $option = self::getArg("option", AT_int, false, 0);
       $resources = self::getArrayArgs($resources);
       $resources2 = self::getArrayArgs($resources2);
       $card_ids = self::getArrayArgs($card_ids);
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('resolveWorker');
-      $this->game->resolveWorker($location_id, $resources, $resources2, $card_ids);
+      $this->game->resolveWorker($location_id, $resources, $resources2, $card_ids, $option);
       self::ajaxResponse();
    }
 
@@ -209,6 +210,16 @@ class action_creatureconforts extends APP_GameAction {
       // Then, call the appropriate method in your game logic
       $this->game->checkAction('confirmCommonRaven');
       $this->game->confirmCommonRaven($location_id);
+      self::ajaxResponse();
+   }
+
+   public function confirmMoose() {
+      self::setAjaxMode();
+      // Retrieve arguments
+      $resource = intval(self::getArg("resource", AT_int));
+      // Then, call the appropriate method in your game logic
+      $this->game->checkAction('confirmMoose');
+      $this->game->confirmMoose($resource);
       self::ajaxResponse();
    }
 

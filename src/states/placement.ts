@@ -8,7 +8,7 @@ class PlacementState implements StateHandler {
    private locations_unavailable: number[];
    private wheelbarrow: number;
 
-   constructor(private game: CreatureConforts, private is_placement_phase: boolean) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: PlacementStateArgs): void {
       debug(args);

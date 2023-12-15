@@ -1,8 +1,8 @@
 <?php
 
-namespace CreatureConforts\Cards\Comforts;
+namespace CreatureComforts\Cards\Comforts;
 
-use CreatureConforts\Core\Globals;
+use CreatureComforts\Core\Globals;
 
 class FairyGarden {
     public function getScore(int $player_id, int $card_id) {

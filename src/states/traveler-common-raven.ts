@@ -1,5 +1,5 @@
 class TravelerCommonRavenState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState({ locations_unavailable: location_ids }: TravelerCommonRavenArgs): void {
       const { worker_locations } = this.game.tableCenter;

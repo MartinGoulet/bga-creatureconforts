@@ -57,11 +57,12 @@
 
         "src/dice-modifier/dice-modifier.ts",
 
+        "src/stocks/dice-stock.ts",
         "src/stocks/discard-stock.ts",
         "src/stocks/hand-stock.ts",
         "src/stocks/location-stock.ts",
 
-        "src/managers/cards-conforts.ts",
+        "src/managers/cards-comforts.ts",
         "src/managers/cards-improvement.ts",
         "src/managers/cards-traveler.ts",
         "src/managers/cards-valley.ts",
@@ -98,12 +99,13 @@
         "src/states/traveler-gray-wolf.ts",
         "src/states/traveler-canada-lynx.ts",
         "src/states/traveler-common-raven.ts",
+        "src/states/traveler-moose.ts",
         "src/states/traveler-striped-skunk.ts",
         "src/states/traveler-wild-turkey.ts",
         
         "src/toolbar-container.ts",
-        "src/creature-conforts.d.ts",
-        "src/creature-conforts.ts",
+        "src/creature-comforts.d.ts",
+        "src/creature-comforts.ts",
         "src/game-options.ts",
         "src/modal.ts",
         "src/notification.ts",

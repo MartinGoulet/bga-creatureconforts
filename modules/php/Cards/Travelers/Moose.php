@@ -1,11 +1,11 @@
 <?php
 
-namespace CreatureConforts\Cards\Travelers;
+namespace CreatureComforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Helpers\ResourcesHelper;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Helpers\ResourcesHelper;
+use CreatureComforts\Managers\Players;
 
 class Moose {
     static function resolve(int $die_value, array $resource, array $group, array $resource2, array $group2) {
@@ -48,11 +48,11 @@ class Moose {
             throw new BgaUserException('Too many resources');
         }
         $unique_resource = array_unique($resource);
-        $isValid = 
+        $isValid =
             (sizeof($resource) == 2 && sizeof($unique_resource) == 1) ||
-            (sizeof($resource) == 4 && sizeof($unique_resource) == 2);
+            (sizeof($resource) == 4 && (sizeof($unique_resource) == 1 || sizeof($unique_resource) == 2));
 
-        if(!$isValid) {
+        if (!$isValid) {
             throw new BgaUserException("Resource must be equals");
         }
         $player_id = Players::getPlayerId();

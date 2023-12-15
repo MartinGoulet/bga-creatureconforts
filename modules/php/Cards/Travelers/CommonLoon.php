@@ -1,11 +1,11 @@
 <?php
 
-namespace CreatureConforts\Cards\Travelers;
+namespace CreatureComforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Helpers\ResourcesHelper;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Helpers\ResourcesHelper;
+use CreatureComforts\Managers\Players;
 
 class CommonLoon {
     static function resolve(int $die_value, array $resource, array $group, array $resource2, array $group2) {

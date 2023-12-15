@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Managers\Cottages;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Managers\Cottages;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
 
 class WorkshopHelper {
 

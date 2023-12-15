@@ -1,5 +1,5 @@
 class ResolveWorkshopState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       const { worker_locations, dice_locations, improvement_market: market } = this.game.tableCenter;
@@ -18,6 +18,16 @@ class ResolveWorkshopState implements StateHandler {
       market.setSelectableCards(
          market.getCards().filter((card) => {
             if (Number(card.location_arg) > die.face && !hasToolShed) return false;
+
+            const has_already_improvement =
+               this.game
+                  .getCurrentPlayerTable()
+                  .improvements.getCards()
+                  .filter((c) => c.type == card.type).length > 0;
+
+            if (has_already_improvement) {
+               return false;
+            }
 
             let cost = { ...this.game.improvementManager.getCardType(card).cost };
             if (TravelerHelper.isActivePileatedWoodpecker() && 'wood' in cost) {

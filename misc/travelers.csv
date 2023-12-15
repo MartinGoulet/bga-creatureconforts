@@ -11,6 +11,6 @@ id|name|gametext|timing
 10|Snapping Turtle|Every unresolved worker earns two more ::lesson:: tokens than usual|ALL_MONTH_LONG
 11|Pine Marten|Worker may may not be sent to Forest locations. On your turn you may assign dice to resolve Forest locations as if you had sent a worker there|ALL_MONTH_LONG
 12|Black Bear|All four Valley locations provide ::fruit:: in addition to what they show|ALL_MONTH_LONG
-13|Moose|In turn uorder, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player|END_OF_MONTH
+13|Moose|In turn order, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player|END_OF_MONTH
 14|Blue Jay|Each player may resolve one Valley location of their choice using the Villae dice only, as if they'd sent a worker there|END_OF_MONTH
 15|Wild Turkey|Each player may change one of their own Family dice to any result they wish|AFTER_ROLLING_FAMILY_DICE

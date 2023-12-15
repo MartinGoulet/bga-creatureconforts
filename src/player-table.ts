@@ -7,10 +7,10 @@ class PlayerTable {
    public cottages: LineStock<CottageCard>;
    public workers: LineStock<Meeple>;
 
-   public conforts: LineStock<ConfortCard>;
+   public comforts: LineStock<ConfortCard>;
    public improvements: LineStock<ImprovementCard>;
 
-   constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
+   constructor(public game: CreatureComforts, player: CreatureComfortsPlayerData) {
       this.player_id = Number(player.id);
       this.player_color = getColorName(player.color);
 
@@ -27,7 +27,7 @@ class PlayerTable {
       return this.improvements.getCards().filter((card) => card.type === '9').length > 0;
    }
 
-   private setupBoard(game: CreatureConforts, player: CreatureConfortsPlayerData) {
+   private setupBoard(game: CreatureComforts, player: CreatureComfortsPlayerData) {
       const dataset: string = [`data-color="${player.color}"`].join(' ');
 
       const resourceManager =
@@ -50,7 +50,7 @@ class PlayerTable {
                </div>
                <div class="col">
                   <div id="player-table-${this.player_id}-improvement" class="player-table-improvement"></div>
-                  <div id="player-table-${this.player_id}-confort" class="player-table-confort"></div>
+                  <div id="player-table-${this.player_id}-comfort" class="player-table-comfort"></div>
                </div>
             </div>
          </div>`;
@@ -59,18 +59,18 @@ class PlayerTable {
       document.getElementById(destination).insertAdjacentHTML('beforeend', html);
    }
 
-   private setupConfort(game: CreatureConforts, player: CreatureConfortsPlayerData) {
-      this.conforts = new LineStock<ConfortCard>(
+   private setupConfort(game: CreatureComforts, player: CreatureComfortsPlayerData) {
+      this.comforts = new LineStock<ConfortCard>(
          game.confortManager,
-         document.getElementById(`player-table-${this.player_id}-confort`),
+         document.getElementById(`player-table-${this.player_id}-comfort`),
          {
             gap: '7px',
          },
       );
-      this.conforts.addCards(game.gamedatas.conforts.players[this.player_id].board);
+      this.comforts.addCards(game.gamedatas.comforts.players[this.player_id].board);
    }
 
-   private setupCottage(game: CreatureConforts, player: CreatureConfortsPlayerData) {
+   private setupCottage(game: CreatureComforts, player: CreatureComfortsPlayerData) {
       this.cottages = new LineStock<CottageCard>(
          game.cottageManager,
          document.getElementById(`player-table-${this.player_id}-cottage`),
@@ -82,7 +82,7 @@ class PlayerTable {
       this.cottages.addCards(game.gamedatas.cottages.players[player.id]);
    }
 
-   private setupDice(game: CreatureConforts) {
+   private setupDice(game: CreatureComforts) {
       this.dice = new PlayerDiceStock(
          game.diceManager,
          document.getElementById(`player-table-${this.player_id}-dice`),
@@ -94,7 +94,7 @@ class PlayerTable {
       this.dice.addDice(dice);
    }
 
-   private setupHand(game: CreatureConforts) {
+   private setupHand(game: CreatureComforts) {
       this.hand = new Hand<ConfortCard>(
          game.confortManager,
          document.getElementById(`player-table-${this.player_id}-hand`),
@@ -102,10 +102,10 @@ class PlayerTable {
          game.getPlayerPanel(this.player_id).counters['card'],
       );
 
-      this.hand.addCards(game.gamedatas.conforts.players[this.player_id].hand);
+      this.hand.addCards(game.gamedatas.comforts.players[this.player_id].hand);
    }
 
-   private setupImprovement(game: CreatureConforts) {
+   private setupImprovement(game: CreatureComforts) {
       this.improvements = new LineStock<ImprovementCard>(
          game.improvementManager,
          document.getElementById(`player-table-${this.player_id}-improvement`),
@@ -117,7 +117,7 @@ class PlayerTable {
       this.improvements.addCards(game.gamedatas.improvements.players[this.player_id]);
    }
 
-   private setupWorker(game: CreatureConforts, player: CreatureConfortsPlayerData) {
+   private setupWorker(game: CreatureComforts, player: CreatureComfortsPlayerData) {
       const workers = game.gamedatas.workers.player.filter((w) => w.type_arg == player.id);
       this.workers = new LineStock<Meeple>(
          game.workerManager,

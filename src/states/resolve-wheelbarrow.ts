@@ -2,7 +2,7 @@ class ResolveWheelbarrowState implements StateHandler {
    private resource_manager?: ResourceManagerPayFor<IconsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('wheelbarrow');
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState({ location_id }: ResolveWheelbarrowArgs): void {
       const { worker_locations } = this.game.tableCenter;
@@ -18,7 +18,6 @@ class ResolveWheelbarrowState implements StateHandler {
       };
 
       const requirement = getRequirementFrom();
-      debugger;
       const available = this.game.getPlayerResources(requirement as IconsType[]);
 
       this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {

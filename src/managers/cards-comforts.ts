@@ -1,9 +1,9 @@
-class ConfortManager extends CardManager<ConfortCard> {
-   constructor(public game: CreatureConforts, prefix: string = 'conforts') {
+class ComfortManager extends CardManager<ConfortCard> {
+   constructor(public game: CreatureComforts, prefix: string = 'comforts') {
       super(game, {
          getId: (card) => `${prefix}-${card.id}`,
          setupDiv: (card: Card, div: HTMLElement) => {
-            div.classList.add('confort');
+            div.classList.add('comfort');
             div.dataset.cardId = '' + card.id;
          },
          setupFrontDiv: (card: Card, div: HTMLElement) => {

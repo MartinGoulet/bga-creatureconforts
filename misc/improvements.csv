@@ -15,4 +15,4 @@ id|name|img|gametext|score|cost|glade|glade_reward|power|solo
 14|Wildwood|11|Owner gains ::mushroom:: when ::keyword-{another}:: player collects|2|[WOOD => 2, STONE => 1]|true|[MUSHROOM => 2]||true
 15|Scale|3|When visiting the Market, you may make ::keyword-{one}:: trade of ::any:: for ::any::. Then the usual rates apply|1|[WOOD => 1, STONE => 2]|false|||true
 16|Field|19|Owner gains ::grain:: when ::keyword-{another}:: player collects|2|[WOOD => 1, STONE => 2]|true|[GRAIN => 2]||true
-17|Herb Garden|10|Gain ::heart-1:: for every ::food:: Comfort owned by all ::keyword-{other}:: players|1|[WOOD => 2]|false|||false
+17|Herb Garden|10|Gain ::heart-1:: for every ::type-::: Comfort owned by all ::keyword-{other}:: players|1|[WOOD => 2]|false|||false

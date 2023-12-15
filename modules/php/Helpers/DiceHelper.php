@@ -1,11 +1,11 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureConforts\Core\Globals;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Valleys;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Valleys;
 
 
 interface DiceRequirement {

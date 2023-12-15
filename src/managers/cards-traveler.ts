@@ -1,5 +1,5 @@
 class TravelerManager extends CardManager<TravelerCard> {
-   constructor(public game: CreatureConforts, prefix = 'traveler') {
+   constructor(public game: CreatureComforts, prefix = 'traveler') {
       super(game, {
          getId: (card) => `${prefix}-${card.id}`,
          setupDiv: (card: Card, div: HTMLElement) => {
@@ -7,10 +7,13 @@ class TravelerManager extends CardManager<TravelerCard> {
             div.dataset.cardId = '' + card.id;
          },
          setupFrontDiv: (card: Card, div: HTMLElement) => {
+            div.classList.add('image');
+
             const card_info: TravelerType = this.getCardType(card);
+            if (!card_info) return;
+
             div.dataset.type = card.type;
             div.dataset.img = '' + card_info.img;
-            div.classList.add('image');
 
             if (div.getElementsByClassName('title').length !== 0) return;
 
@@ -37,7 +40,10 @@ class TravelerManager extends CardManager<TravelerCard> {
                );
             }
          },
-         isCardVisible: (card) => 'type' in card,
+         setupBackDiv: (card: TravelerCard, div: HTMLElement) => {
+            div.classList.add('image');
+         },
+         isCardVisible: (card) => this.getCardType(card) !== undefined,
          cardWidth: 212,
          cardHeight: 142,
       });

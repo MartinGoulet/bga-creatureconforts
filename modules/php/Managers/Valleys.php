@@ -1,8 +1,8 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
 
 /*
  * Cards manager : allows to easily access card

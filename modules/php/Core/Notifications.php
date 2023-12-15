@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Core;
+namespace CreatureComforts\Core;
 
 use BgaSystemException;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
 
@@ -56,7 +56,7 @@ class Notifications extends \APP_DbObject {
             'player_name' => self::getPlayerName($player_id),
             'card' => $card,
             'cost' => $cost,
-            'card_name' => Conforts::getName($card),
+            'card_name' => Comforts::getName($card),
             'resources_to' => $cost,
             'i18n' => ['card_name'],
         ]);
@@ -70,7 +70,7 @@ class Notifications extends \APP_DbObject {
         $message = clienttranslate('${player_name} discards ${card_name}');
 
         $cards = array_values(array_map(function ($card) {
-            $newCard = Conforts::get($card['id']);
+            $newCard = Comforts::get($card['id']);
             $newCard['player_id'] = $card['location_arg'];
             return $newCard;
         }, $cards_before));
@@ -85,7 +85,7 @@ class Notifications extends \APP_DbObject {
                 'player_id' => $player_id,
                 'player_name' => self::getPlayerName($player_id),
                 'card' => $card,
-                'card_name' => Conforts::getName($card),
+                'card_name' => Comforts::getName($card),
                 'i18n' => ['card_name'],
             ]);
         }
@@ -159,6 +159,8 @@ class Notifications extends \APP_DbObject {
         self::notifyAll('onModifyDieWithLessonLearned', $message, [
             'player_id' => $player_id,
             'player_name' => self::getPlayerName($player_id),
+            'die_id' => intval($die['id']),
+            'die_newvalue' => intval($new_value),
             'die_from' => intval($die['face']),
             'die_to' => $new_value,
             'die_color' => $die['type'],
@@ -167,7 +169,7 @@ class Notifications extends \APP_DbObject {
                 LESSON_LEARNED => $nbr_lesson,
                 'umbrella' => $nbr_umbrella
             ],
-            'preserve' => ['die_from', 'die_to', 'die_color'],
+            'preserve' => ['die_from', 'die_to', 'die_color', 'die_id', 'die_newvalue'],
             // TODO check resources_to
         ]);
     }
@@ -401,7 +403,7 @@ class Notifications extends \APP_DbObject {
         return [
             'player_id' => $player_id,
             'player_name' => self::getPlayerName($player_id),
-            'card_name' => Conforts::getName($card),
+            'card_name' => Comforts::getName($card),
             'card' => $card,
             "i18n" => ["card_name"],
         ];

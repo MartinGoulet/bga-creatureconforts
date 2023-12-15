@@ -1,14 +1,22 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
 
 class MarketHelper {
 
-    static function resolve($resources, $resources2) {
+    static function resolve($resources, $resources2, $option) {
+
+        if($option == 2) {
+            Globals::setMarketUsed(false);
+            Globals::setScaleUsed(false);
+            return;
+        }
 
         $player_id = Players::getPlayerId();
         $group = ResourcesHelper::groupByType($resources);
@@ -17,6 +25,16 @@ class MarketHelper {
         if (!Players::hasEnoughResource($player_id, $group)) {
             var_dump($group);
             throw new BgaUserException("You dont have those resources");
+        }
+
+        // Scale
+        if ($option == 1) {
+            if(!Improvements::hasScale($player_id)) {
+                throw new BgaUserException("You dont have a scale");
+            }
+            self::doTransaction($player_id, $group, $group2);
+            Globals::setScaleUsed(true);
+            return;
         }
 
         // Option 1 : Coin => Good

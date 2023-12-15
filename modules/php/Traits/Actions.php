@@ -1,24 +1,24 @@
 <?php
 
-namespace CreatureConforts\Traits;
+namespace CreatureComforts\Traits;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Globals;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Helpers\DiceHelper;
-use CreatureConforts\Helpers\ImprovementHelper;
-use CreatureConforts\Helpers\MarketHelper;
-use CreatureConforts\Helpers\ResourcesHelper;
-use CreatureConforts\Helpers\TravelerHelper;
-use CreatureConforts\Helpers\WorkshopHelper;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
-use CreatureConforts\Managers\Valleys;
-use CreatureConforts\Managers\Worker;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Helpers\DiceHelper;
+use CreatureComforts\Helpers\ImprovementHelper;
+use CreatureComforts\Helpers\MarketHelper;
+use CreatureComforts\Helpers\ResourcesHelper;
+use CreatureComforts\Helpers\TravelerHelper;
+use CreatureComforts\Helpers\WorkshopHelper;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
+use CreatureComforts\Managers\Valleys;
+use CreatureComforts\Managers\Worker;
 
 trait Actions {
 
@@ -28,19 +28,19 @@ trait Actions {
 
     /*
         Each time a player is doing some game action, one of the methods below is called.
-        (note: each method below must match an input method in CreatureConforts.action.php)
+        (note: each method below must match an input method in CreatureComforts.action.php)
     */
 
     function discardStartHand(int $card_id) {
         $current_player_id = $this->getCurrentPlayerId();
-        $card = Conforts::get($card_id);
+        $card = Comforts::get($card_id);
 
         if ($card['location'] !== 'hand' || $card['location_arg'] !== $current_player_id) {
             throw new \BgaUserException("You don't own the card");
         }
 
         // All checks are ok, now proceed
-        Conforts::remainderStartHand($card_id, $current_player_id);
+        Comforts::remainderStartHand($card_id, $current_player_id);
 
         // Desactivate the current player
         $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
@@ -49,7 +49,7 @@ trait Actions {
     function cancelStartHand() {
         $current_player_id = $this->getCurrentPlayerId();
         $this->gamestate->setPlayersMultiactive([$current_player_id], '');
-        Conforts::cancelStartHand($current_player_id);
+        Comforts::cancelStartHand($current_player_id);
     }
 
     function confirmPlacement(array $locations, int $wheelbarrow) {
@@ -67,7 +67,7 @@ trait Actions {
         }
 
         if ($wheelbarrow > 0) {
-            
+
             if (!Players::hasWheelbarrow($current_player_id)) {
                 throw new BgaUserException("You dont have any wheelbarrow");
             }
@@ -111,7 +111,7 @@ trait Actions {
             $sum_lesson = $sum_lesson >= $count_almanac ? $sum_lesson - $count_almanac : 0;
         }
 
-        if(TravelerHelper::isActiveLeopardFrog()) {
+        if (TravelerHelper::isActiveLeopardFrog()) {
             $sum_lesson -= 2;
         }
 
@@ -146,6 +146,7 @@ trait Actions {
             $dice_value_by_location[$location_id][] = $value;
 
             if ($info['lesson'] != 0) {
+                Dice::modify($die_id, $value);
                 Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $value, $info['lesson'], $info['umbrella']);
             }
 
@@ -175,7 +176,7 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
-    function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids) {
+    function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids, int $option) {
         $player_id = $this->getActivePlayerId();
 
         $dice = Dice::getDiceInLocation($location_id);
@@ -190,7 +191,7 @@ trait Actions {
         }
 
         // Market will return at the end of the phase (multiple use)
-        if ($location_id != 8) {
+        if ($location_id != 8 || ($location_id == 8 && $option == 2)) {
             $worker = Worker::returnToPlayerBoard($player_id, $location_id);
             if ($worker !== null) {
                 Notifications::returnToPlayerBoard($worker);
@@ -243,8 +244,8 @@ trait Actions {
         if ($location_id == 8) {
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             $converted_resources2 = ResourcesHelper::convertNumberToResource($resources2);
-            MarketHelper::resolve($converted_resources, $converted_resources2);
-            $this->resolveWorkerNextStep($location_id);
+            MarketHelper::resolve($converted_resources, $converted_resources2, $option);
+            $this->resolveWorkerNextStep($location_id, $option);
             return;
         }
 
@@ -270,10 +271,10 @@ trait Actions {
             if ($slot_id < 1 || $slot_id > 4) {
                 throw new BgaUserException("Slot id must be between 1 and 4");
             }
-            $card = Conforts::addToHand(Conforts::getFromMarket($slot_id), $player_id);
+            $card = Comforts::addToHand(Comforts::getFromMarket($slot_id), $player_id);
             Notifications::addConfortToHand(Players::getPlayerId(), $card);
-            Conforts::refillOwlNest();
-            Notifications::refillOwlNest(Conforts::getOwlNest());
+            Comforts::refillOwlNest();
+            Notifications::refillOwlNest(Comforts::getOwlNest());
             Game::undoSavepoint();
             $this->resolveWorkerNextStep($location_id);
             return;
@@ -282,10 +283,10 @@ trait Actions {
         if ($location_id == 12) {
             $die = array_shift($dice);
             if (intval($die['face']) <= 2) {
-                $cards = Conforts::draw(Players::getPlayerId(), 2);
+                $cards = Comforts::draw(Players::getPlayerId(), 2);
                 Notifications::drawConfort(Players::getPlayerId(), $cards);
             } else {
-                $card = Conforts::draw(Players::getPlayerId());
+                $card = Comforts::draw(Players::getPlayerId());
                 Notifications::drawConfort(Players::getPlayerId(), [$card]);
             }
             Game::undoSavepoint();
@@ -298,8 +299,8 @@ trait Actions {
 
     private function resolveWheelbarrow(int $location_id, $resources) {
         $wheelbarrow = Globals::getWheelbarrow($location_id);
-        if($wheelbarrow == $location_id) {
-            if(sizeof($resources) !== 1) {
+        if ($wheelbarrow == $location_id) {
+            if (sizeof($resources) !== 1) {
                 throw new BgaUserException("You have to choose a resource for wheelbarrow");
             }
             Globals::setWheelbarrow(Players::getPlayerId(), 0);
@@ -308,14 +309,17 @@ trait Actions {
         }
     }
 
-    private function resolveWorkerNextStep(int $location_id) {
+    private function resolveWorkerNextStep(int $location_id, $option = 0) {
         $player_id = $this->getActivePlayerId();
 
         if (TravelerHelper::isActiveCommonRaven()) {
-            $raven_location_ids = Globals::getRavenLocationIds();
-            if (in_array($location_id, $raven_location_ids)) {
-                Players::addResources(Players::getPlayerId(), [COIN => 1]);
-                Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [COIN => 1]);
+            $skip = $location_id == 8 && $option != 2;
+            if (!$skip) {
+                $raven_location_ids = Globals::getRavenLocationIds();
+                if (in_array($location_id, $raven_location_ids)) {
+                    Players::addResources(Players::getPlayerId(), [COIN => 1]);
+                    Notifications::getResourcesFromLocation(Players::getPlayerId(), $location_id, [COIN => 1]);
+                }
             }
         }
 
@@ -346,12 +350,12 @@ trait Actions {
     function craftConfort(int $card_id, array $resources) {
 
         $player_id = intval($this->getActivePlayerId());
-        $card = Conforts::get($card_id);
+        $card = Comforts::get($card_id);
         if ($card['location'] != 'hand' || $card['location_arg'] != $player_id) {
             throw new BgaUserException("The card is not in your hand");
         }
 
-        $cost = Conforts::getCost($card);
+        $cost = Comforts::getCost($card);
 
         if (TravelerHelper::isActivePileatedWoodpecker() && array_key_exists(WOOD, $cost)) {
             $cost[WOOD] -= 1;
@@ -402,9 +406,9 @@ trait Actions {
         }
 
         Players::removeResource($player_id, $cost);
-        Conforts::moveCardToPlayerBoard($player_id, $card_id);
+        Comforts::moveCardToPlayerBoard($player_id, $card_id);
 
-        $card = Conforts::get($card_id);
+        $card = Comforts::get($card_id);
         Notifications::craftConfort($player_id, $card, $cost);
 
         Game::get()->gamestate->nextState('craft');
@@ -416,13 +420,13 @@ trait Actions {
 
     function discardConfort(array $card_ids) {
         $player_id = Players::getPlayerId();
-        $cards = Conforts::getCards($card_ids);
+        $cards = Comforts::getCards($card_ids);
         foreach ($cards as $card_id => $card) {
             if ($card['location'] !== 'hand' || intval($card['location_arg']) !== $player_id) {
                 var_dump($card);
                 throw new BgaUserException("The card is not in your hand");
             }
-            Conforts::addCardToDiscard($card_id);
+            Comforts::addCardToDiscard($card_id);
         }
         Notifications::discardConfort($cards);
         Game::get()->gamestate->nextState();
@@ -440,10 +444,10 @@ trait Actions {
             throw new BgaUserException("Slot id must be between 1 and 4");
         }
         $player_id = Players::getPlayerId();
-        $card = Conforts::addToHand(Conforts::getFromMarket($slot_id), $player_id);
+        $card = Comforts::addToHand(Comforts::getFromMarket($slot_id), $player_id);
         Notifications::addConfortToHand(Players::getPlayerId(), $card);
-        Conforts::refillOwlNest();
-        Notifications::refillOwlNest(Conforts::getOwlNest());
+        Comforts::refillOwlNest();
+        Notifications::refillOwlNest(Comforts::getOwlNest());
         Game::get()->gamestate->nextState();
     }
 
@@ -470,14 +474,29 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
+    function confirmMoose(int $resource) {
+        if ($resource > 0) {
+            $resources = ResourcesHelper::convertNumberToResource([$resource]);
+            $group = ResourcesHelper::groupByType($resources);
+            $left_player_id = intval($this->argMoose()['otherplayer_id']);
+            Players::addResources($left_player_id, $group);
+            Players::removeResource(Players::getPlayerId(), $group);
+            Players::addResources(Players::getPlayerId(), [STORY => 1]);
+            Notifications::travelerExchangeResources($group, [STORY => 1]);
+            Notifications::travelerReceivedResources($group, $left_player_id);
+
+        }
+        Game::get()->gamestate->nextState();
+    }
+
     function confirmStripedSkunk(int $card_id) {
-        $discard = Conforts::getDiscard();
+        $discard = Comforts::getDiscard();
         $card_ids = array_column($discard, 'id');
         if (!in_array($card_id, $card_ids)) {
             throw new BgaUserException("The card is not in the discard pile");
         }
 
-        $card = Conforts::addToHand(['id' => $card_id], Players::getPlayerId());
+        $card = Comforts::addToHand(['id' => $card_id], Players::getPlayerId());
         Notifications::addConfortToHand(Players::getPlayerId(), $card);
         Game::get()->gamestate->nextState("next");
     }

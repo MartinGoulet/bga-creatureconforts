@@ -1,8 +1,8 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
 
 /*
  * Players manager : allows to easily access players
@@ -129,7 +129,7 @@ class Players extends \APP_DbObject {
             $hasEnough = intval(self::getUniqueValueFromDB($sql)) == 1;
         }
         if($card > 0) {
-            $hasEnough = $hasEnough && sizeof(Conforts::getHand($player_id)) >= $card;
+            $hasEnough = $hasEnough && sizeof(Comforts::getHand($player_id)) >= $card;
         }
         return $hasEnough;
     }

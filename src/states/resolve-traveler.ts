@@ -2,7 +2,7 @@ class ResolveTravelerState implements StateHandler {
    private resource_manager?: ResourceManagerPayFor<IconsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('traveler');
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       const { worker_locations, dice_locations } = this.game.tableCenter;

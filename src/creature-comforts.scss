@@ -35,7 +35,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
 @import 'modal';
 @import 'game-options';
 
-@import './managers/cards-confort';
+@import './managers/cards-comfort';
 @import './managers/cards-cottage';
 @import './managers/cards-improvement';
 @import './managers/cards-traveler';
@@ -62,6 +62,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    display: flex;
    justify-content: center;
    padding-top: 40px;
+   flex-direction: column;
 }
 
 // #bga-zoom-wrapper {

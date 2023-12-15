@@ -1,28 +1,29 @@
 <?php
 
-namespace CreatureConforts\Traits;
+namespace CreatureComforts\Traits;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Core\Score;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Cottages;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
-use CreatureConforts\Managers\Valleys;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Core\Score;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Cottages;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
+use CreatureComforts\Managers\Valleys;
 
 trait Debug {
 
     // function setup() {
-    //     self::DbQuery("DELETE FROM confort");
+    //     self::DbQuery("DELETE FROM comfort");
     //     self::DbQuery("DELETE FROM improvement");
     //     self::DbQuery("DELETE FROM traveler");
     //     self::DbQuery("DELETE FROM valley");
     //     Improvements::setup();
-    //     Conforts::setup();
+    //     Comforts::setup();
     //     Travelers::setup();
     //     Valleys::setup();
     // }
@@ -56,6 +57,14 @@ trait Debug {
 
     function next() {
         Game::get()->gamestate->jumpToState(ST_FAMILY_DICE);
+    }
+
+    function saveWhiteDice() {
+        Dice::saveWhiteDice();
+    }
+
+    function getWhiteDice() {
+        var_dump(Globals::getWhiteDice());
     }
 
     function removeWheel() {

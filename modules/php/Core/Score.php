@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Core;
+namespace CreatureComforts\Core;
 
-use CreatureConforts;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Cottages;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
+use CreatureComforts;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Cottages;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
 
 /*
  * Score: a wrapper over table object to allow more generic modules
@@ -16,7 +16,7 @@ class Score extends \APP_DbObject {
 
     public static function getScore(int $player_id) {
         $improvements = Improvements::getPlayerBoard($player_id);
-        $comforts = Conforts::getPlayerBoard($player_id);
+        $comforts = Comforts::getPlayerBoard($player_id);
 
         return [
             "comforts" => self::getScoreComforts($comforts),
@@ -31,7 +31,7 @@ class Score extends \APP_DbObject {
     private static function getScoreComforts($comforts) {
         $score = 0;
         foreach ($comforts as $comfort) {
-            $type = Conforts::getCardType($comfort);
+            $type = Comforts::getCardType($comfort);
             $score += intval($type['score']);
         }
         return $score;
@@ -40,9 +40,9 @@ class Score extends \APP_DbObject {
     private static function getScoreComfortsBonus($comforts, int $player_id) {
         $score = 0;
         foreach ($comforts as $comfort) {
-            $card_info = Conforts::getCardType($comfort);
+            $card_info = Comforts::getCardType($comfort);
             if (array_key_exists('class', $card_info)) {
-                $className = "CreatureConforts\\Cards\\Comforts\\" . $card_info['class'];
+                $className = "CreatureComforts\\Cards\\Comforts\\" . $card_info['class'];
                 $instance = new $className();
                 $score += $instance->getScore($player_id, intval($comfort['id']));
             }
@@ -94,9 +94,9 @@ class Score extends \APP_DbObject {
         $players = Game::get()->loadPlayersBasicInfos();
         foreach ($players as $player_id => $player) {
             if ($player_id !== $current_player_id) {
-                $cards = Conforts::getPlayerBoard($player_id);
+                $cards = Comforts::getPlayerBoard($player_id);
                 foreach ($cards as $card) {
-                    if (Conforts::getCardType($card) === $type) {
+                    if (Comforts::getCardType($card) === $type) {
                         $count += 1;
                     }
                 }

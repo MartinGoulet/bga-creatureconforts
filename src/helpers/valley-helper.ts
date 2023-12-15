@@ -6,7 +6,7 @@ class ValleyHelper {
          .filter((card) => card.location == location)[0];
       return ValleyHelper.game().gamedatas.valley_types[Number(card.type_arg)].position[location_id];
    }
-   private static game(): CreatureConforts {
-      return (window as any).gameui as CreatureConforts;
+   private static game(): CreatureComforts {
+      return (window as any).gameui as CreatureComforts;
    }
 }

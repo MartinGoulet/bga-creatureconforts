@@ -2,7 +2,7 @@ class PlayerTurnDiceState implements StateHandler {
    private readonly diceHelper: DiceHelper;
    private original_dice: Dice[] = [];
 
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       this.diceHelper = new DiceHelper(game);
    }
 
@@ -30,7 +30,7 @@ class PlayerTurnDiceState implements StateHandler {
       const handleHillClick = (selection: Dice[]) => {
          // Clean selection
          worker_locations.setSelectableLocation([]);
-         document.querySelectorAll('#dice-locations .slot-dice').forEach((slot) => {
+         document.querySelectorAll('#dice-locations .slot-dice, #glade .slot-dice').forEach((slot) => {
             slot.classList.remove('selectable');
          });
 
@@ -53,11 +53,14 @@ class PlayerTurnDiceState implements StateHandler {
             this.game.tableCenter.glade
                .getCards()
                .map((card) => Number(card.location_arg))
+               .filter((location) => this.game.tableCenter.getDiceFromLocation(location).length == 0)
                .forEach((location) => {
-                  const dice = this.game.tableCenter.getDiceFromLocation(location);
-                  document
-                     .querySelector(`#dice-locations [data-slot-id="${location}"]`)
-                     .classList.toggle('selectable', dice.length == 0);
+                  const el = document.querySelector(`#glade [data-slot-id="${location}"]`);
+                  el.classList.toggle('selectable', true);
+                  el.addEventListener('click', (ev: Event) => {
+                     ev.stopPropagation();
+                     handleGladeSlotClick(Number(location));
+                  });
                });
          }
       };
@@ -66,18 +69,17 @@ class PlayerTurnDiceState implements StateHandler {
          this.addSelectedDieToSlot(slotId);
       };
 
+      const handleDiceSlotClick = (slotId: SlotId, div: HTMLDivElement) => {
+         if (Number(slotId) >= 20 && div.classList.contains('selectable')) {
+            this.addSelectedDieToSlot(slotId);
+         }
+      };
+
       hill.setSelectionMode('single');
       hill.onSelectionChange = handleHillClick;
       worker_locations.OnLocationClick = handleWorkerLocationClick;
       dice_locations.onDieClick = handleDiceLocationClick;
-
-      document.querySelectorAll('#dice-locations .slot-dice').forEach((slot: HTMLElement) => {
-         slot.addEventListener('click', (ev: Event) => {
-            ev.stopPropagation();
-            const slot_id = Number(slot.dataset.slotId);
-            handleGladeSlotClick(slot_id);
-         });
-      });
+      dice_locations.onSlotClick = handleDiceSlotClick;
    }
 
    onLeavingState(): void {
@@ -93,6 +95,8 @@ class PlayerTurnDiceState implements StateHandler {
 
       const handleCancel = () => {
          const copy = this.original_dice.map((die) => Object.assign({}, die));
+         dice_locations.unselectAll();
+         hill.unselectAll();
          hill.addDice(copy);
       };
 

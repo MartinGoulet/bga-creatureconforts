@@ -1,19 +1,20 @@
 <?php
 
-namespace CreatureConforts\Traits;
+namespace CreatureComforts\Traits;
 
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Globals;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Core\Score;
-use CreatureConforts\Helpers\TravelerHelper;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
-use CreatureConforts\Managers\Valleys;
-use CreatureConforts\Managers\Worker;
+use BgaUserException;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Core\Score;
+use CreatureComforts\Helpers\TravelerHelper;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
+use CreatureComforts\Managers\Valleys;
+use CreatureComforts\Managers\Worker;
 
 trait States {
 
@@ -22,7 +23,7 @@ trait States {
     ////////////
 
     function stStartHandDiscard() {
-        $discarded_cards = Conforts::discardStartHand();
+        $discarded_cards = Comforts::discardStartHand();
         Notifications::discardStartHand($discarded_cards);
         Game::get()->gamestate->nextState();
     }
@@ -98,6 +99,7 @@ trait States {
 
     function stVillageDice() {
         Dice::throwWhiteDice();
+        Dice::saveWhiteDice();
         Notifications::villageDice(Dice::getWhiteDice());
         Game::get()->gamestate->nextState();
     }
@@ -126,8 +128,9 @@ trait States {
                 if ($location_id == 8 && Globals::getMarketUsed()) {
                     // do nothing
                 } else {
-                    Players::addResources($player_id, [LESSON_LEARNED => 1]);
-                    Notifications::getResourcesFromLocation($player_id, $location_id, [LESSON_LEARNED => 1]);
+                    $reward = TravelerHelper::isActiveSnappingTurtle() ? [LESSON_LEARNED => 3] : [LESSON_LEARNED => 1];
+                    Players::addResources($player_id, $reward);
+                    Notifications::getResourcesFromLocation($player_id, $location_id, $reward);
                 }
             }
         }
@@ -140,9 +143,13 @@ trait States {
         Dice::moveWhiteDiceToHill();
         Dice::movePlayerDiceToBoard($player_id);
 
+        foreach (Globals::getWhiteDice() as $die_id => $die) {
+            Dice::modify($die_id, $die['face']);
+        }
+
         Notifications::returnDice($player_id, Dice::getUIData());
 
-        $next_state = sizeof(Conforts::getHand($player_id)) > 3 ? 'discard' : 'next';
+        $next_state = sizeof(Comforts::getHand($player_id)) > 3 ? 'discard' : 'next';
         Game::get()->gamestate->nextState($next_state);
     }
 
@@ -173,6 +180,16 @@ trait States {
     }
 
     function stPreUpkeep() {
+
+        if (TravelerHelper::isActiveMoose() && !Globals::getMooseActivated()) {
+            Globals::setMooseActivated(true);
+            $current_player_id = $this->getActivePlayerId();
+            Game::get()->giveExtraTime($current_player_id);
+            Game::get()->activeNextPlayer();
+            Game::get()->gamestate->nextState('moose');
+            return;
+        }
+        
         $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
         $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
 
@@ -212,9 +229,9 @@ trait States {
         // 2. Discard the leftmost Comfort from the Owl’s Nest, slide the other three
         // cards one slot left, and deal a new Comfort from the deck face up into the
         // empty rightmost slot.
-        $discard = Conforts::discardLeftMostOwlNest();
-        Conforts::refillOwlNest();
-        Notifications::refillOwlNest(Conforts::getOwlNest(), $discard);
+        $discard = Comforts::discardLeftMostOwlNest();
+        Comforts::refillOwlNest();
+        Notifications::refillOwlNest(Comforts::getOwlNest(), $discard);
 
         // Discard the Improvement in the bottom ladder slot from the Workshop,
         // then slide the five remaining Improvements down a slot and deal a new
@@ -254,12 +271,12 @@ trait States {
     function stWildTurkeyEnd() {
         $players = Game::get()->loadPlayersBasicInfos();
 
-        foreach($players as $player_id => $player) {
+        foreach ($players as $player_id => $player) {
             $dice_info = Globals::getWildTurkeyDice($player_id);
-            if($dice_info['die_id'] > 0) {
+            if ($dice_info['die_id'] > 0) {
                 $die = Dice::get($dice_info['die_id']);
                 Dice::updateDieValue($dice_info['die_id'], $dice_info['die_value']);
-                Notifications::modifyDieWithWildTurkey($player_id, $die , $dice_info['die_value']);
+                Notifications::modifyDieWithWildTurkey($player_id, $die, $dice_info['die_value']);
             }
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace CreatureConforts\Core;
+namespace CreatureComforts\Core;
 
 /*
  * Globals: Access to global variables
@@ -24,6 +24,14 @@ class Globals extends \APP_DbObject {
         Game::get()->setGameStateValue(VAR_MARKET_USED, $value ? 1 : 0);
     }
 
+    public static function getMooseActivated() {
+        return self::get("moose_activated", false) ?? false;
+    }
+
+    public static function setMooseActivated(bool $value) {
+        self::set("moose_activated", $value);
+    }
+
     public static function getRavenLocationIds() {
         return self::get("raven_locations_ids", true) ?? [];
     }
@@ -32,12 +40,28 @@ class Globals extends \APP_DbObject {
         self::set("raven_locations_ids", $locations_ids);
     }
 
+    public static function getScaleUsed() {
+        return self::get("scale_used") ?? false;
+    }
+
+    public static function setScaleUsed(bool $value) {
+        self::set("scale_used", $value);
+    }
+
     public static function getWheelbarrow(int $player_id) {
         return self::get("wheelbarrow__" . $player_id, false) ?? 0;
     }
 
     public static function setWheelbarrow(int $player_id, int $location_id) {
         self::set("wheelbarrow__" . $player_id, $location_id);
+    }
+
+    public static function getWhiteDice() {
+        return self::get('white_dice', true) ?? [];
+    }
+
+    public static function setWhiteDice(array $dice) {
+        self::set('white_dice', $dice);
     }
 
     public static function getRiverDialValue() {

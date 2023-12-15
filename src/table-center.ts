@@ -16,12 +16,12 @@ class TableCenter {
    public valley: SlotStock<ImprovementCard>;
 
    public worker_locations: LocationStock;
-   public dice_locations: SlotDiceStock;
+   public dice_locations: DiceLocationStock;
 
    public hill: VillageDiceStock;
    public glade: LineStock<ImprovementCard>;
 
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       this.setupConfortCards(game);
       this.setupImprovementCards(game);
       this.setupTravelerCards(game);
@@ -83,12 +83,16 @@ class TableCenter {
       document.getElementById('river-dial').dataset.position = value.toString();
    }
 
-   private setupConfortCards(game: CreatureConforts) {
-      const { market, discard, deckCount } = game.gamedatas.conforts;
+   public getRiverDial() {
+      return Number(document.getElementById('river-dial').dataset.position);
+   }
+
+   private setupConfortCards(game: CreatureComforts) {
+      const { market, discard, deckCount } = game.gamedatas.comforts;
 
       this.confort_market = new SlotStock<ConfortCard>(
          game.confortManager,
-         document.getElementById(`table-conforts`),
+         document.getElementById(`table-comforts`),
          {
             slotsIds: [1, 2, 3, 4],
             mapCardToSlot: (card) => Number(card.location_arg),
@@ -98,7 +102,7 @@ class TableCenter {
 
       this.confort_deck = new Deck<ConfortCard>(
          game.confortManager,
-         document.getElementById(`deck-conforts`),
+         document.getElementById(`deck-comforts`),
          {
             cardNumber: Number(deckCount),
             topCard: this.hidden_confort,
@@ -108,7 +112,7 @@ class TableCenter {
 
       this.confort_discard_line = new LineStock<ConfortCard>(
          game.confortManagerDiscard,
-         document.getElementById(`discard-conforts-line`),
+         document.getElementById(`discard-comforts-line`),
          {
             gap: '2px',
             center: false,
@@ -117,7 +121,7 @@ class TableCenter {
 
       this.confort_discard = new DiscardStock<ConfortCard>(
          game.confortManager,
-         document.getElementById(`discard-conforts`),
+         document.getElementById(`discard-comforts`),
          this.confort_discard_line,
       );
 
@@ -125,17 +129,16 @@ class TableCenter {
       this.confort_market.addCards(market);
    }
 
-   private setupDiceLocations(game: CreatureConforts) {
-      this.dice_locations = new SlotDiceStock(game.diceManager, document.getElementById(`dice-locations`), {
-         slotsIds: [...arrayRange(1, 12), ...arrayRange(20, 40)].flat(),
-         mapDieToSlot: (die) => die.location,
-         gap: '0',
-      });
+   private setupDiceLocations(game: CreatureComforts) {
+      this.dice_locations = new DiceLocationStock(
+         game.diceManager,
+         document.getElementById(`dice-locations`),
+      );
       const dice = game.gamedatas.dice.filter((die) => die.location > 0);
       this.dice_locations.addDice(dice);
    }
 
-   private setupGlade(game: CreatureConforts) {
+   private setupGlade(game: CreatureComforts) {
       this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
          sort: sortFunction('location_arg'),
          center: false,
@@ -144,14 +147,14 @@ class TableCenter {
       this.glade.addCards(game.gamedatas.improvements.glade);
    }
 
-   private setupHillDice(game: CreatureConforts) {
+   private setupHillDice(game: CreatureComforts) {
       this.hill = new VillageDiceStock(game.diceManager, document.getElementById(`hill-dice`));
 
       const dice = game.gamedatas.dice.filter((die) => die.location == 0);
       this.hill.addDice(dice);
    }
 
-   private setupImprovementCards(game: CreatureConforts) {
+   private setupImprovementCards(game: CreatureComforts) {
       const { market, discard, deckCount } = game.gamedatas.improvements;
       this.improvement_market = new SlotStock<ImprovementCard>(
          game.improvementManager,
@@ -212,7 +215,7 @@ class TableCenter {
       ).innerHTML = `<div class="cc-zone" data-zone-id="9">${icon}${icon}</div>`;
    }
 
-   private setupReservedZones(game: CreatureConforts) {
+   private setupReservedZones(game: CreatureComforts) {
       document.getElementById('reserved-zones').innerHTML = arrayRange(1, 12)
          .map((value) => `<div class="cc-zone" data-zone-id="${value}"></div>`)
          .join('');
@@ -220,7 +223,7 @@ class TableCenter {
       game.gamedatas.raven_location.forEach((location_id) => this.addRavenToken(location_id));
    }
 
-   private setupTravelerCards(game: CreatureConforts) {
+   private setupTravelerCards(game: CreatureComforts) {
       const { count, topCard } = game.gamedatas.travelers;
       this.traveler_deck = new Deck<TravelerCard>(
          game.travelerManager,
@@ -232,7 +235,7 @@ class TableCenter {
       );
    }
 
-   private setupValleyCards(game: CreatureConforts) {
+   private setupValleyCards(game: CreatureComforts) {
       const { forest, meadow } = game.gamedatas.valleys;
 
       this.valley = new SlotStock<ValleyCard>(game.valleyManager, document.getElementById(`table-valleys`), {
@@ -244,7 +247,7 @@ class TableCenter {
       this.valley.addCards([forest.topCard, meadow.topCard]);
    }
 
-   private setupWorkerLocations(game: CreatureConforts) {
+   private setupWorkerLocations(game: CreatureComforts) {
       this.worker_locations = new LocationStock(
          game.workerManager,
          document.getElementById(`worker-locations`),

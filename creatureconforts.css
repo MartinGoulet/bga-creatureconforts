@@ -526,6 +526,16 @@ body > .bga-dice_die {
 #table-center-wrapper #glade:empty {
   padding-bottom: 0;
 }
+#table-center-wrapper #glade .slot-dice {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 30px;
+  left: 33px;
+}
 #table-center-wrapper #board {
   grid-area: board;
   position: relative;
@@ -536,12 +546,12 @@ body > .bga-dice_die {
   border-radius: 10px;
   margin-bottom: 210px;
 }
-#table-center-wrapper #board #table-conforts {
+#table-center-wrapper #board #table-comforts {
   position: absolute;
   top: 850px;
   left: 234px;
 }
-#table-center-wrapper #board #table-conforts .slot {
+#table-center-wrapper #board #table-comforts .slot {
   min-width: 110px;
 }
 #table-center-wrapper #board #table-travelers {
@@ -758,7 +768,7 @@ body > .bga-dice_die {
 #table-center-wrapper #board #decks .deck .bga-cards_deck-counter {
   --bga-cards-deck-counter-size: 25px;
 }
-#table-center-wrapper #board #decks #discard-conforts .card:nth-child(1) {
+#table-center-wrapper #board #decks #discard-comforts .card:nth-child(1) {
   z-index: 1;
 }
 #table-center-wrapper .cc-zone {
@@ -867,7 +877,8 @@ body > .bga-dice_die {
   bottom: 0;
   left: 0;
   right: 0;
-  content: "❌"; /* use the hex value here... */
+  content: "❌";
+  /* use the hex value here... */
   font-size: 40px;
   color: #ff0000;
   line-height: 60px;
@@ -878,7 +889,7 @@ body > .bga-dice_die {
   box-shadow: 0 0 4px 5px white;
 }
 
-#discard-conforts-wrapper {
+#discard-comforts-wrapper {
   grid-area: discard;
   flex-grow: 1;
   position: relative;
@@ -887,7 +898,7 @@ body > .bga-dice_die {
   border-radius: 5px;
   display: none;
 }
-#discard-conforts-wrapper .title {
+#discard-comforts-wrapper > .title {
   background: white;
   color: black;
   left: 20px;
@@ -898,13 +909,13 @@ body > .bga-dice_die {
   padding: 3px 10px;
   position: absolute;
 }
-#discard-conforts-wrapper #discard-conforts-line {
+#discard-comforts-wrapper #discard-comforts-line {
   row-gap: 10px;
   margin-top: 10px;
 }
 
-.discard-conforts-opened #discard-conforts-wrapper,
-.current_player_is_active .gamestate_stripedSkunk #discard-conforts-wrapper {
+.discard-comforts-opened #discard-comforts-wrapper,
+.current_player_is_active .gamestate_stripedSkunk #discard-comforts-wrapper {
   display: block;
 }
 
@@ -1080,11 +1091,11 @@ body > .bga-dice_die {
   left: 6px;
 }
 .player-table .player-table-improvement,
-.player-table .player-table-confort {
+.player-table .player-table-comfort {
   max-width: 515px;
 }
 .player-table .player-table-improvement:empty,
-.player-table .player-table-confort:empty {
+.player-table .player-table-comfort:empty {
   display: none;
 }
 .player-table .icons.counters .wrapper {
@@ -1161,41 +1172,16 @@ body > .bga-dice_die {
 }
 
 .desktop_version.modal_open #modal-display-card .card.improvement {
-  zoom: 4;
+  transform: scale(4);
 }
 .desktop_version.modal_open #modal-display-card .card.traveler {
-  zoom: 3;
+  transform: scale(3);
 }
 .desktop_version.modal_open #modal-display-card .card.valley {
-  zoom: 3;
+  transform: scale(3);
 }
-.desktop_version.modal_open #modal-display-card .card.confort {
-  zoom: 4;
-}
-
-.mobile_version.modal_open #modal-display-card .card.improvement {
-  width: 250px;
-  height: 250px;
-}
-.mobile_version.modal_open #modal-display-card .card.improvement .front {
-  background-size: 750px 1500px;
-}
-.mobile_version.modal_open #modal-display-card .card.traveler {
-  width: 300px;
-  height: 200px;
-}
-.mobile_version.modal_open #modal-display-card .card.traveler .front {
-  background-size: 1500px 600px;
-}
-.mobile_version.modal_open #modal-display-card .card.confort {
-  width: 250px;
-  height: 350px;
-}
-.mobile_version.modal_open #modal-display-card .card.confort .front {
-  background-size: 1500px 2100px;
-  outline: 1px solid #000;
-  box-shadow: 0 0 5px 6px #fff;
-  filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+.desktop_version.modal_open #modal-display-card .card.comfort {
+  transform: scale(4);
 }
 
 #game-phases, #game-infos {
@@ -1256,7 +1242,7 @@ body > .bga-dice_die {
   display: none;
 }
 
-.card.confort {
+.card.comfort {
   --card-width: 110px;
   --card-height: 154px;
   display: inline-block;
@@ -1265,110 +1251,112 @@ body > .bga-dice_die {
   height: var(--card-height);
   border-radius: 5px;
 }
-.card.confort .card-sides .back {
+.card.comfort .card-sides {
+  border-radius: 5px;
+  overflow: hidden;
+}
+.card.comfort .card-sides .back {
   background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
   background-image: url("img/comforts/cards.jpg");
   background-position: -600% -200%;
-  border-radius: 5px;
 }
-.card.confort .card-sides .front {
-  border-radius: 5px;
+.card.comfort .card-sides .front {
   outline: 1px solid #000;
   background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
   background-image: url("img/comforts/cards.jpg");
 }
-.card.confort .card-sides .front[data-img="1"] {
+.card.comfort .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
 }
-.card.confort .card-sides .front[data-img="2"] {
+.card.comfort .card-sides .front[data-img="2"] {
   background-position: -100% 0%;
 }
-.card.confort .card-sides .front[data-img="3"] {
+.card.comfort .card-sides .front[data-img="3"] {
   background-position: -200% 0%;
 }
-.card.confort .card-sides .front[data-img="4"] {
+.card.comfort .card-sides .front[data-img="4"] {
   background-position: -300% 0%;
 }
-.card.confort .card-sides .front[data-img="5"] {
+.card.comfort .card-sides .front[data-img="5"] {
   background-position: -400% 0%;
 }
-.card.confort .card-sides .front[data-img="6"] {
+.card.comfort .card-sides .front[data-img="6"] {
   background-position: -500% 0%;
 }
-.card.confort .card-sides .front[data-img="7"] {
+.card.comfort .card-sides .front[data-img="7"] {
   background-position: -600% 0%;
 }
-.card.confort .card-sides .front[data-img="8"] {
+.card.comfort .card-sides .front[data-img="8"] {
   background-position: 0% -100%;
 }
-.card.confort .card-sides .front[data-img="9"] {
+.card.comfort .card-sides .front[data-img="9"] {
   background-position: -100% -100%;
 }
-.card.confort .card-sides .front[data-img="10"] {
+.card.comfort .card-sides .front[data-img="10"] {
   background-position: -200% -100%;
 }
-.card.confort .card-sides .front[data-img="11"] {
+.card.comfort .card-sides .front[data-img="11"] {
   background-position: -300% -100%;
 }
-.card.confort .card-sides .front[data-img="12"] {
+.card.comfort .card-sides .front[data-img="12"] {
   background-position: -400% -100%;
 }
-.card.confort .card-sides .front[data-img="13"] {
+.card.comfort .card-sides .front[data-img="13"] {
   background-position: -500% -100%;
 }
-.card.confort .card-sides .front[data-img="14"] {
+.card.comfort .card-sides .front[data-img="14"] {
   background-position: -600% -100%;
 }
-.card.confort .card-sides .front[data-img="15"] {
+.card.comfort .card-sides .front[data-img="15"] {
   background-position: 0% -200%;
 }
-.card.confort .card-sides .front[data-img="16"] {
+.card.comfort .card-sides .front[data-img="16"] {
   background-position: -100% -200%;
 }
-.card.confort .card-sides .front[data-img="17"] {
+.card.comfort .card-sides .front[data-img="17"] {
   background-position: -200% -200%;
 }
-.card.confort .card-sides .front[data-img="18"] {
+.card.comfort .card-sides .front[data-img="18"] {
   background-position: -300% -200%;
 }
-.card.confort .card-sides .front[data-img="19"] {
+.card.comfort .card-sides .front[data-img="19"] {
   background-position: -400% -200%;
 }
-.card.confort .card-sides .front[data-img="20"] {
+.card.comfort .card-sides .front[data-img="20"] {
   background-position: -500% -200%;
 }
-.card.confort .card-sides .front[data-img="21"] {
+.card.comfort .card-sides .front[data-img="21"] {
   background-position: -600% -200%;
 }
-.card.confort .card-sides .front[data-img="22"] {
+.card.comfort .card-sides .front[data-img="22"] {
   background-position: 0% -300%;
 }
-.card.confort .card-sides .front[data-img="23"] {
+.card.comfort .card-sides .front[data-img="23"] {
   background-position: -100% -300%;
 }
-.card.confort .card-sides .front[data-img="24"] {
+.card.comfort .card-sides .front[data-img="24"] {
   background-position: -200% -300%;
 }
-.card.confort .card-sides .front[data-img="25"] {
+.card.comfort .card-sides .front[data-img="25"] {
   background-position: -300% -300%;
 }
-.card.confort .card-sides .front[data-img="26"] {
+.card.comfort .card-sides .front[data-img="26"] {
   background-position: -400% -300%;
 }
-.card.confort .card-sides .front[data-img="27"] {
+.card.comfort .card-sides .front[data-img="27"] {
   background-position: -500% -300%;
 }
-.card.confort .card-sides .front[data-img="28"] {
+.card.comfort .card-sides .front[data-img="28"] {
   background-position: -600% -300%;
 }
-.card.confort .card-sides .front > * {
+.card.comfort .card-sides .front > * {
   pointer-events: none;
   user-select: none;
 }
-.card.confort .help-marker {
+.card.comfort .help-marker {
   top: 17px;
 }
-.card.confort .title {
+.card.comfort .title {
   position: absolute;
   top: 8px;
   left: 0;
@@ -1378,7 +1366,7 @@ body > .bga-dice_die {
   color: white;
   font-family: Bosk;
 }
-.card.confort .gametext-wrapper {
+.card.comfort .gametext-wrapper {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1392,34 +1380,34 @@ body > .bga-dice_die {
   align-items: center;
   justify-content: center;
 }
-.card.confort .gametext {
+.card.comfort .gametext {
   text-align: center;
 }
-.card.confort .gametext .i-heart {
+.card.comfort .gametext .i-heart {
   width: 16px;
   height: 12px;
   background-size: 16px 12px;
 }
-.card.confort .gametext .i-heart span {
+.card.comfort .gametext .i-heart span {
   font-size: 9px;
 }
-.card.confort .gametext .resource-group {
+.card.comfort .gametext .resource-group {
   display: inline-block;
   margin: 0 2px;
 }
-.card.confort .gametext .resource-icon {
+.card.comfort .gametext .resource-icon {
   display: inline-flex;
   align-items: center;
   zoom: 0.4;
 }
-.card.confort .gametext .resource-icon::after {
+.card.comfort .gametext .resource-icon::after {
   content: " ";
 }
-.card.confort .gametext .resource-icon[data-type=coin] {
+.card.comfort .gametext .resource-icon[data-type=coin] {
   height: 35px;
 }
 
-.white-border .card.confort .card-sides .front {
+.white-border .card.comfort .card-sides .front {
   outline: 1px solid #000;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
@@ -1524,6 +1512,10 @@ body > .bga-dice_die {
   --card-width: 125px;
   --card-height: 125px;
 }
+.card.improvement .card-sides {
+  border-radius: 5px;
+  overflow: hidden;
+}
 .card.improvement .card-sides .image {
   background-image: url("img/improvements/cards.jpg");
   background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
@@ -1592,11 +1584,9 @@ body > .bga-dice_die {
   background-image: url("img/improvements/cards.jpg");
   background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
   background-position: -200% -300%;
-  border-radius: 5px;
 }
 .card.improvement .card-sides .front {
   outline: 1px solid #000;
-  border-radius: 5px;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
@@ -1699,10 +1689,13 @@ body > .bga-dice_die {
   --card-width: 212px;
   --card-height: 142px;
 }
+.card.traveler .card-sides {
+  border-radius: 5px;
+  overflow: hidden;
+}
 .card.traveler .card-sides .back,
 .card.traveler .card-sides .front {
   outline: 1px solid #000;
-  border-radius: 5px;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
@@ -1870,10 +1863,13 @@ body > .bga-dice_die {
 .card.valley.meadow .front {
   background-image: url("img/meadow.jpg");
 }
+.card.valley .card-sides {
+  border-radius: 5px;
+  overflow: hidden;
+}
 .card.valley .card-sides .front {
   background-size: 1240px 312px;
   outline: 1px solid #000;
-  border-radius: 5px;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
@@ -2303,6 +2299,7 @@ body > .bga-dice_die {
   display: flex;
   justify-content: center;
   padding-top: 40px;
+  flex-direction: column;
 }
 
 #tables-and-center {

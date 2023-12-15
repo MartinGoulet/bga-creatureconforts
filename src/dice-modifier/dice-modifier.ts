@@ -15,7 +15,7 @@ class DiceModifier {
    private readonly diceUmbrella: Record<number, number> = {};
 
    constructor(
-      private game: CreatureConforts,
+      private game: CreatureComforts,
       private diceManager: DiceManager,
       private settings: DiceModifierSettings,
    ) {}

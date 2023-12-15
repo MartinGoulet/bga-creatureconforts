@@ -1,7 +1,7 @@
 class ImprovementManager extends CardManager<ImprovementCard> {
    private readonly cottages: { [id: string]: LineStock<CottageCard> } = {};
 
-   constructor(public game: CreatureConforts, prefix = 'improvement', modal = false) {
+   constructor(public game: CreatureComforts, prefix = 'improvement', modal = false) {
       super(game, {
          getId: (card) => `${prefix}-${card.id}`,
          setupDiv: (card: Card, div: HTMLElement) => {
@@ -56,11 +56,12 @@ class ImprovementManager extends CardManager<ImprovementCard> {
             }
 
             if (card.location == 'glade' && !modal) {
-               const slot = document.querySelector(`#dice-locations [data-slot-id="${card.location_arg}"]`);
-               if (slot) {
+               setTimeout(() => {
+                  const slot = this.game.tableCenter.dice_locations.addSlotElement(card.location_arg);
                   slot.classList.add('slot-dice');
-                  this.game.placeOnObjectPos(slot as any, `${this.getId(card)}-slot-cottage`, -54, -3);
-               }
+                  div.appendChild(slot);
+                  this.game.tableCenter.dice_locations.bindSlotClick(slot, card.location_arg);
+               }, 10);
             }
          },
          isCardVisible: (card) => 'type' in card,
@@ -87,32 +88,15 @@ class ImprovementManager extends CardManager<ImprovementCard> {
       const type_lighting = /::type-lighting::/gi;
       const type_outdoor = /::type-outdoor::/gi;
 
+      const getTypeTemplate = (text: string) =>
+         `<span class="type food"><span class="label">${text}</span><span class="image"></span></span>`;
+
       let value = rawText
          .replaceAll(keywords, `<span class="keyword">$1</span>`)
-         .replaceAll(
-            type_food,
-            `<span class="type food"><span class="label">${_(
-               'Food',
-            )}</span><span class="image"></span></span>`,
-         )
-         .replaceAll(
-            type_clothing,
-            `<span class="type clothing"><span class="label">${_(
-               'Clothing',
-            )}</span><span class="image"></span></span>`,
-         )
-         .replaceAll(
-            type_lighting,
-            `<span class="type lighting"><span class="label">${_(
-               'Lighting',
-            )}</span><span class="image"></span></span>`,
-         )
-         .replaceAll(
-            type_outdoor,
-            `<span class="type outdoor"><span class="label">${_(
-               'Outdoor',
-            )}</span><span class="image"></span></span>`,
-         );
+         .replaceAll(type_food, getTypeTemplate(_('Food')))
+         .replaceAll(type_clothing, getTypeTemplate(_('Clothing')))
+         .replaceAll(type_lighting, getTypeTemplate(_('Lighting')))
+         .replaceAll(type_outdoor, getTypeTemplate(_('Outdoor')));
 
       return this.game.formatTextIcons(value);
    }

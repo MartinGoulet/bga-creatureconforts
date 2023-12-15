@@ -1,14 +1,14 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
 
 /*
  * Cards manager : allows to easily access card
  */
 
-class Conforts {
+class Comforts {
 
     static function anonymize($cards, bool $anonymize = true) {
         if (!$anonymize) return $cards;
@@ -184,6 +184,6 @@ class Conforts {
      * @return \Deck
      */
     private static function deck() {
-        return Game::get()->conforts;
+        return Game::get()->comforts;
     }
 }

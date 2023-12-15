@@ -4,7 +4,7 @@ class PlayerPanel {
    private almanac: number = 0;
    private wheelbarrow: number = 0;
 
-   constructor(public game: CreatureConforts, player: CreatureConfortsPlayerData) {
+   constructor(public game: CreatureComforts, player: CreatureComfortsPlayerData) {
       this.player_id = Number(player.id);
 
       const templateIcon = `<div class="wrapper">

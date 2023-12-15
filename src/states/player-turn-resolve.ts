@@ -1,10 +1,15 @@
 class PlayerTurnResolveState implements StateHandler {
    private glade_selection?: number = undefined;
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
-   onEnteringState({ locations }: PlayerTurnResolveArgs): void {
+   onEnteringState(args: PlayerTurnResolveArgs): void {
+      const { locations, resolve_market } = args;
       if (!this.game.isCurrentPlayerActive()) return;
+
+      if (resolve_market) {
+         this.goToMarket(args);
+      }
 
       const { worker_locations, dice_locations } = this.game.tableCenter;
 
@@ -55,7 +60,9 @@ class PlayerTurnResolveState implements StateHandler {
          .forEach((div) => div.classList.remove('selectable'));
    }
 
-   onUpdateActionButtons({ locations, wheelbarrow }: PlayerTurnResolveArgs): void {
+   onUpdateActionButtons(args: PlayerTurnResolveArgs): void {
+      const { locations, wheelbarrow } = args;
+
       const handleResolve = () => {
          if (this.glade_selection) {
             this.game.takeAction('resolveWorker', { location_id: this.glade_selection });
@@ -72,9 +79,7 @@ class PlayerTurnResolveState implements StateHandler {
          const locationId: number = Number(selectedLocations[0]);
 
          if (locationId == 8) {
-            this.game.setClientState('resolveMarket', {
-               descriptionmyturn: _('You must resolve the effect of the market'),
-            });
+            this.goToMarket(args);
          } else if (locationId == 9) {
             this.game.setClientState('resolveTraveler', {
                descriptionmyturn: _('You must resolve the effect of the traveler'),
@@ -119,9 +124,19 @@ class PlayerTurnResolveState implements StateHandler {
       );
       selectedDiceLocations.forEach((slot) => slot.classList.remove('selected'));
    }
+
+   private goToMarket(args: PlayerTurnResolveArgs) {
+      this.game.setClientState('resolveMarket', {
+         descriptionmyturn: _('You must resolve the effect of the market'),
+         args,
+      });
+   }
 }
 
 interface PlayerTurnResolveArgs {
    locations: number[];
    wheelbarrow: number;
+   resolve_market: boolean;
+   has_scale: boolean;
+   use_scale: boolean;
 }

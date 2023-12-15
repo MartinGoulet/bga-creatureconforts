@@ -1,7 +1,7 @@
 class PlayerTurnDiscardState implements StateHandler {
    private cards: ConfortCard[];
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: PlayerTurnDiscard): void {
       if (!this.game.isCurrentPlayerActive()) return;

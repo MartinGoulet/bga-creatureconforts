@@ -13,7 +13,7 @@ class ColoredDie6 extends BgaDie6 {
 }
 
 class MyDiceManager extends DiceManager {
-   constructor(game: CreatureConforts) {
+   constructor(game: CreatureComforts) {
       super(game, {
          dieTypes: {
             gray: new ColoredDie6('gray'),
@@ -30,39 +30,5 @@ class MyDiceManager extends DiceManager {
             dcac28: new ColoredDie6('yellow'),
          },
       });
-   }
-}
-
-class PlayerDiceStock extends LineDiceStock {
-   constructor(protected manager: DiceManager, protected element: HTMLElement) {
-      super(manager, element, {
-         gap: '8px',
-         sort: sortFunction('id'),
-      });
-   }
-
-   public rollDie(die: BgaDie, settings?: RollDieSettings): void {
-      super.rollDie(die, settings);
-
-      const div = this.getDieElement(die);
-      const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
-      faces.dataset.visibleFace = `${die.face}`;
-   }
-}
-
-class VillageDiceStock extends LineDiceStock {
-   constructor(protected manager: DiceManager, protected element: HTMLElement) {
-      super(manager, element, {
-         gap: '5px',
-         sort: sortFunction('id'),
-      });
-   }
-
-   public rollDie(die: BgaDie, settings?: RollDieSettings): void {
-      super.rollDie(die, settings);
-
-      const div = this.getDieElement(die);
-      const faces = div.querySelector('.bga-dice_die-faces') as HTMLElement;
-      faces.dataset.visibleFace = `${die.face}`;
    }
 }

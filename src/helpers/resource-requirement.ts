@@ -1,5 +1,5 @@
 class ResourceRequirement {
-   static isRequirementMet(game: CreatureConforts, cost: { [type: string]: number }): boolean {
+   static isRequirementMet(game: CreatureComforts, cost: { [type: string]: number }): boolean {
       const { counters } = game.getPlayerPanel(game.getPlayerId());
 
       for (const type of Object.keys(cost)) {

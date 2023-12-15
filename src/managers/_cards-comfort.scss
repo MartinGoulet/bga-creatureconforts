@@ -1,4 +1,4 @@
-.card.confort {
+.card.comfort {
    --card-width: 110px;
    --card-height: 154px;
    display: inline-block;
@@ -8,15 +8,16 @@
    border-radius: 5px;
 
    .card-sides {
+      border-radius: 5px;
+      overflow: hidden;
+
       .back {
          background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
          background-image: url('img/comforts/cards.jpg');
          background-position: -600% -200%;
-         border-radius: 5px;
       }
 
       .front {
-         border-radius: 5px;
          outline: 1px solid #000;
          background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
          background-image: url('img/comforts/cards.jpg');
@@ -102,7 +103,7 @@
 }
 
 .white-border {
-   .card.confort {
+   .card.comfort {
       .card-sides {
          .front {
             outline: 1px solid #000;

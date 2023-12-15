@@ -1,5 +1,5 @@
 class TravelerGrayWolfState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       const { confort_market: market } = this.game.tableCenter;

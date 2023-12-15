@@ -1,8 +1,9 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
 
 /*
  * Dice manager : allows to easily access dice
@@ -71,6 +72,10 @@ class Dice extends \APP_DbObject {
         return array_values(self::getCollectionFromDb($sql));
     }
 
+    static function modify(int $die_id, int $value) {
+        self::DbQuery("UPDATE dice SET dice_value = $value WHERE dice_id = $die_id");
+    }
+
     static function moveDiceToLocation(array $dice_ids, int $location_id) {
         $ids = implode(',', $dice_ids);
         self::DbQuery("UPDATE dice SET dice_location = $location_id WHERE dice_id in ($ids)");
@@ -100,6 +105,12 @@ class Dice extends \APP_DbObject {
             $dice_id = implode(",", array_column($dice, 'id'));
             self::DbQuery("UPDATE dice SET dice_location = null WHERE dice_owner_id = $player_id AND dice_id in ($dice_id)");
         }
+    }
+
+    static function saveWhiteDice() {
+        $sql = "SELECT dice_id id, dice_value face FROM dice WHERE dice_color = 'white'";
+        $dice = self::getCollectionFromDb($sql);
+        Globals::setWhiteDice($dice);
     }
 
     static function throwPlayerDice() {

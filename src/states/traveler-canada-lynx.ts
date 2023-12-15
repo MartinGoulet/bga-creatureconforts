@@ -2,7 +2,7 @@ class TravelerCanadaLynxState implements StateHandler {
    private resource_manager: IResourceManager<GoodsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('canada-lynx');
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;

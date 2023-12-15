@@ -1,4 +1,4 @@
-interface CreatureConfortsPlayerData extends BgaPlayer {
+interface CreatureComfortsPlayerData extends BgaPlayer {
    // Add Player data
    coin: string;
    fruit: string;
@@ -14,13 +14,13 @@ interface CreatureConfortsPlayerData extends BgaPlayer {
 
 type PlayerBoardObject = { [player_id: number]: PlayerBoardInfo };
 
-interface CreatureConfortsGamedatas extends BgaGamedatas<CreatureConfortsPlayerData> {
+interface CreatureComfortsGamedatas extends BgaGamedatas<CreatureComfortsPlayerData> {
    improvement_types: { [card_type: number]: ImprovementType };
    confort_types: { [card_type: number]: ConfortType };
    valley_types: { [card_type: number]: ValleyType };
 
    dice: Dice[];
-   conforts: ConfortUIData;
+   comforts: ConfortUIData;
    cottages: CottageUIData;
    improvements: ImprovementUIData;
    travelers: TravelerUIData;

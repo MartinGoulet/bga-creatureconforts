@@ -3,7 +3,7 @@ class TravelerWildTurkeyStates implements StateHandler {
 
    private toolbar: ToolbarContainer = new ToolbarContainer('wild-turkey');
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: TravelerWildTurkeyArgs): void {
       const { dice, player_color } = this.game.getCurrentPlayerTable();
@@ -121,7 +121,7 @@ class TravelerWildTurkeyStates implements StateHandler {
 class TravelerWildTurkeyEndStates implements StateHandler {
    public isMultipleActivePlayer: boolean = true;
    private toolbar: ToolbarContainer = new ToolbarContainer('wild-turkey');
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
    onEnteringState(args: any): void {
       const { dice } = this.game.getCurrentPlayerTable();
       dice.setSelectionMode('none');

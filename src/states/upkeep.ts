@@ -1,5 +1,5 @@
 class UpkeepState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       this.game.tableCenter.clearReservedZones();

@@ -1,5 +1,5 @@
 class TableScore {
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       if (game.gamedatas.gamestate.name !== 'gameEnd') return;
       this.displayScores(game.gamedatas.scores);
    }
@@ -24,7 +24,7 @@ class TableScore {
       document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
    }
 
-   private getHeaderNames(player_ids: number[], { players }: CreatureConfortsGamedatas) {
+   private getHeaderNames(player_ids: number[], { players }: CreatureComfortsGamedatas) {
       const colums = player_ids.map((id) => {
          const { color, name } = players[id];
          return `<th style="color: #${color}">${name}</th>`;

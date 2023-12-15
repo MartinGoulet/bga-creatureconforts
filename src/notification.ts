@@ -1,5 +1,5 @@
 class NotificationManager {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    setup() {
       const notifs: [string, number?][] = [
@@ -83,6 +83,7 @@ class NotificationManager {
    }
 
    private notif_onMoveDiceToHill({ dice }: { dice: Dice[] }) {
+      this.game.tableCenter.hill.removeDice(dice);
       this.game.tableCenter.hill.addDice(dice);
    }
 
@@ -108,9 +109,9 @@ class NotificationManager {
 
    private notif_onCraftConfort({ player_id, card, cost }: CraftConfortArgs) {
       const counters = this.game.getPlayerPanel(player_id).counters;
-      const conforts = this.game.getPlayerTable(player_id).conforts;
+      const comforts = this.game.getPlayerTable(player_id).comforts;
 
-      conforts.addCard(card);
+      comforts.addCard(card);
       Object.keys(cost).forEach((type) => {
          const value = -cost[type];
          counters[type].incValue(value);
@@ -120,7 +121,9 @@ class NotificationManager {
    private notif_onReturnDice({ player_id, dice }: { player_id: number; dice: Dice[] }) {
       const white_dice = dice.filter((die) => die.type == 'white');
       const player_dice = dice.filter((die) => Number(die.owner_id) == player_id);
+      this.game.tableCenter.hill.removeDice(white_dice);
       this.game.tableCenter.hill.addDice(white_dice);
+      this.game.getPlayerTable(player_id).dice.removeDice(player_dice);
       this.game.getPlayerTable(player_id).dice.addDice(player_dice);
    }
 
@@ -237,8 +240,16 @@ class NotificationManager {
       });
    }
 
-   private notif_onModifyDieWithLessonLearned({ player_id, nbr_lesson }: ModifyDieWithLessonLearnedArgs) {
+   private notif_onModifyDieWithLessonLearned({
+      player_id,
+      nbr_lesson,
+      die_id,
+      die_newvalue,
+   }: ModifyDieWithLessonLearnedArgs) {
       this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
+      const die = this.game.tableCenter.dice_locations.getDice().find((d) => d.id == die_id);
+      die.face = die_newvalue;
+      this.game.getPlayerTable(player_id).dice.rollDie(die, { effect: 'turn', duration: 375 });
    }
 
    private notif_onModifyDieWithWildTurkey({ player_id, die_val_id, die_val_to }: ModifyDieWithWildTurkey) {
@@ -316,7 +327,7 @@ class NotificationManager {
             }
          });
 
-         Object.getOwnPropertyNames(CreatureConforts.prototype)
+         Object.getOwnPropertyNames(CreatureComforts.prototype)
             .filter((item) => item.startsWith('notif_'))
             .map((item) => item.slice(6))
             .forEach((item) => {
@@ -378,6 +389,8 @@ interface BuildImprovementArgs {
 interface ModifyDieWithLessonLearnedArgs {
    player_id: number;
    nbr_lesson: number;
+   die_id: number;
+   die_newvalue: number;
 }
 
 interface ModifyDieWithWildTurkey {

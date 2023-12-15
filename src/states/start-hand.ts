@@ -1,7 +1,7 @@
 class StartHandState implements StateHandler {
    public isMultipleActivePlayer: boolean = true;
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: StartHandStateArgs): void {
       const { hand } = this.game.getCurrentPlayerTable();

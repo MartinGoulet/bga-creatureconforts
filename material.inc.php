@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * CreatureConforts implementation : © Martin Goulet <martin.goulet@live.ca>
+ * CreatureComforts implementation : © Martin Goulet <martin.goulet@live.ca>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -11,7 +11,7 @@
  *
  * material.inc.php
  *
- * CreatureConforts game material description
+ * CreatureComforts game material description
  *
  * Here, you can describe the material of your game with PHP variables.
  *   
@@ -203,7 +203,7 @@ $this->confort_types = [
       'cost' => [WOOD => 2, STONE => 3],
       'class' => "Hearth",
       'img' => 16,
-      'storable' => [WOOD],
+      'storable' => [WOOD, WOOD],
    ],
    24 => [
       'name' => clienttranslate("Lamp"),
@@ -372,7 +372,7 @@ $this->improvement_types = [
    17 => [
       'name' => clienttranslate("Herb Garden"),
       'img' => 10,
-      'gametext' => clienttranslate("Gain ::heart-1:: for every ::food:: Comfort owned by all ::keyword-{other}:: players"),
+      'gametext' => clienttranslate("Gain ::heart-1:: for every ::type-food:: Comfort owned by all ::keyword-{other}:: players"),
       'score' => 1,
       'cost' => [WOOD => 2],
       'glade' => false,
@@ -555,7 +555,7 @@ $this->traveler_types = [
       'trade' => [
          1 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 5],
          2 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 5],
-         3 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 1],
+         3 => ["from" => ["count" => 1], "to" => ["resources" => [WOOD]], "times" => 5],
          4 => ["from" => ["count" => 1, "requirement" => [LESSON_LEARNED]], "to" => ["resources" => [COIN]], "times" => 3],
          5 => ["from" => ["count" => 1, "requirement" => [LESSON_LEARNED]], "to" => ["resources" => [COIN]], "times" => 3],
          6 => ["from" => ["count" => 2, "requirement" => [FRUIT, MUSHROOM]], "to" => ["resources" => [STORY]], "times" => 3],
@@ -577,7 +577,7 @@ $this->traveler_types = [
    ],
    13 => [
       'name' => clienttranslate("Moose"),
-      'gametext' => clienttranslate("In turn uorder, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player"),
+      'gametext' => clienttranslate("In turn order, each player may gain ::story:: from the supply if they give a gift of ::any:: to another player"),
       'timing' => "END OF MONTH",
       'img' => 1,
       'trade' => [

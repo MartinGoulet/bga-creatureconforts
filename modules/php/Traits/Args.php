@@ -1,13 +1,15 @@
 <?php
 
-namespace CreatureConforts\Traits;
+namespace CreatureComforts\Traits;
 
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Globals;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Worker;
+use BgaUserException;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Worker;
 
 trait Args {
 
@@ -26,7 +28,7 @@ trait Args {
         $args = ["_private" => []];
 
         foreach ($players as $player_id => $player) {
-            $cards = Conforts::getHand($player_id);
+            $cards = Comforts::getHand($player_id);
             $selection = array_values(array_filter($cards, function ($card) {
                 return $card['location'] == 'selection';
             }));
@@ -74,15 +76,20 @@ trait Args {
             return $location > 0;
         });
 
+        $has_scale = Improvements::hasScale($player_id);
+
         return [
             'locations' => array_values($locations),
             'wheelbarrow' => Globals::getWheelbarrow($player_id),
+            'resolve_market' => Globals::getMarketUsed(),
+            'has_scale' => $has_scale,
+            'use_scale' => $has_scale && Globals::getScaleUsed()
         ];
     }
 
     function argPlayerTurnDiscard() {
         return [
-            'nbr' => sizeof(Conforts::getHand(Players::getPlayerId())) - 3,
+            'nbr' => sizeof(Comforts::getHand(Players::getPlayerId())) - 3,
         ];
     }
 
@@ -110,6 +117,8 @@ trait Args {
                     'locations' => Globals::getWorkerPlacement($current_player_id),
                     'locations_unavailable' => [],
                     'workers' => [$worker],
+                    "wheelbarrow" => 0,
+                    "wheelbarrow_count" => 0,
                 ]
             ]
         ];
@@ -118,6 +127,16 @@ trait Args {
     function argCommonRaven() {
         return [
             "locations_unavailable" => Globals::getRavenLocationIds(),
+        ];
+    }
+
+    function argMoose() {
+        $current_player_id = $this->getActivePlayerId();
+        $left_player_id = Game::get()->getPrevPlayerTable()[$current_player_id];
+
+        return [
+            'otherplayer' => Game::get()->getPlayerNameById($left_player_id),
+            'otherplayer_id' => $left_player_id,
         ];
     }
 

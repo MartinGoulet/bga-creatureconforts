@@ -1,5 +1,5 @@
 class ResolveOwlNestState implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       const { worker_locations, confort_market: market } = this.game.tableCenter;

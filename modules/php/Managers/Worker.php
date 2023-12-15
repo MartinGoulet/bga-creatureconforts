@@ -1,9 +1,9 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
 
 /*
  * Worker manager : allows to easily access worker

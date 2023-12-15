@@ -22,8 +22,20 @@
    #glade {
       grid-area: glade;
       padding-bottom: 20px;
+
       &:empty {
          padding-bottom: 0;
+      }
+
+      .slot-dice {
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         position: absolute;
+         width: 40px;
+         height: 40px;
+         top: 30px;
+         left: 33px;
       }
    }
 
@@ -37,7 +49,7 @@
       border-radius: 10px;
       margin-bottom: 210px;
 
-      #table-conforts {
+      #table-comforts {
          position: absolute;
          top: 850px;
          left: 234px;
@@ -61,12 +73,14 @@
 
       #worker-locations {
          position: relative;
+
          // Placement should be activated
          &.has-selected-location {
             .slot.selectable.selected {
                animation: none !important;
             }
          }
+
          .slot {
             position: absolute;
             width: 70px;
@@ -85,6 +99,7 @@
             }
 
             .card.worker {
+
                // zoom: 0.75;
                &:nth-child(3),
                &:nth-child(4),
@@ -99,16 +114,19 @@
             left: 85px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
+
          [data-slot-id='2'] {
             top: 98px;
             left: 241px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
+
          [data-slot-id='3'] {
             top: 98px;
             left: 427px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 66%, -10% 66%);
          }
+
          [data-slot-id='4'] {
             top: 98px;
             left: 583px;
@@ -120,11 +138,13 @@
             left: 592px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 120%, -10% 61%);
          }
+
          [data-slot-id='6'] {
             top: 345px;
             left: 624px;
             // clip-path: polygon(50% -10%, 110% -10%, 110% 160%, -10% 80%);
          }
+
          [data-slot-id='7'] {
             top: 291px;
             left: 438px;
@@ -148,11 +168,13 @@
             left: 83px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
+
          [data-slot-id='11'] {
             top: 749px;
             left: 295px;
             // clip-path: polygon(-10% -10%, 110% -10%, 110% 80%, -10% 80%);
          }
+
          [data-slot-id='12'] {
             top: 749px;
             left: 457px;
@@ -162,6 +184,7 @@
 
       #dice-locations {
          position: relative;
+
          .slot {
             position: absolute;
             width: 40px;
@@ -192,16 +215,19 @@
             left: 55px;
             width: 130px;
          }
+
          [data-slot-id='2'] {
             top: 54px;
             left: 211px;
             width: 130px;
          }
+
          [data-slot-id='3'] {
             top: 54px;
             left: 397px;
             width: 130px;
          }
+
          [data-slot-id='4'] {
             top: 54px;
             left: 553px;
@@ -212,10 +238,12 @@
             top: 220px;
             left: 664px;
          }
+
          [data-slot-id='6'] {
             top: 400px;
             left: 590px;
          }
+
          [data-slot-id='7'] {
             top: 306px;
             left: 392px;
@@ -225,6 +253,7 @@
             top: 479px;
             left: 416px;
          }
+
          [data-slot-id='9'] {
             top: 590px;
             left: 354px;
@@ -234,10 +263,12 @@
             top: 755px;
             left: 97px;
          }
+
          [data-slot-id='11'] {
             top: 702px;
             left: 310px;
          }
+
          [data-slot-id='12'] {
             top: 702px;
             left: 472px;
@@ -280,7 +311,7 @@
          gap: 20px;
          width: 720px;
 
-         > div {
+         >div {
             display: flex;
             gap: 20px;
          }
@@ -295,7 +326,8 @@
                --bga-cards-deck-counter-size: 25px;
             }
          }
-         #discard-conforts {
+
+         #discard-comforts {
             .card:nth-child(1) {
                z-index: 1;
             }
@@ -322,16 +354,19 @@
       left: 55px;
       width: 130px;
    }
+
    [data-zone-id='2'] {
       top: 165px;
       left: 211px;
       width: 130px;
    }
+
    [data-zone-id='3'] {
       top: 165px;
       left: 397px;
       width: 130px;
    }
+
    [data-zone-id='4'] {
       top: 165px;
       left: 553px;
@@ -343,11 +378,13 @@
       left: 664px;
       justify-content: flex-start;
    }
+
    [data-zone-id='6'] {
       top: 410px;
       left: 640px;
       justify-content: flex-start;
    }
+
    [data-zone-id='7'] {
       top: 356px;
       left: 392px;
@@ -358,6 +395,7 @@
       top: 429px;
       left: 456px;
    }
+
    [data-zone-id='9'] {
       // top: 540px;
       // left: 354px;
@@ -371,11 +409,13 @@
       left: 157px;
       justify-content: flex-start;
    }
+
    [data-zone-id='11'] {
       top: 752px;
       left: 365px;
       justify-content: flex-start;
    }
+
    [data-zone-id='12'] {
       top: 752px;
       left: 530px;
@@ -402,11 +442,13 @@
 .gamestate_placement {
    .slot.selectable {
       animation: none !important;
+
       &:hover {
          animation: pulseSelectable 1s infinite alternate !important;
          // box-shadow: 0 0 5px 5px orange !important;
       }
    }
+
    .slot.selected {
       animation: none !important;
       box-shadow: 0 0 5px 5px orange !important;
@@ -424,6 +466,7 @@
 .gamestate_placement,
 .gamestate_resolveBicycleDestination {
    [data-traveler='11'] #table-center-wrapper #worker-locations {
+
       [data-slot-id='1'],
       [data-slot-id='2'] {
          &:after {
@@ -432,7 +475,8 @@
             bottom: 0;
             left: 0;
             right: 0;
-            content: '\274c'; /* use the hex value here... */
+            content: '\274c';
+            /* use the hex value here... */
             font-size: 40px;
             color: #ff0000;
             line-height: 60px;
@@ -448,7 +492,7 @@
    }
 }
 
-#discard-conforts-wrapper {
+#discard-comforts-wrapper {
    grid-area: discard;
    flex-grow: 1;
    position: relative;
@@ -457,7 +501,7 @@
    border-radius: 5px;
    display: none;
 
-   .title {
+   >.title {
       background: white;
       color: black;
       left: 20px;
@@ -469,15 +513,15 @@
       position: absolute;
    }
 
-   #discard-conforts-line {
+   #discard-comforts-line {
       row-gap: 10px;
       margin-top: 10px;
    }
 }
 
-.discard-conforts-opened,
+.discard-comforts-opened,
 .current_player_is_active .gamestate_stripedSkunk {
-   #discard-conforts-wrapper {
+   #discard-comforts-wrapper {
       display: block;
    }
 }

@@ -1,5 +1,5 @@
 class ValleyManager extends CardManager<ValleyCard> {
-   constructor(public game: CreatureConforts, prefix = 'valley') {
+   constructor(public game: CreatureComforts, prefix = 'valley') {
       super(game, {
          getId: (card) => `${prefix}-${card.id}`,
          setupDiv: (card: Card, div: HTMLElement) => {

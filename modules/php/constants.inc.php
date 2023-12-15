@@ -44,24 +44,26 @@ const ST_PLAYER_RETURN_UNRESOLVED_WORKER = 56;
 const ST_PRE_UPKEEP = 59;
 const ST_UPKEEP = 60;
 
-const ST_GRAY_WOLF = 70;
-const ST_GRAY_WOLF_NEXT_PLAYER = 71;
-const ST_COMMON_RAVEN = 72;
-const ST_COMMON_RAVEN_NEXT_PLAYER = 73;
-const ST_STRIPED_SKUNK = 74;
-const ST_COMMON_LOON = 75;
-const ST_COMMON_LOON_END = 76;
-const ST_WILD_TURKEY = 77;
-const ST_WILD_TURKEY_END = 78;
-const ST_CANADA_LYNX = 79;
-const ST_CANADA_LYNX_NEXT_PLAYER = 85;
-
 const ST_IMPROVEMENT_BICYCLE = 80;
 
 const ST_START_TURN = 90;
 
 const ST_PRE_END_OF_GAME = 95;
 const ST_PRE_END_OF_GAME_SCORING = 96;
+
+const ST_GRAY_WOLF = 170;
+const ST_GRAY_WOLF_NEXT_PLAYER = 171;
+const ST_COMMON_RAVEN = 172;
+const ST_COMMON_RAVEN_NEXT_PLAYER = 173;
+const ST_STRIPED_SKUNK = 174;
+const ST_COMMON_LOON = 175;
+const ST_COMMON_LOON_END = 176;
+const ST_WILD_TURKEY = 177;
+const ST_WILD_TURKEY_END = 178;
+const ST_CANADA_LYNX = 179;
+const ST_CANADA_LYNX_NEXT_PLAYER = 180;
+const ST_MOOSE = 181;
+const ST_MOOSE_NEXT_PLAYER = 182;
 
 /**
  * Goods tokens
@@ -87,7 +89,7 @@ const LESSON_LEARNED = "lesson";
 const CARD = 'card';
 
 /**
- * Confort type
+ * Comfort type
  */
 
 const CLOTHING = "clothing";

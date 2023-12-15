@@ -5,7 +5,7 @@ class PreEndGame implements StateHandler {
    private stored_resources: Record<number, IconsType[]> = {};
    private available_resources: Record<string, number> = {};
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       for (const resource of ICONS) {
@@ -24,18 +24,18 @@ class PreEndGame implements StateHandler {
          this.addResourcesManager(selection[0]);
       };
 
-      const { conforts } = this.game.getCurrentPlayerTable();
+      const { comforts } = this.game.getCurrentPlayerTable();
       const selectableCards = this.getSelectableComfortCards();
 
-      conforts.setSelectionMode('single');
-      conforts.setSelectableCards(selectableCards);
-      conforts.onSelectionChange = handleSelectionChange;
+      comforts.setSelectionMode('single');
+      comforts.setSelectableCards(selectableCards);
+      comforts.onSelectionChange = handleSelectionChange;
    }
 
    onLeavingState(): void {
-      const { conforts } = this.game.getCurrentPlayerTable();
-      conforts.setSelectionMode('none');
-      conforts.onSelectionChange = undefined;
+      const { comforts } = this.game.getCurrentPlayerTable();
+      comforts.setSelectionMode('none');
+      comforts.onSelectionChange = undefined;
       this.toolbar.removeContainer();
       this.toolbarButton.removeContainer();
    }
@@ -52,7 +52,7 @@ class PreEndGame implements StateHandler {
                .counters[resource].getValue();
          }
          this.stored_resources = {};
-         this.game.getCurrentPlayerTable().conforts.unselectAll();
+         this.game.getCurrentPlayerTable().comforts.unselectAll();
       };
 
       this.game.addActionButton('btn_ress', _('Confirm stored resources'), handleConfirm);
@@ -79,7 +79,7 @@ class PreEndGame implements StateHandler {
          .insertAdjacentHTML('beforeend', html);
 
       const element = document.getElementById(`ress-${this.index_ress}`);
-      const toElement = document.getElementById(`conforts-${44}`);
+      const toElement = document.getElementById(`comforts-${44}`);
       const finalTransform = `translate(${90 * Math.random() + 10}px, ${100 * Math.random() + 25}px)`;
       return this.game.confortManager.animationManager.attachWithAnimation(
          new BgaSlideAnimation({ element, finalTransform }),
@@ -97,40 +97,12 @@ class PreEndGame implements StateHandler {
          .insertAdjacentHTML('beforeend', html);
 
       const element = document.getElementById(`ress-${this.index_ress}`);
-      const toElement = document.getElementById(`conforts-${44}`);
+      const toElement = document.getElementById(`comforts-${44}`);
       const finalTransform = `translate(${90 * Math.random() + 10}px, ${100 * Math.random() + 25}px)`;
       this.game.confortManager.animationManager.attachWithAnimation(
          new BgaSlideAnimation({ element, finalTransform }),
          toElement,
       );
-
-      // this.game
-      //    .slideToObjectPos(
-      //       `ress-${this.index_ress}`,
-      //       `conforts-${44}-front`,
-      //       50 * Math.random(),
-      //       60 & Math.random(),
-      //       375,
-      //    )
-      //    .play();
-
-      // let index = 0;
-      // Object.keys(resources).forEach((type) => {
-      //    const count = resources[type];
-      //    for (let i = 0; i < count; i++) {
-      //       const div = `<div class="resource-icon resource-card" data-type="${type}" id=""></div>`;
-      //       this.game.place(div, );
-      //       this.game.slideTemporaryObject(
-      //          `<div class="resource-icon" data-type="${type}"></div>`,
-      //          'overall-content', //'left-side-wrapper',
-      //          fromElement,
-      //          `player-panel-${player_id}-icons-${type}-counter`,
-      //          1000,
-      //          250 * index++,
-      //       );
-      //    }
-      //    this.game.getPlayerPanel(player_id).counters[type].incValue(count);
-      // });
    }
 
    private addResourcesManager(selection: ConfortCard) {
@@ -164,7 +136,7 @@ class PreEndGame implements StateHandler {
    }
 
    private addResourcesActionButtonAdd() {
-      const { conforts } = this.game.getCurrentPlayerTable();
+      const { comforts } = this.game.getCurrentPlayerTable();
       const handleButtonConfirm = () => {
          if (this.resource_manager.hasTradePending()) {
             this.game.showMessage('You have uncompleted requirement met', 'error');
@@ -172,7 +144,7 @@ class PreEndGame implements StateHandler {
          }
          const resources = this.resource_manager.getResourcesFrom();
          resources.forEach((good) => (this.available_resources[good] -= 1));
-         const card_id = conforts.getSelection()[0].id;
+         const card_id = comforts.getSelection()[0].id;
 
          if (this.stored_resources[card_id] === undefined) {
             this.stored_resources[card_id] = [...resources];
@@ -182,7 +154,7 @@ class PreEndGame implements StateHandler {
 
          this.moveResources(Number(card_id), resources);
 
-         conforts.unselectAll();
+         comforts.unselectAll();
       };
       this.game.addActionButton(
          'btn_confirm',
@@ -193,9 +165,9 @@ class PreEndGame implements StateHandler {
    }
 
    private addResourcesActionButtonCancel() {
-      const { conforts } = this.game.getCurrentPlayerTable();
+      const { comforts } = this.game.getCurrentPlayerTable();
       const handleCancel = () => {
-         conforts.unselectAll();
+         comforts.unselectAll();
       };
       this.game.addActionButton(
          'btn_cancel',
@@ -222,19 +194,19 @@ class PreEndGame implements StateHandler {
    }
 
    private getSelectableComfortCards() {
-      const { conforts, improvements } = this.game.getCurrentPlayerTable();
+      const { comforts, improvements } = this.game.getCurrentPlayerTable();
 
       const canAddStoryFood: boolean =
          improvements.getCards().filter((card) => {
             return Number(card.type) === 12;
-         }).length > 0 || true;
+         }).length > 0;
 
       const canAddStoryClothing: boolean =
          improvements.getCards().filter((card) => {
             return Number(card.type) === 5;
          }).length > 0;
 
-      const selectableCards = conforts.getCards().filter((card) => {
+      const selectableCards = comforts.getCards().filter((card) => {
          const type = this.game.confortManager.getCardType(card);
          return (
             type.storable !== undefined ||

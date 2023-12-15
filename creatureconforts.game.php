@@ -3,7 +3,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * CreatureConforts implementation : © Martin Goulet <martin.goulet@live.ca>
+ * CreatureComforts implementation : © Martin Goulet <martin.goulet@live.ca>
  * 
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -17,21 +17,21 @@
  *
  */
 
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Globals;
-use CreatureConforts\Core\Score;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Cottages;
-use CreatureConforts\Managers\Dice;
-use CreatureConforts\Managers\Improvements;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
-use CreatureConforts\Managers\Valleys;
-use CreatureConforts\Managers\Worker;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Globals;
+use CreatureComforts\Core\Score;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Cottages;
+use CreatureComforts\Managers\Dice;
+use CreatureComforts\Managers\Improvements;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
+use CreatureComforts\Managers\Valleys;
+use CreatureComforts\Managers\Worker;
 
 $swdNamespaceAutoload = function ($class) {
     $classParts = explode('\\', $class);
-    if ($classParts[0] == 'CreatureConforts') {
+    if ($classParts[0] == 'CreatureComforts') {
         array_shift($classParts);
         $file = dirname(__FILE__) . '/modules/php/' . implode(DIRECTORY_SEPARATOR, $classParts) . '.php';
         if (file_exists($file)) {
@@ -47,15 +47,15 @@ require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
 require_once('modules/php/constants.inc.php');
 
 class CreatureConforts extends Table {
-    use CreatureConforts\Traits\Actions;
-    use CreatureConforts\Traits\Args;
-    use CreatureConforts\Traits\Debug;
-    use CreatureConforts\Traits\States;
+    use CreatureComforts\Traits\Actions;
+    use CreatureComforts\Traits\Args;
+    use CreatureComforts\Traits\Debug;
+    use CreatureComforts\Traits\States;
 
     /** @var Deck */
     public $improvements;
     /** @var Deck */
-    public $conforts;
+    public $comforts;
     /** @var Deck */
     public $cottages;
     /** @var Deck */
@@ -77,7 +77,7 @@ class CreatureConforts extends Table {
     /** @var array */
     public $resource_types;
 
-    /** @var CreatureConforts */
+    /** @var CreatureComforts */
     public static $instance = null;
 
     function __construct() {
@@ -106,8 +106,8 @@ class CreatureConforts extends Table {
 
         self::$instance = $this;
 
-        $this->conforts = self::getNew("module.common.deck");
-        $this->conforts->init("confort");
+        $this->comforts = self::getNew("module.common.deck");
+        $this->comforts->init("comfort");
 
         $this->cottages = self::getNew("module.common.deck");
         $this->cottages->init("cottage");
@@ -143,7 +143,7 @@ class CreatureConforts extends Table {
     */
     protected function setupNewGame($players, $options = array()) {
         Players::setupNewGame($players, $options);
-        Conforts::setupNewGame($players, $options);
+        Comforts::setupNewGame($players, $options);
         Cottages::setupNewGame($players, $options);
         Improvements::setupNewGame($players);
         Travelers::setupNewGame($players);
@@ -186,7 +186,7 @@ class CreatureConforts extends Table {
 
         $result['dice'] = Dice::getUIData();
 
-        $result['conforts'] = Conforts::getUIData($current_player_id);
+        $result['comforts'] = Comforts::getUIData($current_player_id);
         $result['cottages'] = Cottages::getUIData();
         $result['improvements'] = Improvements::getUIData();
         $result['travelers'] = Travelers::getUIData();

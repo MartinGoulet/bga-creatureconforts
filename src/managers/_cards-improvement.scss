@@ -8,6 +8,9 @@
    --card-height: 125px;
 
    .card-sides {
+      border-radius: 5px;
+      overflow: hidden;
+
       .image {
          background-image: url('img/improvements/cards.jpg');
          background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
@@ -25,12 +28,10 @@
          background-image: url('img/improvements/cards.jpg');
          background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
          background-position: -200% -300%;
-         border-radius: 5px;
       }
 
       .front {
          outline: 1px solid #000;
-         border-radius: 5px;
          box-shadow: 0 0 5px 6px #fff;
          filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 

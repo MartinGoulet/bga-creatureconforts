@@ -1,7 +1,7 @@
 class GameOptions {
    private turn_number: ebg.counter;
 
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       this.setupGameInfo(game.gamedatas);
       this.setupGamePhase();
       this.game.updatePlayerOrdering();
@@ -16,7 +16,7 @@ class GameOptions {
       this.turn_number.toValue(value);
    }
 
-   private setupGameInfo({ turn_number, nbr_turns }: CreatureConfortsGamedatas) {
+   private setupGameInfo({ turn_number, nbr_turns }: CreatureComfortsGamedatas) {
       const display = document.getElementById('game-infos');
       if (display) {
          display.parentElement.removeChild(display);

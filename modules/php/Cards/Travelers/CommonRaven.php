@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Cards\Travelers;
+namespace CreatureComforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Helpers\ResourcesHelper;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Helpers\ResourcesHelper;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Players;
 
 class CommonRaven {
     static function resolve(int $die_value, array $resources, array $group) {
@@ -41,7 +41,7 @@ class CommonRaven {
         Players::removeResource($player_id, $group);
         Players::addResources($player_id, [LESSON_LEARNED => 1]);
         Notifications::travelerExchangeResources($group, [CARD => 1, LESSON_LEARNED => 1]);
-        $card = Conforts::draw($player_id);
+        $card = Comforts::draw($player_id);
         Notifications::drawConfort($player_id, [$card]);
     }
     static function resolve_third(array $resources, array $group) {

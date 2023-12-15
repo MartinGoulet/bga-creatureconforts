@@ -1,6 +1,6 @@
 class TravelerHelper {
    static setTravelerToTable() {
-      const game = (window as any).gameui as CreatureConforts;
+      const game = (window as any).gameui as CreatureComforts;
       const traveler = game.tableCenter.traveler_deck.getTopCard().type;
       document.getElementById('table').dataset.traveler = traveler;
    }
@@ -26,7 +26,7 @@ class TravelerHelper {
    }
 
    private static isTravelerActive(type: number): boolean {
-      const game = (window as any).gameui as CreatureConforts;
+      const game = (window as any).gameui as CreatureComforts;
       if (Number(game.gamedatas.gamestate.id) > 90) return false;
       return Number(game.tableCenter.traveler_deck.getTopCard().type) === type;
    }

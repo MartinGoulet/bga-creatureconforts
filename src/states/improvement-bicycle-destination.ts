@@ -1,7 +1,7 @@
 class ImprovementBicycleDestinationState implements StateHandler {
    private available: string[];
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: ImprovementBicycleDestinationArgs): void {
       if (!this.game.isCurrentPlayerActive()) return;

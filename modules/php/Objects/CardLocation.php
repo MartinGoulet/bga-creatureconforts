@@ -1,6 +1,6 @@
 <?php
 
-namespace CreatureConforts\Objects;
+namespace CreatureComforts\Objects;
 
 class CardLocation {
 

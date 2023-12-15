@@ -3,7 +3,7 @@ interface DiceRequirement {
 }
 
 class DiceHelper {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    getTotalDiceSlot(location_id: number) {
       if (location_id > 4) {
@@ -24,7 +24,7 @@ class DiceHelper {
          // Get requirement
          requirement = this.getValleyRequirement(info);
       } else if (location_id >= 5 && location_id <= 7) {
-         requirement = new DialRequirement(this.game.gamedatas.river_dial, location_id);
+         requirement = new DialRequirement(this.game.tableCenter.getRiverDial(), location_id);
       } else {
          return true;
       }

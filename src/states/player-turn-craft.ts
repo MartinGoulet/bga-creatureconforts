@@ -2,7 +2,7 @@ class PlayerTurnCraftState implements StateHandler {
    private resourceManager?: ResourceManagerPay<IconsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('craft');
 
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       if (!this.game.isCurrentPlayerActive()) return;
@@ -128,7 +128,7 @@ class PlayerTurnCraftState implements StateHandler {
          this.resourceManager?.reset();
       };
 
-      this.game.addActionButtonDisabled('btn_craft', _('Craft confort'), handleCraft);
+      this.game.addActionButtonDisabled('btn_craft', _('Craft comfort'), handleCraft);
       this.game.addActionButtonDisabled('btn_pass', _('Pass'), handlePass);
       this.game.addActionButtonDisabled('btn_reset', _('Reset'), handleReset);
       this.game.addActionButtonUndo();

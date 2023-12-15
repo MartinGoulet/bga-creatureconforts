@@ -1,5 +1,5 @@
 class TravelerStripedSkunkStates implements StateHandler {
-   constructor(private game: CreatureConforts) {}
+   constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
       const discard = this.game.tableCenter.confort_discard_line;

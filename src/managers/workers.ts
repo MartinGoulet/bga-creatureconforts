@@ -1,5 +1,5 @@
 class WorkerManager extends CardManager<Meeple> {
-   constructor(public game: CreatureConforts) {
+   constructor(public game: CreatureComforts) {
       super(game, {
          getId: (card) => `worker-${card.id}`,
          setupDiv: (card: Meeple, div: HTMLElement) => {

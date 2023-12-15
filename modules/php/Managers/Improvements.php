@@ -1,9 +1,9 @@
 <?php
 
-namespace CreatureConforts\Managers;
+namespace CreatureComforts\Managers;
 
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Notifications;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Notifications;
 
 const LADDER = 'slot';
 const GLADE = 'glade';
@@ -128,6 +128,11 @@ class Improvements extends \APP_DbObject {
 
     static function hasUmbrella($player_id) {
         $cards = self::deck()->getCardsOfTypeInLocation('9', null, 'board', $player_id);
+        return sizeof($cards) > 0;
+    }
+
+    static function hasScale($player_id) {
+        $cards = self::deck()->getCardsOfTypeInLocation('15', null, 'board', $player_id);
         return sizeof($cards) > 0;
     }
 

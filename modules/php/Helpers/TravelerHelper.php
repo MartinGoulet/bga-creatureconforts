@@ -1,25 +1,25 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureConforts\Cards\Travelers\AmericanBeaver;
-use CreatureConforts\Cards\Travelers\BlackBear;
-use CreatureConforts\Cards\Travelers\BlueJay;
-use CreatureConforts\Cards\Travelers\CanadaLynx;
-use CreatureConforts\Cards\Travelers\CommonLoon;
-use CreatureConforts\Cards\Travelers\CommonRaven;
-use CreatureConforts\Cards\Travelers\GrayWolf;
-use CreatureConforts\Cards\Travelers\HairyTailedHole;
-use CreatureConforts\Cards\Travelers\LeopardFrog;
-use CreatureConforts\Cards\Travelers\Moose;
-use CreatureConforts\Cards\Travelers\PileatedWoodpecker;
-use CreatureConforts\Cards\Travelers\PineMarten;
-use CreatureConforts\Cards\Travelers\SnappingTurtle;
-use CreatureConforts\Cards\Travelers\StripedSkunk;
-use CreatureConforts\Cards\Travelers\WildTurkey;
-use CreatureConforts\Managers\Players;
-use CreatureConforts\Managers\Travelers;
+use CreatureComforts\Cards\Travelers\AmericanBeaver;
+use CreatureComforts\Cards\Travelers\BlackBear;
+use CreatureComforts\Cards\Travelers\BlueJay;
+use CreatureComforts\Cards\Travelers\CanadaLynx;
+use CreatureComforts\Cards\Travelers\CommonLoon;
+use CreatureComforts\Cards\Travelers\CommonRaven;
+use CreatureComforts\Cards\Travelers\GrayWolf;
+use CreatureComforts\Cards\Travelers\HairyTailedHole;
+use CreatureComforts\Cards\Travelers\LeopardFrog;
+use CreatureComforts\Cards\Travelers\Moose;
+use CreatureComforts\Cards\Travelers\PileatedWoodpecker;
+use CreatureComforts\Cards\Travelers\PineMarten;
+use CreatureComforts\Cards\Travelers\SnappingTurtle;
+use CreatureComforts\Cards\Travelers\StripedSkunk;
+use CreatureComforts\Cards\Travelers\WildTurkey;
+use CreatureComforts\Managers\Players;
+use CreatureComforts\Managers\Travelers;
 
 class TravelerHelper {
 
@@ -124,12 +124,20 @@ class TravelerHelper {
         return self::isTravelerActive(9);
     }
 
+    static function isActiveSnappingTurtle() {
+        return self::isTravelerActive(10);
+    }
+
     static function isActivePineMarten() {
         return self::isTravelerActive(11);
     }
 
     static function isActiveBlackBear() {
         return self::isTravelerActive(12);
+    }
+
+    static function isActiveMoose() {
+        return self::isTravelerActive(13);
     }
 
     static function isActiveWildTurkey() {

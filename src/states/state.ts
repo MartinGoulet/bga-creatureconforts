@@ -3,10 +3,10 @@ class StateManager {
    private readonly client_states: StateHandler[] = [];
    public current: StateHandler;
 
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       this.states = {
          startHand: new StartHandState(game),
-         placement: new PlacementState(game, true),
+         placement: new PlacementState(game),
          playerTurnDice: new PlayerTurnDiceState(game),
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
@@ -28,7 +28,8 @@ class StateManager {
          canadaLynx: new TravelerCanadaLynxState(game),
          commonRaven: new TravelerCommonRavenState(game),
          stripedSkunk: new TravelerStripedSkunkStates(game),
-         commonLoon: new PlacementState(game, false),
+         commonLoon: new PlacementState(game),
+         moose: new TravelerMooseState(game),
          wildTurkey: new TravelerWildTurkeyStates(game),
          wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
       };

@@ -1,8 +1,8 @@
 <?php
 
-namespace CreatureConforts\Helpers;
+namespace CreatureComforts\Helpers;
 
-use CreatureConforts\Core\Game;
+use CreatureComforts\Core\Game;
 
 class ResourcesHelper {
 

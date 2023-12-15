@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Cards\Travelers;
+namespace CreatureComforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Game;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Game;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Players;
 
 class WildTurkey {
     static function resolve(int $die_value, array $resources, array $group, array $resources2, array $group2) {
@@ -25,7 +25,7 @@ class WildTurkey {
         Notifications::travelerReceivedResources([CARD => 1, STORY => 1]);
         
         Game::undoSavepoint(); // For drawing
-        $card = Conforts::draw($player_id);
+        $card = Comforts::draw($player_id);
         Notifications::drawConfort($player_id, [$card]);
     }
     static function resolve_second() {

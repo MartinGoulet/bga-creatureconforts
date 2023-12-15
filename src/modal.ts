@@ -2,7 +2,7 @@ class Modal {
    public cards: LineStock<Card>;
    private onClose: () => void;
 
-   constructor(private game: CreatureConforts) {
+   constructor(private game: CreatureComforts) {
       const display = document.getElementById('modal-display');
       if (display) {
          display.parentElement.removeChild(display);
@@ -60,7 +60,7 @@ class Modal {
 
    displayConfort(card: ConfortCard) {
       const el = document.getElementById('modal-display-card');
-      const stock = new LineStock<ConfortCard>(new ConfortManager(this.game, 'modal'), el);
+      const stock = new LineStock<ConfortCard>(new ComfortManager(this.game, 'modal'), el);
       stock.addCard(card);
       this.onClose = () => {
          stock.removeCard(card);

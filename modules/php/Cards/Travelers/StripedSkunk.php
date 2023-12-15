@@ -1,12 +1,12 @@
 <?php
 
-namespace CreatureConforts\Cards\Travelers;
+namespace CreatureComforts\Cards\Travelers;
 
 use BgaUserException;
-use CreatureConforts\Core\Notifications;
-use CreatureConforts\Helpers\ResourcesHelper;
-use CreatureConforts\Managers\Conforts;
-use CreatureConforts\Managers\Players;
+use CreatureComforts\Core\Notifications;
+use CreatureComforts\Helpers\ResourcesHelper;
+use CreatureComforts\Managers\Comforts;
+use CreatureComforts\Managers\Players;
 
 class StripedSkunk {
     static function resolve(int $die_value, array $resources, array $group, array $resources2, array $group2, array $card_ids) {
@@ -33,7 +33,7 @@ class StripedSkunk {
             throw new BgaUserException("Wrong type of resource");
         }
         $player_id = Players::getPlayerId();
-        $hand = Conforts::getHand($player_id);
+        $hand = Comforts::getHand($player_id);
         $cards = [];
         foreach ($card_ids as $card_id) {
             $filter = array_filter($hand, function ($card) use ($card_id) {
@@ -42,7 +42,7 @@ class StripedSkunk {
             if (sizeof($filter) == 0) {
                 throw new BgaUserException("Card not in your hand " . $card_id);
             }
-            Conforts::addCardToDiscard($card_id);
+            Comforts::addCardToDiscard($card_id);
             $cards[] = array_shift($filter);
         }
         Notifications::discardConfort($cards);
@@ -55,7 +55,7 @@ class StripedSkunk {
         }
 
         $player_id = Players::getPlayerId();
-        $hand = Conforts::getHand($player_id);
+        $hand = Comforts::getHand($player_id);
         $cards = [];
         foreach ($card_ids as $card_id) {
             $filter = array_filter($hand, function ($card) use ($card_id) {
@@ -64,7 +64,7 @@ class StripedSkunk {
             if (sizeof($filter) == 0) {
                 throw new BgaUserException("Card not in your hand " . $card_id);
             }
-            Conforts::addCardToDiscard($card_id);
+            Comforts::addCardToDiscard($card_id);
             $cards[] = array_shift($filter);
         }
         Notifications::discardConfort($cards);
