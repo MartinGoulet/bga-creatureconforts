@@ -3154,7 +3154,6 @@ var ImprovementManager = (function (_super) {
                     return;
                 div.dataset.type = card.type;
                 div.dataset.img = card_info.img.toString();
-                div.classList.add('image');
                 if (div.getElementsByClassName('title').length !== 0)
                     return;
                 div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
@@ -3233,7 +3232,6 @@ var TravelerManager = (function (_super) {
                 div.dataset.cardId = '' + card.id;
             },
             setupFrontDiv: function (card, div) {
-                div.classList.add('image');
                 var card_info = _this.getCardType(card);
                 if (!card_info)
                     return;
@@ -3254,9 +3252,6 @@ var TravelerManager = (function (_super) {
                         return _this.game.modal.displayTraveler(card);
                     });
                 }
-            },
-            setupBackDiv: function (card, div) {
-                div.classList.add('image');
             },
             isCardVisible: function (card) { return _this.getCardType(card) !== undefined; },
             cardWidth: 212,
@@ -4045,7 +4040,7 @@ var PlayerTurnDiceManipulationState = (function () {
     };
     PlayerTurnDiceManipulationState.prototype.onLeavingState = function () {
         this.toolbar.removeContainer();
-        this.resetDiceManipulation();
+        this.resetDiceManipulation(false);
         var dice_locations = this.game.tableCenter.dice_locations;
         dice_locations.setSelectionMode('none');
         dice_locations.onSelectionChange = undefined;
@@ -4062,7 +4057,7 @@ var PlayerTurnDiceManipulationState = (function () {
         }
         var handleReset = function () {
             _this.game.tableCenter.dice_locations.unselectAll();
-            _this.resetDiceManipulation();
+            _this.resetDiceManipulation(true);
             _this.updateCommandButton();
         };
         var handleConfirm = function () {
@@ -4171,7 +4166,8 @@ var PlayerTurnDiceManipulationState = (function () {
         var umbrella_plus = this.applyIcon(_('Use ${token} to increase by ${nbr}'), 'umbrella', nbr);
         this.game.addActionButton("up".concat(nbr), umbrella_plus, handleUmbrella, this.toolbar.name);
     };
-    PlayerTurnDiceManipulationState.prototype.displayTokens = function (info) {
+    PlayerTurnDiceManipulationState.prototype.displayTokens = function (info, validate) {
+        if (validate === void 0) { validate = true; }
         var htmlDie = this.game.diceManager.getDieElement(info.die).childNodes[0];
         var lesson_wrapper = htmlDie.parentElement.querySelector('.tokens-wrapper');
         if (lesson_wrapper)
@@ -4182,7 +4178,9 @@ var PlayerTurnDiceManipulationState = (function () {
             icons.push(ResourceHelper.getElement('umbrella'));
         }
         htmlDie.parentElement.insertAdjacentHTML('beforeend', "<div class=\"tokens-wrapper\">".concat(icons.join(''), "</div>"));
-        this.validateLocation(info.location);
+        if (validate) {
+            this.validateLocation(info.location);
+        }
     };
     PlayerTurnDiceManipulationState.prototype.getLessonLearnedRemaining = function () {
         var nbrLesson = this.diceManipulation.reduce(function (total, curr) { return (total += Math.abs(curr.lesson)); }, 0);
@@ -4217,12 +4215,12 @@ var PlayerTurnDiceManipulationState = (function () {
         });
         debug(this.diceManipulation);
     };
-    PlayerTurnDiceManipulationState.prototype.resetDiceManipulation = function () {
+    PlayerTurnDiceManipulationState.prototype.resetDiceManipulation = function (validate) {
         var _this = this;
         this.diceManipulation.forEach(function (info) {
             info.lesson = 0;
             info.umbrella = 0;
-            _this.displayTokens(info);
+            _this.displayTokens(info, validate);
         });
     };
     PlayerTurnDiceManipulationState.prototype.updateCommandButton = function () {
@@ -4301,8 +4299,27 @@ var PlayerTurnResolveState = (function () {
             var diceCount = _this.game.tableCenter.getDiceFromLocation(slotId).length;
             return diceCount === 1;
         };
+        var handleDieClick = function (die) {
+            if (die.location && die.location >= 20) {
+                alert('click');
+            }
+        };
         worker_locations.setSelectableLocation(locations.filter(function (f) { return f < 20; }));
         worker_locations.OnLocationClick = handleWorkerLocationClick;
+        locations
+            .filter(function (loc) { return loc >= 20; })
+            .forEach(function (loc) {
+            setTimeout(function () {
+                var slot = document.querySelector("#glade [data-slot-id=\"".concat(loc, "\"]"));
+                slot.classList.toggle('selectable', true);
+                slot.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    slot.classList.toggle('selected');
+                    handleGladeSlotClick(loc, slot.classList.contains('selected'));
+                });
+            }, 15);
+        });
+        dice_locations.onDieClick = handleDieClick;
         var slotDices = document.querySelectorAll('#dice-locations .slot-dice:not(:empty)');
         slotDices.forEach(function (slot) {
             slot.classList.toggle('selectable', true);
@@ -4320,10 +4337,8 @@ var PlayerTurnResolveState = (function () {
         worker_locations.setSelectedLocation([]);
         worker_locations.OnLocationClick = null;
         this.clearSelectedDiceLocations();
+        document.querySelectorAll("#glade .slot-dice").forEach(function (div) { return div.classList.remove('selectable'); });
         this.glade_selection = undefined;
-        document
-            .querySelectorAll('#dice-locations .slot-dice.selectable')
-            .forEach(function (div) { return div.classList.remove('selectable'); });
     };
     PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -4382,7 +4397,7 @@ var PlayerTurnResolveState = (function () {
         this.game.addActionButtonUndo();
     };
     PlayerTurnResolveState.prototype.clearSelectedDiceLocations = function () {
-        var selectedDiceLocations = document.querySelectorAll('#dice-locations .slot-dice.selectable.selected');
+        var selectedDiceLocations = document.querySelectorAll('#dice-locations .slot-dice.selectable.selected, #glade .slot-dice.selectable.selected');
         selectedDiceLocations.forEach(function (slot) { return slot.classList.remove('selected'); });
     };
     PlayerTurnResolveState.prototype.goToMarket = function (args) {
@@ -4981,16 +4996,13 @@ var PreEndGame = (function () {
         this.toolbar = new ToolbarContainer('stored');
         this.toolbarButton = new ToolbarContainer('stored-buttons');
         this.stored_resources = {};
-        this.available_resources = {};
         this.index_ress = 0;
     }
     PreEndGame.prototype.onEnteringState = function (args) {
         var _this = this;
-        for (var _i = 0, ICONS_1 = ICONS; _i < ICONS_1.length; _i++) {
-            var resource = ICONS_1[_i];
-            this.available_resources[resource] = this.game.getCurrentPlayerPanel().counters[resource].getValue();
-        }
         var handleSelectionChange = function (selection) {
+            _this.game.toggleButtonEnable('btn_ress', selection.length === 0);
+            _this.game.toggleButtonEnable('btn_reset_ress', selection.length === 0, 'gray');
             if (selection.length === 0) {
                 _this.resetResourceManager();
                 return;
@@ -5017,16 +5029,28 @@ var PreEndGame = (function () {
     PreEndGame.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
         var handleConfirm = function () {
-            _this.game.takeAction('confirmStoreResource', {});
+            if (_this.toolbar.getContainer())
+                return;
+            var cards = [];
+            Object.keys(_this.stored_resources).forEach(function (card_id) {
+                var resources = _this.stored_resources[card_id];
+                var string = __spreadArray([card_id], ResourceHelper.convertToInt(resources), true).join(';');
+                cards.push(string);
+            });
+            _this.game.takeAction('confirmStoreResource', { info: cards.join('|') });
         };
         var handleReset = function () {
-            for (var _i = 0, ICONS_2 = ICONS; _i < ICONS_2.length; _i++) {
-                var resource = ICONS_2[_i];
-                _this.available_resources[resource] = _this.game
-                    .getCurrentPlayerPanel()
-                    .counters[resource].getValue();
-            }
+            if (_this.toolbar.getContainer())
+                return;
+            var counters = _this.game.getCurrentPlayerPanel().counters;
+            Object.keys(_this.stored_resources).forEach(function (card_id) {
+                var ress = _this.stored_resources[card_id];
+                ress.forEach(function (ress) {
+                    counters[ress].incValue(1);
+                });
+            });
             _this.stored_resources = {};
+            document.querySelectorAll('.storage.resource-icon').forEach(function (div) { return div.remove(); });
             _this.game.getCurrentPlayerTable().comforts.unselectAll();
         };
         this.game.addActionButton('btn_ress', _('Confirm stored resources'), handleConfirm);
@@ -5034,14 +5058,13 @@ var PreEndGame = (function () {
     };
     PreEndGame.prototype.moveResources = function (card_id, resources) {
         return __awaiter(this, void 0, void 0, function () {
-            var player_id, promises, ress;
+            var promises, ress;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        player_id = this.game.getPlayerId();
                         promises = [];
                         for (ress in resources) {
-                            promises.push(this.animateResource(card_id, ress));
+                            promises.push(this.animateResource(card_id, resources[ress]));
                         }
                         return [4, Promise.all(promises)];
                     case 1:
@@ -5053,35 +5076,22 @@ var PreEndGame = (function () {
     };
     PreEndGame.prototype.animateResource = function (card_id, type) {
         this.index_ress += 1;
-        var html = "<div id=\"ress-".concat(this.index_ress, "\" class=\"resource-icon\" data-type=\"").concat(type, "\" style=\"z-index: 10; position: absolute\"></div>");
-        document
-            .getElementById("player-panel-".concat(this.game.getPlayerId(), "-icons-").concat(type, "-counter"))
-            .insertAdjacentHTML('beforeend', html);
+        var html = "<div id=\"ress-".concat(this.index_ress, "\" class=\"resource-icon storage\" data-type=\"").concat(type, "\" style=\"z-index: 10; position: absolute\"></div>");
+        var id = "player-panel-".concat(this.game.getPlayerId(), "-icons-").concat(type, "-counter");
+        document.getElementById(id).insertAdjacentHTML('beforeend', html);
         var element = document.getElementById("ress-".concat(this.index_ress));
-        var toElement = document.getElementById("comforts-".concat(44));
-        var finalTransform = "translate(".concat(90 * Math.random() + 10, "px, ").concat(100 * Math.random() + 25, "px)");
+        var toElement = document.getElementById("comforts-".concat(card_id));
+        var finalTransform = "translate(".concat(60 * Math.random() + 10, "px, ").concat(65 * Math.random() + 25, "px)");
         return this.game.confortManager.animationManager.attachWithAnimation(new BgaSlideAnimation({ element: element, finalTransform: finalTransform }), toElement);
     };
-    PreEndGame.prototype.animationMoveResource = function (player_id, resources) {
-        var type = 'wood';
-        this.index_ress += 1;
-        var html = "<div id=\"ress-".concat(this.index_ress, "\" class=\"resource-icon\" data-type=\"").concat(type, "\" style=\"z-index: 10; position: absolute\"></div>");
-        document
-            .getElementById("player-panel-".concat(player_id, "-icons-").concat(type, "-counter"))
-            .insertAdjacentHTML('beforeend', html);
-        var element = document.getElementById("ress-".concat(this.index_ress));
-        var toElement = document.getElementById("comforts-".concat(44));
-        var finalTransform = "translate(".concat(90 * Math.random() + 10, "px, ").concat(100 * Math.random() + 25, "px)");
-        this.game.confortManager.animationManager.attachWithAnimation(new BgaSlideAnimation({ element: element, finalTransform: finalTransform }), toElement);
-    };
     PreEndGame.prototype.addResourcesManager = function (selection) {
-        var _this = this;
-        var storable = this.game.confortManager.getCardType(selection).storable;
+        var _a = this.game.confortManager.getCardType(selection), storable = _a.storable, card_class = _a.class;
         var filter_available = __spreadArray([], storable, true);
-        var available = GOODS.filter(function (good) { return filter_available.includes(good); }).map(function (good) {
+        var counters = this.game.getCurrentPlayerPanel().counters;
+        var available = ICONS.filter(function (icon) { return filter_available.includes(icon); }).map(function (icon) {
             return {
-                resource: good,
-                initialValue: _this.available_resources[good],
+                resource: icon,
+                initialValue: counters[icon].getValue(),
             };
         });
         if (storable) {
@@ -5092,7 +5102,7 @@ var PreEndGame = (function () {
                     count: storable.length,
                 },
                 to: {},
-                times: 99,
+                times: card_class == 'Lamp' ? 1 : 99,
             });
         }
         else {
@@ -5111,8 +5121,9 @@ var PreEndGame = (function () {
                 _this.game.showMessage('You have uncompleted requirement met', 'error');
                 return;
             }
+            var counters = _this.game.getCurrentPlayerPanel().counters;
             var resources = _this.resource_manager.getResourcesFrom();
-            resources.forEach(function (good) { return (_this.available_resources[good] -= 1); });
+            resources.forEach(function (good) { return counters[good].incValue(-1); });
             var card_id = comforts.getSelection()[0].id;
             if (_this.stored_resources[card_id] === undefined) {
                 _this.stored_resources[card_id] = __spreadArray([], resources, true);
@@ -5360,6 +5371,9 @@ var TravelerCommonRavenState = (function () {
     TravelerCommonRavenState.prototype.onEnteringState = function (_a) {
         var _this = this;
         var location_ids = _a.locations_unavailable;
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        debugger;
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.OnLocationClick = function (slotId) {
             var selection = worker_locations.getSelectedLocation();
@@ -5657,6 +5671,14 @@ var CreatureComforts = (function () {
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         TravelerHelper.setTravelerToTable();
+        Object.keys(gamedatas.comfort_resources).forEach(function (card_id) {
+            gamedatas.comfort_resources[card_id].forEach(function (type) {
+                var transform = "transform: translate(".concat(60 * Math.random() + 10, "px, ").concat(65 * Math.random() + 25, "px)");
+                var html = "<div class=\"resource-icon storage\" data-type=\"".concat(type, "\" style=\"z-index: 10; position: absolute; ").concat(transform, "\"></div>");
+                var toElement = document.getElementById("comforts-".concat(card_id));
+                toElement.insertAdjacentHTML('beforeend', html);
+            });
+        });
         this.setupNotifications();
     };
     CreatureComforts.prototype.onEnteringState = function (stateName, args) {
@@ -6165,7 +6187,7 @@ var NotificationManager = (function () {
         var location_id = _a.location_id, resources = _a.resources, player_id = _a.player_id;
         var fromElement = location_id < 20
             ? document.querySelector("#worker-locations *[data-slot-id=\"".concat(location_id, "\"]"))
-            : document.querySelector("#dice-locations   *[data-slot-id=\"".concat(location_id, "\"]"));
+            : document.querySelector("#glade *[data-slot-id=\"".concat(location_id, "\"]"));
         this.animationMoveResource(player_id, resources, fromElement);
     };
     NotificationManager.prototype.notif_onCraftConfort = function (_a) {
@@ -6646,9 +6668,12 @@ var TableCenter = (function () {
         this.confort_market.addCards(market);
     };
     TableCenter.prototype.setupDiceLocations = function (game) {
+        var _this = this;
         this.dice_locations = new DiceLocationStock(game.diceManager, document.getElementById("dice-locations"));
         var dice = game.gamedatas.dice.filter(function (die) { return die.location > 0; });
-        this.dice_locations.addDice(dice);
+        setTimeout(function () {
+            _this.dice_locations.addDice(dice);
+        }, 15);
     };
     TableCenter.prototype.setupGlade = function (game) {
         this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
@@ -6738,8 +6763,10 @@ var TableScore = (function () {
         this.displayScores(game.gamedatas.scores);
     }
     TableScore.prototype.displayScores = function (scores) {
+        document.querySelectorAll('.players-scores').forEach(function (table) { return table.remove(); });
         var player_ids = this.game.gamedatas.playerorder.map(function (id) { return Number(id); });
-        var html = "<table class=\"players-scores\">\n            <thead>\n               ".concat(this.getHeaderNames(player_ids, this.game.gamedatas), "\n            </thead>\n            <tbody>\n               ").concat(this.getRow('comforts', _('Comforts'), player_ids, scores), "\n               ").concat(this.getRow('comforts_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('improvements', _('Improvements'), player_ids, scores), "\n               ").concat(this.getRow('improvements_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('cottages', _('Cottages'), player_ids, scores), "\n               ").concat(this.getRow('resources', _('Resources'), player_ids, scores), "\n               ").concat(this.getTotals(player_ids, scores), "\n            </tbody>\n         </table>");
+        var html = "<table class=\"players-scores\">\n            <thead>\n               ".concat(this.getHeaderNames(player_ids, this.game.gamedatas), "\n            </thead>\n            <tbody>\n               ").concat(this.getRow('comforts', _('Comforts'), player_ids, scores), "\n               ").concat(this.getRow('comforts_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('improvements', _('Improvements'), player_ids, scores), "\n               ").concat(this.getRow('improvements_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('cottages', _('Cottages'), player_ids, scores), "\n               ").concat(this.getRow('', _('Resources'), player_ids, scores), "\n               ").concat(this.getRow('stories', _('Stories'), player_ids, scores), "\n               ").concat(this.getRow('coins', _('Coins'), player_ids, scores), "\n               ").concat(this.getRow('goods', _('Resources'), player_ids, scores), "\n               ").concat(this.getTotals(player_ids, scores), "\n            </tbody>\n         </table>");
+        debugger;
         document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
     };
     TableScore.prototype.getHeaderNames = function (player_ids, _a) {
@@ -6760,10 +6787,12 @@ var TableScore = (function () {
             }, 0);
             return "<td>\n            <div id=\"score-".concat(pId, "-total\">").concat(total, "</div>\n            <i class=\"fa fa-star\"></id>\n         </td>");
         });
-        return "<tr id=\"scores-row-total\">\n         <td class=\"row-header\">".concat(_('Total'), "</td>\n         ").concat(colums, "\n      </tr>");
+        return "<tr id=\"scores-row-total\">\n         <td class=\"row-header\">".concat(_('Total'), "</td>\n         ").concat(colums.join(''), "\n      </tr>");
     };
     TableScore.prototype.getRow = function (row, title, player_ids, scores) {
         var columns = player_ids.map(function (pId) {
+            if (row === '')
+                return "<td></td>";
             var score = scores[pId][row];
             return "<td>\n            <div id=\"score-".concat(pId, "-").concat(row, "\">").concat(score, "</div>\n            <i class=\"fa fa-star\"></id>\n         </td>");
         });

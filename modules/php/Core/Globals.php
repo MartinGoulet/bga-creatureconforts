@@ -96,6 +96,15 @@ class Globals extends \APP_DbObject {
         self::set("comforts_" . $card_id, $resources);
     }
 
+    public static function getComfortResourceByCard() {
+        $lines = self::getCollectionFromDB("SELECT SUBSTRING(`name`, 10, 3) card_id, `value` FROM `global_variables` where `name` like 'comforts_%'");
+        $result = [];
+        foreach($lines as $line) {
+            $result[intval($line['card_id'])] = json_decode($line['value'], true);
+        }
+        return $result;
+    }
+
     /*************************
      **** GENERIC METHODS ****
      *************************/

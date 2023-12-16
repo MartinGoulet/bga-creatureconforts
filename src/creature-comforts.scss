@@ -12,7 +12,13 @@ $purple: '650e41';
 //    $purple: '650e41',
 // );
 
-$playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
+$playerColorNames: (
+   'yellow',
+   'green',
+   'red',
+   'gray',
+   'purple'
+);
 
 @font-face {
    font-family: "Bosk";
@@ -63,6 +69,15 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    justify-content: center;
    padding-top: 40px;
    flex-direction: column;
+   gap: 20px;
+}
+
+.card,
+.card .card-sides .card-side {
+   border-radius: 5px;
+   background-clip: padding-box;
+   -moz-background-clip: padding-box;
+   -webkit-background-clip: padding-box;
 }
 
 // #bga-zoom-wrapper {
@@ -144,6 +159,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       #btn_discard {
          display: inline-block;
       }
+
       #btn_cancel {
          display: none;
       }
@@ -154,6 +170,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    #btn_discard {
       display: none;
    }
+
    #btn_cancel {
       display: inline-block;
    }
@@ -188,6 +205,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
       display: inline-block;
       vertical-align: middle;
    }
+
    .wheelbarrow {
       height: 35px;
       width: 40px;
@@ -249,6 +267,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    justify-content: center;
    gap: 10px;
    --size: 40px;
+
    .bga-dice_die-face {
       width: 40px;
       height: 40px;
@@ -258,6 +277,7 @@ $playerColorNames: ('yellow', 'green', 'red', 'gray', 'purple');
    .selected {
       box-shadow: 0 0 3px 3px #00ffff;
    }
+
    .disabled {
       opacity: 0.2;
    }

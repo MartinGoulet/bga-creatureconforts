@@ -133,8 +133,8 @@ class Notifications extends \APP_DbObject {
     static function getResourcesFromLocation(int $player_id, int $location_id, array $resources) {
         $message = clienttranslate('${player_name} get ${resources_to} from a location');
         self::notifyAll('onGetResourcesFromLocation', $message, [
-            'player_id' => Players::getPlayerId(),
-            'player_name' => self::getPlayerName(Players::getPlayerId()),
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
             'location_id' => $location_id,
             'resources' => $resources,
             'resources_to' => $resources,

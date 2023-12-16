@@ -174,11 +174,11 @@ class action_creatureconforts extends APP_GameAction {
    public function confirmStoreResource() {
       self::setAjaxMode();
       // Retrieve arguments
-      // $card_ids = self::getArg("card_ids", AT_numberlist, true);
-      // $card_ids = self::getArrayArgs($card_ids);
+      $info_raw = self::getArg("info", AT_numberlist, true);
+      $info = self::getArrayOfArrayArgs($info_raw);
       // Then, call the appropriate method in your game logic
       $this->game->gamestate->checkPossibleAction('confirmStoreResource');
-      $this->game->confirmStoreResource();
+      $this->game->confirmStoreResource($info);
       self::ajaxResponse();
    }
 
@@ -282,6 +282,24 @@ class action_creatureconforts extends APP_GameAction {
     }
     
     */
+
+    private function getArrayOfArrayArgs($args) {
+      // Removing last ';' if exists
+      if (substr($args, -1) == ';')
+         $args = substr($args, 0, -1);
+
+      if ($args == '')
+         $args = array();
+      else
+         $args = explode('|', $args);
+
+      $new_array = [];
+      foreach($args as $arg) {
+         $new_array[] = self::getArrayArgs($arg);
+      }
+
+      return $new_array;
+   }
 
    private function getArrayArgs($args) {
       // Removing last ';' if exists

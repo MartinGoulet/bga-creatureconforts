@@ -135,7 +135,10 @@ class TableCenter {
          document.getElementById(`dice-locations`),
       );
       const dice = game.gamedatas.dice.filter((die) => die.location > 0);
-      this.dice_locations.addDice(dice);
+      setTimeout(() => {
+         // Differ after glade creation
+         this.dice_locations.addDice(dice);
+      }, 15);
    }
 
    private setupGlade(game: CreatureComforts) {

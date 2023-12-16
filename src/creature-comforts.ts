@@ -127,6 +127,17 @@ class CreatureComforts
 
       TravelerHelper.setTravelerToTable();
 
+      Object.keys(gamedatas.comfort_resources).forEach((card_id) => {
+         gamedatas.comfort_resources[card_id].forEach((type) => {
+            const transform = `transform: translate(${60 * Math.random() + 10}px, ${
+               65 * Math.random() + 25
+            }px)`;
+            const html = `<div class="resource-icon storage" data-type="${type}" style="z-index: 10; position: absolute; ${transform}"></div>`;
+            const toElement = document.getElementById(`comforts-${card_id}`);
+            toElement.insertAdjacentHTML('beforeend', html);
+         });
+      });
+
       this.setupNotifications();
    }
 

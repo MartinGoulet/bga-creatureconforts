@@ -14,7 +14,6 @@ class ImprovementManager extends CardManager<ImprovementCard> {
 
             div.dataset.type = card.type;
             div.dataset.img = card_info.img.toString();
-            div.classList.add('image');
 
             if (div.getElementsByClassName('title').length !== 0) return;
 

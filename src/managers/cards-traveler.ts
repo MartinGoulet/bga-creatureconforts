@@ -7,8 +7,6 @@ class TravelerManager extends CardManager<TravelerCard> {
             div.dataset.cardId = '' + card.id;
          },
          setupFrontDiv: (card: Card, div: HTMLElement) => {
-            div.classList.add('image');
-
             const card_info: TravelerType = this.getCardType(card);
             if (!card_info) return;
 
@@ -39,9 +37,6 @@ class TravelerManager extends CardManager<TravelerCard> {
                   this.game.modal.displayTraveler(card),
                );
             }
-         },
-         setupBackDiv: (card: TravelerCard, div: HTMLElement) => {
-            div.classList.add('image');
          },
          isCardVisible: (card) => this.getCardType(card) !== undefined,
          cardWidth: 212,

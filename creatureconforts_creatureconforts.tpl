@@ -5,13 +5,13 @@
     <div id="tables-and-center">
         <div id="current-player-table"></div>
         <div id="table-center-wrapper">
-            <div id="table-improvements"></div>
-            <div id="glade"></div>
+            <div id="table-improvements" class="white-border"></div>
+            <div id="glade" class="white-border"></div>
             <div id="board">
                 <div id="river-dial" data-position="5"></div>
                 <div id="table-comforts" class="white-border"></div>
-                <div id="table-travelers"></div>
-                <div id="table-valleys"></div>
+                <div id="table-travelers" class="white-border"></div>
+                <div id="table-valleys" class="white-border"></div>
                 <div id="worker-locations"></div>
                 <div id="dice-locations"></div>
                 <div id="hill-dice"></div>

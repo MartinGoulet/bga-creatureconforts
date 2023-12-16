@@ -54,6 +54,6 @@ class CommonRaven {
         $player_id = Players::getPlayerId();
         Players::removeResource($player_id, $group);
         Players::addResources($player_id, [COIN => $group[GRAIN]]);
-        Notifications::travelerExchangeResources($group, [LESSON_LEARNED => $group[GRAIN]]);
+        Notifications::travelerExchangeResources($group, [COIN => $group[GRAIN]]);
     }
 }

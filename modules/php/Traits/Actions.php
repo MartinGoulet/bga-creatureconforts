@@ -432,8 +432,15 @@ trait Actions {
         Game::get()->gamestate->nextState();
     }
 
-    function confirmStoreResource() {
+    function confirmStoreResource(array $infos) {
         $current_player_id = $this->getCurrentPlayerId();
+
+        foreach($infos as $key => $info) {
+            $card_id = array_shift($info);
+            $resources = ResourcesHelper::convertNumberToResource($info);
+            Globals::setComfortResource($card_id, $resources);
+            Players::removeResource($current_player_id, ResourcesHelper::groupByType($resources));
+        }
 
         // Desactivate the current player
         $this->gamestate->setPlayerNonMultiactive($current_player_id, '');

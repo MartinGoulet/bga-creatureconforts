@@ -951,7 +951,10 @@ body > .bga-dice_die {
   vertical-align: middle;
 }
 #table-score .players-scores #scores-row-comforts_bonus .row-header,
-#table-score .players-scores #scores-row-improvements_bonus .row-header {
+#table-score .players-scores #scores-row-improvements_bonus .row-header,
+#table-score .players-scores #scores-row-stories .row-header,
+#table-score .players-scores #scores-row-coins .row-header,
+#table-score .players-scores #scores-row-goods .row-header {
   padding-left: 30px;
 }
 #table-score table {
@@ -1249,21 +1252,14 @@ body > .bga-dice_die {
   position: relative;
   width: var(--card-width);
   height: var(--card-height);
-  border-radius: 5px;
 }
-.card.comfort .card-sides {
+.card.comfort .card-sides .back, .card.comfort .card-sides .front {
+  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+  background-image: url("img/comforts/cards.jpg");
   border-radius: 5px;
-  overflow: hidden;
 }
 .card.comfort .card-sides .back {
-  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
-  background-image: url("img/comforts/cards.jpg");
   background-position: -600% -200%;
-}
-.card.comfort .card-sides .front {
-  outline: 1px solid #000;
-  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
-  background-image: url("img/comforts/cards.jpg");
 }
 .card.comfort .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
@@ -1361,7 +1357,7 @@ body > .bga-dice_die {
   top: 8px;
   left: 0;
   right: 0;
-  font-size: 11px;
+  font-size: 0.7rem;
   padding-left: 27px;
   color: white;
   font-family: Bosk;
@@ -1373,7 +1369,7 @@ body > .bga-dice_die {
   right: 0;
   min-height: 33px;
   font-family: "Bosk";
-  font-size: 9px;
+  font-size: 0.6rem;
   color: white;
   padding: 0 5px;
   display: flex;
@@ -1389,7 +1385,7 @@ body > .bga-dice_die {
   background-size: 16px 12px;
 }
 .card.comfort .gametext .i-heart span {
-  font-size: 9px;
+  font-size: 0.6rem;
 }
 .card.comfort .gametext .resource-group {
   display: inline-block;
@@ -1407,7 +1403,7 @@ body > .bga-dice_die {
   height: 35px;
 }
 
-.white-border .card.comfort .card-sides .front {
+.white-border .card .card-sides .front {
   outline: 1px solid #000;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
@@ -1506,89 +1502,77 @@ body > .bga-dice_die {
 .card.improvement {
   display: inline-block;
   position: relative;
-  width: 125px;
-  height: 125px;
-  border-radius: 5px;
+  width: var(--card-width);
+  height: var(--card-height);
   --card-width: 125px;
   --card-height: 125px;
 }
-.card.improvement .card-sides {
-  border-radius: 5px;
-  overflow: hidden;
-}
-.card.improvement .card-sides .image {
+.card.improvement .card-sides .back, .card.improvement .card-sides .front {
   background-image: url("img/improvements/cards.jpg");
   background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
-}
-.card.improvement .card-sides .image[data-img="1"] {
-  background-position: 0% 0%;
-}
-.card.improvement .card-sides .image[data-img="2"] {
-  background-position: -100% 0%;
-}
-.card.improvement .card-sides .image[data-img="3"] {
-  background-position: -200% 0%;
-}
-.card.improvement .card-sides .image[data-img="4"] {
-  background-position: -300% 0%;
-}
-.card.improvement .card-sides .image[data-img="5"] {
-  background-position: -400% 0%;
-}
-.card.improvement .card-sides .image[data-img="6"] {
-  background-position: 0% -100%;
-}
-.card.improvement .card-sides .image[data-img="7"] {
-  background-position: -100% -100%;
-}
-.card.improvement .card-sides .image[data-img="8"] {
-  background-position: -200% -100%;
-}
-.card.improvement .card-sides .image[data-img="9"] {
-  background-position: -300% -100%;
-}
-.card.improvement .card-sides .image[data-img="10"] {
-  background-position: -400% -100%;
-}
-.card.improvement .card-sides .image[data-img="11"] {
-  background-position: 0% -200%;
-}
-.card.improvement .card-sides .image[data-img="12"] {
-  background-position: -100% -200%;
-}
-.card.improvement .card-sides .image[data-img="13"] {
-  background-position: -200% -200%;
-}
-.card.improvement .card-sides .image[data-img="14"] {
-  background-position: -300% -200%;
-}
-.card.improvement .card-sides .image[data-img="15"] {
-  background-position: -400% -200%;
-}
-.card.improvement .card-sides .image[data-img="16"] {
-  background-position: 0% -300%;
-}
-.card.improvement .card-sides .image[data-img="17"] {
-  background-position: -100% -300%;
-}
-.card.improvement .card-sides .image[data-img="18"] {
-  background-position: -200% -300%;
-}
-.card.improvement .card-sides .image[data-img="19"] {
-  background-position: -300% -300%;
-}
-.card.improvement .card-sides .image[data-img="20"] {
-  background-position: -400% -300%;
 }
 .card.improvement .card-sides .back {
-  background-image: url("img/improvements/cards.jpg");
-  background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
   background-position: -200% -300%;
 }
-.card.improvement .card-sides .front {
-  outline: 1px solid #000;
-  box-shadow: 0 0 5px 6px #fff;
-  filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
+.card.improvement .card-sides .front[data-img="1"] {
+  background-position: 0% 0%;
+}
+.card.improvement .card-sides .front[data-img="2"] {
+  background-position: -100% 0%;
+}
+.card.improvement .card-sides .front[data-img="3"] {
+  background-position: -200% 0%;
+}
+.card.improvement .card-sides .front[data-img="4"] {
+  background-position: -300% 0%;
+}
+.card.improvement .card-sides .front[data-img="5"] {
+  background-position: -400% 0%;
+}
+.card.improvement .card-sides .front[data-img="6"] {
+  background-position: 0% -100%;
+}
+.card.improvement .card-sides .front[data-img="7"] {
+  background-position: -100% -100%;
+}
+.card.improvement .card-sides .front[data-img="8"] {
+  background-position: -200% -100%;
+}
+.card.improvement .card-sides .front[data-img="9"] {
+  background-position: -300% -100%;
+}
+.card.improvement .card-sides .front[data-img="10"] {
+  background-position: -400% -100%;
+}
+.card.improvement .card-sides .front[data-img="11"] {
+  background-position: 0% -200%;
+}
+.card.improvement .card-sides .front[data-img="12"] {
+  background-position: -100% -200%;
+}
+.card.improvement .card-sides .front[data-img="13"] {
+  background-position: -200% -200%;
+}
+.card.improvement .card-sides .front[data-img="14"] {
+  background-position: -300% -200%;
+}
+.card.improvement .card-sides .front[data-img="15"] {
+  background-position: -400% -200%;
+}
+.card.improvement .card-sides .front[data-img="16"] {
+  background-position: 0% -300%;
+}
+.card.improvement .card-sides .front[data-img="17"] {
+  background-position: -100% -300%;
+}
+.card.improvement .card-sides .front[data-img="18"] {
+  background-position: -200% -300%;
+}
+.card.improvement .card-sides .front[data-img="19"] {
+  background-position: -300% -300%;
+}
+.card.improvement .card-sides .front[data-img="20"] {
+  background-position: -400% -300%;
 }
 .card.improvement .card-sides .front > * {
   pointer-events: none;
@@ -1620,7 +1604,7 @@ body > .bga-dice_die {
   top: 9px;
   left: 0;
   right: 0;
-  font-size: 10px;
+  font-size: 0.65rem;
   padding-left: 27px;
   color: palegoldenrod;
   font-family: Bosk;
@@ -1632,7 +1616,7 @@ body > .bga-dice_die {
   right: 0;
   min-height: 33px;
   font-family: "Bosk";
-  font-size: 8px;
+  font-size: 0.6rem;
   color: palegoldenrod;
   padding: 0 3px;
   display: flex;
@@ -1685,74 +1669,64 @@ body > .bga-dice_die {
   position: relative;
   width: var(--card-width);
   height: var(--card-height);
-  border-radius: 5px;
   --card-width: 212px;
   --card-height: 142px;
 }
-.card.traveler .card-sides {
-  border-radius: 5px;
-  overflow: hidden;
-}
 .card.traveler .card-sides .back,
 .card.traveler .card-sides .front {
-  outline: 1px solid #000;
-  box-shadow: 0 0 5px 6px #fff;
-  filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
-}
-.card.traveler .card-sides .image {
   background-image: url("img/travelers/cards.jpg");
   background-size: calc(var(--card-width) * 4) calc(var(--card-height) * 4);
 }
-.card.traveler .card-sides .image[data-img="1"] {
-  background-position: 0% 0%;
-}
-.card.traveler .card-sides .image[data-img="2"] {
-  background-position: -100% 0%;
-}
-.card.traveler .card-sides .image[data-img="3"] {
-  background-position: -200% 0%;
-}
-.card.traveler .card-sides .image[data-img="4"] {
-  background-position: -300% 0%;
-}
-.card.traveler .card-sides .image[data-img="5"] {
-  background-position: 0% -100%;
-}
-.card.traveler .card-sides .image[data-img="6"] {
-  background-position: -100% -100%;
-}
-.card.traveler .card-sides .image[data-img="7"] {
-  background-position: -200% -100%;
-}
-.card.traveler .card-sides .image[data-img="8"] {
-  background-position: -300% -100%;
-}
-.card.traveler .card-sides .image[data-img="9"] {
-  background-position: 0% -200%;
-}
-.card.traveler .card-sides .image[data-img="10"] {
-  background-position: -100% -200%;
-}
-.card.traveler .card-sides .image[data-img="11"] {
-  background-position: -200% -200%;
-}
-.card.traveler .card-sides .image[data-img="12"] {
-  background-position: -300% -200%;
-}
-.card.traveler .card-sides .image[data-img="13"] {
-  background-position: 0% -300%;
-}
-.card.traveler .card-sides .image[data-img="14"] {
-  background-position: -100% -300%;
-}
-.card.traveler .card-sides .image[data-img="15"] {
-  background-position: -200% -300%;
-}
-.card.traveler .card-sides .image[data-img="16"] {
-  background-position: -300% -300%;
-}
 .card.traveler .card-sides .back {
   background-position: -100% -200%;
+}
+.card.traveler .card-sides .front[data-img="1"] {
+  background-position: 0% 0%;
+}
+.card.traveler .card-sides .front[data-img="2"] {
+  background-position: -100% 0%;
+}
+.card.traveler .card-sides .front[data-img="3"] {
+  background-position: -200% 0%;
+}
+.card.traveler .card-sides .front[data-img="4"] {
+  background-position: -300% 0%;
+}
+.card.traveler .card-sides .front[data-img="5"] {
+  background-position: 0% -100%;
+}
+.card.traveler .card-sides .front[data-img="6"] {
+  background-position: -100% -100%;
+}
+.card.traveler .card-sides .front[data-img="7"] {
+  background-position: -200% -100%;
+}
+.card.traveler .card-sides .front[data-img="8"] {
+  background-position: -300% -100%;
+}
+.card.traveler .card-sides .front[data-img="9"] {
+  background-position: 0% -200%;
+}
+.card.traveler .card-sides .front[data-img="10"] {
+  background-position: -100% -200%;
+}
+.card.traveler .card-sides .front[data-img="11"] {
+  background-position: -200% -200%;
+}
+.card.traveler .card-sides .front[data-img="12"] {
+  background-position: -300% -200%;
+}
+.card.traveler .card-sides .front[data-img="13"] {
+  background-position: 0% -300%;
+}
+.card.traveler .card-sides .front[data-img="14"] {
+  background-position: -100% -300%;
+}
+.card.traveler .card-sides .front[data-img="15"] {
+  background-position: -200% -300%;
+}
+.card.traveler .card-sides .front[data-img="16"] {
+  background-position: -300% -300%;
 }
 .card.traveler .card-sides .front > * {
   pointer-events: none;
@@ -1855,17 +1829,12 @@ body > .bga-dice_die {
   position: relative;
   width: 310px;
   height: 156px;
-  border-radius: 5px;
 }
 .card.valley.forest .front {
   background-image: url("img/forest.jpg");
 }
 .card.valley.meadow .front {
   background-image: url("img/meadow.jpg");
-}
-.card.valley .card-sides {
-  border-radius: 5px;
-  overflow: hidden;
 }
 .card.valley .card-sides .front {
   background-size: 1240px 312px;
@@ -2300,6 +2269,15 @@ body > .bga-dice_die {
   justify-content: center;
   padding-top: 40px;
   flex-direction: column;
+  gap: 20px;
+}
+
+.card,
+.card .card-sides .card-side {
+  border-radius: 5px;
+  background-clip: padding-box;
+  -moz-background-clip: padding-box;
+  -webkit-background-clip: padding-box;
 }
 
 #tables-and-center {

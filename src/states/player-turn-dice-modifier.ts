@@ -22,7 +22,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
 
    onLeavingState(): void {
       this.toolbar.removeContainer();
-      this.resetDiceManipulation();
+      this.resetDiceManipulation(false);
       const { dice_locations } = this.game.tableCenter;
       dice_locations.setSelectionMode('none');
       dice_locations.onSelectionChange = undefined;
@@ -41,7 +41,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
 
       const handleReset = () => {
          this.game.tableCenter.dice_locations.unselectAll();
-         this.resetDiceManipulation();
+         this.resetDiceManipulation(true);
          this.updateCommandButton();
       };
 
@@ -172,7 +172,7 @@ class PlayerTurnDiceManipulationState implements StateHandler {
       this.game.addActionButton(`up${nbr}`, umbrella_plus, handleUmbrella, this.toolbar.name);
    }
 
-   private displayTokens(info: DiceManipulation) {
+   private displayTokens(info: DiceManipulation, validate = true) {
       const htmlDie = this.game.diceManager.getDieElement(info.die).childNodes[0] as HTMLElement;
       const lesson_wrapper = htmlDie.parentElement.querySelector('.tokens-wrapper');
       if (lesson_wrapper) lesson_wrapper.remove();
@@ -188,7 +188,9 @@ class PlayerTurnDiceManipulationState implements StateHandler {
          `<div class="tokens-wrapper">${icons.join('')}</div>`,
       );
 
-      this.validateLocation(info.location);
+      if (validate) {
+         this.validateLocation(info.location);
+      }
    }
 
    private getLessonLearnedRemaining(): number {
@@ -227,11 +229,11 @@ class PlayerTurnDiceManipulationState implements StateHandler {
       debug(this.diceManipulation);
    }
 
-   private resetDiceManipulation() {
+   private resetDiceManipulation(validate: boolean) {
       this.diceManipulation.forEach((info) => {
          info.lesson = 0;
          info.umbrella = 0;
-         this.displayTokens(info);
+         this.displayTokens(info, validate);
       });
    }
 

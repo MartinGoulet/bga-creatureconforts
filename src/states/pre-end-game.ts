@@ -3,16 +3,19 @@ class PreEndGame implements StateHandler {
    private toolbar: ToolbarContainer = new ToolbarContainer('stored');
    private toolbarButton: ToolbarContainer = new ToolbarContainer('stored-buttons');
    private stored_resources: Record<number, IconsType[]> = {};
-   private available_resources: Record<string, number> = {};
+   // private available_resources: Record<string, number> = {};
+   private index_ress = 0;
 
    constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: any): void {
-      for (const resource of ICONS) {
-         this.available_resources[resource] = this.game.getCurrentPlayerPanel().counters[resource].getValue();
-      }
+      // for (const resource of ICONS) {
+      //    this.available_resources[resource] = this.game.getCurrentPlayerPanel().counters[resource].getValue();
+      // }
 
       const handleSelectionChange = (selection: ConfortCard[]) => {
+         this.game.toggleButtonEnable('btn_ress', selection.length === 0);
+         this.game.toggleButtonEnable('btn_reset_ress', selection.length === 0, 'gray');
          if (selection.length === 0) {
             this.resetResourceManager();
             return;
@@ -42,16 +45,38 @@ class PreEndGame implements StateHandler {
 
    onUpdateActionButtons(args: any): void {
       const handleConfirm = () => {
-         this.game.takeAction('confirmStoreResource', {});
+         if (this.toolbar.getContainer()) return;
+
+         const cards = [];
+
+         Object.keys(this.stored_resources).forEach((card_id) => {
+            const resources = this.stored_resources[card_id];
+            const string = [card_id, ...ResourceHelper.convertToInt(resources)].join(';');
+            cards.push(string);
+         });
+
+         this.game.takeAction('confirmStoreResource', { info: cards.join('|') });
       };
 
       const handleReset = () => {
-         for (const resource of ICONS) {
-            this.available_resources[resource] = this.game
-               .getCurrentPlayerPanel()
-               .counters[resource].getValue();
-         }
+         if (this.toolbar.getContainer()) return;
+
+         // for (const resource of ICONS) {
+         //    this.available_resources[resource] = this.game
+         //       .getCurrentPlayerPanel()
+         //       .counters[resource].getValue();
+         // }
+
+         const { counters } = this.game.getCurrentPlayerPanel();
+
+         Object.keys(this.stored_resources).forEach((card_id) => {
+            const ress = this.stored_resources[card_id];
+            ress.forEach((ress) => {
+               counters[ress].incValue(1);
+            });
+         });
          this.stored_resources = {};
+         document.querySelectorAll('.storage.resource-icon').forEach((div) => div.remove());
          this.game.getCurrentPlayerTable().comforts.unselectAll();
       };
 
@@ -59,13 +84,10 @@ class PreEndGame implements StateHandler {
       this.game.addActionButtonGray('btn_reset_ress', _('Reset stored resources'), handleReset);
    }
 
-   private index_ress = 0;
-
    private async moveResources(card_id: number, resources: IconsType[]) {
-      const player_id = this.game.getPlayerId();
       const promises: Promise<BgaAnimation<any>>[] = [];
       for (const ress in resources) {
-         promises.push(this.animateResource(card_id, ress));
+         promises.push(this.animateResource(card_id, resources[ress]));
       }
 
       await Promise.all(promises);
@@ -73,46 +95,30 @@ class PreEndGame implements StateHandler {
 
    private animateResource(card_id: number, type: string) {
       this.index_ress += 1;
-      const html = `<div id="ress-${this.index_ress}" class="resource-icon" data-type="${type}" style="z-index: 10; position: absolute"></div>`;
-      document
-         .getElementById(`player-panel-${this.game.getPlayerId()}-icons-${type}-counter`)
-         .insertAdjacentHTML('beforeend', html);
+      const html = `<div id="ress-${this.index_ress}" class="resource-icon storage" data-type="${type}" style="z-index: 10; position: absolute"></div>`;
+
+      const id = `player-panel-${this.game.getPlayerId()}-icons-${type}-counter`;
+      document.getElementById(id).insertAdjacentHTML('beforeend', html);
 
       const element = document.getElementById(`ress-${this.index_ress}`);
-      const toElement = document.getElementById(`comforts-${44}`);
-      const finalTransform = `translate(${90 * Math.random() + 10}px, ${100 * Math.random() + 25}px)`;
+      const toElement = document.getElementById(`comforts-${card_id}`);
+      const finalTransform = `translate(${60 * Math.random() + 10}px, ${65 * Math.random() + 25}px)`;
       return this.game.confortManager.animationManager.attachWithAnimation(
          new BgaSlideAnimation({ element, finalTransform }),
          toElement,
       );
    }
 
-   private animationMoveResource(player_id: number, resources: { [type: string]: number }[]) {
-      const type = 'wood';
-
-      this.index_ress += 1;
-      const html = `<div id="ress-${this.index_ress}" class="resource-icon" data-type="${type}" style="z-index: 10; position: absolute"></div>`;
-      document
-         .getElementById(`player-panel-${player_id}-icons-${type}-counter`)
-         .insertAdjacentHTML('beforeend', html);
-
-      const element = document.getElementById(`ress-${this.index_ress}`);
-      const toElement = document.getElementById(`comforts-${44}`);
-      const finalTransform = `translate(${90 * Math.random() + 10}px, ${100 * Math.random() + 25}px)`;
-      this.game.confortManager.animationManager.attachWithAnimation(
-         new BgaSlideAnimation({ element, finalTransform }),
-         toElement,
-      );
-   }
-
    private addResourcesManager(selection: ConfortCard) {
-      const { storable } = this.game.confortManager.getCardType(selection);
+      const { storable, class: card_class } = this.game.confortManager.getCardType(selection);
 
       const filter_available = [...storable];
-      const available = GOODS.filter((good) => filter_available.includes(good)).map((good) => {
+      const { counters } = this.game.getCurrentPlayerPanel();
+
+      const available = ICONS.filter((icon) => filter_available.includes(icon)).map((icon) => {
          return {
-            resource: good,
-            initialValue: this.available_resources[good],
+            resource: icon,
+            initialValue: counters[icon].getValue(),
          } as IResourceCounterSettings<IconsType>;
       });
 
@@ -124,7 +130,7 @@ class PreEndGame implements StateHandler {
                count: storable.length,
             },
             to: {},
-            times: 99,
+            times: card_class == 'Lamp' ? 1 : 99,
          });
       } else {
          this.resource_manager = new ResourceManagerPay<IconsType>(this.toolbar.addContainer(), {
@@ -142,8 +148,9 @@ class PreEndGame implements StateHandler {
             this.game.showMessage('You have uncompleted requirement met', 'error');
             return;
          }
+         const { counters } = this.game.getCurrentPlayerPanel();
          const resources = this.resource_manager.getResourcesFrom();
-         resources.forEach((good) => (this.available_resources[good] -= 1));
+         resources.forEach((good) => counters[good].incValue(-1));
          const card_id = comforts.getSelection()[0].id;
 
          if (this.stored_resources[card_id] === undefined) {

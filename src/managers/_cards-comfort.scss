@@ -5,23 +5,20 @@
    position: relative;
    width: var(--card-width);
    height: var(--card-height);
-   border-radius: 5px;
 
    .card-sides {
-      border-radius: 5px;
-      overflow: hidden;
 
-      .back {
+      .back, .front {
          background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
          background-image: url('img/comforts/cards.jpg');
+         border-radius: 5px;
+      }
+
+      .back {
          background-position: -600% -200%;
       }
 
       .front {
-         outline: 1px solid #000;
-         background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
-         background-image: url('img/comforts/cards.jpg');
-
          @for $row from 0 through 3 {
             @for $col from 0 through 6 {
                &[data-img='#{(($row * 7) + $col + 1)}'] {
@@ -46,7 +43,7 @@
       top: 8px;
       left: 0;
       right: 0;
-      font-size: 11px;
+      font-size: 0.7rem;
       padding-left: 27px;
       color: white;
       font-family: Bosk;
@@ -59,7 +56,7 @@
       right: 0;
       min-height: 33px;
       font-family: "Bosk";
-      font-size: 9px;
+      font-size: 0.6rem;
       color: white;
       padding: 0 5px;
       display: flex;
@@ -76,7 +73,7 @@
          background-size: 16px 12px;
 
          span {
-            font-size: 9px;
+            font-size: 0.6rem;
          }
       }
 
@@ -89,7 +86,7 @@
          display: inline-flex;
          align-items: center;
          zoom: 0.4;
-         
+
 
          &::after {
             content: " ";
@@ -103,7 +100,7 @@
 }
 
 .white-border {
-   .card.comfort {
+   .card {
       .card-sides {
          .front {
             outline: 1px solid #000;

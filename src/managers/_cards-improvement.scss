@@ -1,20 +1,23 @@
 .card.improvement {
    display: inline-block;
    position: relative;
-   width: 125px;
-   height: 125px;
-   border-radius: 5px;
+   width: var(--card-width);
+   height: var(--card-height);
    --card-width: 125px;
    --card-height: 125px;
 
    .card-sides {
-      border-radius: 5px;
-      overflow: hidden;
 
-      .image {
+      .back, .front {
          background-image: url('img/improvements/cards.jpg');
          background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
+      }
 
+      .back {
+         background-position: -200% -300%;
+      }
+
+      .front {
          @for $row from 0 through 3 {
             @for $col from 0 through 4 {
                &[data-img='#{(($row * 5) + $col + 1)}'] {
@@ -22,18 +25,6 @@
                }
             }
          }
-      }
-
-      .back {
-         background-image: url('img/improvements/cards.jpg');
-         background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
-         background-position: -200% -300%;
-      }
-
-      .front {
-         outline: 1px solid #000;
-         box-shadow: 0 0 5px 6px #fff;
-         filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 
          &>* {
             pointer-events: none;
@@ -76,7 +67,7 @@
       top: 9px;
       left: 0;
       right: 0;
-      font-size: 10px;
+      font-size: 0.65rem;;
       padding-left: 27px;
       color: palegoldenrod;
       font-family: Bosk;
@@ -89,7 +80,7 @@
       right: 0;
       min-height: 33px;
       font-family: "Bosk";
-      font-size: 8px;
+      font-size: 0.6rem;
       color: palegoldenrod;
       padding: 0 3px;
       display: flex;

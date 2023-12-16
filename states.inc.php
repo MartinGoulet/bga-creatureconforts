@@ -248,9 +248,10 @@ $endGameStates = [
         "type" => "game",
         "action" => "stEndGameScore",
         "transitions" => [
-            "" => ST_END_GAME,
+            "" => ST_PRE_END_OF_GAME,
         ]
     ],
+
 ];
 
 $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endGameStates + array(

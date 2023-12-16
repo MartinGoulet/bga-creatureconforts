@@ -2,7 +2,6 @@
 
 namespace CreatureComforts\Core;
 
-use CreatureComforts;
 use CreatureComforts\Managers\Comforts;
 use CreatureComforts\Managers\Cottages;
 use CreatureComforts\Managers\Improvements;
@@ -17,15 +16,18 @@ class Score extends \APP_DbObject {
     public static function getScore(int $player_id) {
         $improvements = Improvements::getPlayerBoard($player_id);
         $comforts = Comforts::getPlayerBoard($player_id);
+        $score_resources = self::getScoreResources($player_id);
 
-        return [
+        $score = [
             "comforts" => self::getScoreComforts($comforts),
             "comforts_bonus" => self::getScoreComfortsBonus($comforts, $player_id),
             "improvements" => self::getScoreImprovements($improvements),
             "improvements_bonus" => self::getScoreImprovementsBonus($improvements, $player_id),
             "cottages" => self::getScoreCottage($player_id),
-            "resources" => self::getScoreResources($player_id),
         ];
+
+        $score = array_merge($score, $score_resources);
+        return $score;
     }
 
     private static function getScoreComforts($comforts) {
@@ -115,10 +117,10 @@ class Score extends \APP_DbObject {
         $resources = Players::getResources($player_id);
         $goods = $resources['wood'] + $resources['stone'] + $resources['fruit'] + $resources['mushroom'] + $resources['yarn'] + $resources['grain'];
         $scores = [
-            "story" => intval($resources["story"]) * 2,
-            "coin" => intval($resources["coin"]),
-            "resources" => intdiv($goods, 3),
+            "stories" => intval($resources["story"]) * 2,
+            "coins" => intval($resources["coin"]),
+            "goods" => intdiv($goods, 3),
         ];
-        return array_sum($scores);
+        return $scores;
     }
 }

@@ -103,7 +103,7 @@ class NotificationManager {
       const fromElement =
          location_id < 20
             ? document.querySelector(`#worker-locations *[data-slot-id="${location_id}"]`)
-            : document.querySelector(`#dice-locations   *[data-slot-id="${location_id}"]`);
+            : document.querySelector(`#glade *[data-slot-id="${location_id}"]`);
       this.animationMoveResource(player_id, resources, fromElement);
    }
 

@@ -5,6 +5,7 @@ class TableScore {
    }
 
    displayScores(scores: Record<number, any>) {
+      document.querySelectorAll('.players-scores').forEach((table: HTMLTableElement) => table.remove());
       const player_ids = this.game.gamedatas.playerorder.map((id) => Number(id));
       const html = `<table class="players-scores">
             <thead>
@@ -16,11 +17,15 @@ class TableScore {
                ${this.getRow('improvements', _('Improvements'), player_ids, scores)}
                ${this.getRow('improvements_bonus', _('Bonus'), player_ids, scores)}
                ${this.getRow('cottages', _('Cottages'), player_ids, scores)}
-               ${this.getRow('resources', _('Resources'), player_ids, scores)}
+               ${this.getRow('', _('Resources'), player_ids, scores)}
+               ${this.getRow('stories', _('Stories'), player_ids, scores)}
+               ${this.getRow('coins', _('Coins'), player_ids, scores)}
+               ${this.getRow('goods', _('Resources'), player_ids, scores)}
                ${this.getTotals(player_ids, scores)}
             </tbody>
          </table>`;
 
+      debugger;
       document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
    }
 
@@ -52,12 +57,14 @@ class TableScore {
 
       return `<tr id="scores-row-total">
          <td class="row-header">${_('Total')}</td>
-         ${colums}
+         ${colums.join('')}
       </tr>`;
    }
 
    private getRow(row: string, title: string, player_ids: number[], scores: Record<number, any>) {
       const columns = player_ids.map((pId) => {
+         if (row === '') return `<td></td>`;
+
          const score = scores[pId][row];
          return `<td>
             <div id="score-${pId}-${row}">${score}</div>

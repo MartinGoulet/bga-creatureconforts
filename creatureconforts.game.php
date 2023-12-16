@@ -218,6 +218,8 @@ class CreatureConforts extends Table {
             }
         }
 
+        $result['comfort_resources'] = Globals::getComfortResourceByCard();
+
         return $result;
     }
 

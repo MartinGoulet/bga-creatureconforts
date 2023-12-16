@@ -33,8 +33,29 @@ class PlayerTurnResolveState implements StateHandler {
          return diceCount === 1;
       };
 
+      const handleDieClick = (die: Dice) => {
+         if (die.location && die.location >= 20) {
+            alert('click');
+         }
+      };
+
       worker_locations.setSelectableLocation(locations.filter((f) => f < 20));
       worker_locations.OnLocationClick = handleWorkerLocationClick;
+
+      locations
+         .filter((loc) => loc >= 20)
+         .forEach((loc) => {
+            setTimeout(() => {
+               const slot = document.querySelector(`#glade [data-slot-id="${loc}"]`);
+               slot.classList.toggle('selectable', true);
+               slot.addEventListener('click', (ev: Event) => {
+                  ev.stopPropagation();
+                  slot.classList.toggle('selected');
+                  handleGladeSlotClick(loc, slot.classList.contains('selected'));
+               });
+            }, 15);
+         });
+      dice_locations.onDieClick = handleDieClick;
 
       const slotDices = document.querySelectorAll('#dice-locations .slot-dice:not(:empty)');
       slotDices.forEach((slot: HTMLElement) => {
@@ -54,10 +75,11 @@ class PlayerTurnResolveState implements StateHandler {
       worker_locations.setSelectedLocation([]);
       worker_locations.OnLocationClick = null;
       this.clearSelectedDiceLocations();
+      document.querySelectorAll(`#glade .slot-dice`).forEach((div) => div.classList.remove('selectable'));
       this.glade_selection = undefined;
-      document
-         .querySelectorAll('#dice-locations .slot-dice.selectable')
-         .forEach((div) => div.classList.remove('selectable'));
+      // document
+      //    .querySelectorAll('#dice-locations .slot-dice.selectable')
+      //    .forEach((div) => div.classList.remove('selectable'));
    }
 
    onUpdateActionButtons(args: PlayerTurnResolveArgs): void {
@@ -120,7 +142,7 @@ class PlayerTurnResolveState implements StateHandler {
 
    clearSelectedDiceLocations() {
       const selectedDiceLocations = document.querySelectorAll(
-         '#dice-locations .slot-dice.selectable.selected',
+         '#dice-locations .slot-dice.selectable.selected, #glade .slot-dice.selectable.selected',
       );
       selectedDiceLocations.forEach((slot) => slot.classList.remove('selected'));
    }

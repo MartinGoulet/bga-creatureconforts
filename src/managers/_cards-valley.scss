@@ -3,7 +3,6 @@
    position: relative;
    width: 310px;
    height: 156px;
-   border-radius: 5px;
 
    &.forest {
       .front {
@@ -17,8 +16,6 @@
    }
 
    .card-sides {
-      border-radius: 5px;
-      overflow: hidden;
 
       .front {
          background-size: 1240px 312px;

@@ -213,7 +213,7 @@ $this->confort_types = [
       'cost' => [STONE => 1, YARN => 1, COIN => 1],
       'class' => "Lamp",
       'img' => 17,
-      'storable' => [STORY],
+      'storable' => [STORY, STORY],
    ],
    // --- gen php end --- 
 ];
