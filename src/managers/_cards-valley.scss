@@ -1,8 +1,10 @@
 .card.valley {
+   --card-width: 310px;
+   --card-height: 156px;
    display: inline-block;
    position: relative;
-   width: 310px;
-   height: 156px;
+   width: calc(var(--card-width) * var(--card-ratio));
+   height: calc(var(--card-height) * var(--card-ratio));
 
    &.forest {
       .front {
@@ -18,7 +20,7 @@
    .card-sides {
 
       .front {
-         background-size: 1240px 312px;
+         background-size: calc(var(--card-width) * var(--card-ratio) * 4) calc(var(--card-height) * var(--card-ratio) * 2);
 
          &[data-type='fall'][data-image_pos='1'] {
             background-position: -0% -0%;

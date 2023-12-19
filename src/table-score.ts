@@ -25,7 +25,6 @@ class TableScore {
             </tbody>
          </table>`;
 
-      debugger;
       document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
    }
 

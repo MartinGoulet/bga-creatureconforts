@@ -1,5 +1,5 @@
 class PlayerTurnCraftState implements StateHandler {
-   private resourceManager?: ResourceManagerPay<IconsType>;
+   private resourceManager?: IResourceManager<IconsType>;
    private toolbar: ToolbarContainer = new ToolbarContainer('craft');
 
    constructor(private game: CreatureComforts) {}
@@ -26,13 +26,7 @@ class PlayerTurnCraftState implements StateHandler {
 
          const card_type = this.game.confortManager.getCardType(selection[0]);
 
-         if ('*' in card_type.cost) {
-            this.game.enableButton('btn_reset', 'gray');
-            this.resourceManager = new ResourceManagerPay(this.toolbar.addContainer(), {
-               player_resources: this.game.getPlayerResources([...GOODS]),
-               resource_count: 2,
-            });
-         } else if (TravelerHelper.isActiveHairyTailedHole()) {
+         if (TravelerHelper.isActiveHairyTailedHole() || '*' in card_type.cost) {
             this.game.enableButton('btn_reset', 'gray');
 
             const requirement: IconsType[][] = [];
@@ -46,6 +40,9 @@ class PlayerTurnCraftState implements StateHandler {
                      requirement.push(['coin', 'stone']);
                      resource_type.push('coin', 'stone');
                      hasStoneOrCoin = true;
+                  } else if (['*'].includes(icon)) {
+                     requirement.push([...GOODS]);
+                     resource_type.push(...GOODS);
                   } else {
                      requirement.push([icon as IconsType]);
                      resource_type.push(icon as IconsType);
@@ -53,11 +50,15 @@ class PlayerTurnCraftState implements StateHandler {
                }
             }
 
-            if (hasStoneOrCoin) {
-               this.resourceManager = new ResourceManagerPay(this.toolbar.addContainer(), {
-                  player_resources: this.game.getPlayerResources(resource_type),
-                  resource_count: requirement.length,
-                  requirement,
+            if (hasStoneOrCoin || '*' in card_type.cost) {
+               this.resourceManager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
+                  from: {
+                     available: this.game.getPlayerResources(resource_type),
+                     requirement: requirement,
+                     count: requirement.length,
+                  },
+                  to: {},
+                  times: 1,
                });
             }
          }
@@ -114,7 +115,6 @@ class PlayerTurnCraftState implements StateHandler {
 
          let resources: number[] = [];
 
-         // if ('*' in card_type.cost) {
          if (this.resourceManager) {
             resources = ResourceHelper.convertToInt(this.resourceManager.getResourcesFrom());
          }

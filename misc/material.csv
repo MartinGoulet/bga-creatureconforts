@@ -1,7 +1,7 @@
 id|name|gametext|type|score|cost|class|img|storable
 1|Board Game|+ ::heart-1:: for each other BOARD GAME and TOYS Comfort you have||7|[ANY_RESOURCE => 2, COIN => 1, STORY => 1]|BoardGame|[7, 14, 27]|
 2|Snowshoes||OUTDOOR|6|[WOOD => 1, YARN => 2]||22|
-3|Preserves|+ ::heart-2:: if you also have a PANTRY|FOOD|4|[FRUIT => 4]|Preserves|18|
+3|Preserves|+ ::heart-2:: if you also have a PANTRY|FOOD|4|[FRUIT => 3]|Preserves|18|
 4|Ice Skates|+ ::heart-2:: if you also have SOCKS|OUTDOOR|6|[COIN => 2, YARN => 1]|IceSkates|23|
 5|Muffler||CLOTHING|5|[WOOD => 1, YARN => 1, FRUIT => 1]||5|
 6|Rocking Chair|+ ::heart-2:: if you also have a QUILT||5|[WOOD => 3, YARN => 1]|RockingChair|6|

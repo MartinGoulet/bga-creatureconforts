@@ -1,3 +1,12 @@
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var DEFAULT_ZOOM_LEVELS = [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
 function throttle(callback, delay) {
     var last;
@@ -19,6 +28,40 @@ function throttle(callback, delay) {
         }
     };
 }
+var advThrottle = function (func, delay, options) {
+    if (options === void 0) { options = { leading: true, trailing: false }; }
+    var timer = null, lastRan = null, trailingArgs = null;
+    return function () {
+        var args = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            args[_i] = arguments[_i];
+        }
+        if (timer) {
+            lastRan = this;
+            trailingArgs = args;
+            return;
+        }
+        if (options.leading) {
+            func.call.apply(func, __spreadArray([this], args, false));
+        }
+        else {
+            lastRan = this;
+            trailingArgs = args;
+        }
+        var coolDownPeriodComplete = function () {
+            if (options.trailing && trailingArgs) {
+                func.call.apply(func, __spreadArray([lastRan], trailingArgs, false));
+                lastRan = null;
+                trailingArgs = null;
+                timer = setTimeout(coolDownPeriodComplete, delay);
+            }
+            else {
+                timer = null;
+            }
+        };
+        timer = setTimeout(coolDownPeriodComplete, delay);
+    };
+};
 var ZoomManager = (function () {
     function ZoomManager(settings) {
         var _this = this;
@@ -42,7 +85,7 @@ var ZoomManager = (function () {
         settings.element.classList.add('bga-zoom-inner');
         if ((_b = settings.smooth) !== null && _b !== void 0 ? _b : true) {
             settings.element.dataset.smooth = 'true';
-            settings.element.addEventListener('transitionend', function () { return _this.zoomOrDimensionChanged(); });
+            settings.element.addEventListener('transitionend', advThrottle(function () { return _this.zoomOrDimensionChanged(); }, this.throttleTime, { leading: true, trailing: true, }));
         }
         if ((_d = (_c = settings.zoomControls) === null || _c === void 0 ? void 0 : _c.visible) !== null && _d !== void 0 ? _d : true) {
             this.initZoomControls(settings);
@@ -51,15 +94,15 @@ var ZoomManager = (function () {
             this.setZoom(this._zoom);
         }
         this.throttleTime = (_e = settings.throttleTime) !== null && _e !== void 0 ? _e : 100;
-        window.addEventListener('resize', function () {
+        window.addEventListener('resize', advThrottle(function () {
             var _a;
             _this.zoomOrDimensionChanged();
             if ((_a = _this.settings.autoZoom) === null || _a === void 0 ? void 0 : _a.expectedWidth) {
                 _this.setAutoZoom();
             }
-        });
+        }, this.throttleTime, { leading: true, trailing: true, }));
         if (window.ResizeObserver) {
-            new ResizeObserver(function () { return _this.zoomOrDimensionChanged(); }).observe(settings.element);
+            new ResizeObserver(advThrottle(function () { return _this.zoomOrDimensionChanged(); }, this.throttleTime, { leading: true, trailing: true, })).observe(settings.element);
         }
         if ((_f = this.settings.autoZoom) === null || _f === void 0 ? void 0 : _f.expectedWidth) {
             this.setAutoZoom();
@@ -121,7 +164,7 @@ var ZoomManager = (function () {
         (_b = this.zoomOutButton) === null || _b === void 0 ? void 0 : _b.classList.toggle('disabled', newIndex === 0);
         this.settings.element.style.transform = zoom === 1 ? '' : "scale(".concat(zoom, ")");
         (_d = (_c = this.settings).onZoomChange) === null || _d === void 0 ? void 0 : _d.call(_c, this._zoom);
-        this.zoomOrDimensionChangedUnsafe();
+        this.zoomOrDimensionChanged();
     };
     ZoomManager.prototype.manualHeightUpdate = function () {
         if (!window.ResizeObserver) {
@@ -129,10 +172,6 @@ var ZoomManager = (function () {
         }
     };
     ZoomManager.prototype.zoomOrDimensionChanged = function () {
-        var _this = this;
-        throttle(function () { return _this.zoomOrDimensionChangedUnsafe(); }, this.throttleTime);
-    };
-    ZoomManager.prototype.zoomOrDimensionChangedUnsafe = function () {
         var _a, _b;
         this.settings.element.style.width = "".concat(this.wrapper.getBoundingClientRect().width / this._zoom, "px");
         this.wrapper.style.height = "".concat(this.settings.element.getBoundingClientRect().height, "px");
@@ -450,15 +489,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
 };
 var AnimationManager = (function () {
     function AnimationManager(game, settings) {
@@ -2896,7 +2926,6 @@ var VillageDiceStock = (function (_super) {
         if (originStock) {
             var originalDie = originStock.getDice().find(function (d) { return d.id == die.id; });
             if (originalDie.face !== die.face) {
-                debugger;
                 this.rollDie(die, { effect: 'turn', duration: 0 });
             }
         }
@@ -3154,19 +3183,19 @@ var ImprovementManager = (function (_super) {
                     return;
                 div.dataset.type = card.type;
                 div.dataset.img = card_info.img.toString();
-                if (div.getElementsByClassName('title').length !== 0)
-                    return;
-                div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
-                if (card_info.gametext) {
-                    var gametext = _this.formatText(_(card_info.gametext));
-                    div.insertAdjacentHTML('beforeend', "<div class=\"gametext-wrapper\"><div class=\"gametext\">".concat(gametext, "</div></div>"));
-                }
-                if (card.type_arg) {
-                }
-                if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayImprovement(card);
-                    });
+                if (div.getElementsByClassName('title').length === 0) {
+                    div.insertAdjacentHTML('beforeend', "<div class=\"title\">".concat(_(card_info.name), "</div>"));
+                    if (card_info.gametext) {
+                        var gametext = _this.formatText(_(card_info.gametext));
+                        div.insertAdjacentHTML('beforeend', "<div class=\"gametext-wrapper\"><div class=\"gametext\">".concat(gametext, "</div></div>"));
+                    }
+                    if (card.type_arg) {
+                    }
+                    if ('type' in card) {
+                        _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
+                            return _this.game.modal.displayImprovement(card);
+                        });
+                    }
                 }
                 if (!document.getElementById("".concat(_this.getId(card), "-slot-cottage")) && !modal) {
                     div.insertAdjacentHTML('beforeend', "<div id=\"".concat("".concat(_this.getId(card), "-slot-cottage"), "\" class=\"slot-cottage\"></div>"));
@@ -4271,7 +4300,6 @@ var PlayerTurnDiceManipulationState = (function () {
 var PlayerTurnResolveState = (function () {
     function PlayerTurnResolveState(game) {
         this.game = game;
-        this.glade_selection = undefined;
     }
     PlayerTurnResolveState.prototype.onEnteringState = function (args) {
         var _this = this;
@@ -4286,13 +4314,12 @@ var PlayerTurnResolveState = (function () {
             var isSelected = worker_locations.isSelectedLocation(slotId);
             _this.clearSelectedDiceLocations();
             worker_locations.setSelectedLocation(isSelected ? [] : [slotId]);
-            _this.game.toggleButtonEnable('btn_resolve', !isSelected);
+            _this.resolveLocation(Number(slotId), args, args.wheelbarrow);
         };
         var handleGladeSlotClick = function (slotId, isSelected) {
-            if (hasSingleDice(slotId)) {
-                _this.glade_selection = isSelected ? slotId : undefined;
-                _this.game.toggleButtonEnable('btn_resolve', isSelected);
+            if (hasSingleDice(slotId) && isSelected) {
                 worker_locations.setSelectedLocation([]);
+                _this.resolveLocation(Number(slotId), args, args.wheelbarrow);
             }
         };
         var hasSingleDice = function (slotId) {
@@ -4301,7 +4328,7 @@ var PlayerTurnResolveState = (function () {
         };
         var handleDieClick = function (die) {
             if (die.location && die.location >= 20) {
-                alert('click');
+                handleGladeSlotClick(Number(die.location), true);
             }
         };
         worker_locations.setSelectableLocation(locations.filter(function (f) { return f < 20; }));
@@ -4312,11 +4339,6 @@ var PlayerTurnResolveState = (function () {
             setTimeout(function () {
                 var slot = document.querySelector("#glade [data-slot-id=\"".concat(loc, "\"]"));
                 slot.classList.toggle('selectable', true);
-                slot.addEventListener('click', function (ev) {
-                    ev.stopPropagation();
-                    slot.classList.toggle('selected');
-                    handleGladeSlotClick(loc, slot.classList.contains('selected'));
-                });
             }, 15);
         });
         dice_locations.onDieClick = handleDieClick;
@@ -4338,63 +4360,51 @@ var PlayerTurnResolveState = (function () {
         worker_locations.OnLocationClick = null;
         this.clearSelectedDiceLocations();
         document.querySelectorAll("#glade .slot-dice").forEach(function (div) { return div.classList.remove('selectable'); });
-        this.glade_selection = undefined;
     };
     PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
-        var locations = args.locations, wheelbarrow = args.wheelbarrow;
-        var handleResolve = function () {
-            if (_this.glade_selection) {
-                _this.game.takeAction('resolveWorker', { location_id: _this.glade_selection });
-                return;
-            }
-            var selectedLocations = _this.game.tableCenter.worker_locations.getSelectedLocation();
-            if (selectedLocations.length === 0) {
-                _this.game.showMessage(_('You must select a location with one of your workers'), 'error');
-                return;
-            }
-            var locationId = Number(selectedLocations[0]);
-            if (locationId == 8) {
-                _this.goToMarket(args);
-            }
-            else if (locationId == 9) {
-                _this.game.setClientState('resolveTraveler', {
-                    descriptionmyturn: _('You must resolve the effect of the traveler'),
-                });
-            }
-            else if (locationId == 10) {
-                _this.game.setClientState('resolveWorkshop', {
-                    descriptionmyturn: _("You must select one card in the Workshop"),
-                });
-            }
-            else if (locationId == 11) {
-                _this.game.setClientState('resolveOwnNest', {
-                    descriptionmyturn: _("You must select one card in the Owl's Nest"),
-                });
-            }
-            else if (wheelbarrow === locationId) {
-                _this.game.setClientState('resolveWheelbarrow', {
-                    descriptionmyturn: _("You must select one card in the Owl's Nest"),
-                    args: {
-                        location_id: locationId,
-                    },
-                });
-            }
-            else {
-                _this.game.takeAction('resolveWorker', { location_id: locationId });
-            }
-        };
+        var locations = args.locations;
         var handleEnd = function () {
             _this.game.takeAction('confirmResolveWorker');
         };
         if (locations.length > 0) {
-            this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
             this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
         }
         else {
             this.game.addActionButton('btn_end', _('End'), handleEnd);
         }
         this.game.addActionButtonUndo();
+    };
+    PlayerTurnResolveState.prototype.resolveLocation = function (locationId, args, wheelbarrow) {
+        if (locationId == 8) {
+            this.goToMarket(args);
+        }
+        else if (locationId == 9) {
+            this.game.setClientState('resolveTraveler', {
+                descriptionmyturn: _('You must resolve the effect of the traveler'),
+            });
+        }
+        else if (locationId == 10) {
+            this.game.setClientState('resolveWorkshop', {
+                descriptionmyturn: _("You must select one card in the Workshop"),
+            });
+        }
+        else if (locationId == 11) {
+            this.game.setClientState('resolveOwnNest', {
+                descriptionmyturn: _("You must select one card in the Owl's Nest"),
+            });
+        }
+        else if (wheelbarrow === locationId) {
+            this.game.setClientState('resolveWheelbarrow', {
+                descriptionmyturn: _("You must select one card in the Owl's Nest"),
+                args: {
+                    location_id: locationId,
+                },
+            });
+        }
+        else {
+            this.game.takeAction('resolveWorker', { location_id: locationId });
+        }
     };
     PlayerTurnResolveState.prototype.clearSelectedDiceLocations = function () {
         var selectedDiceLocations = document.querySelectorAll('#dice-locations .slot-dice.selectable.selected, #glade .slot-dice.selectable.selected');
@@ -4433,14 +4443,7 @@ var PlayerTurnCraftState = (function () {
             if (selection.length == 0)
                 return;
             var card_type = _this.game.confortManager.getCardType(selection[0]);
-            if ('*' in card_type.cost) {
-                _this.game.enableButton('btn_reset', 'gray');
-                _this.resourceManager = new ResourceManagerPay(_this.toolbar.addContainer(), {
-                    player_resources: _this.game.getPlayerResources(__spreadArray([], GOODS, true)),
-                    resource_count: 2,
-                });
-            }
-            else if (TravelerHelper.isActiveHairyTailedHole()) {
+            if (TravelerHelper.isActiveHairyTailedHole() || '*' in card_type.cost) {
                 _this.game.enableButton('btn_reset', 'gray');
                 var requirement = [];
                 var resource_type = [];
@@ -4453,17 +4456,25 @@ var PlayerTurnCraftState = (function () {
                             resource_type.push('coin', 'stone');
                             hasStoneOrCoin = true;
                         }
+                        else if (['*'].includes(icon)) {
+                            requirement.push(__spreadArray([], GOODS, true));
+                            resource_type.push.apply(resource_type, GOODS);
+                        }
                         else {
                             requirement.push([icon]);
                             resource_type.push(icon);
                         }
                     }
                 }
-                if (hasStoneOrCoin) {
-                    _this.resourceManager = new ResourceManagerPay(_this.toolbar.addContainer(), {
-                        player_resources: _this.game.getPlayerResources(resource_type),
-                        resource_count: requirement.length,
-                        requirement: requirement,
+                if (hasStoneOrCoin || '*' in card_type.cost) {
+                    _this.resourceManager = new ResourceManagerPayFor(_this.toolbar.addContainer(), {
+                        from: {
+                            available: _this.game.getPlayerResources(resource_type),
+                            requirement: requirement,
+                            count: requirement.length,
+                        },
+                        to: {},
+                        times: 1,
                     });
                 }
             }
@@ -5373,7 +5384,6 @@ var TravelerCommonRavenState = (function () {
         var location_ids = _a.locations_unavailable;
         if (!this.game.isCurrentPlayerActive())
             return;
-        debugger;
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.OnLocationClick = function (slotId) {
             var selection = worker_locations.getSelectedLocation();
@@ -5667,7 +5677,9 @@ var CreatureComforts = (function () {
             _this.dontPreloadImage("board_".concat(color, ".jpg"));
             _this.dontPreloadImage("dice_".concat(color, ".jpg"));
         });
-        this.dontPreloadImage('improvements.jpg');
+        var htmlElement = document.getElementsByTagName('html')[0];
+        htmlElement.classList.toggle('mobile_version', document.body.classList.contains('mobile_version'));
+        htmlElement.classList.toggle('desktop_version', document.body.classList.contains('desktop_version'));
         this.createPlayerPanels(gamedatas);
         this.createPlayerTables(gamedatas);
         TravelerHelper.setTravelerToTable();
@@ -5680,6 +5692,16 @@ var CreatureComforts = (function () {
             });
         });
         this.setupNotifications();
+        if (navigator.userAgent.indexOf('iPhone') > -1) {
+            document.body.style.fontSize = '';
+        }
+        var parent = document.querySelector('.debug_section');
+        if (parent) {
+            this.addActionButton('reload_css', _('Reload CSS'), function () { return reloadCss(); }, parent, null, 'gray');
+        }
+    };
+    CreatureComforts.prototype.onScreenWidthChange = function () {
+        document.getElementById('table').dataset.zoom = '' + (this.gameinterface_zoomFactor < 1);
     };
     CreatureComforts.prototype.onEnteringState = function (stateName, args) {
         this.stateManager.onEnteringState(stateName, args);
@@ -6159,6 +6181,7 @@ var NotificationManager = (function () {
         var dice = _a.dice;
         var white_dice = dice.filter(function (die) { return die.type == 'white'; });
         var stack = this.game.tableCenter.hill;
+        stack.removeAll();
         stack.addDice(white_dice);
         stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
     };
@@ -6371,7 +6394,9 @@ var NotificationManager = (function () {
                     case 1:
                         _b.sent();
                         return [3, 4];
-                    case 2: return [4, this.game.tableCenter.glade.addCard(card)];
+                    case 2:
+                        debugger;
+                        return [4, this.game.tableCenter.glade.addCard(card)];
                     case 3:
                         _b.sent();
                         _b.label = 4;
@@ -6766,7 +6791,6 @@ var TableScore = (function () {
         document.querySelectorAll('.players-scores').forEach(function (table) { return table.remove(); });
         var player_ids = this.game.gamedatas.playerorder.map(function (id) { return Number(id); });
         var html = "<table class=\"players-scores\">\n            <thead>\n               ".concat(this.getHeaderNames(player_ids, this.game.gamedatas), "\n            </thead>\n            <tbody>\n               ").concat(this.getRow('comforts', _('Comforts'), player_ids, scores), "\n               ").concat(this.getRow('comforts_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('improvements', _('Improvements'), player_ids, scores), "\n               ").concat(this.getRow('improvements_bonus', _('Bonus'), player_ids, scores), "\n               ").concat(this.getRow('cottages', _('Cottages'), player_ids, scores), "\n               ").concat(this.getRow('', _('Resources'), player_ids, scores), "\n               ").concat(this.getRow('stories', _('Stories'), player_ids, scores), "\n               ").concat(this.getRow('coins', _('Coins'), player_ids, scores), "\n               ").concat(this.getRow('goods', _('Resources'), player_ids, scores), "\n               ").concat(this.getTotals(player_ids, scores), "\n            </tbody>\n         </table>");
-        debugger;
         document.getElementById('table-score').insertAdjacentHTML('afterbegin', html);
     };
     TableScore.prototype.getHeaderNames = function (player_ids, _a) {
@@ -6841,6 +6865,21 @@ function countExtractions(mainArray, targetArray) {
         }
     }
     return minExtractions;
+}
+function reloadCss() {
+    var links = document.getElementsByTagName('link');
+    for (var cl in links) {
+        var link = links[cl];
+        if (link.rel === 'stylesheet' && link.href.includes('99999')) {
+            var index = link.href.indexOf('?timestamp=');
+            var href = link.href;
+            if (index >= 0) {
+                href = href.substring(0, index);
+            }
+            link.href = href + '?timestamp=' + Date.now();
+            console.log('reloading ' + link.href);
+        }
+    }
 }
 define(['dojo', 'dojo/_base/declare', 'ebg/core/gamegui', 'ebg/counter', 'ebg/stock'], function (dojo, declare) {
     return declare('bgagame.creatureconforts', [ebg.core.gamegui], new CreatureComforts());

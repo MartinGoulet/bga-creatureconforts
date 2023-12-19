@@ -7,6 +7,82 @@
   font-family: "PanPizza";
   src: url("img/panpizza.ttf") format("truetype");
 }
+.card:not(.cottage):not(.worker) {
+  display: inline-block;
+  position: relative;
+  width: calc(var(--card-width) * var(--card-ratio));
+  height: calc(var(--card-height) * var(--card-ratio));
+}
+.card:not(.cottage):not(.worker) .card-sides .back,
+.card:not(.cottage):not(.worker) .card-sides .front {
+  border-radius: 5px;
+}
+.card:not(.cottage):not(.worker) .card-sides .front > * {
+  pointer-events: none;
+  user-select: none;
+}
+.card:not(.cottage):not(.worker) .title {
+  position: absolute;
+  top: calc(var(--title-top) * var(--card-ratio));
+  left: 0;
+  right: 0;
+  font-size: calc(var(--title-font-size) * var(--card-ratio));
+  padding-left: calc(var(--title-left-padding) * var(--card-ratio));
+}
+.card:not(.cottage):not(.worker) .gametext-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  min-height: calc(var(--gametext-min-height) * var(--card-ratio));
+  font-family: "Bosk";
+  font-size: calc(var(--gametext-font-size) * var(--card-ratio));
+  padding: 0 calc(var(--card-ratio) * 5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card:not(.cottage):not(.worker) .gametext {
+  text-align: center;
+}
+.card:not(.cottage):not(.worker) .gametext .i-heart {
+  width: calc(16px * var(--card-ratio));
+  height: calc(12px * var(--card-ratio));
+  background-size: calc(16px * var(--card-ratio)) calc(12px * var(--card-ratio));
+}
+.card:not(.cottage):not(.worker) .gametext .i-heart span {
+  font-size: calc(0.5rem * var(--card-ratio));
+}
+.card:not(.cottage):not(.worker) .gametext .resource-group {
+  display: inline-block;
+  margin: 0 2px;
+}
+.card:not(.cottage):not(.worker) .gametext .resource-icon {
+  display: inline-flex;
+  align-items: center;
+  zoom: calc(0.4 * var(--card-ratio));
+}
+.card:not(.cottage):not(.worker) .gametext .resource-icon::after {
+  content: " ";
+}
+.card:not(.cottage):not(.worker) .gametext .resource-icon[data-type=coin] {
+  height: 35px;
+}
+
+.mobile_version #table[data-zoom=true] .card .front .gametext-wrapper,
+.mobile_version #table[data-zoom=true] .card .front .title {
+  font-size: calc(var(--gametext-font-size) * var(--card-ratio) * 0.5);
+}
+
+.mobile_version #table[data-zoom=true] .card.comfort .front .gametext-wrapper,
+.mobile_version #table[data-zoom=true] .card.comfort .front .title {
+  font-size: calc(var(--gametext-font-size) * var(--card-ratio) * 0.75);
+}
+
+.mobile_version #table[data-zoom=true] .card.improvement .front .help-marker {
+  font-size: 10px;
+}
+
 #bga-zoom-wrapper {
   position: relative;
 }
@@ -1175,16 +1251,29 @@ body > .bga-dice_die {
 }
 
 .desktop_version.modal_open #modal-display-card .card.improvement {
-  transform: scale(4);
+  --card-ratio: 4;
 }
 .desktop_version.modal_open #modal-display-card .card.traveler {
-  transform: scale(3);
+  --card-ratio: 3;
 }
 .desktop_version.modal_open #modal-display-card .card.valley {
-  transform: scale(3);
+  --card-ratio: 3;
 }
 .desktop_version.modal_open #modal-display-card .card.comfort {
-  transform: scale(4);
+  --card-ratio: 4;
+}
+
+.mobile_version.modal_open #modal-display-card .card.improvement {
+  --card-ratio: 2.5;
+}
+.mobile_version.modal_open #modal-display-card .card.traveler {
+  --card-ratio: 1.5;
+}
+.mobile_version.modal_open #modal-display-card .card.valley {
+  --card-ratio: 1.1;
+}
+.mobile_version.modal_open #modal-display-card .card.comfort {
+  --card-ratio: 2.5;
 }
 
 #game-phases, #game-infos {
@@ -1248,18 +1337,22 @@ body > .bga-dice_die {
 .card.comfort {
   --card-width: 110px;
   --card-height: 154px;
-  display: inline-block;
-  position: relative;
-  width: var(--card-width);
-  height: var(--card-height);
 }
-.card.comfort .card-sides .back, .card.comfort .card-sides .front {
-  background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+.card.comfort .card-sides .back,
+.card.comfort .card-sides .front {
+  background-size: calc(var(--card-width) * var(--card-ratio) * 7) calc(var(--card-height) * var(--card-ratio) * 4);
   background-image: url("img/comforts/cards.jpg");
   border-radius: 5px;
 }
 .card.comfort .card-sides .back {
   background-position: -600% -200%;
+}
+.card.comfort .card-sides .front {
+  --title-top: 8px;
+  --title-font-size: 0.7rem;
+  --title-left-padding: 27px;
+  --gametext-font-size: 0.6rem;
+  --gametext-min-height: 33px;
 }
 .card.comfort .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
@@ -1345,62 +1438,15 @@ body > .bga-dice_die {
 .card.comfort .card-sides .front[data-img="28"] {
   background-position: -600% -300%;
 }
-.card.comfort .card-sides .front > * {
-  pointer-events: none;
-  user-select: none;
-}
 .card.comfort .help-marker {
   top: 17px;
 }
 .card.comfort .title {
-  position: absolute;
-  top: 8px;
-  left: 0;
-  right: 0;
-  font-size: 0.7rem;
-  padding-left: 27px;
   color: white;
   font-family: Bosk;
 }
 .card.comfort .gametext-wrapper {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  min-height: 33px;
-  font-family: "Bosk";
-  font-size: 0.6rem;
   color: white;
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.card.comfort .gametext {
-  text-align: center;
-}
-.card.comfort .gametext .i-heart {
-  width: 16px;
-  height: 12px;
-  background-size: 16px 12px;
-}
-.card.comfort .gametext .i-heart span {
-  font-size: 0.6rem;
-}
-.card.comfort .gametext .resource-group {
-  display: inline-block;
-  margin: 0 2px;
-}
-.card.comfort .gametext .resource-icon {
-  display: inline-flex;
-  align-items: center;
-  zoom: 0.4;
-}
-.card.comfort .gametext .resource-icon::after {
-  content: " ";
-}
-.card.comfort .gametext .resource-icon[data-type=coin] {
-  height: 35px;
 }
 
 .white-border .card .card-sides .front {
@@ -1500,19 +1546,24 @@ body > .bga-dice_die {
 }
 
 .card.improvement {
-  display: inline-block;
-  position: relative;
-  width: var(--card-width);
-  height: var(--card-height);
   --card-width: 125px;
   --card-height: 125px;
 }
-.card.improvement .card-sides .back, .card.improvement .card-sides .front {
+.card.improvement .card-sides .back,
+.card.improvement .card-sides .front {
   background-image: url("img/improvements/cards.jpg");
-  background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
+  background-size: calc(var(--card-width) * var(--card-ratio) * 5) calc(var(--card-height) * var(--card-ratio) * 4);
 }
 .card.improvement .card-sides .back {
   background-position: -200% -300%;
+}
+.card.improvement .card-sides .front {
+  --title-top: 8px;
+  --title-font-size: 0.7rem;
+  --title-left-padding: 27px;
+  --gametext-font-size: 0.57rem;
+  --gametext-min-height: 33px;
+  -webkit-text-size-adjust: none;
 }
 .card.improvement .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
@@ -1574,10 +1625,6 @@ body > .bga-dice_die {
 .card.improvement .card-sides .front[data-img="20"] {
   background-position: -400% -300%;
 }
-.card.improvement .card-sides .front > * {
-  pointer-events: none;
-  user-select: none;
-}
 .card.improvement .card-sides .front .slot-cottage {
   position: absolute;
   top: 36px;
@@ -1600,39 +1647,19 @@ body > .bga-dice_die {
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
 }
 .card.improvement .title {
-  position: absolute;
-  top: 9px;
-  left: 0;
-  right: 0;
-  font-size: 0.65rem;
-  padding-left: 27px;
   color: palegoldenrod;
   font-family: Bosk;
 }
 .card.improvement .gametext-wrapper {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  min-height: 33px;
-  font-family: "Bosk";
-  font-size: 0.6rem;
   color: palegoldenrod;
-  padding: 0 3px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .card.improvement [data-type="8"] .gametext-wrapper,
 .card.improvement [data-type="14"] .gametext-wrapper,
 .card.improvement [data-type="16"] .gametext-wrapper {
-  min-height: 28px;
+  min-height: calc(var(--card-ratio) * 28px);
 }
 .card.improvement [data-type="11"] .gametext-wrapper {
-  min-height: 41px;
-}
-.card.improvement .gametext {
-  text-align: center;
+  min-height: calc(var(--card-ratio) * 41px);
 }
 .card.improvement .gametext .keyword {
   color: white;
@@ -1640,45 +1667,29 @@ body > .bga-dice_die {
 .card.improvement .gametext .type .label {
   color: white;
 }
-.card.improvement .gametext .i-heart {
-  width: 16px;
-  height: 12px;
-  background-size: 16px 12px;
-}
-.card.improvement .gametext .i-heart span {
-  font-size: 9px;
-}
-.card.improvement .gametext .resource-group {
-  display: inline-block;
-  margin: 0 2px;
-}
-.card.improvement .gametext .resource-icon {
-  display: inline-flex;
-  align-items: center;
-  zoom: 0.4;
-}
-.card.improvement .gametext .resource-icon::after {
-  content: " ";
-}
-.card.improvement .gametext .resource-icon[data-type=coin] {
-  height: 35px;
-}
 
 .card.traveler {
   display: inline-block;
   position: relative;
-  width: var(--card-width);
-  height: var(--card-height);
+  width: calc(var(--card-width) * var(--card-ratio));
+  height: calc(var(--card-height) * var(--card-ratio));
   --card-width: 212px;
   --card-height: 142px;
 }
 .card.traveler .card-sides .back,
 .card.traveler .card-sides .front {
   background-image: url("img/travelers/cards.jpg");
-  background-size: calc(var(--card-width) * 4) calc(var(--card-height) * 4);
+  background-size: calc(var(--card-width) * var(--card-ratio) * 4) calc(var(--card-height) * var(--card-ratio) * 4);
 }
 .card.traveler .card-sides .back {
   background-position: -100% -200%;
+}
+.card.traveler .card-sides .front {
+  --title-top: 6px;
+  --title-font-size: 10px;
+  --title-left-padding: 5px;
+  --gametext-font-size: 9px;
+  --gametext-min-height: 32px;
 }
 .card.traveler .card-sides .front[data-img="1"] {
   background-position: 0% 0%;
@@ -1738,55 +1749,30 @@ body > .bga-dice_die {
   left: 3px;
 }
 .card.traveler .title {
+  color: palegoldenrod;
+  font-family: Bosk;
   font-family: "PanPizza";
   color: white;
-  position: absolute;
-  font-size: 10px;
-  top: 6px;
-  left: 5px;
 }
 .card.traveler .gametext-wrapper {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 32px;
-  font-family: "Bosk";
-  font-size: 7px;
   color: white;
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 9px;
+  line-height: calc(10px * var(--card-ratio));
 }
 .card.traveler .gametext {
-  text-align: justify;
-}
-.card.traveler .gametext .i-heart {
-  width: 16px;
-  height: 12px;
-  background-size: 16px 12px;
-}
-.card.traveler .gametext .i-heart span {
-  font-size: 9px;
-}
-.card.traveler .gametext .resource-group {
-  display: inline-flex;
-  margin: 0 2px;
+  text-align: justify !important;
 }
 .card.traveler .gametext .resource-icon {
   display: inline-flex;
   align-items: flex-end;
-  zoom: 0.3;
+  zoom: calc(0.3 * var(--card-ratio));
 }
 .card.traveler .gametext .resource-icon::after {
   content: " ";
 }
 .card.traveler .gametext .resource-icon[data-type=coin] {
-  height: 25px;
-  transform: translateY(-2px);
-  zoom: 0.5;
+  height: 25px !important;
+  transform: translateY(-5px);
+  zoom: calc(0.5 * var(--card-ratio));
 }
 .card.traveler .gametext .resource-icon[data-type=lesson] {
   transform: translateY(-6px);
@@ -1825,10 +1811,12 @@ body > .bga-dice_die {
 }
 
 .card.valley {
+  --card-width: 310px;
+  --card-height: 156px;
   display: inline-block;
   position: relative;
-  width: 310px;
-  height: 156px;
+  width: calc(var(--card-width) * var(--card-ratio));
+  height: calc(var(--card-height) * var(--card-ratio));
 }
 .card.valley.forest .front {
   background-image: url("img/forest.jpg");
@@ -1837,7 +1825,7 @@ body > .bga-dice_die {
   background-image: url("img/meadow.jpg");
 }
 .card.valley .card-sides .front {
-  background-size: 1240px 312px;
+  background-size: calc(var(--card-width) * var(--card-ratio) * 4) calc(var(--card-height) * var(--card-ratio) * 2);
   outline: 1px solid #000;
   box-shadow: 0 0 5px 6px #fff;
   filter: drop-shadow(0.1vw 0.1vw 0.1vw black);
@@ -2270,6 +2258,7 @@ body > .bga-dice_die {
   padding-top: 40px;
   flex-direction: column;
   gap: 20px;
+  --card-ratio: 1;
 }
 
 .card,

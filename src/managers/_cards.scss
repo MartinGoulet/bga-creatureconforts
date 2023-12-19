@@ -1,0 +1,92 @@
+.card:not(.cottage):not(.worker) {
+    display: inline-block;
+    position: relative;
+    width: calc(var(--card-width) * var(--card-ratio));
+    height: calc(var(--card-height) * var(--card-ratio));
+
+    .card-sides {
+
+        .back,
+        .front {
+            border-radius: 5px;
+        }
+
+        .front {
+            &>* {
+                pointer-events: none;
+                user-select: none;
+            }
+        }
+    }
+
+    .title {
+        position: absolute;
+        top: calc(var(--title-top) * var(--card-ratio));
+        left: 0;
+        right: 0;
+        font-size: calc(var(--title-font-size) * var(--card-ratio));
+        padding-left: calc(var(--title-left-padding) * var(--card-ratio));
+    }
+
+    .gametext-wrapper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        min-height: calc(var(--gametext-min-height) * var(--card-ratio));
+        font-family: "Bosk";
+        font-size: calc(var(--gametext-font-size) * var(--card-ratio));
+        padding: 0 calc(var(--card-ratio) * 5px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .gametext {
+        text-align: center;
+
+        .i-heart {
+            width: calc(16px * var(--card-ratio));
+            height: calc(12px * var(--card-ratio));
+            background-size: calc(16px * var(--card-ratio)) calc(12px * var(--card-ratio));
+
+            span {
+                font-size: calc(0.5rem * var(--card-ratio));
+            }
+        }
+
+        .resource-group {
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        .resource-icon {
+            display: inline-flex;
+            align-items: center;
+            zoom: calc(0.4 * var(--card-ratio));
+
+
+            &::after {
+                content: " ";
+            }
+
+            &[data-type=coin] {
+                height: 35px;
+            }
+        }
+    }
+}
+
+.mobile_version #table[data-zoom='true'] .card .front .gametext-wrapper,
+.mobile_version #table[data-zoom='true'] .card .front .title {
+    font-size: calc(var(--gametext-font-size) * var(--card-ratio) * 0.5);
+}
+
+.mobile_version #table[data-zoom='true'] .card.comfort .front .gametext-wrapper,
+.mobile_version #table[data-zoom='true'] .card.comfort .front .title {
+    font-size: calc(var(--gametext-font-size) * var(--card-ratio) * 0.75);
+}
+
+.mobile_version #table[data-zoom='true'] .card.improvement .front .help-marker {
+    font-size: 10px;
+}

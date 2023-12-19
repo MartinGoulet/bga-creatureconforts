@@ -248,7 +248,7 @@ $endGameStates = [
         "type" => "game",
         "action" => "stEndGameScore",
         "transitions" => [
-            "" => ST_PRE_END_OF_GAME,
+            "" => ST_END_GAME,
         ]
     ],
 
@@ -355,7 +355,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
     ST_PLAYER_TURN_RESOLVE => [
         "phase" => "5c",
         "name" => "playerTurnResolve",
-        "descriptionmyturn" => clienttranslate('${you} must resolve your workers'),
+        "descriptionmyturn" => clienttranslate('${you} must resolve your workers or pass'),
         "description" => clienttranslate('${actplayer} must resolve their workers'),
         "args" => "argPlayerTurnResolve",
         "type" => "activeplayer",

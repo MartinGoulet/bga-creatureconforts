@@ -1,16 +1,13 @@
 .card.improvement {
-   display: inline-block;
-   position: relative;
-   width: var(--card-width);
-   height: var(--card-height);
    --card-width: 125px;
    --card-height: 125px;
 
    .card-sides {
 
-      .back, .front {
+      .back,
+      .front {
          background-image: url('img/improvements/cards.jpg');
-         background-size: calc(var(--card-width) * 5) calc(var(--card-height) * 4);
+         background-size: calc(var(--card-width) * var(--card-ratio) * 5) calc(var(--card-height) * var(--card-ratio) * 4);
       }
 
       .back {
@@ -18,17 +15,19 @@
       }
 
       .front {
+         --title-top: 8px;
+         --title-font-size: 0.7rem;
+         --title-left-padding: 27px;
+         --gametext-font-size: 0.57rem;
+         --gametext-min-height: 33px;
+         -webkit-text-size-adjust: none;
+
          @for $row from 0 through 3 {
             @for $col from 0 through 4 {
                &[data-img='#{(($row * 5) + $col + 1)}'] {
                   background-position: ($col * -100%) ($row * -100%);
                }
             }
-         }
-
-         &>* {
-            pointer-events: none;
-            user-select: none;
          }
 
          .slot-cottage {
@@ -63,80 +62,31 @@
    }
 
    .title {
-      position: absolute;
-      top: 9px;
-      left: 0;
-      right: 0;
-      font-size: 0.65rem;;
-      padding-left: 27px;
       color: palegoldenrod;
       font-family: Bosk;
    }
 
    .gametext-wrapper {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      min-height: 33px;
-      font-family: "Bosk";
-      font-size: 0.6rem;
       color: palegoldenrod;
-      padding: 0 3px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
    }
 
    [data-type="8"] .gametext-wrapper,
    [data-type="14"] .gametext-wrapper,
    [data-type="16"] .gametext-wrapper {
-      min-height: 28px;
+      min-height: calc(var(--card-ratio) * 28px);
    }
 
    [data-type="11"] .gametext-wrapper {
-      min-height: 41px;
+      min-height: calc(var(--card-ratio) * 41px);
    }
 
    .gametext {
-      text-align: center;
-
       .keyword {
          color: white;
       }
 
       .type .label {
          color: white;
-      }
-
-      .i-heart {
-         width: 16px;
-         height: 12px;
-         background-size: 16px 12px;
-
-         span {
-            font-size: 9px;
-         }
-      }
-
-      .resource-group {
-         display: inline-block;
-         margin: 0 2px;
-      }
-
-      .resource-icon {
-         display: inline-flex;
-         align-items: center;
-         zoom: 0.4;
-
-
-         &::after {
-            content: " ";
-         }
-
-         &[data-type=coin] {
-            height: 35px;
-         }
       }
    }
 }

@@ -28,7 +28,6 @@ class VillageDiceStock extends LineDiceStock {
       if (originStock) {
          const originalDie = originStock.getDice().find((d) => d.id == die.id);
          if (originalDie.face !== die.face) {
-            debugger;
             this.rollDie(die, { effect: 'turn', duration: 0 });
          }
       }

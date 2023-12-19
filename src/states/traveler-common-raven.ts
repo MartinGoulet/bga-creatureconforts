@@ -3,7 +3,6 @@ class TravelerCommonRavenState implements StateHandler {
 
    onEnteringState({ locations_unavailable: location_ids }: TravelerCommonRavenArgs): void {
       if (!this.game.isCurrentPlayerActive()) return;
-      debugger;
       const { worker_locations } = this.game.tableCenter;
 
       worker_locations.OnLocationClick = (slotId: SlotId) => {

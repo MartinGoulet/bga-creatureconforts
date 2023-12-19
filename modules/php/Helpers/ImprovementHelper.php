@@ -3,13 +3,11 @@
 namespace CreatureComforts\Helpers;
 
 use BgaUserException;
-use CreatureComforts\Core\Game;
 use CreatureComforts\Core\Notifications;
 use CreatureComforts\Managers\Cottages;
 use CreatureComforts\Managers\Dice;
 use CreatureComforts\Managers\Improvements;
 use CreatureComforts\Managers\Players;
-use CreatureComforts\Managers\Worker;
 
 class ImprovementHelper {
 
@@ -25,15 +23,12 @@ class ImprovementHelper {
                 break;
             case 8: // Orchard
                 self::playerGetResources($location_id, $owner_id, FRUIT);
-                Game::get()->gamestate->nextState("next");
                 break;
             case 14: // Wildwood
                 self::playerGetResources($location_id, $owner_id, MUSHROOM);
-                Game::get()->gamestate->nextState("next");
                 break;
             case 16: // Field
                 self::playerGetResources($location_id, $owner_id, GRAIN);
-                Game::get()->gamestate->nextState("next");
                 break;
             default:
                 throw new BgaUserException("Improvement not implemented");

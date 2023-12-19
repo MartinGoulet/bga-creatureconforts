@@ -78,6 +78,7 @@ class NotificationManager {
    private notif_onVillageDice({ dice }: { dice: Dice[] }) {
       const white_dice = dice.filter((die) => die.type == 'white');
       const stack = this.game.tableCenter.hill;
+      stack.removeAll();
       stack.addDice(white_dice);
       stack.rollDice(dice, { effect: 'rollIn', duration: [500, 900] });
    }
@@ -227,6 +228,7 @@ class NotificationManager {
       if (card.location == 'board') {
          await this.game.getPlayerTable(player_id).improvements.addCard(card);
       } else {
+         debugger;
          await this.game.tableCenter.glade.addCard(card);
       }
 

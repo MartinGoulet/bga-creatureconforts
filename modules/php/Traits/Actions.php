@@ -187,6 +187,7 @@ trait Actions {
 
         if ($location_id >= 20) {
             ImprovementHelper::resolve($location_id);
+            $this->resolveWorkerNextStep($location_id);
             return;
         }
 
@@ -262,6 +263,7 @@ trait Actions {
             $die = array_shift($dice);
             $converted_resources = ResourcesHelper::convertNumberToResource($resources);
             WorkshopHelper::resolve(intval($die['face']), intval(array_shift($resources)));
+            Game::undoSavepoint();
             $this->resolveWorkerNextStep($location_id);
             return;
         }
@@ -337,10 +339,8 @@ trait Actions {
             return $worker['location'] !== 'player';
         });
 
-        // TODO Glade
-        // $next_step = count($workers_not_home) > 0 ? "next" : "end";
-        // Game::get()->gamestate->nextState($next_step);
-        Game::get()->gamestate->nextState("next");
+        $next_step = count($workers_not_home) > 0 || Dice::countDiceInGlade() > 0 ? "next" : "end";
+        Game::get()->gamestate->nextState($next_step);
     }
 
     function confirmResolveWorker() {
@@ -365,23 +365,31 @@ trait Actions {
         }
 
         if (array_key_exists(ANY_RESOURCE, $cost)) {
-            if (sizeof($resources) !== $cost[ANY_RESOURCE]) {
+            // Board game card
+            if (sizeof($resources) !== 4) {
                 throw new BgaUserException("Not the right amount of resources");
             }
+            // Remove two last resources (coin and story)
+            $generic_resources = array_slice($resources, 0, 2, false);
 
-            unset($cost[ANY_RESOURCE]);
-            foreach ($resources as $idResource) {
+            $new_cost = [];
+            foreach ($generic_resources as $idResource) {
                 $code = $this->good_types[$idResource];
-                if (array_key_exists($code, $cost)) {
-                    $cost[$code] += 1;
+                if (array_key_exists($code, $new_cost)) {
+                    $new_cost[$code] += 1;
                 } else {
-                    $cost[$code] = 1;
+                    $new_cost[$code] = 1;
                 }
             }
+
+            $new_cost[COIN] = 1;
+            $new_cost[STORY] = 1;
+            $cost = $new_cost;
         }
 
         if (TravelerHelper::isActiveHairyTailedHole() && sizeof($resources) > 0) {
             $group = ResourcesHelper::groupByType(ResourcesHelper::convertNumberToResource($resources));
+            // throw new BgaUserException(json_encode(($cost)));
             $isOk = true;
             $sumStoneCoin = 0;
             foreach ($cost as $resource => $count) {
@@ -435,7 +443,7 @@ trait Actions {
     function confirmStoreResource(array $infos) {
         $current_player_id = $this->getCurrentPlayerId();
 
-        foreach($infos as $key => $info) {
+        foreach ($infos as $key => $info) {
             $card_id = array_shift($info);
             $resources = ResourcesHelper::convertNumberToResource($info);
             Globals::setComfortResource($card_id, $resources);
@@ -491,7 +499,6 @@ trait Actions {
             Players::addResources(Players::getPlayerId(), [STORY => 1]);
             Notifications::travelerExchangeResources($group, [STORY => 1]);
             Notifications::travelerReceivedResources($group, $left_player_id);
-
         }
         Game::get()->gamestate->nextState();
     }

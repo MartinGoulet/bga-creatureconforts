@@ -1,6 +1,4 @@
 class PlayerTurnResolveState implements StateHandler {
-   private glade_selection?: number = undefined;
-
    constructor(private game: CreatureComforts) {}
 
    onEnteringState(args: PlayerTurnResolveArgs): void {
@@ -17,14 +15,13 @@ class PlayerTurnResolveState implements StateHandler {
          const isSelected = worker_locations.isSelectedLocation(slotId);
          this.clearSelectedDiceLocations();
          worker_locations.setSelectedLocation(isSelected ? [] : [slotId]);
-         this.game.toggleButtonEnable('btn_resolve', !isSelected);
+         this.resolveLocation(Number(slotId), args, args.wheelbarrow);
       };
 
       const handleGladeSlotClick = (slotId: number, isSelected: boolean) => {
-         if (hasSingleDice(slotId)) {
-            this.glade_selection = isSelected ? slotId : undefined;
-            this.game.toggleButtonEnable('btn_resolve', isSelected);
+         if (hasSingleDice(slotId) && isSelected) {
             worker_locations.setSelectedLocation([]);
+            this.resolveLocation(Number(slotId), args, args.wheelbarrow);
          }
       };
 
@@ -35,7 +32,7 @@ class PlayerTurnResolveState implements StateHandler {
 
       const handleDieClick = (die: Dice) => {
          if (die.location && die.location >= 20) {
-            alert('click');
+            handleGladeSlotClick(Number(die.location), true);
          }
       };
 
@@ -48,11 +45,6 @@ class PlayerTurnResolveState implements StateHandler {
             setTimeout(() => {
                const slot = document.querySelector(`#glade [data-slot-id="${loc}"]`);
                slot.classList.toggle('selectable', true);
-               slot.addEventListener('click', (ev: Event) => {
-                  ev.stopPropagation();
-                  slot.classList.toggle('selected');
-                  handleGladeSlotClick(loc, slot.classList.contains('selected'));
-               });
             }, 15);
          });
       dice_locations.onDieClick = handleDieClick;
@@ -76,68 +68,49 @@ class PlayerTurnResolveState implements StateHandler {
       worker_locations.OnLocationClick = null;
       this.clearSelectedDiceLocations();
       document.querySelectorAll(`#glade .slot-dice`).forEach((div) => div.classList.remove('selectable'));
-      this.glade_selection = undefined;
-      // document
-      //    .querySelectorAll('#dice-locations .slot-dice.selectable')
-      //    .forEach((div) => div.classList.remove('selectable'));
    }
 
    onUpdateActionButtons(args: PlayerTurnResolveArgs): void {
-      const { locations, wheelbarrow } = args;
-
-      const handleResolve = () => {
-         if (this.glade_selection) {
-            this.game.takeAction('resolveWorker', { location_id: this.glade_selection });
-            return;
-         }
-
-         const selectedLocations = this.game.tableCenter.worker_locations.getSelectedLocation();
-
-         if (selectedLocations.length === 0) {
-            this.game.showMessage(_('You must select a location with one of your workers'), 'error');
-            return;
-         }
-
-         const locationId: number = Number(selectedLocations[0]);
-
-         if (locationId == 8) {
-            this.goToMarket(args);
-         } else if (locationId == 9) {
-            this.game.setClientState('resolveTraveler', {
-               descriptionmyturn: _('You must resolve the effect of the traveler'),
-            });
-         } else if (locationId == 10) {
-            this.game.setClientState('resolveWorkshop', {
-               descriptionmyturn: _(`You must select one card in the Workshop`),
-            });
-         } else if (locationId == 11) {
-            this.game.setClientState('resolveOwnNest', {
-               descriptionmyturn: _(`You must select one card in the Owl's Nest`),
-            });
-         } else if (wheelbarrow === locationId) {
-            this.game.setClientState('resolveWheelbarrow', {
-               descriptionmyturn: _(`You must select one card in the Owl's Nest`),
-               args: {
-                  location_id: locationId,
-               },
-            });
-         } else {
-            this.game.takeAction('resolveWorker', { location_id: locationId });
-         }
-      };
+      const { locations } = args;
 
       const handleEnd = () => {
          this.game.takeAction('confirmResolveWorker');
       };
 
       if (locations.length > 0) {
-         this.game.addActionButtonDisabled('btn_resolve', _('Resolve'), handleResolve);
          this.game.addActionButtonRed('btn_end', _('End'), handleEnd);
       } else {
          this.game.addActionButton('btn_end', _('End'), handleEnd);
       }
 
       this.game.addActionButtonUndo();
+   }
+
+   private resolveLocation(locationId: number, args: PlayerTurnResolveArgs, wheelbarrow: number) {
+      if (locationId == 8) {
+         this.goToMarket(args);
+      } else if (locationId == 9) {
+         this.game.setClientState('resolveTraveler', {
+            descriptionmyturn: _('You must resolve the effect of the traveler'),
+         });
+      } else if (locationId == 10) {
+         this.game.setClientState('resolveWorkshop', {
+            descriptionmyturn: _(`You must select one card in the Workshop`),
+         });
+      } else if (locationId == 11) {
+         this.game.setClientState('resolveOwnNest', {
+            descriptionmyturn: _(`You must select one card in the Owl's Nest`),
+         });
+      } else if (wheelbarrow === locationId) {
+         this.game.setClientState('resolveWheelbarrow', {
+            descriptionmyturn: _(`You must select one card in the Owl's Nest`),
+            args: {
+               location_id: locationId,
+            },
+         });
+      } else {
+         this.game.takeAction('resolveWorker', { location_id: locationId });
+      }
    }
 
    clearSelectedDiceLocations() {

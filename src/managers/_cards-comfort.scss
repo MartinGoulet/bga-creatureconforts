@@ -1,15 +1,16 @@
 .card.comfort {
    --card-width: 110px;
    --card-height: 154px;
-   display: inline-block;
-   position: relative;
-   width: var(--card-width);
-   height: var(--card-height);
+   // display: inline-block;
+   // position: relative;
+   // width: calc(var(--card-width) * var(--card-ratio));
+   // height: calc(var(--card-height) * var(--card-ratio));
 
    .card-sides {
 
-      .back, .front {
-         background-size: calc(var(--card-width) * 7) calc(var(--card-height) * 4);
+      .back,
+      .front {
+         background-size: calc(var(--card-width) * var(--card-ratio) * 7) calc(var(--card-height) * var(--card-ratio) * 4);
          background-image: url('img/comforts/cards.jpg');
          border-radius: 5px;
       }
@@ -19,17 +20,18 @@
       }
 
       .front {
+         --title-top: 8px;
+         --title-font-size: 0.7rem;
+         --title-left-padding: 27px;
+         --gametext-font-size: 0.6rem;
+         --gametext-min-height: 33px;
+
          @for $row from 0 through 3 {
             @for $col from 0 through 6 {
                &[data-img='#{(($row * 7) + $col + 1)}'] {
                   background-position: ($col * -100%) ($row * -100%);
                }
             }
-         }
-
-         &>* {
-            pointer-events: none;
-            user-select: none;
          }
       }
    }
@@ -39,63 +41,12 @@
    }
 
    .title {
-      position: absolute;
-      top: 8px;
-      left: 0;
-      right: 0;
-      font-size: 0.7rem;
-      padding-left: 27px;
       color: white;
       font-family: Bosk;
    }
 
    .gametext-wrapper {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      min-height: 33px;
-      font-family: "Bosk";
-      font-size: 0.6rem;
       color: white;
-      padding: 0 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-   }
-
-   .gametext {
-      text-align: center;
-
-      .i-heart {
-         width: 16px;
-         height: 12px;
-         background-size: 16px 12px;
-
-         span {
-            font-size: 0.6rem;
-         }
-      }
-
-      .resource-group {
-         display: inline-block;
-         margin: 0 2px;
-      }
-
-      .resource-icon {
-         display: inline-flex;
-         align-items: center;
-         zoom: 0.4;
-
-
-         &::after {
-            content: " ";
-         }
-
-         &[data-type=coin] {
-            height: 35px;
-         }
-      }
    }
 }
 

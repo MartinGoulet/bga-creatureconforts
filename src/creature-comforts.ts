@@ -1,7 +1,6 @@
 const isDebug =
    window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 const debug = isDebug ? console.log.bind(window.console) : function () {};
-// const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 const arrayRange = (start, end) => Array.from(Array(end - start + 1).keys()).map((x) => x + start);
 const LOCAL_STORAGE_ZOOM_KEY = 'creature-comforts-zoom';
 
@@ -29,7 +28,37 @@ interface CreatureComforts
       delay?: number,
    ): void;
    addTooltipHtmlToClass(cssClass: string, html: string, delay?: number): void;
+   gameinterface_zoomFactor: number;
 }
+
+// const Observe = (sel, opt, cb) => {
+//    const Obs = new MutationObserver((m) => [...m].forEach(cb));
+//    document.querySelectorAll(sel).forEach((el) => Obs.observe(el, opt));
+// };
+
+// Observe(
+//    '#page-content',
+//    {
+//       attributesList: ['style'],
+//       attributeOldValue: true,
+//    },
+//    (m) => {
+//       const divPageContent = m.target as HTMLDivElement;
+//       const value = divPageContent.style['zoom'];
+//       if (value) {
+//          // // divPageContent.style.transform = `scale(${value})`;
+//          // // divPageContent.style.transformOrigin = `top center`;
+//          // divPageContent.style['zoom'] = null;
+//          // const pageTitle = document.getElementById('page-title');
+//          // // pageTitle.style.transform = `scale(${value})`;
+//          // // pageTitle.style.transformOrigin = `top center`;
+//          // pageTitle.style['zoom'] = null;
+//          // const table = document.getElementById('table');
+//          // table.style.transform = `scale(${value})`;
+//          // table.style.transformOrigin = `top center`;
+//       }
+//    },
+// );
 
 class CreatureComforts
    implements ebg.core.gamegui, BgaGame<CreatureComfortsPlayerData, CreatureComfortsGamedatas>
@@ -103,7 +132,9 @@ class CreatureComforts
          this.dontPreloadImage(`dice_${color}.jpg`);
       });
 
-      this.dontPreloadImage('improvements.jpg');
+      const htmlElement = document.getElementsByTagName('html')[0];
+      htmlElement.classList.toggle('mobile_version', document.body.classList.contains('mobile_version'));
+      htmlElement.classList.toggle('desktop_version', document.body.classList.contains('desktop_version'));
 
       // Setting up player boards
       this.createPlayerPanels(gamedatas);
@@ -113,7 +144,7 @@ class CreatureComforts
       //    element: document.getElementById('table'),
       //    smooth: false,
       //    zoomControls: {
-      //       color: 'white',
+      //       color: 'black',
       //    },
       //    localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
       //    // onDimensionsChange: () => {
@@ -139,6 +170,29 @@ class CreatureComforts
       });
 
       this.setupNotifications();
+
+      // (document.querySelector('head') as HTMLHeadElement).insertAdjacentHTML(
+      //    'afterbegin',
+      //    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+      // );
+
+      if (navigator.userAgent.indexOf('iPhone') > -1) {
+         document.body.style.fontSize = '';
+
+         // document
+         //    .querySelector('[name=viewport]')
+         //    .setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1');
+      }
+
+      // add reload Css debug button
+      const parent = document.querySelector('.debug_section');
+      if (parent) {
+         this.addActionButton('reload_css', _('Reload CSS'), () => reloadCss(), parent, null, 'gray');
+      }
+   }
+
+   public onScreenWidthChange() {
+      document.getElementById('table').dataset.zoom = '' + (this.gameinterface_zoomFactor < 1);
    }
 
    ///////////////////////////////////////////////////

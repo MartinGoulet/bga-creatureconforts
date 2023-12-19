@@ -15,25 +15,25 @@ class ImprovementManager extends CardManager<ImprovementCard> {
             div.dataset.type = card.type;
             div.dataset.img = card_info.img.toString();
 
-            if (div.getElementsByClassName('title').length !== 0) return;
+            if (div.getElementsByClassName('title').length === 0) {
+               div.insertAdjacentHTML('beforeend', `<div class="title">${_(card_info.name)}</div>`);
+               if (card_info.gametext) {
+                  const gametext = this.formatText(_(card_info.gametext));
+                  div.insertAdjacentHTML(
+                     'beforeend',
+                     `<div class="gametext-wrapper"><div class="gametext">${gametext}</div></div>`,
+                  );
+               }
 
-            div.insertAdjacentHTML('beforeend', `<div class="title">${_(card_info.name)}</div>`);
-            if (card_info.gametext) {
-               const gametext = this.formatText(_(card_info.gametext));
-               div.insertAdjacentHTML(
-                  'beforeend',
-                  `<div class="gametext-wrapper"><div class="gametext">${gametext}</div></div>`,
-               );
-            }
+               if (card.type_arg) {
+                  //    game.setTooltip(div.id, this.getTooltip(card));
+               }
 
-            if (card.type_arg) {
-               //    game.setTooltip(div.id, this.getTooltip(card));
-            }
-
-            if ('type' in card) {
-               this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
-                  this.game.modal.displayImprovement(card),
-               );
+               if ('type' in card) {
+                  this.game.addModalToCard(div, `${this.getId(card)}-help-marker`, () =>
+                     this.game.modal.displayImprovement(card),
+                  );
+               }
             }
 
             if (!document.getElementById(`${this.getId(card)}-slot-cottage`) && !modal) {
