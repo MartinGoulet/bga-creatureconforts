@@ -249,7 +249,9 @@ class NotificationManager {
       die_newvalue,
    }: ModifyDieWithLessonLearnedArgs) {
       this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
-      const die = this.game.tableCenter.dice_locations.getDice().find((d) => d.id == die_id);
+      const die =
+         this.game.tableCenter.dice_locations.getDice().find((d) => d.id == die_id) ??
+         this.game.tableCenter.hill.getDice().find((d) => d.id == die_id);
       die.face = die_newvalue;
       this.game.getPlayerTable(player_id).dice.rollDie(die, { effect: 'turn', duration: 375 });
    }

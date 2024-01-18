@@ -3176,6 +3176,10 @@ var ImprovementManager = (function (_super) {
             setupDiv: function (card, div) {
                 div.classList.add('improvement');
                 div.dataset.cardId = '' + card.id;
+                var cottage = _this.game.gamedatas.cottages.improvements.find(function (c) { return c.location_arg == card.id; });
+                if (cottage) {
+                    div.dataset.owner = cottage.type_arg;
+                }
             },
             setupFrontDiv: function (card, div) {
                 var card_info = _this.getCardType(card);
@@ -3223,10 +3227,14 @@ var ImprovementManager = (function (_super) {
         return _this;
     }
     ImprovementManager.prototype.addCottage = function (card, cottage) {
+        this.getCardElement(card).dataset.owner = cottage.type_arg;
         return this.cottages[card.id].addCard(cottage);
     };
     ImprovementManager.prototype.getCardType = function (card) {
         return this.game.gamedatas.improvement_types[card.type];
+    };
+    ImprovementManager.prototype.isOwner = function (card, player_id) {
+        return this.getCardElement(card).dataset.owner == player_id.toString();
     };
     ImprovementManager.prototype.formatText = function (rawText) {
         if (!rawText) {
@@ -3310,10 +3318,17 @@ var ValleyManager = (function (_super) {
                 div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
                 if (card.type_arg) {
                 }
+                if (div.getElementsByClassName('dice-rule').length !== 0)
+                    return;
+                var card_info = game.gamedatas.valley_types[Number(card.type_arg)];
+                for (var _i = 0, _a = [1, 2, 3, 4]; _i < _a.length; _i++) {
+                    var pos = _a[_i];
+                    if (card_info.position[pos] && card_info.position[pos].rule) {
+                        div.insertAdjacentHTML('beforeend', "<div class=\"dice-rule\" data-pos=\"".concat(pos, "\">").concat(_this.getTextRule(card_info.position[pos].rule), "</div>"));
+                    }
+                }
                 if ('type' in card) {
-                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () {
-                        return _this.game.modal.displayValley(card);
-                    });
+                    _this.game.addModalToCard(div, "".concat(_this.getId(card), "-help-marker"), function () { return _this.game.modal.displayValley(card); }, 'black');
                 }
             },
             isCardVisible: function () { return true; },
@@ -3323,6 +3338,23 @@ var ValleyManager = (function (_super) {
         _this.game = game;
         return _this;
     }
+    ValleyManager.prototype.getTextRule = function (rule) {
+        var _a;
+        var rules = {
+            '3_OR_UNDER': _('OR UNDER'),
+            '4_OR_HIGHER': _('OR HIGHER'),
+            TOTAL_5_OR_LOWER: _('TOTAL 5 OR_LOWER'),
+            TOTAL_6_OR_LOWER: _('TOTAL 6 OR LOWER'),
+            TOTAL_7_OR_HIGHER: _('TOTAL 7 OR HIGHER'),
+            TOTAL_10_OR_HIGHER: _('TOTAL_10 OR HIGHER'),
+            TOTAL_11_OR_HIGHER: _('TOTAL_11 OR HIGHER'),
+            TOTAL_7: _('TOTAL 7'),
+            TOTAL_8: _('TOTAL 8'),
+            ALL_EVEN: _('ALL EVEN'),
+            ALL_ODD: _('ALL ODD'),
+        };
+        return (_a = rules[rule]) !== null && _a !== void 0 ? _a : '';
+    };
     return ValleyManager;
 }(CardManager));
 var CottageManager = (function (_super) {
@@ -3953,6 +3985,7 @@ var PlayerTurnDiceState = (function () {
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         this.original_dice = hill.getDice().map(function (die) { return Object.assign({}, die); });
         var handleGladeSlotClick = function (slot_id) {
+            debugger;
             var canAddDice = _this.game.tableCenter.getDiceFromLocation(Number(slot_id)).length == 0 &&
                 hill.getSelection()[0].owner_id;
             if (canAddDice) {
@@ -3981,6 +4014,11 @@ var PlayerTurnDiceState = (function () {
             if (selection[0].owner_id) {
                 _this.game.tableCenter.glade
                     .getCards()
+                    .filter(function (card) {
+                    return card.type == '7'
+                        ? !_this.game.improvementManager.isOwner(card, _this.game.getPlayerId())
+                        : true;
+                })
                     .map(function (card) { return Number(card.location_arg); })
                     .filter(function (location) { return _this.game.tableCenter.getDiceFromLocation(location).length == 0; })
                     .forEach(function (location) {
@@ -4274,6 +4312,8 @@ var PlayerTurnDiceManipulationState = (function () {
         }
     };
     PlayerTurnDiceManipulationState.prototype.validateLocation = function (location) {
+        if (location >= 20)
+            return;
         var dice = this.diceManipulation
             .filter(function (info) { return info.location === location; })
             .map(function (info) {
@@ -4360,6 +4400,9 @@ var PlayerTurnResolveState = (function () {
         worker_locations.OnLocationClick = null;
         this.clearSelectedDiceLocations();
         document.querySelectorAll("#glade .slot-dice").forEach(function (div) { return div.classList.remove('selectable'); });
+        document
+            .querySelectorAll('#dice-locations .slot-dice.selected')
+            .forEach(function (div) { return div.classList.remove('selected'); });
     };
     PlayerTurnResolveState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -5749,9 +5792,10 @@ var CreatureComforts = (function () {
     CreatureComforts.prototype.addActionButtonReset = function (parent, handle) {
         this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
     };
-    CreatureComforts.prototype.addModalToCard = function (div, helpMarkerId, callback) {
+    CreatureComforts.prototype.addModalToCard = function (div, helpMarkerId, callback, color) {
+        if (color === void 0) { color = 'white'; }
         if (!document.getElementById(helpMarkerId)) {
-            div.insertAdjacentHTML('afterbegin', "<div id=\"".concat(helpMarkerId, "\" class=\"help-marker\">\n                     <i class=\"fa fa-search\" style=\"color: white\"></i>\n                  </div>"));
+            div.insertAdjacentHTML('afterbegin', "<div id=\"".concat(helpMarkerId, "\" class=\"help-marker\">\n                     <i class=\"fa fa-search\" style=\"color: ").concat(color, "\"></i>\n                  </div>"));
             document.getElementById(helpMarkerId).addEventListener('click', function (evt) {
                 evt.stopPropagation();
                 evt.preventDefault();
@@ -5963,8 +6007,7 @@ var CreatureComforts = (function () {
 var GameOptions = (function () {
     function GameOptions(game) {
         this.game = game;
-        this.setupGameInfo(game.gamedatas);
-        this.setupGamePhase();
+        this.setupGamePhase(game.gamedatas);
         this.game.updatePlayerOrdering();
     }
     GameOptions.prototype.setPhase = function (phase) {
@@ -5974,38 +6017,30 @@ var GameOptions = (function () {
     GameOptions.prototype.setTurnNumber = function (value) {
         this.turn_number.toValue(value);
     };
-    GameOptions.prototype.setupGameInfo = function (_a) {
+    GameOptions.prototype.setupGamePhase = function (_a) {
         var turn_number = _a.turn_number, nbr_turns = _a.nbr_turns;
-        var display = document.getElementById('game-infos');
-        if (display) {
-            display.parentElement.removeChild(display);
-        }
-        var html = "\n         <div class=\"player-board\" id=\"game-infos\">\n            <div class=\"title\">".concat(_('Game informations'), "</div>\n            <div class=\"player-board-inner\">\n               <div id=\"game-infos-turn-number\">").concat(_('Turn : '), " <span id=\"game-infos-turn-number-counter\"></span> / ").concat(nbr_turns, "</div>\n            </div>\n         </div>");
-        document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
-        this.turn_number = new ebg.counter();
-        this.turn_number.create('game-infos-turn-number-counter');
-        this.turn_number.setValue(turn_number);
-    };
-    GameOptions.prototype.setupGamePhase = function () {
         var display = document.getElementById('game-phases');
         if (display) {
             display.parentElement.removeChild(display);
         }
-        var _a = {
+        var _b = {
             phase1: _('New traveler'),
             phase2: _('Family dice'),
             phase3: _('Placement'),
             phase4: _('Village dice'),
             phase5: _('Player Turn'),
             phase6: _('Upkeep'),
-        }, phase1 = _a.phase1, phase2 = _a.phase2, phase3 = _a.phase3, phase4 = _a.phase4, phase5 = _a.phase5, phase6 = _a.phase6;
-        var _b = {
+        }, phase1 = _b.phase1, phase2 = _b.phase2, phase3 = _b.phase3, phase4 = _b.phase4, phase5 = _b.phase5, phase6 = _b.phase6;
+        var _c = {
             phase5b: _('Assign dice'),
             phase5c: _('Resolve locations'),
             phase5e: _('Craft Comforts'),
-        }, phase5b = _b.phase5b, phase5c = _b.phase5c, phase5e = _b.phase5e;
-        var html = "\n         <div class=\"player-board\" id=\"game-phases\">\n            <div class=\"title\">".concat(_('Turn order'), "</div>\n            <div class=\"player-board-inner\">\n               <ul id=\"wg-phases\" data-phase=\"1\">\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">1. ").concat(phase1, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">2. ").concat(phase2, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">3. ").concat(phase3, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">4. ").concat(phase4, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">5. ").concat(phase5, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5b, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5c, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5e, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">6. ").concat(phase6, "</div></li>\n               </ul>\n            </div>\n         </div>");
+        }, phase5b = _c.phase5b, phase5c = _c.phase5c, phase5e = _c.phase5e;
+        var html = "\n         <div class=\"player-board\" id=\"game-phases\">\n            <div class=\"title\">".concat(_('Turn'), " \n               <span id=\"game-infos-turn-number-counter\"></span> / ").concat(nbr_turns, "\n            </div>\n            <div class=\"player-board-inner\">\n               <ul id=\"wg-phases\" data-phase=\"1\">\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">1. ").concat(phase1, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">2. ").concat(phase2, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">3. ").concat(phase3, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">4. ").concat(phase4, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">5. ").concat(phase5, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5b, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5c, "</div></li>\n                  <li class=\"sub\"><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">").concat(phase5e, "</div></li>\n                  <li><div class=\"wg-icon\"></div><div class=\"wg-phase-name\">6. ").concat(phase6, "</div></li>\n               </ul>\n            </div>\n         </div>");
         document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
+        this.turn_number = new ebg.counter();
+        this.turn_number.create('game-infos-turn-number-counter');
+        this.turn_number.setValue(turn_number);
     };
     return GameOptions;
 }());
@@ -6414,9 +6449,10 @@ var NotificationManager = (function () {
         });
     };
     NotificationManager.prototype.notif_onModifyDieWithLessonLearned = function (_a) {
+        var _b;
         var player_id = _a.player_id, nbr_lesson = _a.nbr_lesson, die_id = _a.die_id, die_newvalue = _a.die_newvalue;
         this.game.getPlayerPanel(player_id).counters['lesson'].incValue(-nbr_lesson);
-        var die = this.game.tableCenter.dice_locations.getDice().find(function (d) { return d.id == die_id; });
+        var die = (_b = this.game.tableCenter.dice_locations.getDice().find(function (d) { return d.id == die_id; })) !== null && _b !== void 0 ? _b : this.game.tableCenter.hill.getDice().find(function (d) { return d.id == die_id; });
         die.face = die_newvalue;
         this.game.getPlayerTable(player_id).dice.rollDie(die, { effect: 'turn', duration: 375 });
     };

@@ -68,6 +68,9 @@ class PlayerTurnResolveState implements StateHandler {
       worker_locations.OnLocationClick = null;
       this.clearSelectedDiceLocations();
       document.querySelectorAll(`#glade .slot-dice`).forEach((div) => div.classList.remove('selectable'));
+      document
+         .querySelectorAll('#dice-locations .slot-dice.selected')
+         .forEach((div) => div.classList.remove('selected'));
    }
 
    onUpdateActionButtons(args: PlayerTurnResolveArgs): void {

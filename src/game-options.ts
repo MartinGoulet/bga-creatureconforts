@@ -2,8 +2,8 @@ class GameOptions {
    private turn_number: ebg.counter;
 
    constructor(private game: CreatureComforts) {
-      this.setupGameInfo(game.gamedatas);
-      this.setupGamePhase();
+      // this.setupGameInfo(game.gamedatas);
+      this.setupGamePhase(game.gamedatas);
       this.game.updatePlayerOrdering();
    }
 
@@ -16,30 +16,30 @@ class GameOptions {
       this.turn_number.toValue(value);
    }
 
-   private setupGameInfo({ turn_number, nbr_turns }: CreatureComfortsGamedatas) {
-      const display = document.getElementById('game-infos');
-      if (display) {
-         display.parentElement.removeChild(display);
-      }
+   // private setupGameInfo({ turn_number, nbr_turns }: CreatureComfortsGamedatas) {
+   //    const display = document.getElementById('game-infos');
+   //    if (display) {
+   //       display.parentElement.removeChild(display);
+   //    }
 
-      const html = `
-         <div class="player-board" id="game-infos">
-            <div class="title">${_('Game informations')}</div>
-            <div class="player-board-inner">
-               <div id="game-infos-turn-number">${_(
-                  'Turn : ',
-               )} <span id="game-infos-turn-number-counter"></span> / ${nbr_turns}</div>
-            </div>
-         </div>`;
+   //    const html = `
+   //       <div class="player-board" id="game-infos">
+   //          <div class="title">${_('Game informations')}</div>
+   //          <div class="player-board-inner">
+   //             <div id="game-infos-turn-number">${_(
+   //                'Turn : ',
+   //             )} <span id="game-infos-turn-number-counter"></span> / ${nbr_turns}</div>
+   //          </div>
+   //       </div>`;
 
-      document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
+   //    document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
 
-      this.turn_number = new ebg.counter();
-      this.turn_number.create('game-infos-turn-number-counter');
-      this.turn_number.setValue(turn_number);
-   }
+   //    this.turn_number = new ebg.counter();
+   //    this.turn_number.create('game-infos-turn-number-counter');
+   //    this.turn_number.setValue(turn_number);
+   // }
 
-   private setupGamePhase() {
+   private setupGamePhase({ turn_number, nbr_turns }: CreatureComfortsGamedatas) {
       const display = document.getElementById('game-phases');
       if (display) {
          display.parentElement.removeChild(display);
@@ -62,7 +62,9 @@ class GameOptions {
 
       const html = `
          <div class="player-board" id="game-phases">
-            <div class="title">${_('Turn order')}</div>
+            <div class="title">${_('Turn')} 
+               <span id="game-infos-turn-number-counter"></span> / ${nbr_turns}
+            </div>
             <div class="player-board-inner">
                <ul id="wg-phases" data-phase="1">
                   <li><div class="wg-icon"></div><div class="wg-phase-name">1. ${phase1}</div></li>
@@ -79,5 +81,9 @@ class GameOptions {
          </div>`;
 
       document.getElementById('player_boards').insertAdjacentHTML('beforeend', html);
+
+      this.turn_number = new ebg.counter();
+      this.turn_number.create('game-infos-turn-number-counter');
+      this.turn_number.setValue(turn_number);
    }
 }

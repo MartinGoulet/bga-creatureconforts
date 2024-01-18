@@ -259,6 +259,8 @@ class PlayerTurnDiceManipulationState implements StateHandler {
    }
 
    private validateLocation(location: number) {
+      if (location >= 20) return;
+
       const dice = this.diceManipulation
          .filter((info) => info.location === location)
          .map((info) => {

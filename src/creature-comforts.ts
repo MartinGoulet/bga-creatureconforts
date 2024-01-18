@@ -262,12 +262,17 @@ class CreatureComforts
       this.addActionButton('btn_reset', _('Reset'), handle, parent, false, 'gray');
    }
 
-   public addModalToCard(div: HTMLElement, helpMarkerId: string, callback: () => void) {
+   public addModalToCard(
+      div: HTMLElement,
+      helpMarkerId: string,
+      callback: () => void,
+      color: string = 'white',
+   ) {
       if (!document.getElementById(helpMarkerId)) {
          div.insertAdjacentHTML(
             'afterbegin',
             `<div id="${helpMarkerId}" class="help-marker">
-                     <i class="fa fa-search" style="color: white"></i>
+                     <i class="fa fa-search" style="color: ${color}"></i>
                   </div>`,
          );
 

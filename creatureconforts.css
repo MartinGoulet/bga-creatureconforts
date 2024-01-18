@@ -1819,10 +1819,10 @@ body > .bga-dice_die {
   height: calc(var(--card-height) * var(--card-ratio));
 }
 .card.valley.forest .front {
-  background-image: url("img/forest.jpg");
+  background-image: url("img/valleys/forest.jpg");
 }
 .card.valley.meadow .front {
-  background-image: url("img/meadow.jpg");
+  background-image: url("img/valleys/meadow.jpg");
 }
 .card.valley .card-sides .front {
   background-size: calc(var(--card-width) * var(--card-ratio) * 4) calc(var(--card-height) * var(--card-ratio) * 2);
@@ -1902,6 +1902,25 @@ body > .bga-dice_die {
 .card.valley .card-sides .front > * {
   pointer-events: none;
   user-select: none;
+}
+.card.valley .dice-rule {
+  font-family: "Bosk";
+  color: white;
+  position: absolute;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  font-size: calc(11px * var(--card-ratio));
+  bottom: calc(8px * var(--card-ratio));
+  max-width: calc(58px * var(--card-ratio));
+  min-height: calc(26px * var(--card-ratio));
+}
+.card.valley .dice-rule[data-pos="1"], .card.valley .dice-rule[data-pos="3"] {
+  left: calc(70px * var(--card-ratio));
+}
+.card.valley .dice-rule[data-pos="2"], .card.valley .dice-rule[data-pos="4"] {
+  right: calc(25px * var(--card-ratio));
+  max-width: calc(31px * var(--card-ratio));
 }
 
 .bga-dice_die.colored-die[data-color=yellow] .bga-dice_die-face {

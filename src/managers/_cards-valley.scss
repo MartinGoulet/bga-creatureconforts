@@ -8,12 +8,13 @@
 
    &.forest {
       .front {
-         background-image: url('img/forest.jpg');
+         background-image: url('img/valleys/forest.jpg');
       }
    }
+
    &.meadow {
       .front {
-         background-image: url('img/meadow.jpg');
+         background-image: url('img/valleys/meadow.jpg');
       }
    }
 
@@ -25,24 +26,31 @@
          &[data-type='fall'][data-image_pos='1'] {
             background-position: -0% -0%;
          }
+
          &[data-type='fall'][data-image_pos='2'] {
             background-position: -100% -0%;
          }
+
          &[data-type='spring'][data-image_pos='3'] {
             background-position: -200% -0%;
          }
+
          &[data-type='spring'][data-image_pos='4'] {
             background-position: -300% -0%;
          }
+
          &[data-type='spring'][data-image_pos='5'] {
             background-position: -0% -100%;
          }
+
          &[data-type='summer'][data-image_pos='6'] {
             background-position: -100% -100%;
          }
+
          &[data-type='summer'][data-image_pos='7'] {
             background-position: -200% -100%;
          }
+
          &[data-type='summer'][data-image_pos='8'] {
             background-position: -300% -100%;
          }
@@ -59,10 +67,40 @@
             }
          }
 
-         & > * {
+         &>* {
             pointer-events: none;
             user-select: none;
          }
+      }
+   }
+
+   .dice-rule {
+      font-family: "Bosk";
+      color: white;
+      position: absolute;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      // background-color: red;
+      font-size: calc(11px * var(--card-ratio));
+      bottom: calc(8px * var(--card-ratio));
+      max-width: calc(58px * var(--card-ratio));
+      min-height: calc(26px * var(--card-ratio));
+
+      // font-size: 11px;
+      // min-height: 26px;
+      // bottom: 8px;
+      // max-width: 58px;
+
+      &[data-pos="1"],
+      &[data-pos="3"] {
+         left: calc(70px * var(--card-ratio));
+      }
+
+      &[data-pos="2"],
+      &[data-pos="4"] {
+         right: calc(25px * var(--card-ratio));
+         max-width: calc(31px * var(--card-ratio));
       }
    }
 }

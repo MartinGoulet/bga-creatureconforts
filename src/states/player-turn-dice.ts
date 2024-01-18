@@ -13,6 +13,7 @@ class PlayerTurnDiceState implements StateHandler {
       this.original_dice = hill.getDice().map((die) => Object.assign({}, die));
 
       const handleGladeSlotClick = (slot_id: number) => {
+         debugger;
          const canAddDice =
             this.game.tableCenter.getDiceFromLocation(Number(slot_id)).length == 0 &&
             (hill.getSelection()[0] as Dice).owner_id;
@@ -52,6 +53,11 @@ class PlayerTurnDiceState implements StateHandler {
          if (selection[0].owner_id) {
             this.game.tableCenter.glade
                .getCards()
+               .filter((card) => {
+                  return card.type == '7'
+                     ? !this.game.improvementManager.isOwner(card, this.game.getPlayerId())
+                     : true;
+               })
                .map((card) => Number(card.location_arg))
                .filter((location) => this.game.tableCenter.getDiceFromLocation(location).length == 0)
                .forEach((location) => {

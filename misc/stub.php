@@ -22,6 +22,10 @@ class Table {
         $this->gamestate = new Gamestate();
     }
 
+    function getBgaEnvironment() {
+        return 'studio';
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game
     ////////////

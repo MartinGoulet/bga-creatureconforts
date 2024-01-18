@@ -7,6 +7,10 @@ class ImprovementManager extends CardManager<ImprovementCard> {
          setupDiv: (card: Card, div: HTMLElement) => {
             div.classList.add('improvement');
             div.dataset.cardId = '' + card.id;
+            const cottage = this.game.gamedatas.cottages.improvements.find((c) => c.location_arg == card.id);
+            if (cottage) {
+               div.dataset.owner = cottage.type_arg;
+            }
          },
          setupFrontDiv: (card: ImprovementCard, div: HTMLElement) => {
             const card_info: ImprovementType = this.getCardType(card);
@@ -50,6 +54,7 @@ class ImprovementManager extends CardManager<ImprovementCard> {
                   (c) => c.location_arg == card.id,
                );
                if (cottage) {
+                  // div.parentElement.parentElement.dataset.owner = cottage.type_arg;
                   this.cottages[card.id].addCard(cottage);
                }
             }
@@ -70,11 +75,16 @@ class ImprovementManager extends CardManager<ImprovementCard> {
    }
 
    addCottage(card: ImprovementCard, cottage: CottageCard) {
+      this.getCardElement(card).dataset.owner = cottage.type_arg;
       return this.cottages[card.id].addCard(cottage);
    }
 
    getCardType(card: ImprovementCard): ImprovementType {
       return this.game.gamedatas.improvement_types[card.type];
+   }
+
+   isOwner(card: ImprovementCard, player_id: number) {
+      return this.getCardElement(card).dataset.owner == player_id.toString();
    }
 
    private formatText(rawText: string) {

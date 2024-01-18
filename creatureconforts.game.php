@@ -201,11 +201,6 @@ class CreatureConforts extends Table {
             }
         }
 
-        $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
-        // $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
-        $result['debug_valley'] = array_values(self::getCollectionFromDB("SELECT * FROM valley WHERE card_location != 'box' ORDER BY card_location, card_location_arg desc"));
-        $result['debug_traveler'] = self::getCollectionFromDB("SELECT * FROM traveler");
-        $result['debug_short_game'] = intval(self::getGameStateValue(OPTION_SHORT_GAME));
         $result['raven_location'] = Globals::getRavenLocationIds();
 
         $result['turn_number'] = self::getStat(STAT_TURN_NUMBER);
@@ -219,6 +214,18 @@ class CreatureConforts extends Table {
         }
 
         $result['comfort_resources'] = Globals::getComfortResourceByCard();
+
+        if ($this->getBgaEnvironment() == 'studio') {
+
+            $result['debug_gv'] = self::getCollectionFromDB("SELECT * FROM global_variables");
+            // $result['debug_cottage'] = self::getCollectionFromDB("SELECT * FROM cottage");
+            $result['debug_valley'] = array_values(self::getCollectionFromDB("SELECT * FROM valley WHERE card_location != 'box' ORDER BY card_location, card_location_arg desc"));
+            $result['debug_traveler'] = self::getCollectionFromDB("SELECT * FROM traveler");
+            $result['debug_traveler_deck'] = array_values($this->travelers->getCardsOnTop(15, 'deck'));
+            $result['debug_improvement_deck'] = array_values($this->improvements->getCardsOnTop(40, 'deck'));
+            $result['debug_short_game'] = intval(self::getGameStateValue(OPTION_SHORT_GAME));
+        }
+
 
         return $result;
     }
