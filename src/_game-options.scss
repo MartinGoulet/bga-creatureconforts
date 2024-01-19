@@ -8,6 +8,7 @@
       font-size: 24px;
       line-height: 36px;
       border-bottom: 2px solid white;
+      font-family: 'Bosk';
    }
    .player-board-inner {
       position: relative;
@@ -30,7 +31,8 @@
 
 #wg-phases {
    > li {
-      padding: 5px 15px;
+      font-family: 'Bosk';
+      padding: 2px 15px;
       transition: ease-in-out all 0.2s;
       display: flex;
       align-items: center;
@@ -41,7 +43,7 @@
       transition: background-color 1s ease-in-out;
 
       &.sub {
-         padding: 3px 15px 3px 29px;
+         padding: 2px 15px 2px 29px;
       }
    }
 

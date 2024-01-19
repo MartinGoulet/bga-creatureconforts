@@ -27,6 +27,7 @@ class PlayerTurnDiceState implements StateHandler {
       const handleDiceLocationClick = (die: Dice) => {
          dice_locations.unselectDie(die, true);
          hill.addDie(die);
+         hill.unselectAll();
       };
 
       const handleHillClick = (selection: Dice[]) => {

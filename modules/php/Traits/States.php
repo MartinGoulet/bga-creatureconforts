@@ -189,7 +189,16 @@ trait States {
             Game::get()->gamestate->nextState('moose');
             return;
         }
-        
+
+        if (TravelerHelper::isActiveBlueJay() && !Globals::getBlueJayActivated()) {
+            Globals::setBlueJayActivated(true);
+            $current_player_id = $this->getActivePlayerId();
+            Game::get()->giveExtraTime($current_player_id);
+            Game::get()->activeNextPlayer();
+            Game::get()->gamestate->nextState('blue_jay');
+            return;
+        }
+
         $gameOption = intval(Game::get()->getGameStateValue(OPTION_SHORT_GAME));
         $isShortGame = $gameOption === OPTION_SHORT_GAME_ENABLED;
 
@@ -265,6 +274,22 @@ trait States {
             $scores[$player_id] = $score;
         }
         Notifications::finalScoring($scores);
+        Game::get()->gamestate->nextState();
+    }
+
+    function stBlueJayEnd() {
+        $players = Game::get()->loadPlayersBasicInfos();
+
+        foreach ($players as $player_id => $player) {
+            $info = Globals::getBlueJayInfo($player_id);
+            $location_id = intval($info['location_id']);
+            if ($location_id >= 1 && $location_id <= 4) {
+                $valley = Valleys::getValleyLocationInfo($location_id);
+                Players::addResources($player_id, $valley['resources']);
+                Notifications::getResourcesFromLocation($player_id, $location_id, $valley['resources']);
+            }
+        }
+
         Game::get()->gamestate->nextState();
     }
 

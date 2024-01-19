@@ -172,7 +172,7 @@ $travelerStates = [
         "transitions" => ["" => ST_PLACEMENT]
     ],
     ST_MOOSE => [
-        "phase" => "1",
+        "phase" => "6",
         "name" => "moose",
         "descriptionmyturn" => clienttranslate('${you} may gain ::story:: if you give a ::any:: to ${otherplayer}'),
         "description" => clienttranslate('Waiting for others to choose if they want to trade'),
@@ -183,7 +183,7 @@ $travelerStates = [
     ],
 
     ST_MOOSE_NEXT_PLAYER => [
-        "phase" => "1",
+        "phase" => "6",
         "name" => "mooseNextPlayer",
         "type" => "game",
         "action" => "stPlayerTurnNextTraveler",
@@ -213,6 +213,25 @@ $travelerStates = [
         "transitions" => ["" => ST_PLACEMENT]
     ],
 
+    ST_BLUE_JAY => [
+        "phase" => "blueJay",
+        "name" => "blueJay",
+        "descriptionmyturn" => clienttranslate('${you} may resolve one Valley location of your choice'),
+        "description" => clienttranslate('Waiting for others to choose their location'),
+        "type" => "multipleactiveplayer",
+        'action' => 'stMakeEveryoneActive',
+        'args' => 'argBlueJay',
+        "possibleactions" => ["confirmBlueJay", "cancelBlueJay"],
+        "transitions" => ["" => ST_BLUE_JAY_END]
+    ],
+
+    ST_BLUE_JAY_END => [
+        "phase" => "blueJay",
+        "name" => "blueJayEnd",
+        "type" => "game",
+        "action" => "stBlueJayEnd",
+        "transitions" => ["" => ST_PRE_UPKEEP]
+    ],
 ];
 
 $improvementStates = [
@@ -434,6 +453,7 @@ $machinestates = $basicGameStates + $travelerStates + $improvementStates + $endG
         "action" => "stPreUpkeep",
         "transitions" => [
             "moose" => ST_MOOSE,
+            "blue_jay" => ST_BLUE_JAY,
             "upkeep" => ST_UPKEEP,
             "end" => ST_PRE_END_OF_GAME,
         ]

@@ -77,6 +77,7 @@
         "src/helpers/valley-helper.ts",
 
         "src/states/state-manager.ts",
+        "src/states/traveler-blue-jay.ts",
         "src/states/start-hand.ts",
         "src/states/placement.ts",
         "src/states/player-turn-dice.ts",

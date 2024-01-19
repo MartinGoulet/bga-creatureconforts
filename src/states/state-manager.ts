@@ -34,6 +34,7 @@ class StateManager {
          moose: new TravelerMooseState(game),
          wildTurkey: new TravelerWildTurkeyStates(game),
          wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
+         blueJay: new TravelerBlueJayState(game),
       };
    }
 

@@ -145,6 +145,7 @@ class TableCenter {
       this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
          sort: sortFunction('location_arg'),
          center: false,
+         gap: '16px',
       });
 
       this.glade.addCards(game.gamedatas.improvements.glade);

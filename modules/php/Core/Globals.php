@@ -8,6 +8,28 @@ namespace CreatureComforts\Core;
 
 class Globals extends \APP_DbObject {
 
+    public static function getBlueJayActivated() {
+        return self::get("blue_jay_activated", false) ?? false;
+    }
+
+    public static function setBlueJayActivated(bool $value) {
+        self::set("blue_jay_activated", $value);
+    }
+
+    public static function getBlueJayInfo(int $player_id) {
+        return self::get("blue_jay_" . $player_id, true) ?? [
+            'location_id' => -1,
+            'dice' => null,
+        ];
+    }
+
+    public static function setBlueJayInfo(int $player_id, int $location_id, array $dice) {
+        self::set("blue_jay_" . $player_id, [
+            'location_id' => $location_id,
+            'dice' => $dice,
+        ]);
+    }
+
     public static function getFirstPlayerId() {
         return intval(Game::get()->getGameStateValue(VAR_FIRST_PLAYER));
     }

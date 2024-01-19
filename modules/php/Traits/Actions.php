@@ -145,9 +145,15 @@ trait Actions {
             $dice_by_locations[$location_id][] = $die_id;
             $dice_value_by_location[$location_id][] = $value;
 
+            if(abs($info['umbrella']) > 0) {
+                $value_umbrella = intval($die['face']) + $info['umbrella'];
+                Notifications::modifyDieWithUmbrella(Players::getPlayerId(), $die, $value_umbrella,  $info['umbrella']);
+                $die['face'] = $value_umbrella;
+            }
+
             if ($info['lesson'] != 0) {
                 Dice::modify($die_id, $value);
-                Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $value, $info['lesson'], $info['umbrella']);
+                Notifications::modifyDieWithLessonLearned(Players::getPlayerId(), $die, $value, $info['lesson']);
             }
 
             if (!in_array($location_id, [1, 2, 3, 4, 5, 6, 7, 9, 10, 12]) && $value !== intval($die['face'])) {
@@ -572,4 +578,19 @@ trait Actions {
     function undo() {
         Game::undoRestorePoint();
     }
+
+    public function confirmBlueJay(int $location_id, array $dice_ids) {
+        $current_player_id = $this->getCurrentPlayerId();
+        Globals::setBlueJayInfo($current_player_id, $location_id, $dice_ids);
+        // Desactivate the current player
+        $this->gamestate->setPlayerNonMultiactive($current_player_id, '');
+    }
+    
+
+    public function cancelBlueJay() {
+        $current_player_id = $this->getCurrentPlayerId();
+        Globals::setBlueJayInfo($current_player_id, -1, []);
+        $this->gamestate->setPlayersMultiactive([$current_player_id], '');
+    }
+    
 }

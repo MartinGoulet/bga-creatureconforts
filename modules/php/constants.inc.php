@@ -64,6 +64,8 @@ const ST_CANADA_LYNX = 179;
 const ST_CANADA_LYNX_NEXT_PLAYER = 180;
 const ST_MOOSE = 181;
 const ST_MOOSE_NEXT_PLAYER = 182;
+const ST_BLUE_JAY = 183;
+const ST_BLUE_JAY_END = 184;
 
 /**
  * Goods tokens

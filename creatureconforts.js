@@ -3319,14 +3319,13 @@ var ValleyManager = (function (_super) {
             getId: function (card) { return "".concat(prefix, "-").concat(card.id); },
             setupDiv: function (card, div) {
                 div.classList.add('valley');
-                div.dataset.cardId = '' + card.id;
+                div.dataset.cardId = card.id;
+                div.dataset.cardType = card.type_arg;
                 div.classList.add(card.location);
             },
             setupFrontDiv: function (card, div) {
                 div.dataset.type = card.type;
                 div.dataset.image_pos = '' + game.gamedatas.valley_types[Number(card.type_arg)].image_pos;
-                if (card.type_arg) {
-                }
                 if (div.getElementsByClassName('dice-rule').length !== 0)
                     return;
                 var card_info = game.gamedatas.valley_types[Number(card.type_arg)];
@@ -3352,13 +3351,11 @@ var ValleyManager = (function (_super) {
         var rules = {
             '3_OR_UNDER': _('OR UNDER'),
             '4_OR_HIGHER': _('OR HIGHER'),
-            TOTAL_5_OR_LOWER: _('TOTAL 5 OR_LOWER'),
+            TOTAL_5_OR_LOWER: _('TOTAL 5 OR LOWER'),
             TOTAL_6_OR_LOWER: _('TOTAL 6 OR LOWER'),
             TOTAL_7_OR_HIGHER: _('TOTAL 7 OR HIGHER'),
             TOTAL_10_OR_HIGHER: _('TOTAL_10 OR HIGHER'),
-            TOTAL_11_OR_HIGHER: _('TOTAL_11 OR HIGHER'),
-            TOTAL_7: _('TOTAL 7'),
-            TOTAL_8: _('TOTAL 8'),
+            TOTAL_11_OR_HIGHER: _('TOTAL 11 OR HIGHER'),
             ALL_EVEN: _('ALL EVEN'),
             ALL_ODD: _('ALL ODD'),
         };
@@ -3729,6 +3726,7 @@ var StateManager = (function () {
             moose: new TravelerMooseState(game),
             wildTurkey: new TravelerWildTurkeyStates(game),
             wildTurkeyEnd: new TravelerWildTurkeyEndStates(game),
+            blueJay: new TravelerBlueJayState(game),
         };
     }
     StateManager.prototype.onEnteringState = function (stateName, args) {
@@ -3805,6 +3803,135 @@ var StateManager = (function () {
         });
     };
     return StateManager;
+}());
+var TravelerBlueJayState = (function () {
+    function TravelerBlueJayState(game) {
+        this.game = game;
+        this.isMultipleActivePlayer = true;
+        this.original_dice = [];
+        this.diceHelper = new DiceHelper(game);
+    }
+    TravelerBlueJayState.prototype.onEnteringState = function (args) {
+        var _this = this;
+        this.original_dice = __spreadArray([], args.dice, true);
+        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        var handleDiceLocationClick = function (die) {
+            dice_locations.unselectDie(die, true);
+            hill.addDie(die);
+            hill.unselectAll();
+            _this.game.disableButton('btn_confirm');
+        };
+        var handleHillClick = function (selection) {
+            worker_locations.setSelectableLocation([]);
+            document.querySelectorAll('#dice-locations .slot-dice, #glade .slot-dice').forEach(function (slot) {
+                slot.classList.remove('selectable');
+            });
+            if (selection.length == 0) {
+                return;
+            }
+            dice_locations.unselectAll();
+            var preFilter = arrayRange(1, 4);
+            if (hill.getDice().length !== 4) {
+                preFilter = preFilter.filter(function (location_id) { return _this.game.tableCenter.getDiceFromLocation(location_id).length > 0; });
+            }
+            var locations = preFilter.filter(function (location_id) {
+                var count = _this.game.tableCenter.getDiceFromLocation(location_id).length;
+                var max = _this.diceHelper.getTotalDiceSlot(location_id);
+                return count < max || max == -1;
+            });
+            worker_locations.setSelectableLocation(locations);
+        };
+        var handleWorkerLocationClick = function (slotId) {
+            _this.addSelectedDieToSlot(slotId);
+            var location_id = Number(slotId);
+            var isRequirementMet = _this.diceHelper.isRequirementMet(location_id, _this.game.tableCenter.getDiceFromLocation(location_id));
+            _this.game.toggleButtonEnable('btn_confirm', isRequirementMet, 'blue');
+        };
+        if (!this.game.isCurrentPlayerActive()) {
+            this.displayDiceSelection(args._private.location_id, args._private.dice);
+        }
+        else {
+            hill.setSelectionMode('single');
+            hill.onSelectionChange = handleHillClick;
+            worker_locations.OnLocationClick = handleWorkerLocationClick;
+            dice_locations.onDieClick = handleDiceLocationClick;
+        }
+    };
+    TravelerBlueJayState.prototype.onLeavingState = function () {
+        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        hill.setSelectionMode('none');
+        hill.onSelectionChange = null;
+        worker_locations.OnLocationClick = null;
+        dice_locations.onDieClick = null;
+    };
+    TravelerBlueJayState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var _a = this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
+        var handleReset = function () {
+            var copy = _this.original_dice.map(function (die) { return Object.assign({}, die); });
+            dice_locations.unselectAll();
+            hill.unselectAll();
+            hill.addDice(copy);
+        };
+        var handleConfirm = function () {
+            var location_id = arrayRange(1, 4).find(function (loc) { return _this.game.tableCenter.getDiceFromLocation(loc).length > 0; });
+            if (location_id === undefined)
+                return;
+            var dice = _this.game.tableCenter.getDiceFromLocation(location_id);
+            if (!_this.diceHelper.isRequirementMet(location_id, dice)) {
+                _this.game.showMessage(_('Requirement not met'), 'error');
+                return;
+            }
+            var dice_ids = dice.map(function (die) { return die.id; }).join(';');
+            var data = { location_id: location_id, dice_ids: dice_ids };
+            _this.game.takeAction('confirmBlueJay', data, function () {
+                _this.displayDiceSelection(location_id, dice.map(function (die) { return Number(die.id); }));
+            });
+        };
+        var handlePass = function () {
+            _this.game.takeAction('confirmBlueJay', { location_id: -1, dice_ids: '' });
+        };
+        var handleCancel = function () {
+            _this.game.takeAction('cancelBlueJay', {}, function () {
+                var hill = _this.game.tableCenter.hill;
+                hill.addDice(__spreadArray([], args.dice, true));
+                _this.game.restoreServerGameState();
+            });
+        };
+        if (this.game.isCurrentPlayerActive()) {
+            this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+            this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
+            this.game.addActionButtonRed('btn_pass', _('Pass'), handlePass);
+        }
+        else {
+            this.game.addActionButtonGray('btn_cancel', _('Cancel'), handleCancel);
+        }
+    };
+    TravelerBlueJayState.prototype.addSelectedDieToSlot = function (slotId) {
+        var _a = this.game.tableCenter, hill = _a.hill, dice_locations = _a.dice_locations;
+        var die = hill.getSelection()[0];
+        if (!die)
+            return;
+        var copy = __assign(__assign({}, die), { location: Number(slotId) });
+        dice_locations.addDie(copy);
+    };
+    TravelerBlueJayState.prototype.displayDiceSelection = function (location_id, dice_ids) {
+        var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
+        hill.setSelectionMode('none');
+        hill.onSelectionChange = null;
+        worker_locations.OnLocationClick = null;
+        dice_locations.onDieClick = null;
+        if (arrayRange(1, 4).includes(location_id)) {
+            dice_ids.forEach(function (dice_id) {
+                var die = hill.getDice().find(function (die) { return die.id == dice_id; });
+                if (die) {
+                    var copy = __assign(__assign({}, die), { location: location_id });
+                    dice_locations.addDie(copy);
+                }
+            });
+        }
+    };
+    return TravelerBlueJayState;
 }());
 var StartHandState = (function () {
     function StartHandState(game) {
@@ -4006,6 +4133,7 @@ var PlayerTurnDiceState = (function () {
         var handleDiceLocationClick = function (die) {
             dice_locations.unselectDie(die, true);
             hill.addDie(die);
+            hill.unselectAll();
         };
         var handleHillClick = function (selection) {
             worker_locations.setSelectableLocation([]);
@@ -6877,6 +7005,7 @@ var TableCenter = (function () {
         this.glade = new LineStock(this.game.improvementManager, document.getElementById('glade'), {
             sort: sortFunction('location_arg'),
             center: false,
+            gap: '16px',
         });
         this.glade.addCards(game.gamedatas.improvements.glade);
     };

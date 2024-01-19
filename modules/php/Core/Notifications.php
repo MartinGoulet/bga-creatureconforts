@@ -167,7 +167,7 @@ class Notifications extends \APP_DbObject {
         ]);
     }
 
-    static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson, $nbr_umbrella) {
+    static function modifyDieWithLessonLearned(int $player_id, array $die, int $new_value, $nbr_lesson) {
         $message = clienttranslate('${player_name} uses ${resources_to} to change ${die_from} for ${die_to}');
         $new_dice = $die;
         $new_dice['face'] = $new_value;
@@ -182,9 +182,33 @@ class Notifications extends \APP_DbObject {
             'nbr_lesson' => $nbr_lesson,
             'resources_to' => [
                 LESSON_LEARNED => $nbr_lesson,
+                'umbrella' => 0
+            ],
+            'preserve' => ['die_from', 'die_to', 'die_color', 'die_id', 'die_newvalue'],
+            // TODO check resources_to
+        ]);
+    }
+
+    static function modifyDieWithUmbrella(int $player_id, array $die, int $new_value, $nbr_umbrella) {
+        $message = clienttranslate('${player_name} uses ${card_name} to change ${die_from} for ${die_to}');
+        $new_dice = $die;
+        $new_dice['face'] = $new_value;
+        self::notifyAll('onModifyDieWithLessonLearned', $message, [
+            'player_id' => $player_id,
+            'player_name' => self::getPlayerName($player_id),
+            'die_id' => intval($die['id']),
+            'die_newvalue' => intval($new_value),
+            'die_from' => intval($die['face']),
+            'die_to' => $new_value,
+            'die_color' => $die['type'],
+            'nbr_lesson' => 0,
+            'resources_to' => [
+                LESSON_LEARNED => 0,
                 'umbrella' => $nbr_umbrella
             ],
             'preserve' => ['die_from', 'die_to', 'die_color', 'die_id', 'die_newvalue'],
+            'card_name' => _('Umbrella'),
+            'i18n' => ['card_name'],
             // TODO check resources_to
         ]);
     }

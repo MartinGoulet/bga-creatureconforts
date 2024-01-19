@@ -140,6 +140,10 @@ class TravelerHelper {
         return self::isTravelerActive(13);
     }
 
+    static function isActiveBlueJay() {
+        return self::isTravelerActive(14);
+    }
+
     static function isActiveWildTurkey() {
         return self::isTravelerActive(15);
     }

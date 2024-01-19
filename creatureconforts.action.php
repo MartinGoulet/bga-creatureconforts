@@ -54,6 +54,29 @@ class action_creatureconforts extends APP_GameAction {
    }
 
    // TODO: defines your action entry points there
+   public function cancelBlueJay() {
+      self::setAjaxMode();
+      // Then, call the appropriate method in your game logic
+      $this->game->gamestate->checkPossibleAction('cancelBlueJay');
+      $this->game->cancelBlueJay();
+
+      self::ajaxResponse();
+   }
+
+   public function confirmBlueJay() {
+      self::setAjaxMode();
+
+      // Retrieve arguments
+      $location_id = self::getArg("location_id", AT_int, true);
+      $dice_ids = self::getArrayArgs(self::getArg("dice_ids", AT_numberlist, true));
+
+      // Then, call the appropriate method in your game logic
+      $this->game->gamestate->checkPossibleAction('confirmBlueJay');
+      $this->game->confirmBlueJay($location_id, $dice_ids);
+
+      self::ajaxResponse();
+   }
+
 
    public function confirmPlacement() {
       self::setAjaxMode();
@@ -283,7 +306,7 @@ class action_creatureconforts extends APP_GameAction {
     
     */
 
-    private function getArrayOfArrayArgs($args) {
+   private function getArrayOfArrayArgs($args) {
       // Removing last ';' if exists
       if (substr($args, -1) == ';')
          $args = substr($args, 0, -1);
@@ -294,7 +317,7 @@ class action_creatureconforts extends APP_GameAction {
          $args = explode('|', $args);
 
       $new_array = [];
-      foreach($args as $arg) {
+      foreach ($args as $arg) {
          $new_array[] = self::getArrayArgs($arg);
       }
 

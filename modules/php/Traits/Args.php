@@ -93,6 +93,17 @@ trait Args {
         ];
     }
 
+    function argBlueJay() {
+        $current_player_id = intval($this->getCurrentPlayerId());
+        $info = Globals::getBlueJayInfo($current_player_id);
+        return [
+            '_private' => [
+                $current_player_id => $info,
+            ],
+            'dice' => Dice::getWhiteDice(),
+        ];
+    }
+
     function argCanadaLynx() {
         $current_player_id = $this->getActivePlayerId();
         $left_player_id = Game::get()->getPrevPlayerTable()[$current_player_id];

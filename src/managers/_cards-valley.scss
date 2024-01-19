@@ -75,16 +75,16 @@
    }
 
    .dice-rule {
-      font-family: "Bosk";
+      font-family: "MotterCondensed";
       color: white;
       position: absolute;
       text-align: center;
       display: flex;
       align-items: center;
+      justify-content: center;
       // background-color: red;
-      font-size: calc(11px * var(--card-ratio));
+      font-size: calc(8px * var(--card-ratio));
       bottom: calc(8px * var(--card-ratio));
-      max-width: calc(58px * var(--card-ratio));
       min-height: calc(26px * var(--card-ratio));
 
       // font-size: 11px;
@@ -94,13 +94,44 @@
 
       &[data-pos="1"],
       &[data-pos="3"] {
-         left: calc(70px * var(--card-ratio));
+         // left: calc(70px * var(--card-ratio));
+         // width: calc(58px * var(--card-ratio));
+         left: calc(92px * var(--card-ratio));
+         width: calc(38px * var(--card-ratio));
       }
 
       &[data-pos="2"],
       &[data-pos="4"] {
          right: calc(25px * var(--card-ratio));
-         max-width: calc(31px * var(--card-ratio));
+         width: calc(36px * var(--card-ratio));
+      }
+   }
+
+   &[data-card-type="1"] {
+      .dice-rule[data-pos="1"] {
+         left: calc(72px * var(--card-ratio));
+         width: calc(58px * var(--card-ratio));
+         justify-content: start;
+      }
+
+      .dice-rule[data-pos="2"] {
+         right: calc(32px * var(--card-ratio));
+         width: calc(38px * var(--card-ratio));
+      }
+   }
+
+   &[data-card-type="3"] {
+      .dice-rule[data-pos="1"] {
+         left: calc(72px * var(--card-ratio));
+         width: calc(58px * var(--card-ratio));
+         justify-content: start;
+      }
+   }
+
+   &[data-card-type="11"] {
+      .dice-rule[data-pos="4"] {
+         right: calc(32px * var(--card-ratio));
+         width: calc(38px * var(--card-ratio));
       }
    }
 }

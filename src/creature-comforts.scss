@@ -30,6 +30,11 @@ $playerColorNames: (
    src: url("img/panpizza.ttf") format("truetype");
 }
 
+@font-face {
+   font-family: "MotterCondensed";
+   src: url("img/Motter_Corpus_Std_Condensed.otf") format("opentype");
+}
+
 @import './managers/cards';
 @import '../node_modules/bga-zoom/bga-zoom';
 @import '../node_modules/bga-cards/bga-cards';

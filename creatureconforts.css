@@ -7,6 +7,10 @@
   font-family: "PanPizza";
   src: url("img/panpizza.ttf") format("truetype");
 }
+@font-face {
+  font-family: "MotterCondensed";
+  src: url("img/Motter_Corpus_Std_Condensed.otf") format("opentype");
+}
 .card:not(.cottage):not(.worker) {
   display: inline-block;
   position: relative;
@@ -1148,7 +1152,7 @@ body > .bga-dice_die {
 .player-table .player-table-board {
   margin: 0 auto 20px;
   background-size: 400px 220px;
-  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 5px 4px rgba(0, 0, 0, 0.5);
   width: 400px;
   height: 220px;
   border-radius: 10px;
@@ -1194,10 +1198,6 @@ body > .bga-dice_die {
 }
 .player-table.player-color-purple .player-table-board {
   background-image: url("img/purple/board.jpg");
-}
-.player-table .card.improvement .card-sides .front {
-  box-shadow: none;
-  filter: none;
 }
 
 .gamestate_bicycle .player-table .card.improvement .front[data-type="4"] {
@@ -1286,6 +1286,7 @@ body > .bga-dice_die {
   font-size: 24px;
   line-height: 36px;
   border-bottom: 2px solid white;
+  font-family: "Bosk";
 }
 #game-phases .player-board-inner, #game-infos .player-board-inner {
   position: relative;
@@ -1304,7 +1305,8 @@ body > .bga-dice_die {
 }
 
 #wg-phases > li {
-  padding: 5px 15px;
+  font-family: "Bosk";
+  padding: 2px 15px;
   transition: ease-in-out all 0.2s;
   display: flex;
   align-items: center;
@@ -1315,7 +1317,7 @@ body > .bga-dice_die {
   transition: background-color 1s ease-in-out;
 }
 #wg-phases > li.sub {
-  padding: 3px 15px 3px 29px;
+  padding: 2px 15px 2px 29px;
 }
 #wg-phases[data-phase="1"] li:nth-child(1), #wg-phases[data-phase="2"] li:nth-child(2), #wg-phases[data-phase="3"] li:nth-child(3), #wg-phases[data-phase="4"] li:nth-child(4), #wg-phases[data-phase="5"] li:nth-child(5), #wg-phases[data-phase="5b"] li:nth-child(5), #wg-phases[data-phase="5c"] li:nth-child(5), #wg-phases[data-phase="5e"] li:nth-child(5), #wg-phases[data-phase="6"] li:nth-child(9) {
   background-color: #35a589;
@@ -1904,23 +1906,42 @@ body > .bga-dice_die {
   user-select: none;
 }
 .card.valley .dice-rule {
-  font-family: "Bosk";
+  font-family: "MotterCondensed";
   color: white;
   position: absolute;
   text-align: center;
   display: flex;
   align-items: center;
-  font-size: calc(11px * var(--card-ratio));
+  justify-content: center;
+  font-size: calc(8px * var(--card-ratio));
   bottom: calc(8px * var(--card-ratio));
-  max-width: calc(58px * var(--card-ratio));
   min-height: calc(26px * var(--card-ratio));
 }
 .card.valley .dice-rule[data-pos="1"], .card.valley .dice-rule[data-pos="3"] {
-  left: calc(70px * var(--card-ratio));
+  left: calc(92px * var(--card-ratio));
+  width: calc(38px * var(--card-ratio));
 }
 .card.valley .dice-rule[data-pos="2"], .card.valley .dice-rule[data-pos="4"] {
   right: calc(25px * var(--card-ratio));
-  max-width: calc(31px * var(--card-ratio));
+  width: calc(36px * var(--card-ratio));
+}
+.card.valley[data-card-type="1"] .dice-rule[data-pos="1"] {
+  left: calc(72px * var(--card-ratio));
+  width: calc(58px * var(--card-ratio));
+  justify-content: start;
+}
+.card.valley[data-card-type="1"] .dice-rule[data-pos="2"] {
+  right: calc(32px * var(--card-ratio));
+  width: calc(38px * var(--card-ratio));
+}
+.card.valley[data-card-type="3"] .dice-rule[data-pos="1"] {
+  left: calc(72px * var(--card-ratio));
+  width: calc(58px * var(--card-ratio));
+  justify-content: start;
+}
+.card.valley[data-card-type="11"] .dice-rule[data-pos="4"] {
+  right: calc(32px * var(--card-ratio));
+  width: calc(38px * var(--card-ratio));
 }
 
 .bga-dice_die.colored-die[data-color=yellow] .bga-dice_die-face {
@@ -2004,7 +2025,8 @@ body > .bga-dice_die {
 [data-phase="5c"] #hill-dice .bga-dice_die[data-color=white],
 [data-phase="5d"] #hill-dice .bga-dice_die[data-color=white],
 [data-phase="5e"] #hill-dice .bga-dice_die[data-color=white],
-[data-phase="5f"] #hill-dice .bga-dice_die[data-color=white] {
+[data-phase="5f"] #hill-dice .bga-dice_die[data-color=white],
+[data-phase=blueJay] #hill-dice .bga-dice_die[data-color=white] {
   display: block;
 }
 

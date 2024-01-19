@@ -13,9 +13,10 @@ use CreatureComforts\Managers\Players;
 class ImprovementHelper {
 
     static function resolve(int $location_id, array $resource, array $resource2) {
-        $improvement = array_filter(Improvements::getGlade(), function ($card) use ($location_id) {
+        $improvements = array_filter(Improvements::getGlade(), function ($card) use ($location_id) {
             return intval($card['location_arg']) === $location_id;
-        })[0];
+        });
+        $improvement = array_shift($improvements);
         $owner_id = Cottages::getOwner($improvement);
 
         switch (intval($improvement['type'])) {
