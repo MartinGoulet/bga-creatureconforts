@@ -111,6 +111,13 @@ class PlayerTurnResolveState implements StateHandler {
                location_id: locationId,
             },
          });
+      } else if (this.game.improvementManager.isGuestCottageFromLocation(locationId)) {
+         this.game.setClientState('resolveGuestCottageTake', {
+            descriptionmyturn: _(`You must select one resource to take`),
+            args: {
+               location_id: locationId,
+            } as ResolveGuestCottageTakeArgs,
+         });
       } else {
          this.game.takeAction('resolveWorker', { location_id: locationId });
       }

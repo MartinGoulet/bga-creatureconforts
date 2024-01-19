@@ -10,6 +10,21 @@ use CreatureComforts\Managers\Travelers;
 
 class Notifications extends \APP_DbObject {
 
+    static function guestCottage(int $player_id, int $player_id2, array $resources) {
+        $message = clienttranslate('${player_name} gives ${resources_to} to ${player_name2} with ${card_name}');
+        self::notifyAll('onGuestCottage', $message, [
+            'player_id' => intval($player_id),
+            'player_name' => self::getPlayerName($player_id),
+            'player_id2' => intval($player_id2),
+            'player_name2' => self::getPlayerName($player_id2),
+            'resources' => $resources,
+            'resources_to' => $resources,
+            'card_name' => _('Guest Cottage'),
+            "i18n" => ["card_name"],
+        ]);
+    }
+
+
     static function addConfortToHand(int $player_id, array $card) {
         $message = clienttranslate('${player_name} get ${card_name} from the Owl\'s nest');
         $card_args = self::getConfortCardArgs($card, $player_id);
@@ -262,8 +277,8 @@ class Notifications extends \APP_DbObject {
     }
 
     static function refillLadder(array $ladder, $shuffled = false, $discard = null) {
-        $message = $shuffled 
-            ? clienttranslate('The improvement deck is reshuffled because it is empty"') 
+        $message = $shuffled
+            ? clienttranslate('The improvement deck is reshuffled because it is empty"')
             : '';
         self::notifyAll('onRefillLadder', $message, [
             'ladder' => $ladder,
@@ -318,7 +333,7 @@ class Notifications extends \APP_DbObject {
     }
 
     static function travelerReceivedResources($resources_to, $player_id = null) {
-        if($player_id == null) {
+        if ($player_id == null) {
             $player_id = Players::getPlayerId();
         }
         $message = clienttranslate('${player_name} receives ${resources_to} from the traveler');

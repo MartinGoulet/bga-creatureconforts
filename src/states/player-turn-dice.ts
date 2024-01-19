@@ -2,6 +2,8 @@ class PlayerTurnDiceState implements StateHandler {
    private readonly diceHelper: DiceHelper;
    private original_dice: Dice[] = [];
 
+   private handles: Record<string, any> = [];
+
    constructor(private game: CreatureComforts) {
       this.diceHelper = new DiceHelper(game);
    }
@@ -13,7 +15,6 @@ class PlayerTurnDiceState implements StateHandler {
       this.original_dice = hill.getDice().map((die) => Object.assign({}, die));
 
       const handleGladeSlotClick = (slot_id: number) => {
-         debugger;
          const canAddDice =
             this.game.tableCenter.getDiceFromLocation(Number(slot_id)).length == 0 &&
             (hill.getSelection()[0] as Dice).owner_id;
@@ -61,12 +62,19 @@ class PlayerTurnDiceState implements StateHandler {
                .map((card) => Number(card.location_arg))
                .filter((location) => this.game.tableCenter.getDiceFromLocation(location).length == 0)
                .forEach((location) => {
+                  const idElement = `#glade [data-slot-id="${location}"]`;
+                  if (this.handles[idElement]) {
+                     document.querySelector(idElement).removeEventListener('click', this.handles[idElement]);
+                     delete this.handles[idElement];
+                  }
                   const el = document.querySelector(`#glade [data-slot-id="${location}"]`);
                   el.classList.toggle('selectable', true);
-                  el.addEventListener('click', (ev: Event) => {
+                  const handleEvent = (ev: Event) => {
                      ev.stopPropagation();
                      handleGladeSlotClick(Number(location));
-                  });
+                  };
+                  el.addEventListener('click', handleEvent);
+                  this.handles[idElement] = handleEvent;
                });
          }
       };
@@ -94,6 +102,12 @@ class PlayerTurnDiceState implements StateHandler {
       hill.onSelectionChange = null;
       worker_locations.OnLocationClick = null;
       dice_locations.onDieClick = null;
+      Object.keys(this.handles).forEach((key) => {
+         debugger;
+         const el = document.querySelector(key);
+         el.removeEventListener('click', this.handles[key]);
+         delete this.handles[key];
+      });
    }
 
    onUpdateActionButtons(args: any): void {

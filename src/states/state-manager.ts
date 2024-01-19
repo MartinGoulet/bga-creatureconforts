@@ -11,6 +11,8 @@ class StateManager {
          playerTurnResolve: new PlayerTurnResolveState(game),
          playerTurnCraftConfort: new PlayerTurnCraftState(game),
          resolvePlayerTurnDiceManipulation: new PlayerTurnDiceManipulationState(game),
+         resolveGuestCottageGive: new ResolveGuestCottageGiveState(game),
+         resolveGuestCottageTake: new ResolveGuestCottageTakeState(game),
          resolveTraveler: new ResolveTravelerState(game),
          resolveTravelerDiscard: new ResolveTravelerDiscardState(game),
          resolveMarket: new ResolveMarketState(game),

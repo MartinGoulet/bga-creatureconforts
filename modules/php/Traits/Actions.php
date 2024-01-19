@@ -186,7 +186,7 @@ trait Actions {
         }
 
         if ($location_id >= 20) {
-            ImprovementHelper::resolve($location_id);
+            ImprovementHelper::resolve($location_id, $resources, $resources2);
             $this->resolveWorkerNextStep($location_id);
             return;
         }

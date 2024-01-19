@@ -87,6 +87,18 @@ class ImprovementManager extends CardManager<ImprovementCard> {
       return this.getCardElement(card).dataset.owner == player_id.toString();
    }
 
+   isGuestCottage(card: ImprovementCard) {
+      return card.type === '7';
+   }
+
+   isGuestCottageFromLocation(locationId: number) {
+      const card = this.game.tableCenter.glade
+         .getCards()
+         .find((c) => c.location_arg === locationId.toString());
+
+      return card && this.isGuestCottage(card);
+   }
+
    private formatText(rawText: string) {
       if (!rawText) {
          return '';

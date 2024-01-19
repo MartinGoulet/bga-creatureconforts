@@ -33,6 +33,7 @@ class NotificationManager {
          ['onAddWheelbarrow', 100],
          ['onNewTurn', 100],
          ['onFinalScoring', 3000],
+         ['onGuestCottage', 10],
       ];
 
       this.setupNotifications(notifs);
@@ -228,7 +229,6 @@ class NotificationManager {
       if (card.location == 'board') {
          await this.game.getPlayerTable(player_id).improvements.addCard(card);
       } else {
-         debugger;
          await this.game.tableCenter.glade.addCard(card);
       }
 
@@ -289,6 +289,14 @@ class NotificationManager {
       });
    }
 
+   private notif_onGuestCottage(args: NotifGuestCottageArgs) {
+      const { player_id, player_id2, resources } = args;
+      Object.keys(resources).forEach((type) => {
+         this.game.getPlayerPanel(player_id).counters[type].incValue(0 - resources[type]);
+         this.game.getPlayerPanel(player_id2).counters[type].incValue(resources[type]);
+      });
+   }
+
    private animationMoveResource(
       player_id: number,
       resources: { [type: string]: number }[],
@@ -341,64 +349,4 @@ class NotificationManager {
             });
       }
    }
-}
-
-interface DiscardStartHandArgs {
-   player_id: number;
-   card: ConfortCard;
-}
-
-interface NewTravelerArgs {
-   card: TravelerCard;
-   count: number;
-}
-
-interface FamilyDiceArgs {
-   player_id: number;
-   rolledDice: number[];
-   dice: Dice[];
-}
-
-interface GetResourcesFromLocationArgs {
-   player_id: number;
-   location_id: number;
-   resources: { [type: string]: number }[];
-}
-
-interface CraftConfortArgs {
-   player_id: number;
-   card: ConfortCard;
-   cost: { [type: string]: number }[];
-}
-
-interface TravelerExchangeResourcesArgs {
-   player_id: number;
-   from: { [type: string]: number }[];
-   to: { [type: string]: number }[];
-}
-
-interface MarketExchangeResourcesArgs {
-   player_id: number;
-   from: { [type: string]: number }[];
-   to: { [type: string]: number }[];
-}
-
-interface BuildImprovementArgs {
-   player_id: number;
-   card: ImprovementCard;
-   cottage: CottageCard;
-   cost: { [type: string]: number }[];
-}
-
-interface ModifyDieWithLessonLearnedArgs {
-   player_id: number;
-   nbr_lesson: number;
-   die_id: number;
-   die_newvalue: number;
-}
-
-interface ModifyDieWithWildTurkey {
-   player_id: number;
-   die_val_id: number;
-   die_val_to: number;
 }

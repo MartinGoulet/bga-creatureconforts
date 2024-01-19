@@ -3236,6 +3236,15 @@ var ImprovementManager = (function (_super) {
     ImprovementManager.prototype.isOwner = function (card, player_id) {
         return this.getCardElement(card).dataset.owner == player_id.toString();
     };
+    ImprovementManager.prototype.isGuestCottage = function (card) {
+        return card.type === '7';
+    };
+    ImprovementManager.prototype.isGuestCottageFromLocation = function (locationId) {
+        var card = this.game.tableCenter.glade
+            .getCards()
+            .find(function (c) { return c.location_arg === locationId.toString(); });
+        return card && this.isGuestCottage(card);
+    };
     ImprovementManager.prototype.formatText = function (rawText) {
         if (!rawText) {
             return '';
@@ -3699,6 +3708,8 @@ var StateManager = (function () {
             playerTurnResolve: new PlayerTurnResolveState(game),
             playerTurnCraftConfort: new PlayerTurnCraftState(game),
             resolvePlayerTurnDiceManipulation: new PlayerTurnDiceManipulationState(game),
+            resolveGuestCottageGive: new ResolveGuestCottageGiveState(game),
+            resolveGuestCottageTake: new ResolveGuestCottageTakeState(game),
             resolveTraveler: new ResolveTravelerState(game),
             resolveTravelerDiscard: new ResolveTravelerDiscardState(game),
             resolveMarket: new ResolveMarketState(game),
@@ -3976,6 +3987,7 @@ var PlayerTurnDiceState = (function () {
     function PlayerTurnDiceState(game) {
         this.game = game;
         this.original_dice = [];
+        this.handles = [];
         this.diceHelper = new DiceHelper(game);
     }
     PlayerTurnDiceState.prototype.onEnteringState = function (args) {
@@ -3985,7 +3997,6 @@ var PlayerTurnDiceState = (function () {
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         this.original_dice = hill.getDice().map(function (die) { return Object.assign({}, die); });
         var handleGladeSlotClick = function (slot_id) {
-            debugger;
             var canAddDice = _this.game.tableCenter.getDiceFromLocation(Number(slot_id)).length == 0 &&
                 hill.getSelection()[0].owner_id;
             if (canAddDice) {
@@ -4022,12 +4033,19 @@ var PlayerTurnDiceState = (function () {
                     .map(function (card) { return Number(card.location_arg); })
                     .filter(function (location) { return _this.game.tableCenter.getDiceFromLocation(location).length == 0; })
                     .forEach(function (location) {
+                    var idElement = "#glade [data-slot-id=\"".concat(location, "\"]");
+                    if (_this.handles[idElement]) {
+                        document.querySelector(idElement).removeEventListener('click', _this.handles[idElement]);
+                        delete _this.handles[idElement];
+                    }
                     var el = document.querySelector("#glade [data-slot-id=\"".concat(location, "\"]"));
                     el.classList.toggle('selectable', true);
-                    el.addEventListener('click', function (ev) {
+                    var handleEvent = function (ev) {
                         ev.stopPropagation();
                         handleGladeSlotClick(Number(location));
-                    });
+                    };
+                    el.addEventListener('click', handleEvent);
+                    _this.handles[idElement] = handleEvent;
                 });
             }
         };
@@ -4046,11 +4064,18 @@ var PlayerTurnDiceState = (function () {
         dice_locations.onSlotClick = handleDiceSlotClick;
     };
     PlayerTurnDiceState.prototype.onLeavingState = function () {
+        var _this = this;
         var _a = this.game.tableCenter, hill = _a.hill, worker_locations = _a.worker_locations, dice_locations = _a.dice_locations;
         hill.setSelectionMode('none');
         hill.onSelectionChange = null;
         worker_locations.OnLocationClick = null;
         dice_locations.onDieClick = null;
+        Object.keys(this.handles).forEach(function (key) {
+            debugger;
+            var el = document.querySelector(key);
+            el.removeEventListener('click', _this.handles[key]);
+            delete _this.handles[key];
+        });
     };
     PlayerTurnDiceState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -4445,6 +4470,14 @@ var PlayerTurnResolveState = (function () {
                 },
             });
         }
+        else if (this.game.improvementManager.isGuestCottageFromLocation(locationId)) {
+            this.game.setClientState('resolveGuestCottageTake', {
+                descriptionmyturn: _("You must select one resource to take"),
+                args: {
+                    location_id: locationId,
+                },
+            });
+        }
         else {
             this.game.takeAction('resolveWorker', { location_id: locationId });
         }
@@ -4460,6 +4493,103 @@ var PlayerTurnResolveState = (function () {
         });
     };
     return PlayerTurnResolveState;
+}());
+var ResolveGuestCottageGiveState = (function () {
+    function ResolveGuestCottageGiveState(game) {
+        this.game = game;
+        this.toolbar = new ToolbarContainer('guest-cottage-give');
+    }
+    ResolveGuestCottageGiveState.prototype.onEnteringState = function (args) {
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var available = this.game.getPlayerResources(__spreadArray([], GOODS, true));
+        available.find(function (info) { return info.resource === args.take; }).initialValue += 1;
+        this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
+            from: { available: available, count: 1 },
+            to: {},
+            times: 1,
+        });
+    };
+    ResolveGuestCottageGiveState.prototype.onLeavingState = function () {
+        var _a;
+        this.toolbar.removeContainer();
+        (_a = this.resource_manager) === null || _a === void 0 ? void 0 : _a.reset();
+        this.resource_manager = null;
+    };
+    ResolveGuestCottageGiveState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var toArray = function (resources) {
+            return ResourceHelper.convertToInt(resources).join(';');
+        };
+        var handleConfirm = function () {
+            var rm = _this.resource_manager;
+            if (rm.hasTradePending() || rm.getResourcesFrom().length === 0) {
+                _this.game.showMessage(_('You have trade that was incomplete'), 'error');
+                return;
+            }
+            var data = {
+                location_id: args.location_id,
+                resources: toArray([args.take]),
+                resources2: toArray(rm.getResourcesFrom()),
+            };
+            _this.game.takeAction('resolveWorker', data);
+        };
+        var handleReset = function () {
+            _this.resource_manager.reset();
+        };
+        this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonClientCancel();
+        this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
+    };
+    return ResolveGuestCottageGiveState;
+}());
+var ResolveGuestCottageTakeState = (function () {
+    function ResolveGuestCottageTakeState(game) {
+        this.game = game;
+        this.toolbar = new ToolbarContainer('guest-cottage-take');
+    }
+    ResolveGuestCottageTakeState.prototype.onEnteringState = function (args) {
+        if (!this.game.isCurrentPlayerActive())
+            return;
+        var available = GOODS.map(function (p) {
+            return { resource: p, initialValue: 1 };
+        });
+        this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
+            from: { available: available, count: 1 },
+            to: {},
+            times: 1,
+        });
+    };
+    ResolveGuestCottageTakeState.prototype.onLeavingState = function () {
+        var _a;
+        this.toolbar.removeContainer();
+        (_a = this.resource_manager) === null || _a === void 0 ? void 0 : _a.reset();
+        this.resource_manager = null;
+    };
+    ResolveGuestCottageTakeState.prototype.onUpdateActionButtons = function (args) {
+        var _this = this;
+        var handleConfirm = function () {
+            var rm = _this.resource_manager;
+            if (rm.hasTradePending() || rm.getResourcesFrom().length === 0) {
+                _this.game.showMessage(_('You have trade that was incomplete'), 'error');
+                return;
+            }
+            _this.game.setClientState('resolveGuestCottageGive', {
+                descriptionmyturn: _("You must select one resource to give"),
+                args: {
+                    location_id: args.location_id,
+                    take: rm.getResourcesFrom()[0],
+                },
+            });
+        };
+        var handleReset = function () {
+            _this.resource_manager.reset();
+        };
+        this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirm);
+        this.game.addActionButtonClientCancel();
+        this.game.addActionButtonGray('btn_reset', _('Reset'), handleReset);
+    };
+    return ResolveGuestCottageTakeState;
 }());
 var PlayerTurnCraftState = (function () {
     function PlayerTurnCraftState(game) {
@@ -6158,6 +6288,7 @@ var NotificationManager = (function () {
             ['onAddWheelbarrow', 100],
             ['onNewTurn', 100],
             ['onFinalScoring', 3000],
+            ['onGuestCottage', 10],
         ];
         this.setupNotifications(notifs);
         ['message', 'onDrawConfort'].forEach(function (eventName) {
@@ -6429,9 +6560,7 @@ var NotificationManager = (function () {
                     case 1:
                         _b.sent();
                         return [3, 4];
-                    case 2:
-                        debugger;
-                        return [4, this.game.tableCenter.glade.addCard(card)];
+                    case 2: return [4, this.game.tableCenter.glade.addCard(card)];
                     case 3:
                         _b.sent();
                         _b.label = 4;
@@ -6487,6 +6616,14 @@ var NotificationManager = (function () {
         this.game.tableScore.displayScores(scores);
         Object.keys(scores).forEach(function (player_id) {
             _this.game.scoreCtrl[player_id].toValue(scores[player_id]['total']);
+        });
+    };
+    NotificationManager.prototype.notif_onGuestCottage = function (args) {
+        var _this = this;
+        var player_id = args.player_id, player_id2 = args.player_id2, resources = args.resources;
+        Object.keys(resources).forEach(function (type) {
+            _this.game.getPlayerPanel(player_id).counters[type].incValue(0 - resources[type]);
+            _this.game.getPlayerPanel(player_id2).counters[type].incValue(resources[type]);
         });
     };
     NotificationManager.prototype.animationMoveResource = function (player_id, resources, fromElement) {
