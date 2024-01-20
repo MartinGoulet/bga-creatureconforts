@@ -18,7 +18,11 @@ class ResolveWheelbarrowState implements StateHandler {
       };
 
       const requirement = getRequirementFrom();
-      const available = this.game.getPlayerResources(requirement as IconsType[]);
+      const available1 = this.game.getPlayerResources(requirement as IconsType[]);
+
+      const available = GOODS.map((p) => {
+         return { resource: p, initialValue: 1 } as IResourceCounterSettings<GoodsType>;
+      }).filter((info) => requirement.includes(info.resource));
 
       this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
          from: { requirement, available, count: 1 },

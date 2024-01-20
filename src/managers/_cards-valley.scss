@@ -128,10 +128,42 @@
       }
    }
 
+   &[data-card-type="6"] {
+      .dice-rule[data-pos="1"] {
+         left: calc(72px * var(--card-ratio));
+         width: calc(58px * var(--card-ratio));
+         justify-content: start;
+      }
+
+      .dice-rule[data-pos="2"] {
+         right: calc(25px * var(--card-ratio));
+         width: calc(32px * var(--card-ratio));
+      }
+   }
+
+   &[data-card-type="7"] {
+      .dice-rule[data-pos="1"] {
+         left: calc(74px * var(--card-ratio));
+         width: calc(56px * var(--card-ratio));
+      }
+   }
+
    &[data-card-type="11"] {
       .dice-rule[data-pos="4"] {
          right: calc(32px * var(--card-ratio));
          width: calc(38px * var(--card-ratio));
+      }
+   }
+
+   &[data-card-type="14"] {
+      .dice-rule[data-pos="3"] {
+         left: calc(82px * var(--card-ratio));
+         width: calc(45px * var(--card-ratio));
+      }
+
+      .dice-rule[data-pos="4"] {
+         right: calc(26px * var(--card-ratio));
+         width: calc(30px * var(--card-ratio));
       }
    }
 }

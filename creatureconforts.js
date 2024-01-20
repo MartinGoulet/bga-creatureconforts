@@ -3354,7 +3354,7 @@ var ValleyManager = (function (_super) {
             TOTAL_5_OR_LOWER: _('TOTAL 5 OR LOWER'),
             TOTAL_6_OR_LOWER: _('TOTAL 6 OR LOWER'),
             TOTAL_7_OR_HIGHER: _('TOTAL 7 OR HIGHER'),
-            TOTAL_10_OR_HIGHER: _('TOTAL_10 OR HIGHER'),
+            TOTAL_10_OR_HIGHER: _('TOTAL 10 OR HIGHER'),
             TOTAL_11_OR_HIGHER: _('TOTAL 11 OR HIGHER'),
             ALL_EVEN: _('ALL EVEN'),
             ALL_ODD: _('ALL ODD'),
@@ -4057,7 +4057,7 @@ var PlacementState = (function () {
         };
         if (!this.game.isSpectator) {
             if (this.game.isCurrentPlayerActive()) {
-                this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirmPlacement);
+                this.game.addActionButton('btn_confirm', _('Confirm'), handleConfirmPlacement);
                 this.game.addActionButtonGray('btn_cancel', _('Reset'), handleCancelLocal);
             }
             else {
@@ -5189,7 +5189,10 @@ var ResolveWheelbarrowState = (function () {
             return Object.keys(valley_info.resources).filter(function (res) { return GOODS.includes(res); });
         };
         var requirement = getRequirementFrom();
-        var available = this.game.getPlayerResources(requirement);
+        var available1 = this.game.getPlayerResources(requirement);
+        var available = GOODS.map(function (p) {
+            return { resource: p, initialValue: 1 };
+        }).filter(function (info) { return requirement.includes(info.resource); });
         this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
             from: { requirement: requirement, available: available, count: 1 },
             to: {},
@@ -5616,6 +5619,7 @@ var TravelerGrayWolfState = (function () {
     TravelerGrayWolfState.prototype.onLeavingState = function () {
         var market = this.game.tableCenter.confort_market;
         market.setSelectionMode('none');
+        market.setSelectableCards([]);
         market.onSelectionChange = null;
     };
     TravelerGrayWolfState.prototype.onUpdateActionButtons = function (args) {

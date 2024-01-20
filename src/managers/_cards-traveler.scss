@@ -103,20 +103,26 @@
             height: 30px;
          }
 
-         &[data-type=any] {
-            transform: translateY(-4px);
-            zoom: 0.45;
-         }
+         // &[data-type=any] {
+         //    transform: translateY(-4px);
+         //    zoom: 0.45;
+         // }
 
          &[data-type=different] {
+            --width-icon: calc(8px * var(--card-ratio));
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle fill='black' cx='12' cy='12' r='11' /%3E%3Cpath fill='white' d='M18 9.998H6a1 1 0 1 1 0-2h12a1 1 0 0 1 0 2zm0 6H6a1 1 0 0 1 0-2h12a1 1 0 0 1 0 2z'/%3E%3Cpath fill='white' d='M14.999 5H15c.507.219.742.806.525 1.314l-5.212 12.162A.999.999 0 0 1 9 19a1.002 1.002 0 0 1-.525-1.314l5.212-12.162A.999.999 0 0 1 15 5z'/%3E%3C/svg%3E");
             zoom: unset;
-            width: 8px;
-            height: 8px;
-            background-size: 8px 8px;
+            width: var(--width-icon);
+            height: var(--width-icon);
+            background-size: var(--width-icon) var(--width-icon);
             margin: 0px -4px 0;
-            z-index: 10;
          }
       }
+   }
+}
+
+#modal-display {
+   .card.traveler .gametext .resource-icon[data-type=different] {
+      transform: translateY(-2px);
    }
 }

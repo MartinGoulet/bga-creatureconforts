@@ -14,6 +14,7 @@ class TravelerGrayWolfState implements StateHandler {
    onLeavingState(): void {
       const market = this.game.tableCenter.confort_market;
       market.setSelectionMode('none');
+      market.setSelectableCards([]);
       market.onSelectionChange = null;
    }
 

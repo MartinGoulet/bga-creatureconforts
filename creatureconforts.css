@@ -1798,18 +1798,18 @@ body > .bga-dice_die {
   zoom: 0.4;
   height: 30px;
 }
-.card.traveler .gametext .resource-icon[data-type=any] {
-  transform: translateY(-4px);
-  zoom: 0.45;
-}
 .card.traveler .gametext .resource-icon[data-type=different] {
+  --width-icon: calc(8px * var(--card-ratio));
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle fill='black' cx='12' cy='12' r='11' /%3E%3Cpath fill='white' d='M18 9.998H6a1 1 0 1 1 0-2h12a1 1 0 0 1 0 2zm0 6H6a1 1 0 0 1 0-2h12a1 1 0 0 1 0 2z'/%3E%3Cpath fill='white' d='M14.999 5H15c.507.219.742.806.525 1.314l-5.212 12.162A.999.999 0 0 1 9 19a1.002 1.002 0 0 1-.525-1.314l5.212-12.162A.999.999 0 0 1 15 5z'/%3E%3C/svg%3E");
   zoom: unset;
-  width: 8px;
-  height: 8px;
-  background-size: 8px 8px;
+  width: var(--width-icon);
+  height: var(--width-icon);
+  background-size: var(--width-icon) var(--width-icon);
   margin: 0px -4px 0;
-  z-index: 10;
+}
+
+#modal-display .card.traveler .gametext .resource-icon[data-type=different] {
+  transform: translateY(-2px);
 }
 
 .card.valley {
@@ -1939,9 +1939,30 @@ body > .bga-dice_die {
   width: calc(58px * var(--card-ratio));
   justify-content: start;
 }
+.card.valley[data-card-type="6"] .dice-rule[data-pos="1"] {
+  left: calc(72px * var(--card-ratio));
+  width: calc(58px * var(--card-ratio));
+  justify-content: start;
+}
+.card.valley[data-card-type="6"] .dice-rule[data-pos="2"] {
+  right: calc(25px * var(--card-ratio));
+  width: calc(32px * var(--card-ratio));
+}
+.card.valley[data-card-type="7"] .dice-rule[data-pos="1"] {
+  left: calc(74px * var(--card-ratio));
+  width: calc(56px * var(--card-ratio));
+}
 .card.valley[data-card-type="11"] .dice-rule[data-pos="4"] {
   right: calc(32px * var(--card-ratio));
   width: calc(38px * var(--card-ratio));
+}
+.card.valley[data-card-type="14"] .dice-rule[data-pos="3"] {
+  left: calc(82px * var(--card-ratio));
+  width: calc(45px * var(--card-ratio));
+}
+.card.valley[data-card-type="14"] .dice-rule[data-pos="4"] {
+  right: calc(26px * var(--card-ratio));
+  width: calc(30px * var(--card-ratio));
 }
 
 .bga-dice_die.colored-die[data-color=yellow] .bga-dice_die-face {

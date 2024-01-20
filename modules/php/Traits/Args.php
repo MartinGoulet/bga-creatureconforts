@@ -115,24 +115,24 @@ trait Args {
     }
 
     function argCommonLoon() {
-        $current_player_id = $this->getCurrentPlayerId();
-        $left_player_id = Game::get()->getPrevPlayerTable()[$current_player_id];
-        $workers = Worker::getWorkersFromPlayer($left_player_id);
-        $worker = array_shift($workers);
+        $info = [];
+        foreach (self::loadPlayersBasicInfos() as $player_id => $player) {
+            $pId = intval($player_id);
+            $left_player_id = Game::get()->getPrevPlayerTable()[$player_id];
+            $workers = Worker::getWorkersFromPlayer($left_player_id);
+            $worker = array_shift($workers);
+            $info[$pId] = [
+                'otherplayer' => Game::get()->getPlayerNameById($left_player_id),
+                'otherplayer_id' => $left_player_id,
+                'locations' => Globals::getWorkerPlacement($player_id),
+                'locations_unavailable' => [],
+                'workers' => [$worker],
+                "wheelbarrow" => 0,
+                "wheelbarrow_count" => 0,
+            ];
+        }
 
-        return [
-            'otherplayer' => Game::get()->getPlayerNameById($left_player_id),
-            'otherplayer_id' => $left_player_id,
-            '_private' => [
-                $current_player_id => [
-                    'locations' => Globals::getWorkerPlacement($current_player_id),
-                    'locations_unavailable' => [],
-                    'workers' => [$worker],
-                    "wheelbarrow" => 0,
-                    "wheelbarrow_count" => 0,
-                ]
-            ]
-        ];
+        return ['_private' => $info];
     }
 
     function argCommonRaven() {

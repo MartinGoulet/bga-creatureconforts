@@ -47,7 +47,7 @@ class ValleyManager extends CardManager<ValleyCard> {
          TOTAL_5_OR_LOWER: _('TOTAL 5 OR LOWER'),
          TOTAL_6_OR_LOWER: _('TOTAL 6 OR LOWER'),
          TOTAL_7_OR_HIGHER: _('TOTAL 7 OR HIGHER'),
-         TOTAL_10_OR_HIGHER: _('TOTAL_10 OR HIGHER'),
+         TOTAL_10_OR_HIGHER: _('TOTAL 10 OR HIGHER'),
          TOTAL_11_OR_HIGHER: _('TOTAL 11 OR HIGHER'),
          // TOTAL_7: _('TOTAL 7'),
          // TOTAL_8: _('TOTAL 8'),

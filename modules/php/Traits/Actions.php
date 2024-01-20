@@ -183,6 +183,15 @@ trait Actions {
     }
 
     function resolveWorker(int $location_id, array $resources, array $resources2, array $card_ids, int $option) {
+        // var_dump([
+        //     'location_id' => $location_id,
+        //     'resources' => $resources,
+        //     'resource2' => $resources2,
+        //     'card_ids' => $card_ids,
+        //     'option' => $option,
+        // ]);
+        // throw new BgaUserException('ok');
+
         $player_id = $this->getActivePlayerId();
 
         $dice = Dice::getDiceInLocation($location_id);
@@ -305,15 +314,17 @@ trait Actions {
         throw new BgaUserException("Not implemented yet");
     }
 
-    private function resolveWheelbarrow(int $location_id, $resources) {
-        $wheelbarrow = Globals::getWheelbarrow($location_id);
+    private function resolveWheelbarrow(int $location_id, array $resources) {
+        $wheelbarrow = Globals::getWheelbarrow(Players::getPlayerId());
         if ($wheelbarrow == $location_id) {
             if (sizeof($resources) !== 1) {
                 throw new BgaUserException("You have to choose a resource for wheelbarrow");
             }
+            $converted_resources = ResourcesHelper::convertNumberToResource($resources);
+            $group = ResourcesHelper::groupByType($converted_resources);
             Globals::setWheelbarrow(Players::getPlayerId(), 0);
-            Players::addResources(Players::getPlayerId(), $resources);
-            Notifications::getResourceFromWheelbarrow($location_id, $resources);
+            Players::addResources(Players::getPlayerId(), $group);
+            Notifications::getResourceFromWheelbarrow($location_id, $group);
         }
     }
 
