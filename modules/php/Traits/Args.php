@@ -166,4 +166,10 @@ trait Args {
 
         return $args;
     }
+
+    function argBicycle() {
+        $workers = Worker::getWorkersFromPlayer(Players::getPlayerId());
+        $location_ids = array_map(fn ($card) => intval($card['location_arg']), $workers);
+        return ['location_ids' => array_values($location_ids)];
+    }
 }

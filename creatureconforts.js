@@ -5495,16 +5495,16 @@ var ImprovementBicycleState = (function () {
     function ImprovementBicycleState(game) {
         this.game = game;
     }
-    ImprovementBicycleState.prototype.onEnteringState = function (args) {
+    ImprovementBicycleState.prototype.onEnteringState = function (_a) {
         var _this = this;
+        var location_ids = _a.location_ids;
         if (!this.game.isCurrentPlayerActive())
             return;
         var worker_locations = this.game.tableCenter.worker_locations;
-        this.available = worker_locations.getCards().map(function (worker) { return worker.location_arg; });
-        worker_locations.setSelectableLocation(this.available);
+        worker_locations.setSelectableLocation(location_ids);
         worker_locations.OnLocationClick = function (slotId) {
             if (worker_locations.isSelectedLocation(slotId)) {
-                _this.reset();
+                _this.reset(location_ids);
             }
             else {
                 worker_locations.setSelectedLocation([slotId]);
@@ -5520,27 +5520,30 @@ var ImprovementBicycleState = (function () {
         worker_locations.setSelectableLocation();
         worker_locations.OnLocationClick = undefined;
     };
-    ImprovementBicycleState.prototype.onUpdateActionButtons = function (args) {
+    ImprovementBicycleState.prototype.onUpdateActionButtons = function (_a) {
         var _this = this;
+        var location_ids = _a.location_ids;
         var handleConfirm = function () {
             var selectedSlotId = _this.game.tableCenter.worker_locations.getSelectedLocation();
             if (selectedSlotId.length !== 1)
                 return;
+            var min = TravelerHelper.isActivePineMarten() ? 3 : 1;
             _this.game.setClientState('resolveBicycleDestination', {
                 descriptionmyturn: _('${you} must select a destination for your worker'),
                 args: {
                     location_from: Number(selectedSlotId[0]),
+                    locations: arrayRange(min, 12).filter(function (loc) { return !location_ids.includes(loc); }),
                 },
             });
         };
         this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
         this.game.addActionButtonPass(true);
-        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(); });
+        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(location_ids); });
     };
-    ImprovementBicycleState.prototype.reset = function () {
+    ImprovementBicycleState.prototype.reset = function (location_ids) {
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectedLocation();
-        worker_locations.setSelectableLocation(this.available);
+        worker_locations.setSelectableLocation(location_ids);
         this.game.disableButton('btn_confirm');
         this.game.disableButton('btn_reset');
     };
@@ -5550,21 +5553,19 @@ var ImprovementBicycleDestinationState = (function () {
     function ImprovementBicycleDestinationState(game) {
         this.game = game;
     }
-    ImprovementBicycleDestinationState.prototype.onEnteringState = function (args) {
+    ImprovementBicycleDestinationState.prototype.onEnteringState = function (_a) {
         var _this = this;
+        var location_from = _a.location_from, locations = _a.locations;
         if (!this.game.isCurrentPlayerActive())
             return;
         document
-            .querySelector("#worker-locations [data-slot-id=\"".concat(args.location_from, "\"]"))
+            .querySelector("#worker-locations [data-slot-id=\"".concat(location_from, "\"]"))
             .classList.add('remainder');
         var worker_locations = this.game.tableCenter.worker_locations;
-        var unavailable = worker_locations.getCards().map(function (worker) { return worker.location_arg; });
-        var min = TravelerHelper.isActivePineMarten() ? 3 : 1;
-        this.available = arrayRange(min, 12).filter(function (loc) { return !unavailable.includes(loc.toString()); });
-        worker_locations.setSelectableLocation(this.available);
+        worker_locations.setSelectableLocation(locations);
         worker_locations.OnLocationClick = function (slotId) {
             if (worker_locations.isSelectedLocation(slotId)) {
-                _this.reset();
+                _this.reset(locations);
             }
             else {
                 worker_locations.setSelectedLocation([slotId]);
@@ -5583,7 +5584,7 @@ var ImprovementBicycleDestinationState = (function () {
     };
     ImprovementBicycleDestinationState.prototype.onUpdateActionButtons = function (_a) {
         var _this = this;
-        var location_from = _a.location_from;
+        var location_from = _a.location_from, locations = _a.locations;
         var handleConfirm = function () {
             var locations = _this.game.tableCenter.worker_locations.getSelectedLocation();
             if (locations.length !== 1)
@@ -5591,13 +5592,13 @@ var ImprovementBicycleDestinationState = (function () {
             _this.game.takeAction('confirmBicycle', { location_from: location_from, location_to: Number(locations[0]) });
         };
         this.game.addActionButtonDisabled('btn_confirm', _('Confirm'), handleConfirm);
-        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(); });
+        this.game.addActionButtonDisabled('btn_reset', _('Reset'), function () { return _this.reset(locations); });
         this.game.addActionButtonClientCancel();
     };
-    ImprovementBicycleDestinationState.prototype.reset = function () {
+    ImprovementBicycleDestinationState.prototype.reset = function (location_ids) {
         var worker_locations = this.game.tableCenter.worker_locations;
         worker_locations.setSelectedLocation();
-        worker_locations.setSelectableLocation(this.available);
+        worker_locations.setSelectableLocation(location_ids);
         this.game.disableButton('btn_confirm');
         this.game.disableButton('btn_reset');
     };

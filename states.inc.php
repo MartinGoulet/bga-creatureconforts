@@ -241,6 +241,7 @@ $improvementStates = [
         "descriptionmyturn" => clienttranslate('Bicycle : ${you} may move one of your workers to a different location'),
         "description" => clienttranslate('Bycicle : ${actplayer} may move one of his workers to a different location'),
         "type" => "activeplayer",
+        "args" => "argBicycle",
         "possibleactions" => ["confirmBicycle", "pass"],
         "transitions" => [
             "next" => ST_PLAYER_TURN_DICE,
