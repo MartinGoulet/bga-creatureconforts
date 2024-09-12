@@ -54,6 +54,8 @@ class PlacementState implements StateHandler {
       deck.setSelectableLocation([]);
       deck.setSelectedLocation([]);
       deck.OnLocationClick = null;
+      this.locations = [];
+      this.original_workers = [];
    }
 
    onUpdateActionButtons(args: any): void {

@@ -294,6 +294,8 @@
          left: 514px;
          box-shadow: 0 0 5px 4px #fff;
          border-radius: 50%;
+         transition-duration: 0.8s;
+         transition-property: transform;
 
          @for $pos from 0 through 5 {
             &[data-position='#{$pos + 1}'] {

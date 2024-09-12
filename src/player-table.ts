@@ -36,7 +36,7 @@ class PlayerTable {
             : '';
 
       const html = `
-         <div id="player-table-${this.player_id}" class="player-table player-color-${this.player_color}" style="--player-color: #${player.color}" ${dataset}>
+         <div id="player-table-${this.player_id}" class="player-table player-color-${this.player_color}" style="--player-color: #${player.color}; --player-color-bg: #${player.color}11" ${dataset}>
             <div id="player-table-${this.player_id}-name" class="name-wrapper">${player.name}</div>
             <div class="cols">
                <div class="col">

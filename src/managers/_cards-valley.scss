@@ -148,6 +148,13 @@
       }
    }
 
+   &[data-card-type="8"] {
+      .dice-rule[data-pos="2"] {
+         right: calc(25px * var(--card-ratio));
+         width: calc(40px * var(--card-ratio));
+      }
+   }
+
    &[data-card-type="11"] {
       .dice-rule[data-pos="4"] {
          right: calc(32px * var(--card-ratio));
@@ -164,6 +171,13 @@
       .dice-rule[data-pos="4"] {
          right: calc(26px * var(--card-ratio));
          width: calc(30px * var(--card-ratio));
+      }
+   }
+
+   &[data-card-type="18"] {
+      .dice-rule[data-pos="4"] {
+         right: calc(26px * var(--card-ratio));
+         width: calc(40px * var(--card-ratio));
       }
    }
 }

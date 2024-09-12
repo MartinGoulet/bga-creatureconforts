@@ -157,13 +157,15 @@ class Notifications extends \APP_DbObject {
     }
 
     static function getResourceFromWheelbarrow(int $location_id, array $resources) {
-        $message = clienttranslate('${player_name} get ${resources_to} from wheelbarrow');
+        $message = clienttranslate('${player_name} get ${resources_to} from ${card_name}');
         self::notifyAll('onGetResourcesFromLocation', $message, [
             'player_id' => Players::getPlayerId(),
             'player_name' => self::getPlayerName(Players::getPlayerId()),
             'location_id' => $location_id,
             'resources' => $resources,
             'resources_to' => $resources,
+            'card_name' => clienttranslate("Wheelbarrow"),
+            'i18n' => ['card_name']
         ]);
     }
 

@@ -4034,6 +4034,8 @@ var PlacementState = (function () {
         deck.setSelectableLocation([]);
         deck.setSelectedLocation([]);
         deck.OnLocationClick = null;
+        this.locations = [];
+        this.original_workers = [];
     };
     PlacementState.prototype.onUpdateActionButtons = function (args) {
         var _this = this;
@@ -4592,7 +4594,7 @@ var PlayerTurnResolveState = (function () {
         }
         else if (wheelbarrow === locationId) {
             this.game.setClientState('resolveWheelbarrow', {
-                descriptionmyturn: _("You must select one card in the Owl's Nest"),
+                descriptionmyturn: _("You must select one good for your wheelbarrow"),
                 args: {
                     location_id: locationId,
                 },
@@ -5189,12 +5191,11 @@ var ResolveWheelbarrowState = (function () {
             return Object.keys(valley_info.resources).filter(function (res) { return GOODS.includes(res); });
         };
         var requirement = getRequirementFrom();
-        var available1 = this.game.getPlayerResources(requirement);
         var available = GOODS.map(function (p) {
             return { resource: p, initialValue: 1 };
         }).filter(function (info) { return requirement.includes(info.resource); });
         this.resource_manager = new ResourceManagerPayFor(this.toolbar.addContainer(), {
-            from: { requirement: requirement, available: available, count: 1 },
+            from: { available: available, count: 1 },
             to: {},
             times: 1,
         });
@@ -6874,7 +6875,7 @@ var PlayerTable = (function () {
         var resourceManager = this.game.getPlayerId() === Number(player.id)
             ? "<div id=\"player-table-".concat(this.player_id, "-resources\" class=\"icons counters\"></div>")
             : '';
-        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n                     <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n                  </div>\n                  ").concat(resourceManager, "\n                  <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n               </div>\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-improvement\" class=\"player-table-improvement\"></div>\n                  <div id=\"player-table-").concat(this.player_id, "-comfort\" class=\"player-table-comfort\"></div>\n               </div>\n            </div>\n         </div>");
+        var html = "\n         <div id=\"player-table-".concat(this.player_id, "\" class=\"player-table player-color-").concat(this.player_color, "\" style=\"--player-color: #").concat(player.color, "; --player-color-bg: #").concat(player.color, "11\" ").concat(dataset, ">\n            <div id=\"player-table-").concat(this.player_id, "-name\" class=\"name-wrapper\">").concat(player.name, "</div>\n            <div class=\"cols\">\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-board\" class=\"player-table-board\">\n                     <div id=\"player-table-").concat(this.player_id, "-dice\" class=\"player-table-dice\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-cottage\" class=\"player-table-cottage\"></div>\n                     <div id=\"player-table-").concat(this.player_id, "-worker\" class=\"player-table-worker\"></div>\n                  </div>\n                  ").concat(resourceManager, "\n                  <div id=\"player-table-").concat(this.player_id, "-hand\"></div>\n               </div>\n               <div class=\"col\">\n                  <div id=\"player-table-").concat(this.player_id, "-improvement\" class=\"player-table-improvement\"></div>\n                  <div id=\"player-table-").concat(this.player_id, "-comfort\" class=\"player-table-comfort\"></div>\n               </div>\n            </div>\n         </div>");
         var destination = this.game.getPlayerId() == this.player_id ? 'current-player-table' : 'tables';
         document.getElementById(destination).insertAdjacentHTML('beforeend', html);
     };
@@ -7125,7 +7126,7 @@ var TableScore = (function () {
             if (row === '')
                 return "<td></td>";
             var score = scores[pId][row];
-            return "<td>\n            <div id=\"score-".concat(pId, "-").concat(row, "\">").concat(score, "</div>\n            <i class=\"fa fa-star\"></id>\n         </td>");
+            return "<td>\n            <div id=\"score-".concat(pId, "-").concat(row, "\">").concat(score, "</div>\n            <i class=\"fa fa-star\"></i>\n         </td>");
         });
         return this.getScoreRow(row, title, columns);
     };

@@ -67,7 +67,7 @@ class TableScore {
          const score = scores[pId][row];
          return `<td>
             <div id="score-${pId}-${row}">${score}</div>
-            <i class="fa fa-star"></id>
+            <i class="fa fa-star"></i>
          </td>`;
       });
 

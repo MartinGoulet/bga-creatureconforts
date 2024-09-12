@@ -3,7 +3,8 @@
    padding: 10px 0 30px;
    border-radius: 8px;
    border: 4px solid var(--player-color);
-   background-color: hsla(0, 0%, 100%, 0.4);
+   // background-color: hsla(0, 0%, 100%, 0.4);
+   background-color: var(--player-color-bg);
    position: relative;
 
    .name-wrapper {
